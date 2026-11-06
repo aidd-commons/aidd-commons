@@ -1,5 +1,11 @@
 # Acknowledgements
 
+## Project contributors
+
+- [Guanxing Chen (@gxCaesar)](https://github.com/gxCaesar) — project contributor and repository owner.
+
+## Open ecosystem
+
 AIDD Commons builds on a substantial open education, software, data, and scientific literature ecosystem. The project particularly acknowledges:
 
 - TeachOpenCADD for demonstrating a modular, notebook-based route through computer-aided drug design;
