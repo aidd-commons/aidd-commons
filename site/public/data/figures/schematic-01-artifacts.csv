@@ -1,0 +1,10 @@
+﻿Object / relation,Source label / relation identity
+artifact-name-0,Learn
+artifact-name-1,Atlas
+artifact-name-2,Labs
+artifact-name-3,Report
+relation,correction-to-artifact-0
+relation,correction-to-artifact-1
+relation,correction-to-artifact-2
+relation,correction-to-artifact-3
+relation,shared-identifier-rail

@@ -26,6 +26,8 @@ export default defineConfig({
     },
     {
       name: "mobile-chromium",
+      // This file owns its explicit viewport and DPR matrix.
+      testIgnore: ["**/figure-details-accessibility.spec.ts"],
       use: { ...devices["Pixel 7"], channel: "chrome" },
     },
   ],

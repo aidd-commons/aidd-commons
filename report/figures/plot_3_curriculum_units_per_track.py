@@ -6,7 +6,7 @@ file holds eighteen tracks, each with its ordered lessons, and a flat list of
 120 learning units, each carrying the track it belongs to and one of three
 layers.
 
-What the figure shows. The aligned count matrix separates learning units
+What the figure shows. The stacked count bars separate learning units
 by layer: core, research and practice. A separate last column counts lessons per
 track, because a unit is attached to a lesson and the two counts are not the
 same thing. The tracks are in curriculum order, so the figure reads as the
@@ -22,14 +22,16 @@ learning.
 from __future__ import annotations
 
 import sys
-from collections import Counter
 from pathlib import Path
+
+from matplotlib.ticker import MaxNLocator
 
 _HERE = Path(__file__).resolve().parent
 if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 import figure_style as style  # noqa: E402  (the module sits next to this script)
+from plot_data import load_plot_data  # noqa: E402
 
 FIGURE_NUMBER = 3
 STEM = "plot_3_curriculum_units_per_track"
@@ -38,75 +40,125 @@ LAYER_COLOUR = {"core": "teal", "research": "coral", "practice": "slate"}
 
 CAPTION = (
     "Curriculum units per track across the {tracks} tracks, split by layer, beside the number of "
-    "lessons in each track. The curriculum holds {units} learning units in {lessons} lessons, "
+    "lessons in each track. Stacked segments count core, research and practice units, with zero "
+    "practice counts labelled explicitly; separate lollipops count lessons. The curriculum holds "
+    "{units} learning units in {lessons} lessons, "
     "{layers}. A unit is a learning objective attached to a lesson, so the two counts differ, and "
     "neither one says how long a track takes or whether a learner reaches its end."
 )
+
+
+def load_data() -> dict:
+    """Return the complete canonical population used by print and web."""
+    return load_plot_data(FIGURE_NUMBER, read_json=style.load_json, read_yaml=style.load_yaml)
 
 
 def build() -> dict[str, Path]:
     """Separate unit layers from lesson counts on a shared track alignment."""
     style.apply_style("light")
     tokens, colours = style.tokens(), style.categorical()
-    registry = style.load_yaml(style.REPO_ROOT / "catalog/curriculum/tracks.yaml")
-    tracks = sorted(registry["tracks"], key=lambda t: t["order"])
-    counts = {t["id"]: Counter() for t in tracks}
-    for unit in registry["units"]:
-        counts[unit["track_id"]][unit["layer"]] += 1
-    fig = style.figure(height=6.45)
+    data = load_data()
+    registry, tracks, counts = data["registry"], data["tracks"], data["counts"]
+    fig = style.figure(height=7.4)
     style.heading(
         fig,
         "Learning units and lessons are different objects",
-        (
-            f"{len(tracks)} tracks · {len(registry['units'])} declared learning units · "
-            f"curriculum order"
-        ),
+        f"{len(tracks)} tracks · {len(registry['units'])} learning units · curriculum order",
     )
-    ax = fig.add_axes((0.39, 0.11, 0.56, 0.69))
+    ax = fig.add_axes((0.39, 0.12, 0.38, 0.68))
+    lessons_ax = fig.add_axes((0.84, 0.12, 0.12, 0.68))
     ys = list(range(len(tracks)))[::-1]
-    for y, t in zip(ys, tracks, strict=True):
-        ax.axhline(y, color=tokens["rule"], lw=0.45, zorder=0)
-        for x, layer in enumerate(LAYERS):
-            n = counts[t["id"]][layer]
+    totals = [sum(counts[t["id"]].values()) for t in tracks]
+    from matplotlib.patches import Patch
+
+    handles = []
+    for index, layer in enumerate(LAYERS):
+        colour = LAYER_COLOUR[layer]
+        values = [counts[t["id"]][layer] for t in tracks]
+        left = [sum(counts[t["id"]][previous] for previous in LAYERS[:index]) for t in tracks]
+        bars = ax.barh(
+            ys,
+            values,
+            left=left,
+            height=0.64,
+            color=style.fill_colours()[colour],
+            edgecolor=colours[colour],
+            linewidth=0.65,
+            hatch=style.atlas_palette.HATCH[colour],
+        )
+        for bar, n in zip(bars, values, strict=True):
             if n:
-                ax.scatter(
-                    x,
-                    y,
-                    s=30 + 35 * n,
-                    facecolor=style.fill_colours()[LAYER_COLOUR[layer]],
-                    edgecolor=colours[LAYER_COLOUR[layer]],
-                    linewidth=0.85,
-                    marker=style.markers()[LAYER_COLOUR[layer]],
-                    zorder=2,
+                ax.text(
+                    bar.get_x() + bar.get_width() / 2,
+                    bar.get_y() + bar.get_height() / 2,
+                    str(n),
+                    ha="center",
+                    va="center",
+                    fontsize=10.0,
+                    fontweight="bold",
                 )
-            ax.text(
-                x, y, str(n), ha="center", va="center", fontsize=8.4, fontweight="bold", zorder=3
+        handles.append(
+            Patch(
+                facecolor=style.fill_colours()[colour],
+                edgecolor=colours[colour],
+                hatch=style.atlas_palette.HATCH[colour],
+                label=layer.title(),
             )
-        lessons = len(t["lessons"])
-        ax.text(3.25, y, str(lessons), ha="center", va="center", fontweight="bold", fontsize=9)
-    ax.axvline(2.62, color=tokens["rule"], lw=0.8)
-    ax.set_xticks([0, 1, 2, 3.25], ["Core", "Research", "Practice", "Lessons"])
-    ax.xaxis.tick_top()
-    ax.tick_params(length=0, pad=10)
+        )
+    for y, track, total in zip(ys, tracks, totals, strict=True):
+        if counts[track["id"]]["practice"] == 0:
+            ax.annotate(
+                "Practice 0",
+                (total, y),
+                xytext=(6, 0),
+                textcoords="offset points",
+                ha="left",
+                va="center",
+                fontsize=10,
+                color=colours["slate"],
+            )
+    lesson_values = [len(t["lessons"]) for t in tracks]
+    for y, n in zip(ys, lesson_values, strict=True):
+        lessons_ax.plot([0, n], [y, y], color=colours["slate"], lw=1.6)
+        lessons_ax.plot(
+            n, y, marker="D", ms=5.5, color=colours["slate"], mec=tokens["ink"], mew=0.5
+        )
+        lessons_ax.annotate(
+            str(n),
+            (n, y),
+            xytext=(6, 0),
+            textcoords="offset points",
+            ha="left",
+            va="center",
+            fontsize=10.0,
+            fontweight="bold",
+        )
     ax.set_yticks(ys, style.track_labels([t["id"] for t in tracks]))
-    ax.tick_params(axis="y", pad=10)
-    ax.set_xlim(-0.5, 3.7)
-    ax.set_ylim(-0.7, len(tracks) - 0.3)
-    for s in ax.spines.values():
-        s.set_visible(False)
-    ax.text(
-        0.26,
-        1.08,
-        "Learning units by layer",
-        transform=ax.transAxes,
-        ha="center",
-        fontsize=9.2,
-        fontweight="bold",
+    lessons_ax.set_yticks(ys, [])
+    for axis in (ax, lessons_ax):
+        axis.set_ylim(-0.7, len(tracks) - 0.3)
+        style.clean_axis(axis)
+        axis.xaxis.set_major_locator(MaxNLocator(nbins=4, integer=True))
+    ax.set_xlim(0, max(totals) * 1.04)
+    lessons_ax.set_xlim(0, max(lesson_values) * 1.35)
+    ax.set_xlabel("Learning units")
+    lessons_ax.set_xlabel("Lessons")
+    style.title(ax, "(a) Units by layer")
+    style.title(lessons_ax, "(b) Lessons")
+    fig.legend(
+        handles=handles,
+        loc="upper left",
+        bbox_to_anchor=(0.38, 0.885),
+        ncol=3,
+        columnspacing=1.3,
+        handlelength=1.4,
+        fontsize=10.0,
     )
     style.footnote(
         fig,
         (
-            "Numbers give exact counts; symbol area reinforces unit count. Neither units "
+            "Stacked segments give exact unit counts; the separate alignment counts lessons. "
+            "Neither units "
             "nor lessons measure reader learning."
         ),
     )

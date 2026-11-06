@@ -6,10 +6,11 @@ rows carry one of three observed depths (worked, executable, assessed) and, for
 every row that has a runnable task, the basis that task rests on (real-data or
 authored).
 
-What the figure shows. The first three columns count each track's topics by
-observed depth. Depth is an ordered quantity, so it takes the palette's
-ordered ladder, pale for worked and dark for assessed. The final two columns
-separate runnable topics by what their runnable task rests on. A task that computes
+What the figure shows. The left stacked bars count each track's topics by
+highest observed depth, assigning each topic to one mutually exclusive depth.
+Depth is an ordered quantity, so it takes the palette's
+ordered ladder, pale for worked and dark for assessed. The separate right stacked bars
+partition runnable topics by what their runnable task rests on. A task that computes
 on measured records, or that runs a real simulation, docking or structure
 prediction, rests on real data; a task that runs on hand-written or synthetic
 inputs rests on authored inputs. The audit counts an executable-on-real-data
@@ -26,14 +27,16 @@ zero-openness or zero-quality interpretation.
 from __future__ import annotations
 
 import sys
-from collections import Counter, defaultdict
 from pathlib import Path
+
+from matplotlib.ticker import MaxNLocator
 
 _HERE = Path(__file__).resolve().parent
 if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 import figure_style as style  # noqa: E402  (the module sits next to this script)
+from plot_data import load_plot_data  # noqa: E402
 
 FIGURE_NUMBER = 4
 STEM = "plot_4_depth_distribution_per_track"
@@ -43,111 +46,145 @@ BASES = ["real-data", "authored"]
 BASE_COLOUR = {"real-data": "ember", "authored": "slate"}
 
 CAPTION = (
-    "Observed depth per track for this project's {topics} audited topics, beside the basis each "
+    "Highest observed depth per track for this project's {topics} audited topics, "
+    "beside the basis each "
     "track's runnable topics rest on. {depths}, and of the {runnable} runnable topics {bases}. "
-    "Depth records what a reviewer observed in the material, not what a learner achieved."
+    "Each topic appears once in the highest-depth stack; the separate run-basis stack partitions "
+    "runnable topics. Depth records what a reviewer observed in the material, not what a learner "
+    "achieved."
 )
 
 
+def load_data() -> dict:
+    """Return the complete canonical population used by print and web."""
+    return load_plot_data(FIGURE_NUMBER, read_json=style.load_json, read_yaml=style.load_yaml)
+
+
 def build() -> dict[str, Path]:
-    """Retain all depth and run-basis counts without stacked-bar ambiguity."""
+    """Separate mutually exclusive highest depths from runnable-basis counts."""
     style.apply_style("light")
     tokens, colours = style.tokens(), style.categorical()
-    payload = style.load_json(style.DATA_DIR / "comparison.v1.json")
-    rows = [r for r in payload["rows"] if r["provider_id"] == SELF_ID]
-    order = []
-    depth_by_track = defaultdict(Counter)
-    base_by_track = defaultdict(Counter)
-    for row in sorted(rows, key=lambda r: r["track_order"]):
-        track = row["track_id"]
-        if track not in depth_by_track:
-            order.append(track)
-        depth_by_track[track][row["depth"]] += 1
-        if row["run_basis"]:
-            base_by_track[track][row["run_basis"]] += 1
-    fig = style.figure(height=6.45)
+    data = load_data()
+    rows, order = data["rows"], data["order"]
+    depth_by_track, base_by_track = data["depth_by_track"], data["base_by_track"]
+    fig = style.figure(height=7.4)
     style.heading(
         fig,
         "Observed depth and the basis of runnable work",
-        f"{len(rows)} historical topics · material observations, not learner achievements",
+        f"{len(rows)} historical topics · highest observed depth, not learner achievement",
     )
-    ax = fig.add_axes((0.39, 0.12, 0.57, 0.68))
+    ax = fig.add_axes((0.39, 0.12, 0.32, 0.68))
+    basis_ax = fig.add_axes((0.78, 0.12, 0.18, 0.68))
     ys = list(range(len(order)))[::-1]
-    for y, track in zip(ys, order, strict=True):
-        ax.axhline(y, color=tokens["rule"], lw=0.45, zorder=0)
-        for x, depth in enumerate(DEPTHS):
-            n = depth_by_track[track][depth]
+    from matplotlib.patches import Patch
+
+    depth_handles, basis_handles = [], []
+    ladder = style.ladder_steps("light", 3)
+    for index, depth in enumerate(DEPTHS):
+        values = [depth_by_track[t][depth] for t in order]
+        left = [sum(depth_by_track[t][d] for d in DEPTHS[:index]) for t in order]
+        hatch = ["//", "xx", "\\"][index]
+        bars = ax.barh(
+            ys,
+            values,
+            left=left,
+            height=0.64,
+            color=ladder[index],
+            edgecolor=tokens["ink"],
+            linewidth=0.6,
+            hatch=hatch,
+        )
+        for bar, n in zip(bars, values, strict=True):
             if n:
-                ax.scatter(
-                    x,
-                    y,
-                    s=30 + 12 * n,
-                    facecolor=style.ladder_steps("light", 3)[x],
-                    edgecolor=tokens["ink"],
-                    linewidth=0.55,
-                    marker=["o", "s", "D"][x],
-                )
-            ax.text(
-                x,
-                y,
-                str(n),
-                ha="center",
-                va="center",
-                fontsize=8.2,
-                color=tokens["panel"] if x == 2 and n else tokens["ink"],
-                fontweight="bold" if n else "normal",
-            )
-        if not sum(base_by_track[track].values()):
-            ax.text(
-                3.55,
-                y,
-                "no runnable topic",
-                ha="center",
-                va="center",
-                fontsize=8.0,
-                color=tokens["muted"],
-            )
-        else:
-            for x, basis in zip([3.1, 4.0], BASES, strict=True):
-                n = base_by_track[track][basis]
                 ax.text(
-                    x,
-                    y,
+                    bar.get_x() + bar.get_width() / 2,
+                    bar.get_y() + bar.get_height() / 2,
                     str(n),
                     ha="center",
                     va="center",
+                    fontsize=10.0,
                     fontweight="bold",
-                    fontsize=9,
-                    color=colours[BASE_COLOUR[basis]],
+                    color=tokens["panel"] if index == 2 else tokens["ink"],
                 )
-    ax.axvline(2.55, color=tokens["rule"], lw=0.8)
-    ax.set_xticks(
-        [0, 1, 2, 3.1, 4.0], ["Worked", "Executable", "Assessed", "Real data", "Authored"]
-    )
-    ax.xaxis.tick_top()
-    ax.tick_params(length=0, pad=10)
+        depth_handles.append(
+            Patch(
+                facecolor=ladder[index], edgecolor=tokens["ink"], hatch=hatch, label=depth.title()
+            )
+        )
+    for index, basis in enumerate(BASES):
+        colour = BASE_COLOUR[basis]
+        values = [base_by_track[t][basis] for t in order]
+        left = [sum(base_by_track[t][b] for b in BASES[:index]) for t in order]
+        bars = basis_ax.barh(
+            ys,
+            values,
+            left=left,
+            height=0.64,
+            color=style.fill_colours()[colour],
+            edgecolor=colours[colour],
+            linewidth=0.6,
+            hatch=style.atlas_palette.HATCH[colour],
+        )
+        for bar, n in zip(bars, values, strict=True):
+            if n:
+                basis_ax.text(
+                    bar.get_x() + bar.get_width() / 2,
+                    bar.get_y() + bar.get_height() / 2,
+                    str(n),
+                    ha="center",
+                    va="center",
+                    fontsize=10.0,
+                    fontweight="bold",
+                )
+        basis_handles.append(
+            Patch(
+                facecolor=style.fill_colours()[colour],
+                edgecolor=colours[colour],
+                hatch=style.atlas_palette.HATCH[colour],
+                label="Real data" if basis == "real-data" else "Authored",
+            )
+        )
+    for y, track in zip(ys, order, strict=True):
+        if not sum(base_by_track[track].values()):
+            basis_ax.text(
+                0.02,
+                y,
+                "No runnable topic",
+                transform=basis_ax.get_yaxis_transform(),
+                va="center",
+                fontsize=10.0,
+                color=tokens["muted"],
+            )
     ax.set_yticks(ys, style.track_labels(order))
-    ax.tick_params(axis="y", pad=10)
-    ax.set_xlim(-0.5, 4.5)
-    ax.set_ylim(-0.7, len(order) - 0.3)
-    for s in ax.spines.values():
-        s.set_visible(False)
-    ax.text(
-        0.27,
-        1.08,
-        "Topics by observed depth",
-        transform=ax.transAxes,
-        ha="center",
-        fontweight="bold",
+    basis_ax.set_yticks(ys, [])
+    maximum = max(sum(depth_by_track[t].values()) for t in order)
+    ax.set_xlim(0, maximum * 1.04)
+    basis_ax.set_xlim(0, maximum * 1.04)
+    for axis in (ax, basis_ax):
+        axis.set_ylim(-0.7, len(order) - 0.3)
+        axis.set_xlabel("Topics")
+        axis.xaxis.set_major_locator(MaxNLocator(nbins=4, integer=True))
+        style.clean_axis(axis)
+    style.title(ax, "(a) Highest observed depth")
+    style.title(basis_ax, "(b) Runnable basis")
+    fig.legend(
+        handles=depth_handles,
+        loc="upper left",
+        bbox_to_anchor=(0.38, 0.885),
+        ncol=3,
+        columnspacing=0.6,
+        handletextpad=0.3,
+        handlelength=1.0,
         fontsize=9.2,
     )
-    ax.text(
-        0.82,
-        1.08,
-        "Runnable basis",
-        transform=ax.transAxes,
-        ha="center",
-        fontweight="bold",
+    fig.legend(
+        handles=basis_handles,
+        loc="upper left",
+        bbox_to_anchor=(0.76, 0.885),
+        ncol=2,
+        handlelength=0.9,
+        handletextpad=0.25,
+        columnspacing=0.5,
         fontsize=9.2,
     )
     style.footnote(

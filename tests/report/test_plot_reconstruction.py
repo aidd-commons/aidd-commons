@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib
 import json
 import sys
 import unittest
@@ -18,6 +19,8 @@ import matplotlib.pyplot as plt  # noqa: E402
 import plot_2_coverage_bounds as coverage  # noqa: E402
 import plot_8_freesolv_split_calibration as freesolv  # noqa: E402
 import plot_10_acquisition_policy_recovery as acquisition  # noqa: E402
+from matplotlib.text import Text  # noqa: E402
+from plot_data import load_plot_data  # noqa: E402
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 
@@ -176,6 +179,88 @@ class PlotReconstructionTests(unittest.TestCase):
                 ValueError, "CHEMBL5736995 maxmin missing recovery checkpoint"
             ):
                 acquisition.build()
+
+    def test_all_shared_populations_serialize_without_nonfinite_numbers(self):
+        for number in range(1, 14):
+            data = load_plot_data(number)
+            json.dumps(data, allow_nan=False)
+            self.assertEqual(data["source"]["plot"], number)
+            self.assertFalse(data["source"]["new_experiment"])
+            self.assertTrue(data["source"]["paths"])
+
+    def test_unit_and_highest_depth_stacks_keep_all_tracks_and_zero_practice(self):
+        for number, keys in (
+            (3, ("core", "research", "practice")),
+            (4, ("worked", "executable", "assessed")),
+        ):
+            module = importlib.import_module(
+                next((ROOT / "report/figures").glob(f"plot_{number}_*.py")).stem
+            )
+            data = module.load_data()
+            tracks = [track["id"] for track in data["tracks"]] if number == 3 else data["order"]
+            counts = data["counts"] if number == 3 else data["depth_by_track"]
+
+            def inspect(fig, tracks=tracks, keys=keys, counts=counts, number=number):
+                self.assertEqual(len(tracks), 18)
+                for bars, key in zip(fig.axes[0].containers, keys, strict=True):
+                    self.assertEqual(
+                        [bar.get_width() for bar in bars], [counts[track][key] for track in tracks]
+                    )
+                if number == 3:
+                    self.assertEqual(
+                        sum(text.get_text() == "Practice 0" for text in fig.axes[0].texts), 2
+                    )
+                else:
+                    self.assertEqual(sum(sum(counts[track].values()) for track in tracks), 93)
+
+            self.inspect(module, inspect)
+
+    def test_openness_keeps_every_cell_and_four_state_denominator(self):
+        data = load_plot_data(6)
+        self.assertEqual(sum(len(cells) for cells in data["cells"].values()), 70)
+        for kind, cells in data["cells"].items():
+            for cell in cells.values():
+                self.assertEqual(set(cell["states"]), set(data["states"]))
+                self.assertEqual(sum(cell["states"].values()), data["totals"][kind])
+                self.assertEqual(
+                    cell["applicable"], cell["total"] - cell["states"]["not_applicable"]
+                )
+
+    def test_shared_loader_rejects_duplicate_bounds_and_unknown_access(self):
+        defects = fixture("plot-shared-data-defects.json")
+        payload = style.load_json(style.DATA_DIR / "comparison.v1.json")
+        payload["summaries"].append(
+            payload["summaries"][
+                defects["duplicate_coverage_interval"]["duplicate_summary_index"]
+            ].copy()
+        )
+        with self.assertRaisesRegex(ValueError, "duplicate coverage interval"):
+            load_plot_data(2, read_json=lambda _: payload)
+        resources = style.load_json(style.DATA_DIR / "resources.v1.json")
+        defect = defects["unrecognized_access_level"]
+        resources[defect["record_index"]]["access_level"]["value"] = defect["value"]
+        with self.assertRaisesRegex(ValueError, "unexpected access level"):
+            load_plot_data(7, read_json=lambda _: resources)
+
+    def test_all_print_masters_keep_native_width_and_inserted_type_floor(self):
+        for path in sorted((ROOT / "report/figures").glob("plot_[0-9]*.py")):
+            module = importlib.import_module(path.stem)
+
+            def inspect(fig, path=path):
+                self.assertAlmostEqual(fig.get_size_inches()[0] * 25.4, 180.0, 8)
+                fig.canvas.draw()
+                for text in fig.findobj(Text):
+                    if text.get_visible() and text.get_text():
+                        self.assertGreaterEqual(
+                            text.get_fontsize(), 8.9, (path.stem, text.get_text())
+                        )
+                for ax in fig.axes:
+                    for label in (ax.xaxis.label, ax.yaxis.label, ax.title):
+                        if label.get_text():
+                            self.assertGreaterEqual(label.get_fontsize(), 10)
+                plt.close(fig)
+
+            self.inspect(module, inspect)
 
 
 if __name__ == "__main__":

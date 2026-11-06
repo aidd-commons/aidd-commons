@@ -1,4 +1,5 @@
 ---
+import {plotFraction, valueAtPlotFraction} from "../lib/scientific-plot";
 export interface PlotPoint { x: number; y: number; label?: string }
 export interface PlotSeries {
   name: string;
@@ -18,14 +19,16 @@ interface Props {
   yMin?: number;
   yMax?: number;
   xTicks?: number[];
+  xScale?: "linear" | "log";
   yTicks?: number[];
+  yTickLabels?: string[];
   scatter?: boolean;
   chinese?: boolean;
   showTable?: boolean;
   /** Related plots inspect the nearest retained x together; their axes stay independent. */
   syncGroup?: string;
 }
-const { title, xLabel, yLabel, series, xMin = 0, xMax = 1, yMin = 0, yMax = 1, xTicks, yTicks, scatter = false, chinese = false, showTable = true, syncGroup } = Astro.props;
+const { title, xLabel, yLabel, series, xMin = 0, xMax = 1, yMin = 0, yMax = 1, xTicks, yTicks, yTickLabels, xScale = "linear", scatter = false, chinese = false, showTable = true, syncGroup } = Astro.props;
 if (![xMin, xMax, yMin, yMax].every(Number.isFinite) || xMax <= xMin || yMax <= yMin) {
   throw new Error("ScientificPlot requires finite, increasing axis limits: " + title);
 }
@@ -33,15 +36,17 @@ if (series.some(line => line.points.some(point => !Number.isFinite(point.x) || !
   throw new Error("ScientificPlot cannot display a non-finite source value: " + title);
 }
 const palette = ["var(--atlas-teal)", "var(--atlas-coral)", "var(--atlas-ink)", "var(--atlas-muted)", "var(--atlas-teal-deep)"];
-const px = (x: number) => 100 * (x - xMin) / (xMax - xMin);
+const px = (x: number) => 100 * plotFraction(x, xMin, xMax, xScale);
 const py = (y: number) => 100 * (y - yMin) / (yMax - yMin);
 const fractions = [0, .25, .5, .75, 1];
-const horizontalTicks = xTicks ?? fractions.map(fraction => xMin + fraction * (xMax - xMin));
+const horizontalTicks = xTicks ?? fractions.map(fraction => valueAtPlotFraction(fraction, xMin, xMax, xScale));
 const verticalTicks = yTicks ?? fractions.map(fraction => yMin + fraction * (yMax - yMin));
 if (horizontalTicks.some(value => !Number.isFinite(value) || value < xMin || value > xMax) || verticalTicks.some(value => !Number.isFinite(value) || value < yMin || value > yMax)) {
   throw new Error("ScientificPlot ticks must lie inside their axis limits: " + title);
 }
 const tick = (value: number) => Number(value.toPrecision(3)).toString();
+// Validate every source x even for a disconnected or single-point series.
+series.forEach(line => line.points.forEach(point => px(point.x)));
 const color = (line: PlotSeries, index: number) => line.color ?? palette[index % palette.length];
 const marker = (line: PlotSeries, index: number) => ((line.marker ?? index) % 7 + 7) % 7;
 // The table, initial download and marks share the same source series. Filtering is display-only.
@@ -53,13 +58,13 @@ const rows = series.flatMap((line, index) => line.points.map((point, pointIndex)
 const csvCell = (value: string) => '"' + value.replaceAll('"', '""') + '"';
 const csv = [headers, ...rows.map(row => row.cells)].map(row => row.map(csvCell).join(",")).join("\r\n");
 ---
-<div class="science-plot not-content" data-science-plot data-chinese={chinese ? "true" : "false"} data-plot-series={JSON.stringify(series)} data-x-label={xLabel} data-y-label={yLabel} data-x-min={xMin} data-x-max={xMax} data-sync-group={syncGroup}>
+<div class="science-plot not-content" data-science-plot data-chinese={chinese ? "true" : "false"} data-plot-series={JSON.stringify(series)} data-x-label={xLabel} data-y-label={yLabel} data-x-min={xMin} data-x-max={xMax} data-x-scale={xScale} data-sync-group={syncGroup} style={yTickLabels?{"--plot-axis":"5.2rem"}:undefined}>
   <p class="science-plot__title">{title}</p>
   <div class="science-plot__workspace"><div class="science-plot__chart">
   <p class="science-plot__quantity">{yLabel}</p>
   <div class="science-plot__body" data-plot-surface role="group" aria-label={title + ". " + yLabel + "; " + xLabel}>
     <div class="science-plot__cursor" data-plot-cursor hidden aria-hidden="true" />
-    {verticalTicks.map(value => <div class="science-plot__grid" style={{ bottom: py(value) + "%" }}><span>{tick(value)}</span></div>)}
+    {verticalTicks.map((value,index) => <div class="science-plot__grid" style={{ bottom: py(value) + "%" }}><span>{yTickLabels?.[index] ?? tick(value)}</span></div>)}
     {horizontalTicks.map(value => <div class="science-plot__vertical" style={{ left: px(value) + "%" }} />)}
     {series.map((line, index) => (
       <div class="science-plot__series" style={{ "--series-color": color(line, index) }} data-series={line.name} data-series-index={index}>
@@ -100,7 +105,7 @@ const csv = [headers, ...rows.map(row => row.cells)].map(row => row.map(csvCell)
   {showTable && <details class="science-plot__table"><summary>{chinese ? "查看所示数据的表格" : "Read displayed data as a table"} <span data-plot-row-count>({rows.length})</span></summary><div class="science-table-scroll" tabindex="0" role="region" aria-label={title + (chinese ? "数据表" : " data table")}><table><caption>{title} · {chinese ? "与图中所示序列一致；保留源值精度" : "Matches the displayed series; source precision retained"}</caption><thead><tr>{headers.map(header => <th scope="col">{header}</th>)}</tr></thead><tbody>{rows.map(row => <tr data-series-row={row.index} data-point-row={row.pointIndex}>{row.cells.map((cell, index) => index === 0 ? <th scope="row">{cell}</th> : <td>{cell}</td>)}</tr>)}</tbody></table></div></details>}
 </div>
 <script>
-  import {retainedXValues,nearestRetainedX,pointsAtNearestX,readablePlotValue} from "../lib/scientific-plot";
+  import {retainedXValues,nearestRetainedX,pointsAtNearestX,readablePlotValue,plotFraction,valueAtPlotFraction,type PlotScale} from "../lib/scientific-plot";
   interface SourcePoint { x: number; y: number; label?: string }
   interface SourceSeries { name: string; points: SourcePoint[] }
   function initializeScientificPlots() {
@@ -122,7 +127,7 @@ const csv = [headers, ...rows.map(row => row.cells)].map(row => row.map(csvCell)
       const csvCell = (value: string) => '"' + value.replaceAll('"', '""') + '"';
       const visible = () => new Set(toggles.filter(button => button.getAttribute("aria-pressed") === "true").map(button => Number(button.dataset.seriesToggle)));
       function inspect(x: number, announce = false) {
-        const retained = nearestRetainedX(xs,x);
+        const retained = nearestRetainedX(xs,x,root.dataset.xScale as PlotScale);
         if (retained === undefined) return;
         selectedX = retained;
         range.value = String(xs.indexOf(selectedX));
@@ -133,7 +138,7 @@ const csv = [headers, ...rows.map(row => row.cells)].map(row => row.map(csvCell)
         const exactValues=[`${root.dataset.xLabel}: ${selectedX}`];
         const shown = visible();
         cursor.hidden = !shown.size;
-        cursor.style.left = `${100 * (selectedX - Number(root.dataset.xMin)) / (Number(root.dataset.xMax)-Number(root.dataset.xMin))}%`;
+        cursor.style.left = `${100 * plotFraction(selectedX,Number(root.dataset.xMin),Number(root.dataset.xMax),root.dataset.xScale as PlotScale)}%`;
         values.replaceChildren();
         root.querySelectorAll<HTMLElement>("[data-point-index], [data-point-row]").forEach(node => node.classList.remove("is-inspected"));
         series.forEach((line,index) => {
@@ -200,7 +205,7 @@ const csv = [headers, ...rows.map(row => row.cells)].map(row => row.map(csvCell)
       });
       surface.addEventListener("click", event => {
         const bounds = surface.getBoundingClientRect();
-        const x = Number(root.dataset.xMin) + (event.clientX-bounds.left)/bounds.width * (Number(root.dataset.xMax)-Number(root.dataset.xMin));
+        const x = valueAtPlotFraction((event.clientX-bounds.left)/bounds.width,Number(root.dataset.xMin),Number(root.dataset.xMax),root.dataset.xScale as PlotScale);
         inspect(x,true);
       });
       root.addEventListener("science-plot-select-x", event => inspect((event as CustomEvent<{x:number}>).detail.x));

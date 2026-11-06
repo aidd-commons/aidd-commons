@@ -38,111 +38,14 @@ if str(_HERE) not in sys.path:
 
 import figure_style as style  # noqa: E402  (the module sits next to this script)
 from figure_sources import catalogue_projection  # noqa: E402
+from plot_data import load_plot_data  # noqa: E402
 
 FIGURE_NUMBER = 7
 STEM = "plot_7_access_and_licence"
 
 #: Licence layers, most permissive first. The order is also the order of
 #: restriction used when a record carries more than one licence.
-LICENCE_LAYERS: list[tuple[str, list[str]]] = [
-    (
-        "Public domain dedication",
-        [
-            "CC0",
-            "CC0 1.0",
-            "CC0 1.0 Universal",
-            "CC0-1.0",
-            "United States Government work, public domain",
-        ],
-    ),
-    (
-        "Permissive software licence",
-        ["MIT", "Apache-2.0", "BSD-3-Clause", "BSD-2-Clause", "New BSD"],
-    ),
-    (
-        "Creative Commons attribution",
-        [
-            "CC-BY-4.0",
-            "CC BY 4.0",
-            "CC BY-4.0",
-            "Creative Commons Attribution 4.0 International",
-            "Creative Commons Attribution 4.0 International Public License",
-        ],
-    ),
-    (
-        "Copyleft",
-        [
-            "GPL-3.0",
-            "GPL-2.0",
-            "GPL-2.0 with clarifying addendum",
-            "LGPL-2.1",
-            "MPL-2.0",
-            "GNU Affero General Public License v3",
-            "CC BY-SA 4.0",
-            "Creative Commons Attribution-ShareAlike 3.0 Unported",
-        ],
-    ),
-    (
-        "Creative Commons non-commercial",
-        [
-            "CC BY-NC 4.0",
-            "CC-BY-NC-ND-4.0",
-            # The share-alike variant is non-commercial first. It adds a
-            # share-alike condition, and the non-commercial restriction is the
-            # one that decides what a reader may do with the artefact.
-            "CC BY-NC-SA 4.0",
-        ],
-    ),
-    (
-        "Other stated terms",
-        [
-            # MACE's ASL checkpoints carry an academic non-commercial licence,
-            # not Apache-2.0 or a permissive software grant.
-            "ASL",
-            # A vendor's own open model licence, published as its own terms
-            # rather than as a variant of a standard licence.
-            "NVIDIA Open Model License",
-            # A specification offered under a community specification licence
-            # together with an attribution licence, published as its own terms.
-            "Community-Spec-1.0 with CC-BY-3.0",
-            # A data portal's own use terms, and an academic licence that
-            # permits research use and withholds commercial use. Both are
-            # published terms rather than variants of a standard licence.
-            "DepMap Portal Data Terms and Conditions",
-            "DrugBank Academic License",
-            # A portal's own data licence, published as its own terms: it
-            # charges nothing and restricts no use, but it does require an
-            # acknowledgement and that redistributed products say whether
-            # they carry the most current data.
-            "GTEx Portal Data License",
-            # Apache-2.0 conditioned by the Commons Clause v1.0. The clause
-            # withholds the right to sell the software, so the grant is not the
-            # permissive one.
-            "Apache-2.0 with Commons Clause v1.0",
-            "EMBL-EBI Terms of Use",
-            "Polaris Platform Agreement",
-            "The scFoundation License",
-            "Other (Open)",
-            "Proprietary, no open-source licence",
-            # PIE checkpoints use Arc's custom model terms, separate from the
-            # repository's Creative Commons source-code licence.
-            "Arc Research Institute PIE Model Non-Commercial License",
-        ],
-    ),
-]
-NO_LICENCE = "No licence recorded"
-
-#: Access levels, most open first. The order is a presentational one; the
-#: counts are not.
-ACCESS_ORDER = [
-    "open_weights",
-    "open_source",
-    "source_available",
-    "research_only",
-    "gated",
-    "closed",
-    "unverified",
-]
+from plot_data import ACCESS_ORDER, LICENCE_LAYERS, NO_LICENCE, licence_layer  # noqa: E402
 
 
 def caption(
@@ -172,25 +75,23 @@ def caption(
 
 
 def _licence_layer(names: list[str]) -> str:
-    """The most restrictive layer among a record's licences."""
-    rank = {name: index for index, (_, members) in enumerate(LICENCE_LAYERS) for name in members}
-    unknown = [name for name in names if name not in rank]
-    if unknown:
-        raise KeyError(f"licence names without a layer: {unknown}")
-    return LICENCE_LAYERS[max(rank[name] for name in names)][0]
+    """The shared most-restrictive stated layer, preserving the public helper."""
+    return licence_layer(names)
+
+
+def load_data() -> dict:
+    """Return the complete canonical population used by print and web."""
+    return load_plot_data(FIGURE_NUMBER, read_json=style.load_json, read_yaml=style.load_yaml)
 
 
 def build() -> dict[str, Path]:
     """Expose access and licence counts on separate full-width alignments."""
     style.apply_style("light")
     tokens, colours = style.tokens(), style.categorical()
-    resources = style.load_json(style.DATA_DIR / "resources.v1.json")
-    access_counts = Counter(r["access_level"]["value"] for r in resources)
-    layer_counts = Counter()
-    for record in resources:
-        names = [licence["name"] for licence in record.get("licenses", [])]
-        layer_counts[_licence_layer(names) if names else NO_LICENCE] += 1
-    fig = style.figure(height=6.5)
+    data = load_data()
+    resources = data["resources"]
+    access_counts, layer_counts = Counter(data["access_counts"]), Counter(data["layer_counts"])
+    fig = style.figure(height=7.2)
     style.heading(
         fig,
         "Access and stated licence answer different questions",
@@ -240,7 +141,7 @@ def build() -> dict[str, Path]:
                 transform=ax.get_yaxis_transform(),
                 ha="right",
                 va="center",
-                fontsize=8.8,
+                fontsize=10.0,
                 fontweight="bold",
             )
             ax.text(
@@ -250,7 +151,7 @@ def build() -> dict[str, Path]:
                 transform=ax.get_yaxis_transform(),
                 ha="right",
                 va="center",
-                fontsize=8.4,
+                fontsize=10.0,
                 color=tokens["muted"],
             )
         ax.set_yticks(ys, names)
@@ -266,7 +167,7 @@ def build() -> dict[str, Path]:
             "Count",
             transform=ax.transAxes,
             ha="right",
-            fontsize=8,
+            fontsize=10.0,
             color=tokens["muted"],
         )
         ax.text(
@@ -275,7 +176,7 @@ def build() -> dict[str, Path]:
             "Share",
             transform=ax.transAxes,
             ha="right",
-            fontsize=8,
+            fontsize=10.0,
             color=tokens["muted"],
         )
     style.footnote(

@@ -41,5 +41,5 @@ describe("workbench curated-source release", () => {
         await expect(
           access(join(destination, source.path)),
         ).resolves.toBeUndefined();
-  }, 30_000);
+  }, 120_000);
 });

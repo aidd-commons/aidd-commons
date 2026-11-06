@@ -610,7 +610,7 @@ def native_master_sources() -> list[Path]:
         root / "catalog/curriculum/tracks.yaml",
         root / "catalog/resources/model-img2mol.yaml",
         root / "catalog/resources/dataset-polaris-adme.yaml",
-        root / "report/aidd-commons-living-report-v0.1.md",
+        root / "report/aidd-commons-living-report-v0.2.md",
         root / "docs/PROJECT_CHARTER.md",
         root / "docs/EDITORIAL_GUIDE.md",
         root / "docs/RESOURCE_SCHEMA.md",
@@ -684,9 +684,11 @@ def validate_native_master(stem: str) -> dict[str, Path]:
         slide = ET.fromstring(package.read("ppt/slides/slide1.xml"))
         named_text = {}
         shape_names = set()
+        shapes_by_name = {}
         for shape in slide.findall(".//p:sp", ns):
             name = shape.find("p:nvSpPr/p:cNvPr", ns).get("name")
             shape_names.add(name)
+            shapes_by_name[name] = shape
             named_text[name] = "\n".join("".join(t.text or "" for t in para.findall(".//a:t", ns)) for para in shape.findall("p:txBody/a:p", ns))
         for name, expected in contract["native_texts"].items():
             if normalize(named_text.get(name, "")) != normalize(expected):
@@ -699,7 +701,10 @@ def validate_native_master(stem: str) -> dict[str, Path]:
             actual_dashed = dash is not None and dash.get("val") not in (None, "solid")
             if actual_dashed != (name in contract["dashed_connectors"]):
                 errors.append(f"native connector line style differs: {name}")
-            if name != "shared-identifier-rail" and connector.find("p:spPr/a:ln/a:tailEnd", ns) is None:
+            if (
+                name not in contract.get("non_directional_connectors", ["shared-identifier-rail"])
+                and connector.find("p:spPr/a:ln/a:tailEnd", ns) is None
+            ):
                 errors.append(f"native directional arrowhead is missing: {name}")
         if connector_names != set(contract["native_connectors"]):
             errors.append("native connector names differ from the authored source graph")
@@ -707,6 +712,26 @@ def validate_native_master(stem: str) -> dict[str, Path]:
             actual = {name for name in shape_names if re.fullmatch(r"(?:prerequisite-\d+-\d+|core-includes-\d+)", name)}
             if actual != set(contract["relation_marks"]):
                 errors.append("native prerequisite/core inclusion marks differ from current YAML")
+        for name in contract.get("required_markers", []):
+            marker = shapes_by_name.get(name)
+            fill = marker.find("p:spPr/a:solidFill/a:srgbClr", ns) if marker is not None else None
+            if fill is None or fill.get("val", "").upper() != "FFFFFF":
+                errors.append(f"required-field marker is not hollow: {name}")
+        for name, shape in shapes_by_name.items():
+            if not named_text[name].strip():
+                continue
+            sizes = [
+                int(node.get("sz")) / 100
+                for node in shape.findall(".//a:defRPr", ns) + shape.findall(".//a:rPr", ns)
+                if node.get("sz")
+            ]
+            minimum = (
+                contract.get("major_minimum_font_pt", 10)
+                if name in contract.get("major_native_texts", [])
+                else contract.get("minimum_font_pt", 8.9)
+            )
+            if not sizes or min(sizes) < minimum - 0.01:
+                errors.append(f"native text below required font floor: {name}")
         relationships = ET.fromstring(package.read("ppt/slides/_rels/slide1.xml.rels"))
         targets = {item.get("Id"): item.get("Target") for item in relationships}
         actual_images = {}

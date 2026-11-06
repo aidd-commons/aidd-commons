@@ -29,9 +29,11 @@ PAGES = {
     "/zh-cn/": REPO_ROOT / "site/src/pages/zh-cn/index.astro",
     "/": REPO_ROOT / "site/src/pages/index.astro",
     "/audit/": REPO_ROOT / "site/src/pages/audit/index.astro",
+    "/zh-cn/audit/": REPO_ROOT / "site/src/pages/zh-cn/audit/index.astro",
     "/labs/": REPO_ROOT / "site/src/pages/labs/index.astro",
     "/zh-cn/labs/": REPO_ROOT / "site/src/pages/zh-cn/labs/index.astro",
     "/report/": REPO_ROOT / "site/src/pages/report/index.astro",
+    "/zh-cn/report/": REPO_ROOT / "site/src/pages/zh-cn/report/index.astro",
 }
 
 
@@ -274,6 +276,45 @@ def check_delivery(
     return problems
 
 
+def check_web_metadata(item: dict[str, Any], directory: Path) -> list[str]:
+    """Check responsive products and identities against the actual report sequence."""
+    name = item.get("id", "?")
+    problems = []
+    source = (REPO_ROOT / "report/aidd-commons-living-report-v0.2.md").read_text(encoding="utf-8")
+    order = {}
+    chapter = ""
+    for line in source.splitlines():
+        if line.startswith("# "):
+            chapter = re.sub(r"\s+", "-", re.sub(r"[^\w\s-]", "", line[2:].lower()).strip())
+        match = re.search(r"\(figures/out/([a-z0-9_-]+)\.pdf\)", line)
+        if match:
+            order[match.group(1).replace("_", "-")] = (len(order) + 1, chapter)
+    stem = item.get("source_stem", "").replace("_", "-")
+    expected = order.get(stem)
+    if expected != (item.get("reportNumber"), item.get("chapterAnchor")):
+        problems.append(f"{name}: report number/chapter differs from canonical report order")
+    if item.get("detailHref") != f"/report/figures/{stem}/":
+        problems.append(f"{name}: detail route differs from its stable library id")
+    for width in (480, 960):
+        filename = item.get("previews", {}).get(str(width))
+        if filename != f"{stem}-{width}.webp":
+            problems.append(f"{name}: missing source-bound {width}px WebP preview")
+            continue
+        path = directory / filename
+        if not path.is_file() or path.is_symlink():
+            problems.append(f"{name}: {filename} is not a regular preview file")
+            continue
+        try:
+            with Image.open(path) as preview:
+                height = round(item["height"] * width / item["width"])
+                if preview.format != "WEBP" or preview.size != (width, height):
+                    problems.append(f"{name}: {width}px preview format/dimensions are invalid")
+                preview.verify()
+        except (OSError, ValueError, SyntaxError) as error:
+            problems.append(f"{name}: WebP preview cannot be decoded: {error}")
+    return problems
+
+
 def check_library(
     library: list[dict[str, Any]],
     directory: Path,
@@ -290,6 +331,7 @@ def check_library(
     observed: set[str] = set()
     for item in library:
         name = item.get("id", "?")
+        problems.extend(check_web_metadata(item, directory))
         problems.extend(check_delivery(item, directory, captions, schematics, require_pages=False))
         if name in seen:
             problems.append(f"{name}: duplicate library id")
@@ -308,6 +350,10 @@ def check_library(
             problems.append(f"{name}: library title/source note is missing")
         if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", item.get("visual_revision_date", "")):
             problems.append(f"{name}: visual revision date is invalid")
+        if item.get("visualRevision") != item.get("visual_revision_date"):
+            problems.append(f"{name}: visual revision aliases disagree")
+        if item.get("sourceDate") != max(item.get("source_dates", []), default=None):
+            problems.append(f"{name}: source date differs from retained source dates")
         for field, suffix in (("file", ".png"), ("pdf", ".pdf")):
             delivered = directory / str(item.get(field, ""))
             source = source_directory / f"{stem}{suffix}"
@@ -338,11 +384,17 @@ def check_library(
                         "p": "http://schemas.openxmlformats.org/presentationml/2006/main",
                         "a": "http://schemas.openxmlformats.org/drawingml/2006/main",
                     }
-                    if not all(
-                        slide.find(f".//{tag}", ns) is not None for tag in ("p:sp", "a:t", "p:pic")
-                    ):
+                    if not all(slide.find(f".//{tag}", ns) is not None for tag in ("p:sp", "a:t")):
+                        problems.append(f"{name}: PPTX lacks native text/shapes")
+                    native_sources = str(REPO_ROOT / "report/figures")
+                    if native_sources not in sys.path:
+                        sys.path.insert(0, native_sources)
+                    from schematic_style import _native_source_contracts
+
+                    required_images = _native_source_contracts()[stem]["native_contract"]["images"]
+                    if len(slide.findall(".//p:pic", ns)) != len(required_images):
                         problems.append(
-                            f"{name}: PPTX lacks native text/shapes or separate illustrations"
+                            f"{name}: native illustration count differs from source contract"
                         )
                     package.read("ppt/presentation.xml")
             except (OSError, KeyError, zipfile.BadZipFile, ET.ParseError):
@@ -368,6 +420,7 @@ def check_manifest() -> list[str]:
     ids: set[str] = set()
     for figure in figures:
         problems.extend(check_delivery(figure, FIGURE_DIR, captions, schematics))
+        problems.extend(check_web_metadata(figure, FIGURE_DIR))
         name = figure.get("id", "?")
         if name in ids:
             problems.append(f"{name}: duplicate figure id")
@@ -378,9 +431,10 @@ def check_manifest() -> list[str]:
         if not generator.is_file():
             problems.append(f"{name}: source generator does not exist")
     problems.extend(check_placements(figures, PAGES, REPO_ROOT / "site/src"))
-    problems.extend(
-        check_library(payload.get("library", []), FIGURE_DIR, REPORT_OUT, captions, schematics)
-    )
+    library = payload.get("library", [])
+    problems.extend(check_library(library, FIGURE_DIR, REPORT_OUT, captions, schematics))
+    if [item.get("reportNumber") for item in library] != list(range(1, 21)):
+        problems.append("figure library must follow canonical report order 1 through 20")
     # Ordinary builds validate current native labels, relationships and embedded
     # illustration sources without regenerating or loading the authoring runtime.
     os.environ.setdefault("MPLCONFIGDIR", str(REPO_ROOT / ".cache/matplotlib"))

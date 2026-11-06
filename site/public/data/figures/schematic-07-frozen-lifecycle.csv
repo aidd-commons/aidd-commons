@@ -1,0 +1,13 @@
+﻿Object / relation,Source label / relation identity
+lifecycle-name-0,Protocol freeze
+lifecycle-name-1,Structural pretest
+lifecycle-name-2,Finite-output pretest
+lifecycle-name-3,One-time opening
+lifecycle-name-4,Reviewed summary
+relation,lifecycle-order-1
+relation,lifecycle-order-2
+relation,lifecycle-order-3
+relation,lifecycle-order-4
+relation,pretest-development-return
+relation,pretest-return-drop
+relation,posttest-invalidating-error

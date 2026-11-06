@@ -1,0 +1,14 @@
+[
+  {
+    "kind": "filled_required_marker",
+    "shape_name": "contract-0-field-0-required",
+    "value": "008A86",
+    "expected_diagnostic": "required-field marker is not hollow: contract-0-field-0-required"
+  },
+  {
+    "kind": "undersized_major_label",
+    "shape_name": "contract-title-0",
+    "value": 950,
+    "expected_diagnostic": "native text below required font floor: contract-title-0"
+  }
+]

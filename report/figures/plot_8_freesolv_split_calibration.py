@@ -33,6 +33,7 @@ if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 import figure_style as style  # noqa: E402  (the module sits next to this script)
+from plot_data import load_plot_data  # noqa: E402
 
 FIGURE_NUMBER = 8
 STEM = "plot_8_freesolv_split_calibration"
@@ -58,20 +59,18 @@ def _group_centre(split_index: int) -> float:
     return split_index * (len(SERIES) + GROUP_GAP) + (len(SERIES) - 1) / 2
 
 
+def load_data() -> dict:
+    """Return the complete canonical population used by print and web."""
+    return load_plot_data(FIGURE_NUMBER, read_json=style.load_json, read_yaml=style.load_yaml)
+
+
 def build() -> dict[str, Path]:
     """Pair the two frozen splits within each model and metric."""
     style.apply_style("light")
     tokens, colours = style.tokens(), style.categorical()
-    results = style.load_json(style.REPO_ROOT / "labs/freesolv/reviewed-results.json")
-    splits = results["splits"]
-    for split in SPLITS:
-        for source, expected in (
-            ("point_metrics", {key for key, _, _ in SERIES}),
-            ("interval_metrics", {key for key, _, _ in SERIES if key != "train_mean"}),
-        ):
-            if set(splits[split][source]) != expected:
-                raise ValueError(f"{split}: incomplete or unexpected {source} model set")
-    fig = style.figure(height=5.45)
+    data = load_data()
+    results, splits = data["results"], data["splits"]
+    fig = style.figure(height=6.4)
     style.heading(
         fig,
         "Split choice changes error and interval behaviour",
@@ -81,7 +80,7 @@ def build() -> dict[str, Path]:
         ),
     )
     axes = style.axes_grid(
-        fig, 2, 2, left=0.15, right=0.965, bottom=0.20, top=0.79, wspace=0.50, hspace=0.82
+        fig, 2, 2, left=0.13, right=0.965, bottom=0.20, top=0.81, wspace=0.43, hspace=0.82
     )
     metrics = [
         ("point_metrics", "mae", "(a) Mean absolute error", "kcal/mol", "{:.2f}"),
@@ -110,7 +109,7 @@ def build() -> dict[str, Path]:
                     "No interval defined",
                     transform=ax.get_yaxis_transform(),
                     va="center",
-                    fontsize=8,
+                    fontsize=10.0,
                     color=tokens["muted"],
                 )
                 continue
@@ -118,7 +117,7 @@ def build() -> dict[str, Path]:
             ax.plot([a, b], [y, y], color=colours[colour], lw=1.2)
             ax.plot(a, y, "o", ms=6.5, mfc=colours[colour], mec=tokens["ink"], mew=0.5)
             ax.plot(b, y, "s", ms=6.5, mfc=tokens["panel"], mec=colours[colour], mew=1)
-            for value, offset in [(a, 7.5), (b, -7.5)]:
+            for value, offset in [(a, 10), (b, -10)]:
                 ax.annotate(
                     fmt.format(value),
                     (value, y),
@@ -126,7 +125,7 @@ def build() -> dict[str, Path]:
                     textcoords="offset points",
                     ha="center",
                     va="center",
-                    fontsize=8,
+                    fontsize=10.0,
                 )
         ax.set_yticks([2, 1, 0], ["Mean", "Ridge", "Forest"])
         ax.set_ylim(-0.65, 2.65)
@@ -145,7 +144,7 @@ def build() -> dict[str, Path]:
         ncol=2,
         loc="lower center",
         bbox_to_anchor=(0.5, 0.09),
-        fontsize=8.5,
+        fontsize=10.0,
         handletextpad=0.5,
     )
     style.footnote(

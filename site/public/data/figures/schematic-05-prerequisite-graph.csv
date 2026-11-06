@@ -1,0 +1,68 @@
+﻿Object / relation,Source label / relation identity
+route-name-0,Core
+route-count-0,25
+route-name-1,Small molecules
+route-count-1,29
+route-name-2,Targets and cells
+route-count-2,16
+route-name-3,Biologics
+route-count-3,17
+route-name-4,Structure and physics
+route-count-4,15
+route-name-5,Agents and feedback
+route-count-5,14
+lesson-name-0,Evidence claim boundaries
+lesson-required-count-0,5
+lesson-name-1,Therapeutic decision framing
+lesson-required-count-1,3
+lesson-name-2,Biological representations
+lesson-required-count-2,3
+lesson-name-3,Identity lineage and reuse
+lesson-required-count-3,2
+lesson-name-4,Docking and free energy
+lesson-required-count-4,1
+lesson-name-5,Model table construction
+lesson-required-count-5,2
+lesson-name-6,Baseline fitting and validation
+lesson-required-count-6,2
+lesson-name-7,Metrics and uncertainty
+lesson-required-count-7,1
+lesson-name-8,Regression and classification errors
+lesson-required-count-8,1
+lesson-name-9,Uncertainty to decisions
+lesson-required-count-9,1
+relation,core-includes-0
+relation,prerequisite-0-1
+relation,prerequisite-0-2
+relation,prerequisite-0-3
+relation,prerequisite-0-4
+relation,prerequisite-0-5
+relation,core-includes-1
+relation,prerequisite-1-1
+relation,prerequisite-1-2
+relation,prerequisite-1-3
+relation,core-includes-2
+relation,prerequisite-2-2
+relation,prerequisite-2-3
+relation,prerequisite-2-4
+relation,core-includes-3
+relation,prerequisite-3-3
+relation,prerequisite-3-4
+relation,core-includes-4
+relation,prerequisite-4-3
+relation,core-includes-5
+relation,prerequisite-5-1
+relation,prerequisite-5-5
+relation,core-includes-6
+relation,prerequisite-6-1
+relation,prerequisite-6-5
+relation,prerequisite-7-1
+relation,core-includes-8
+relation,prerequisite-8-4
+relation,prerequisite-9-5
+Route · core,25 lessons; prerequisites: none
+Route · small-molecules,29 lessons; prerequisites: foundations/getting-started; drug-discovery-foundations/discovery-context; data-governance/records-to-model-table; machine-learning/baseline-training-validation; evaluation-and-reproducibility/metrics-and-uncertainty
+Route · targets-cells,16 lessons; prerequisites: foundations/getting-started; drug-discovery-foundations/discovery-context; representations/biological-representations
+Route · biologics,17 lessons; prerequisites: foundations/getting-started; drug-discovery-foundations/discovery-context; representations/biological-representations; physics-based-modeling/docking-to-fep; data-governance/identity-lineage-and-reuse
+Route · structure-physics,15 lessons; prerequisites: foundations/getting-started; representations/biological-representations; data-governance/identity-lineage-and-reuse; qsar-properties/regression-classification-errors
+Route · agents-feedback,14 lessons; prerequisites: foundations/getting-started; data-governance/records-to-model-table; machine-learning/baseline-training-validation; qsar-properties/uncertainty-to-decisions

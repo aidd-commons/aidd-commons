@@ -1,0 +1,52 @@
+﻿Object / relation,Source label / relation identity
+openness-record-name-0,Img2Mol
+openness-record-kind-0,model
+openness-access-0,source available
+openness-lifecycle-0,unverified
+openness-state-0-0,available
+openness-0-0-glyph,+
+openness-state-0-1,not available
+openness-0-1-glyph,×
+openness-state-0-2,available
+openness-0-2-glyph,+
+openness-state-0-3,available
+openness-0-3-glyph,+
+openness-state-0-4,unverified
+openness-0-4-glyph,?
+openness-state-0-5,unverified
+openness-0-5-glyph,?
+openness-state-0-6,not available
+openness-0-6-glyph,×
+openness-record-name-1,ADME-Fang-v1
+openness-record-kind-1,dataset
+openness-access-1,open source
+openness-lifecycle-1,active
+openness-state-1-0,not applicable
+openness-1-0-glyph,–
+openness-state-1-1,not applicable
+openness-1-1-glyph,–
+openness-state-1-2,not applicable
+openness-1-2-glyph,–
+openness-state-1-3,not applicable
+openness-1-3-glyph,–
+openness-state-1-4,available
+openness-1-4-glyph,+
+openness-state-1-5,unverified
+openness-1-5-glyph,?
+openness-state-1-6,not applicable
+openness-1-6-glyph,–
+openness-review-date,Record review: 2026-10-21. Availability does not establish unrestricted use.
+model-img2mol · Inference code,available; https://api.github.com/repos/bayer-science-for-a-better-life/Img2Mol/git/trees/main?recursive=1
+model-img2mol · Training code,not_available; https://api.github.com/repos/bayer-science-for-a-better-life/Img2Mol/git/trees/main?recursive=1
+model-img2mol · Weights,available; https://raw.githubusercontent.com/bayer-science-for-a-better-life/Img2Mol/main/README.md
+model-img2mol · Architecture,available; https://api.github.com/repos/bayer-science-for-a-better-life/Img2Mol/git/trees/main?recursive=1
+model-img2mol · Data recipe,unverified; unverified
+model-img2mol · Training data,unverified; unverified
+model-img2mol · Evaluation code,not_available; https://api.github.com/repos/bayer-science-for-a-better-life/Img2Mol/git/trees/main?recursive=1
+dataset-polaris-adme · Inference code,not_applicable; https://polarishub.io/datasets/biogen/adme-fang-v1
+dataset-polaris-adme · Training code,not_applicable; https://polarishub.io/datasets/biogen/adme-fang-v1
+dataset-polaris-adme · Weights,not_applicable; https://polarishub.io/datasets/biogen/adme-fang-v1
+dataset-polaris-adme · Architecture,not_applicable; https://polarishub.io/datasets/biogen/adme-fang-v1
+dataset-polaris-adme · Data recipe,available; https://raw.githubusercontent.com/polaris-hub/polaris-recipes/main/org-Biogen/fang2023_ADME/01_polaris_adme-fang_data_curation.ipynb
+dataset-polaris-adme · Training data,unverified; unverified
+dataset-polaris-adme · Evaluation code,not_applicable; https://polarishub.io/datasets/biogen/adme-fang-v1

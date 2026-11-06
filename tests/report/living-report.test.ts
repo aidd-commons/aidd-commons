@@ -19,7 +19,7 @@ const expectedChapters = [
   "Safety, licences, limitations, and roadmap",
   "The completed laboratory evidence",
   "How the comparison audit works",
-  "What the independent reading found",
+  "What the retained automated readings found",
   "The current frontier method families",
   "Learning through linked scientific views",
 ];

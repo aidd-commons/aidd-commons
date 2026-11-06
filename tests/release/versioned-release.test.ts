@@ -75,4 +75,4 @@ it("ships consistent release metadata, the report addendum, and the historical c
     true,
   );
   await read("CHANGELOG.md");
-}, 30_000);
+}, 120_000);

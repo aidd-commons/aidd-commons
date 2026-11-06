@@ -91,9 +91,9 @@ describe("every licence name in the catalogue has a layer in the figure", () => 
     expect(report).toEqual([]);
   });
 
-  it("keeps the figure's layer list and this test's list in step", async () => {
+  it("keeps the shared plot loader's layer list and this test's list in step", async () => {
     const figure = await readFile(
-      join(repositoryRoot, "report/figures/plot_7_access_and_licence.py"),
+      join(repositoryRoot, "report/figures/plot_data.py"),
       "utf8",
     );
     // The figure raises on a licence name that is in no layer, so a name

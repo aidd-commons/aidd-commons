@@ -24,7 +24,6 @@ is a statement about what has been read rather than about what exists.
 from __future__ import annotations
 
 import sys
-from collections import Counter
 from pathlib import Path
 
 from matplotlib.patches import Rectangle
@@ -34,7 +33,8 @@ if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 import figure_style as style  # noqa: E402  (the module sits next to this script)
-from figure_sources import catalogue_projection, validate_openness_join  # noqa: E402
+from figure_sources import catalogue_projection  # noqa: E402
+from plot_data import load_plot_data  # noqa: E402
 
 FIGURE_NUMBER = 6
 STEM = "plot_6_openness_matrix"
@@ -73,24 +73,25 @@ def _bin_index(proportion: float) -> int:
     return len(BIN_EDGES) - 1
 
 
+def load_data() -> dict:
+    """Return the complete canonical population used by print and web."""
+    return load_plot_data(FIGURE_NUMBER, read_json=style.load_json, read_yaml=style.load_yaml)
+
+
 def build() -> dict[str, Path]:
     """Show complete openness-state distributions rather than a dominant remainder."""
     style.apply_style("light")
     tokens, colours = style.tokens(), style.categorical()
-    openness = style.load_json(style.DATA_DIR / "openness.v1.json")
-    resources = style.load_json(style.DATA_DIR / "resources.v1.json")
-    validate_openness_join(resources, openness)
-    kind_of = {r["id"]: r["kind"] for r in resources}
-    totals = Counter(kind_of.values())
-    kinds = [k for k, _ in sorted(totals.items(), key=lambda p: (-p[1], p[0]))]
-    fig = style.figure(height=5.45)
+    data = load_data()
+    resources, totals, kinds = (data[k] for k in ("resources", "totals", "kinds"))
+    fig = style.figure(height=7.6)
     style.heading(
         fig,
         "Seven questions of openness remain separate",
         f"{len(resources)} records · fraction available / applicable · strip retains "
         f"every evidence state",
     )
-    ax = fig.add_axes((0.215, 0.22, 0.75, 0.58))
+    ax = fig.add_axes((0.225, 0.18, 0.745, 0.65))
     states_order = ["available", "unverified", "not_available", "not_applicable"]
     fills = {
         "available": colours["teal"],
@@ -100,30 +101,27 @@ def build() -> dict[str, Path]:
     }
     hatches = {"available": "", "unverified": "..", "not_available": "xx", "not_applicable": "//"}
     for y, kind in enumerate(kinds):
-        records = [r for r in openness if kind_of[r["id"]] == kind]
         for x, (dim, _) in enumerate(DIMENSIONS):
-            states = Counter(r["openness"][dim]["value"] for r in records)
-            if set(states) - set(states_order):
-                raise ValueError(f"unexpected openness states {states}")
-            applicable = sum(states[s] for s in states_order[:-1])
+            cell = data["cells"][kind][dim]
+            states, applicable = cell["states"], cell["applicable"]
             ax.text(
                 x + 0.5,
-                y + 0.28,
+                y + 0.24,
                 f"{states['available']}/{applicable}" if applicable else "n/a",
                 ha="center",
                 va="center",
-                fontsize=8.1,
+                fontsize=10.0,
                 fontweight="bold",
             )
             left = x + 0.08
             for state in states_order:
-                width = 0.84 * states[state] / len(records)
+                width = 0.84 * states[state] / totals[kind]
                 if width:
                     ax.add_patch(
                         Rectangle(
-                            (left, y + 0.56),
+                            (left, y + 0.48),
                             width,
-                            0.20,
+                            0.32,
                             facecolor=fills[state],
                             edgecolor=tokens["muted"],
                             lw=0.4,
@@ -136,7 +134,7 @@ def build() -> dict[str, Path]:
     ax.set_xticks([x + 0.5 for x in range(len(DIMENSIONS))], [label for _, label in DIMENSIONS])
     ax.xaxis.tick_top()
     ax.set_yticks(
-        [y + 0.40 for y in range(len(kinds))],
+        [y + 0.42 for y in range(len(kinds))],
         [f"{k.replace('-', ' ')} ({totals[k]})" for k in kinds],
     )
     ax.tick_params(length=0, pad=10)
@@ -155,8 +153,8 @@ def build() -> dict[str, Path]:
         ["Available", "Unverified", "Not available", "Not applicable"],
         ncol=2,
         loc="lower left",
-        bbox_to_anchor=(0.21, 0.095),
-        fontsize=8.4,
+        bbox_to_anchor=(0.22, 0.072),
+        fontsize=10.0,
         handlelength=1.8,
         columnspacing=2.5,
     )

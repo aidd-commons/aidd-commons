@@ -18,6 +18,9 @@ interface FigureEntry {
   alt: string;
   caption: string;
   pages: string[];
+  previews: Record<string, string>;
+  detailHref: string;
+  reportNumber: number;
 }
 
 const { id, chinese = Astro.url.pathname.includes("/zh-cn/") } = Astro.props;
@@ -26,6 +29,9 @@ if (!figure) {
   throw new Error(`AtlasFigure: no figure is registered under the id "${id}".`);
 }
 const preview = withSiteBase(`/figures/${figure.file}`, import.meta.env.BASE_URL);
+const detail = withSiteBase(`${chinese ? "/zh-cn" : ""}${figure.detailHref}`, import.meta.env.BASE_URL);
+const small = withSiteBase(`/figures/${figure.previews["480"]}`, import.meta.env.BASE_URL);
+const large = withSiteBase(`/figures/${figure.previews["960"]}`, import.meta.env.BASE_URL);
 const pdf = withSiteBase(`/figures/${figure.pdf}`, import.meta.env.BASE_URL);
 const pptx = figure.pptx ? withSiteBase(`/figures/${figure.pptx}`, import.meta.env.BASE_URL) : undefined;
 ---
@@ -34,7 +40,9 @@ const pptx = figure.pptx ? withSiteBase(`/figures/${figure.pptx}`, import.meta.e
   <div class="atlas-figure__frame">
     <a class="atlas-figure__preview" href={pdf}>
       <img
-        src={preview}
+        src={small}
+        srcset={`${small} 480w, ${large} 960w`}
+        sizes="(max-width: 48rem) 100vw, 72rem"
         width={figure.width}
         height={figure.height}
         alt={figure.alt}
@@ -45,6 +53,7 @@ const pptx = figure.pptx ? withSiteBase(`/figures/${figure.pptx}`, import.meta.e
     </a>
   </div>
   <figcaption class="atlas-figure__caption">
+    <a class="atlas-figure__detail" href={detail}>{chinese ? `图 ${figure.reportNumber} · 阅读网页版与来源` : `Figure ${figure.reportNumber} · Read the web view and sources`} →</a>
     <details class="atlas-figure__description"><summary>{chinese ? "阅读完整图注" : "Read the full caption"}</summary><p lang="en">{figure.caption}</p></details>
     <div class="atlas-figure__files"><a class="atlas-figure__download" href={pdf} download>{chinese ? "下载 PDF" : "Download PDF"}</a><a class="atlas-figure__download" href={preview} download>PNG</a>
     {pptx && <a class="atlas-figure__download" href={pptx} download>{chinese ? "可编辑示意图" : "Editable diagram"}</a>}</div>
@@ -91,6 +100,7 @@ const pptx = figure.pptx ? withSiteBase(`/figures/${figure.pptx}`, import.meta.e
     line-height: 1.5;
   }
 
+  .atlas-figure__detail { flex-basis: 100%; display: flex; align-items: center; min-height: 44px; font-size: .85rem; font-weight: 650; }
   .atlas-figure__description { flex: 1 1 22rem; min-width: 0; }
   .atlas-figure__description summary { min-height: 44px; align-content: center; cursor: pointer; font-size: .78rem; }
   .atlas-figure__description p { margin: .3rem 0 .8rem; font-size: .8rem; }

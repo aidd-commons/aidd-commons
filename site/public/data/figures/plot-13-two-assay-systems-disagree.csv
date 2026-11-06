@@ -1,0 +1,12 @@
+﻿Section,Pair / selected CYP molecule,Shared n / CYP2D6 pChEMBL,Pearson r / CYP3A4 pChEMBL,Spearman rho / difference
+Pairwise agreement,"CYP2D6 against CYP3A4, all pairs",1195,0.2987472291525193,0.2980596894318972
+Pairwise agreement,"CYP2D6 against CYP3A4, clean pairs",1015,0.2990050716862229,0.3037894169671597
+Pairwise agreement,microsome against rat hepatocyte,359,0.3409553979362063,0.3868354632960799
+Pairwise agreement,microsome against human hepatocyte,96,0.40827229549770977,0.4864353376748756
+Pairwise agreement,human hepatocyte against rat hepatocyte,106,0.3094982568782439,0.4731608384561121
+Selected CYP extreme,CHEMBL298817,7.4,4.5,2.9000000000000004
+Selected CYP extreme,CHEMBL1650652,7.4,4.61,2.79
+Selected CYP extreme,CHEMBL4755729,6.8,4.05,2.75
+Selected CYP extreme,CHEMBL5205327,4.54,7.0,-2.46
+Selected CYP extreme,CHEMBL1642906,4.7,7.39,-2.6899999999999995
+Selected CYP extreme,CHEMBL5925065,4.7,7.57,-2.87

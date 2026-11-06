@@ -18,6 +18,9 @@ const manifest = JSON.parse(readFileSync("site/src/data/atlas-figures.json", "ut
     source_note: string;
     source_dates: string[];
     visual_revision_date: string;
+    reportNumber: number;
+    detailHref: string;
+    previews: Record<string, string>;
   }[];
 };
 const figureCount = manifest.library.length;
@@ -43,6 +46,9 @@ for (const chinese of [false, true]) {
       await expect(figure.locator("[data-figure-source]")).toHaveText(entry.source_note);
       expect(await figure.locator("[data-figure-dates] time").evaluateAll(nodes => nodes.map(node => node.getAttribute("datetime")))).toEqual([entry.visual_revision_date, ...entry.source_dates]);
       await expect(figure.locator("img")).toHaveAttribute("alt", entry.alt);
+      await expect(figure.locator("img")).toHaveAttribute("src", `/figures/${entry.previews["480"]}`);
+      await expect(figure.locator("img")).toHaveAttribute("srcset", `/figures/${entry.previews["480"]} 480w, /figures/${entry.previews["960"]} 960w`);
+      await expect(figure.locator("[data-figure-detail]")).toHaveAttribute("href", `${chinese ? "/zh-cn" : ""}${entry.detailHref}`);
       await expect(figure.locator("img")).toHaveAttribute("width", String(entry.width));
       await expect(figure.locator("img")).toHaveAttribute("height", String(entry.height));
       await expect(figure.locator("[data-library-preview]")).toHaveAttribute("href", `/figures/${entry.pdf}`);
@@ -51,6 +57,8 @@ for (const chinese of [false, true]) {
       );
       expect(links).toEqual([entry.pdf, ...(entry.pptx ? [entry.pptx] : []), entry.file].map(file => ({ href: `/figures/${file}`, download: true })));
     }
+    expect(await library.locator("[data-library-figure]").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-library-figure")))).toEqual(manifest.library.map(entry => entry.id));
+    expect(manifest.library.map(entry => entry.reportNumber)).toEqual(Array.from({ length: 20 }, (_, i) => i + 1));
     const labels = await library.locator(".figure-library__figure-heading > span").allTextContents();
     expect(labels).toEqual(Array.from({ length: figureCount }, (_, index) => `${chinese ? "图" : "Figure"} ${String(index + 1).padStart(2, "0")}`));
     for (const [track, view] of Object.entries(teachingViews)) {
@@ -116,6 +124,7 @@ for (const chinese of [false, true]) {
     await expect(dialog.locator("[data-zoom-source]")).toHaveText(entry.source_note);
     expect(await dialog.locator("[data-zoom-dates] time").evaluateAll(nodes => nodes.map(node => node.getAttribute("datetime")))).toEqual([entry.visual_revision_date, ...entry.source_dates]);
     await expect(dialog.locator("[data-zoom-image]")).toHaveAttribute("alt", entry.alt);
+    await expect(dialog.locator("[data-zoom-image]")).toHaveAttribute("src", `/figures/${entry.file}`);
     await expect(dialog.locator("[data-zoom-image]")).toHaveAttribute("width", String(entry.width));
     await expect(dialog.locator("[data-zoom-image]")).toHaveAttribute("height", String(entry.height));
     await expect(dialog.locator("[data-zoom-close]")).toBeFocused();

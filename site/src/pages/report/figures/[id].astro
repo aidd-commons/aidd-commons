@@ -1,0 +1,8 @@
+---
+import FigureDetail from '../../../components/FigureDetail.astro';
+import SiteShell from '../../../components/SiteShell.astro';
+import manifest from '../../../data/atlas-figures.json';
+export function getStaticPaths(){return manifest.library.map(entry=>({params:{id:entry.id},props:{entry}}));}
+const {entry}=Astro.props;
+---
+<SiteShell title={`Figure ${entry.reportNumber}: ${entry.title}`} description={entry.alt}><FigureDetail id={entry.id}/></SiteShell>

@@ -8,12 +8,11 @@ const { chinese = false } = Astro.props;
 const t = (en: string, zh: string) => chinese ? zh : en;
 const asset = (file: string) => withSiteBase(`/figures/${file}`, import.meta.env.BASE_URL);
 const views = Object.entries(teachingViews);
-const groups = [
-  { kind: "schematic", id: "schematics", title: t("Concepts and methods", "概念与方法图"), description: t("Separate illustrations, native text and connectors form editable diagrams. These graphics explain teaching relationships; they are not biological observations.", "独立插画、原生文字与连接线组成可编辑图。图形说明教学关系，不是生物学观测。") },
-  { kind: "plot", id: "plots", title: t("Data and retained results", "数据与保留结果"), description: t("Each plot retains its source dates, comparison population and interpretation limits. A visual revision is not a new experiment or a new review of every source.", "每张图保留其来源日期、比较对象与解释边界。视觉更新不等于重新运行实验或重新审核全部来源。") },
-];
-const orderedFigures = groups.flatMap(group => manifest.library.filter(entry => entry.kind === group.kind));
-const figureLabel = (id: string) => `${t("Figure", "图")} ${String(orderedFigures.findIndex(entry => entry.id === id) + 1).padStart(2, "0")}`;
+const orderedFigures = [...manifest.library].sort((a, b) => a.reportNumber - b.reportNumber);
+const figureLabel = (id: string) => `${t("Figure", "图")} ${String(orderedFigures.find(entry => entry.id === id)!.reportNumber).padStart(2, "0")}`;
+const firstSchematic = orderedFigures.find(entry => entry.kind === "schematic")!.id;
+const firstPlot = orderedFigures.find(entry => entry.kind === "plot")!.id;
+const detail = (entry: typeof manifest.library[number]) => withSiteBase(`${chinese ? "/zh-cn" : ""}${entry.detailHref}`, import.meta.env.BASE_URL);
 // Dense comparisons need the full reading width; paired figures retain their native aspect ratio.
 const fullWidth = new Set(["schematic-03-decision-pipeline", "plot-1-registry-composition", "plot-2-coverage-bounds", "plot-7-access-and-licence", "plot-10-acquisition-policy-recovery", "plot-13-two-assay-systems-disagree"]);
 const layout = (entry: typeof manifest.library[number]) => fullWidth.has(entry.id) ? "wide" : "paired";
@@ -32,7 +31,7 @@ const layout = (entry: typeof manifest.library[number]) => fullWidth.has(entry.i
     </div>
   </header>
   <nav class="figure-library__nav" aria-label={t("Figure groups", "图件分组")}>
-    {groups.map(group => <a href={`#${group.id}`}>{group.title}<span aria-hidden="true">↓</span></a>)}
+    <a href="#report-figures">{t("Figures in report order", "按报告顺序阅读图件")}<span aria-hidden="true">↓</span></a>
     <a href="#teaching-views">{t("Interactive teaching views", "交互式教学视图")}<span aria-hidden="true">↓</span></a>
     <a href={withSiteBase(chinese ? "/zh-cn/report/" : "/report/", import.meta.env.BASE_URL)}>{t("Return to the report", "返回报告")}<span aria-hidden="true">↗</span></a>
   </nav>
@@ -61,15 +60,18 @@ const layout = (entry: typeof manifest.library[number]) => fullWidth.has(entry.i
     <p>{t("Try a shorter search or choose another type.", "请尝试更短的关键词或选择其他类型。")}</p>
     <button type="button" data-library-reset>{t("Show all", "显示全部")}</button>
   </div>
-  {groups.map(group => <section id={group.id} class="figure-library__group" data-library-group aria-labelledby={`${group.id}-title`}>
-    <header><div><span class="figure-library__section-number" aria-hidden="true">{group.kind === "schematic" ? "01" : "02"}</span><h2 id={`${group.id}-title`}>{group.title}</h2></div><p>{group.description}</p></header>
-    <div class="figure-library__grid">{manifest.library.filter(entry => entry.kind === group.kind).map(entry => <figure id={entry.id} data-library-figure={entry.id} data-library-item data-kind={entry.kind} data-layout={layout(entry)} data-search={[figureLabel(entry.id), entry.title, entry.caption, entry.source_note, group.title, group.kind === "schematic" ? "concepts methods 概念 方法图" : "data retained results 数据 保留结果"].join(" ")}>
+  <section id="report-figures" class="figure-library__group" data-library-group aria-labelledby="report-figures-title">
+    <header><div><span class="figure-library__section-number" aria-hidden="true">01–20</span><h2 id="report-figures-title">{t("Read in report order", "按报告顺序阅读")}</h2></div><p>{t("The numbering follows the complete Report v0.2. Open a figure for a readable web view and its source table; enlarge the print original to inspect every label.", "编号与完整 Report v0.2 一致。打开图件可阅读网页版与来源表；放大印刷原图可检查所有标签。")}</p></header>
+    <div class="figure-library__grid">{orderedFigures.map(entry => <figure id={entry.id} data-library-figure={entry.id} data-library-item data-kind={entry.kind} data-report-number={entry.reportNumber} data-layout={layout(entry)} data-search={[figureLabel(entry.id), entry.title, entry.caption, entry.source_note, entry.kind === "schematic" ? "Concepts and methods 概念与方法图" : "Data and retained results 数据与保留结果", entry.kind === "schematic" ? "concepts methods 概念 方法图" : "data retained results 数据 保留结果"].join(" ")}>
+      {entry.id === firstSchematic && <span id="schematics" class="figure-library__legacy-anchor" aria-hidden="true"></span>}
+      {entry.id === firstPlot && <span id="plots" class="figure-library__legacy-anchor" aria-hidden="true"></span>}
       <div class="figure-library__figure-heading"><span>{figureLabel(entry.id)}</span><h3>{entry.title}</h3></div>
-      <a class="figure-library__preview" href={asset(entry.pdf)} data-library-preview aria-label={`${t("Open PDF", "打开 PDF")}: ${entry.title}`}>
-        <img src={asset(entry.file)} width={entry.width} height={entry.height} alt={entry.alt} loading="lazy" decoding="async" />
+      <a class="figure-library__preview" href={asset(entry.pdf)} data-library-preview data-original={asset(entry.file)} aria-label={`${t("Open PDF", "打开 PDF")}: ${entry.title}`}>
+        <img src={asset(entry.previews["480"])} srcset={`${asset(entry.previews["480"])} 480w, ${asset(entry.previews["960"])} 960w`} sizes={layout(entry) === "wide" ? "(max-width: 48rem) 100vw, 80rem" : "(max-width: 48rem) 100vw, 40rem"} width={entry.width} height={entry.height} alt={entry.alt} loading="lazy" decoding="async" />
         <span class="figure-library__enlarge" data-library-enlarge hidden aria-hidden="true">{t("Enlarge figure", "放大图件")} ↗</span>
       </a>
       <figcaption>
+        <a class="figure-library__detail" href={detail(entry)} data-figure-detail>{t("Read the figure and its source data", "阅读图件及其来源数据")}<span aria-hidden="true">→</span></a>
         <details class="figure-library__inspector" name="figure-inspector" data-library-inspector>
           <summary>{t("Read caption and sources", "阅读图注与来源")}<span aria-hidden="true">+</span></summary>
           <div>
@@ -85,9 +87,9 @@ const layout = (entry: typeof manifest.library[number]) => fullWidth.has(entry.i
         </div>
       </figcaption>
     </figure>)}</div>
-  </section>)}
+  </section>
   <section id="teaching-views" class="figure-library__group" data-library-group aria-labelledby="teaching-views-title">
-    <header><div><span class="figure-library__section-number" aria-hidden="true">03</span><h2 id="teaching-views-title">{t("Interactive teaching views", "交互式教学视图")}</h2></div><p>{t("Static details from the teaching views. Open the lesson to interact with its scientific objects, retained comparisons and source boundaries.", "教学视图的静态局部预览。打开课程，与科学对象、保留比较和来源边界交互。")}</p></header>
+    <header><div><span class="figure-library__section-number" aria-hidden="true">02</span><h2 id="teaching-views-title">{t("Interactive teaching views", "交互式教学视图")}</h2></div><p>{t("Static details from the teaching views. Open the lesson to interact with its scientific objects, retained comparisons and source boundaries.", "教学视图的静态局部预览。打开课程，与科学对象、保留比较和来源边界交互。")}</p></header>
     <ol class="figure-library__teaching">{views.map(([track, view], index) => <li data-library-item data-kind="interactive" data-search={[view.question.en, view.question.zh, view.state.en, view.state.zh, view.mechanism.en, view.mechanism.zh, "interactive teaching view 交互式 教学 视图"].join(" ")}>
       <a class="figure-library__teaching-link" href={withSiteBase(`/${chinese ? "zh-cn/" : ""}learn/${view.lesson}/#scientific-view-${track}`, import.meta.env.BASE_URL)}>
         <div class="figure-library__teaching-preview"><img src={asset(`teaching-views/${track}.png`)} alt="" width="960" height="640" loading="lazy" decoding="async" data-teaching-thumbnail={track} /><span aria-hidden="true">{t("Open lesson", "打开课程")} ↗</span></div>
@@ -178,7 +180,7 @@ const layout = (entry: typeof manifest.library[number]) => fullWidth.has(entry.i
         current = preview;
         const figure = preview.closest<HTMLElement>("[data-library-figure]")!;
         const original = preview.querySelector("img")!;
-        image.src = original.src; image.alt = original.alt;
+        image.src = preview.dataset.original!; image.alt = original.alt;
         image.width = Number(original.getAttribute("width")); image.height = Number(original.getAttribute("height"));
         dialog.querySelector("[data-zoom-title]")!.textContent = `${figure.querySelector(".figure-library__figure-heading > span")!.textContent} · ${figure.querySelector("h3")!.textContent}`;
         dialog.querySelector("[data-zoom-caption]")!.textContent = figure.querySelector("[data-figure-caption]")!.textContent;
@@ -301,6 +303,8 @@ const layout = (entry: typeof manifest.library[number]) => fullWidth.has(entry.i
   .figure-library__inspector > div { padding: .25rem .8rem; background: var(--atlas-panel); border-left: 2px solid var(--atlas-teal); }
   .figure-library__inspector p { margin: .7rem 0; max-width: 110ch; }
   .figure-library__dates, .figure-library__source { color: var(--atlas-muted); font-size: .72rem; }
+  .figure-library__legacy-anchor { display: block; scroll-margin-top: 2rem; }
+  .figure-library__detail { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 44px; font-size: .82rem; font-weight: 650; }
   .figure-library__downloads { display: flex; flex-wrap: wrap; gap: .1rem 1.1rem; }
   .figure-library__teaching { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.8rem 1.25rem; list-style: none; margin: 0; padding: 0; }
   .figure-library__teaching li { min-width: 0; }

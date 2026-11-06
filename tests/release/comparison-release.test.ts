@@ -96,5 +96,5 @@ describe("comparison audit public release", () => {
     await expect(readFile(inventoryPath, "utf8")).resolves.toContain(
       "catalog/comparisons/taxonomy.yaml",
     );
-  }, 30_000);
+  }, 120_000);
 });

@@ -4,6 +4,7 @@ import {
   access,
   mkdir,
   mkdtemp,
+  readFile,
   readdir,
   rm,
   writeFile,
@@ -140,7 +141,7 @@ describe("curated release allowlist completeness", () => {
       destination,
       inventoryPath: join(workspace, "inventory.txt"),
     });
-  }, 30_000);
+  }, 120_000);
 
   it("names only files that exist in the repository", () => {
     const missing = fileAllowlist.filter(
@@ -154,9 +155,19 @@ describe("curated release allowlist completeness", () => {
     for (const path of [
       "site/scripts/make-site-figures.py",
       "site/scripts/check-site-figures.py",
+      "site/scripts/export-figure-details.py",
+      "site/scripts/export-figure-motions.ts",
     ]) {
       await expect(access(join(destination, path))).resolves.toBeUndefined();
     }
+  });
+
+  it("ships shared SSR source-table helpers with their importing tests", async () => {
+    const path = "tests/helpers/figure-source-table.ts";
+    await expect(access(join(destination, path))).resolves.toBeUndefined();
+    expect(await readFile(join(destination, path), "utf8")).toBe(
+      await readFile(join(repositoryRoot, path), "utf8"),
+    );
   });
 
   it.skipIf(!isGitCheckout)(

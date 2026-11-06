@@ -33,7 +33,6 @@ assert one.
 from __future__ import annotations
 
 import sys
-from collections import defaultdict
 from pathlib import Path
 
 _HERE = Path(__file__).resolve().parent
@@ -41,6 +40,7 @@ if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 import figure_style as style  # noqa: E402  (the module sits next to this script)
+from plot_data import load_plot_data  # noqa: E402
 
 FIGURE_NUMBER = 2
 STEM = "plot_2_coverage_bounds"
@@ -82,26 +82,18 @@ THRESHOLD_TITLES = {
 }
 
 
+def load_data() -> dict:
+    """Return the complete canonical population used by print and web."""
+    return load_plot_data(FIGURE_NUMBER, read_json=style.load_json, read_yaml=style.load_yaml)
+
+
 def build() -> dict[str, Path]:
     """Show every interval in one aligned provider-by-threshold matrix."""
     style.apply_style("light")
     tokens, colours = style.tokens(), style.categorical()
-    payload = style.load_json(style.DATA_DIR / "comparison.v1.json")
-    names = {p["id"]: p["name"] for p in payload["providers"]}
-    classes = {p["id"]: p["provider_class"] for p in payload["providers"]}
-    thresholds = list(payload["thresholds"])
-    bounds = defaultdict(dict)
-    for row in payload["summaries"]:
-        pair = (row["lower"], row["upper"])
-        if not 0 <= pair[0] <= pair[1] <= payload["taxonomy"]["topics"]:
-            raise ValueError(f"invalid coverage interval {row}")
-        bounds[row["provider_id"]][row["threshold"]] = pair
-    if set(bounds) != set(names):
-        raise ValueError("coverage summaries do not contain every declared provider")
-    order = [SELF_ID] + sorted((p for p in bounds if p != SELF_ID), key=lambda p: names[p])
-    if any(set(bounds[p]) != set(thresholds) for p in order):
-        raise ValueError("a provider is missing a required threshold")
-    total = payload["taxonomy"]["topics"]
+    data = load_data()
+    payload, names, classes = data["payload"], data["names"], data["classes"]
+    thresholds, bounds, order, total = (data[k] for k in ("thresholds", "bounds", "order", "total"))
     class_order = ["curriculum", "tutorial-collection", "benchmark-hub", "specialist-reference"]
     markers = {
         "curriculum": "o",
@@ -109,7 +101,7 @@ def build() -> dict[str, Path]:
         "benchmark-hub": "^",
         "specialist-reference": "D",
     }
-    fig = style.figure(height=6.65)
+    fig = style.figure(height=7.8)
     style.heading(
         fig,
         "Evidence bounds, rather than a leaderboard",
@@ -118,7 +110,7 @@ def build() -> dict[str, Path]:
             f"topics · {payload['as_of']}"
         ),
     )
-    axes = style.axes_grid(fig, 1, 5, left=0.295, right=0.978, bottom=0.135, top=0.81, wspace=0.16)
+    axes = style.axes_grid(fig, 1, 5, left=0.31, right=0.978, bottom=0.14, top=0.82, wspace=0.16)
     ys = list(range(len(order)))[::-1]
     for col, (ax, threshold) in enumerate(zip(axes, thresholds, strict=True)):
         for y, p in zip(ys, order, strict=True):
@@ -127,16 +119,14 @@ def build() -> dict[str, Path]:
             colour = colours["teal"] if own else colours["slate"]
             ax.plot([0, total], [y, y], color=tokens["rule"], lw=0.5, zorder=0)
             if own:
-                ax.plot(
-                    lo, y, marker="D", ms=5.2, color=colour, mec=tokens["ink"], mew=0.5, zorder=4
-                )
+                ax.plot(lo, y, marker="D", ms=6, color=colour, mec=tokens["ink"], mew=0.5, zorder=4)
             else:
                 ax.plot([lo, hi], [y, y], color=colour, lw=1.8, zorder=2)
                 ax.plot(
                     lo,
                     y,
                     marker=markers[classes[p]],
-                    ms=4,
+                    ms=5,
                     mfc=tokens["panel"],
                     mec=colour,
                     mew=0.9,
@@ -146,7 +136,7 @@ def build() -> dict[str, Path]:
                     hi,
                     y,
                     marker=markers[classes[p]],
-                    ms=4,
+                    ms=5,
                     mfc=colour,
                     mec=colour,
                     mew=0.6,
@@ -155,11 +145,11 @@ def build() -> dict[str, Path]:
             ax.annotate(
                 str(lo) if lo == hi else f"{lo}–{hi}",
                 (total / 2, y),
-                xytext=(0, -11),
+                xytext=(0, -12),
                 textcoords="offset points",
                 ha="center",
                 va="center",
-                fontsize=8.0,
+                fontsize=10.0,
                 fontweight="bold" if own else "normal",
                 color=tokens["ink"],
             )
@@ -177,7 +167,7 @@ def build() -> dict[str, Path]:
             "Executable on real data", "Real-data\nexecution"
         )
         style.title(ax, label)
-        ax.set_xlabel("Topics", fontsize=8.2)
+        ax.set_xlabel("Topics", fontsize=10.0)
     from matplotlib.lines import Line2D
 
     handles = [
@@ -192,7 +182,7 @@ def build() -> dict[str, Path]:
         ncol=2,
         loc="lower left",
         bbox_to_anchor=(0.29, 0.025),
-        fontsize=8.2,
+        fontsize=10.0,
         handlelength=1,
         handletextpad=0.4,
         columnspacing=1.5,
@@ -201,7 +191,7 @@ def build() -> dict[str, Path]:
         0.035,
         0.095,
         "Open marker: lower\nFilled marker: upper",
-        fontsize=8.0,
+        fontsize=10.0,
         color=tokens["muted"],
         va="top",
     )

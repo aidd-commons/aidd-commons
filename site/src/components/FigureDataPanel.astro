@@ -1,0 +1,29 @@
+---
+import ScientificPlot from './ScientificPlot.astro';
+import {withSiteBase} from '../lib/site-paths';
+import type {FigurePanel} from '../lib/figure-detail';
+interface Props {panel:FigurePanel;chinese?:boolean}
+const {panel,chinese=false}=Astro.props;
+const readable=(n:number)=>Number(n.toPrecision(6)).toString();
+---
+<section class="figure-panel" data-figure-panel>
+ {panel.type==='plot' ? <ScientificPlot {...panel} title={panel.title} xLabel={panel.xLabel} yLabel={panel.yLabel} series={panel.series} showTable={false} chinese={chinese}/> : <>
+ <h3>{panel.title}</h3>
+ {panel.type==='bars' && <ol class:list={['figure-bars',{'is-stacked':panel.stacked}]}>
+ {panel.rows?.map(row=><li>
+  <div class="figure-bars__label">{row.href?<a href={withSiteBase(`${chinese?'/zh-cn':''}${row.href}`,import.meta.env.BASE_URL)}>{row.label}</a>:<span>{row.label}</span>}{row.meta&&<strong>{row.meta}</strong>}</div>
+  <div class="figure-bars__stack" aria-hidden="true">{panel.stacked&&row.segments.map((s:any,index:number)=><i class={`stack-state-${index}`} style={{width:`${100*s.value/(panel.maximum??1)}%`,backgroundColor:s.color}}/>)}</div><div class="figure-bars__tracks">{row.segments.map((s:any,index:number)=><div class="figure-bars__segment" data-evidence-state={s.label} style={{'--bar-width':`${100*s.value/(panel.maximum??1)}%`,'--bar-color':s.color}}>
+    <span class="figure-bars__bar" aria-hidden="true"/><span class="figure-bars__value"><i class={`figure-bars__symbol symbol-${index%4}`} aria-hidden="true"/>{s.label.replaceAll('_',' ')}: <b title={String(s.value)} data-exact-value={s.value}>{readable(s.value)}</b></span>
+  </div>)}</div>
+ </li>)}
+ </ol>}
+ {panel.type==='intervals' && <><p class="figure-panel__axis">0 — {panel.maximum} topics · ● observed lower · ◇ possible upper</p><ol class="figure-intervals">{panel.rows?.map(row=><li>
+  <div class="figure-intervals__label"><span>{row.label}<small>{row.class}</small></span><strong>{row.lower}–{row.upper}</strong></div>
+  <div class="figure-intervals__track" aria-label={`${row.label}: lower ${row.lower}, upper ${row.upper}, out of ${panel.maximum}`}><span class="figure-intervals__span" style={{left:`${100*row.lower/(panel.maximum??1)}%`,width:`${100*(row.upper-row.lower)/(panel.maximum??1)}%`}}/><i class="figure-intervals__lower" style={{left:`${100*row.lower/(panel.maximum??1)}%`}}/><i class="figure-intervals__upper" style={{left:`${100*row.upper/(panel.maximum??1)}%`}}/></div>
+ </li>)}</ol></>}
+ </>}
+ {panel.note&&<p class="figure-panel__note">{panel.note}</p>}
+</section>
+<style>
+.figure-panel{min-width:0;padding:.9rem 0}.figure-panel h3{font-size:1.05rem;margin:0 0 1rem}.figure-panel__note,.figure-panel__axis{font-size:.8rem;color:var(--atlas-muted);line-height:1.6}.figure-bars,.figure-intervals{list-style:none;padding:0;margin:0;display:grid;gap:.75rem}.figure-bars>li,.figure-intervals>li{min-width:0;border-bottom:1px solid var(--atlas-rule);padding-bottom:.65rem}.figure-bars__label,.figure-intervals__label{display:flex;justify-content:space-between;gap:.7rem;font-size:.83rem;line-height:1.45;margin-bottom:.35rem;overflow-wrap:anywhere}.figure-bars__label strong,.figure-intervals__label strong{font-variant-numeric:tabular-nums;white-space:nowrap}.figure-bars__stack:empty{display:none}.figure-bars__stack{display:flex;height:.75rem;width:100%;margin-bottom:.3rem;background:var(--atlas-rule)}.figure-bars__stack i{height:100%;border-right:1px solid var(--atlas-panel)}.figure-bars__stack .stack-state-1{background-image:repeating-linear-gradient(45deg,transparent,transparent 3px,#ffffff99 3px,#ffffff99 4px)}.figure-bars__stack .stack-state-2{background-image:radial-gradient(#ffffff 1px,transparent 1px);background-size:4px 4px}.figure-bars__stack .stack-state-3{background-image:repeating-linear-gradient(-45deg,transparent,transparent 3px,#ffffff99 3px,#ffffff99 4px)}.figure-bars__tracks{display:grid;gap:.3rem}.figure-bars__segment{position:relative;min-height:1.55rem;min-width:0}.figure-bars__bar{position:absolute;inset-block:0;left:0;width:var(--bar-width);background:color-mix(in srgb,var(--bar-color) 20%,transparent);border-left:3px solid var(--bar-color);max-width:100%}.figure-bars__value{position:relative;z-index:1;display:flex;align-items:center;gap:.35rem;padding:.2rem .35rem;font-size:.75rem;line-height:1.4;overflow-wrap:anywhere}.figure-bars__value b{font-variant-numeric:tabular-nums}.figure-bars__symbol{display:inline-block;width:.45rem;height:.45rem;border:1px solid currentColor;background:currentColor;flex-shrink:0}.symbol-0{border-radius:50%}.symbol-1{background:transparent;transform:rotate(45deg)}.symbol-2{background:repeating-linear-gradient(45deg,transparent,transparent 2px,currentColor 2px,currentColor 3px)}.symbol-3{background:transparent}.is-stacked .figure-bars__bar{display:none}.is-stacked .figure-bars__tracks{display:flex;flex-wrap:wrap;gap:.15rem}.is-stacked .figure-bars__segment{flex:1 1 8rem}.is-stacked .figure-bars__value{font-size:.72rem}.figure-intervals__label small{display:block;font-size:.7rem;color:var(--atlas-muted);margin-top:.15rem}.figure-intervals__track{position:relative;height:1.4rem;margin-inline:.35rem;border-bottom:1px solid var(--atlas-rule);background:linear-gradient(90deg,transparent 49.8%,var(--atlas-rule) 50%,transparent 50.2%)}.figure-intervals__span{position:absolute;top:.5rem;height:.3rem;background:var(--atlas-teal-deep)}.figure-intervals__lower,.figure-intervals__upper{position:absolute;top:.3rem;width:.65rem;height:.65rem;transform:translateX(-50%);border:2px solid var(--atlas-teal-deep);background:var(--atlas-panel)}.figure-intervals__lower{border-radius:50%;background:var(--atlas-teal-deep)}.figure-intervals__upper{transform:translateX(-50%) rotate(45deg)}
+</style>

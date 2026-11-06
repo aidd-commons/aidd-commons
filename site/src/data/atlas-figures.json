@@ -1,6 +1,6 @@
 {
   "name": "atlas-figures",
-  "description": "Source-derived data plots and native editable illustrated schematic masters, with PNG previews and actual PDF exports at their authored dimensions. The existing measured light identity is retained on paper; schematics include a PPTX source.",
+  "description": "Source-derived data plots and native editable illustrated schematic masters, with responsive WebP previews and canonical PNG/PDF exports at authored dimensions. The existing measured light identity is retained on paper; schematics include a PPTX source.",
   "generated_by": "site/scripts/make-site-figures.py",
   "drawings_from": "report/figures/",
   "captions_from": [
@@ -14,11 +14,19 @@
       "pdf": "plot-2-coverage-bounds.pdf",
       "source_stem": "plot_2_coverage_bounds",
       "width": 2125,
-      "height": 1995,
+      "height": 2340,
+      "previews": {
+        "480": "plot-2-coverage-bounds-480.webp",
+        "960": "plot-2-coverage-bounds-960.webp"
+      },
+      "reportNumber": 11,
+      "chapterAnchor": "reproducibility-evaluation-and-failure-modes",
+      "detailHref": "/report/figures/plot-2-coverage-bounds/",
       "alt": "The audit reports an interval rather than a leaderboard: all 93 AIDD Commons cells are direct observations, so this project's own row is an exact count at every threshold, while an external interval can remain open where depth or run basis is unverified, including in material that has been read.",
       "caption": "Coverage bounds for thirteen providers across five thresholds, each bound a lower and an upper count out of 93 topics. AIDD Commons is the first row and its bounds are equal at every threshold, 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed, because all 93 of its cells are direct observations. Every external row is an interval, because unobserved cells contribute to an upper bound and nothing to a lower one. The bounds are not confidence intervals and no probability attaches to them.",
       "pages": [
-        "/audit/"
+        "/audit/",
+        "/zh-cn/audit/"
       ]
     },
     {
@@ -27,11 +35,19 @@
       "pdf": "plot-5-self-record-vs-reading.pdf",
       "source_stem": "plot_5_self_record_vs_reading",
       "width": 2125,
-      "height": 1545,
+      "height": 1500,
+      "previews": {
+        "480": "plot-5-self-record-vs-reading-480.webp",
+        "960": "plot-5-self-record-vs-reading-960.webp"
+      },
+      "reportNumber": 12,
+      "chapterAnchor": "reproducibility-evaluation-and-failure-modes",
+      "detailHref": "/report/figures/plot-5-self-record-vs-reading/",
       "alt": "The retained topic readings agree with the current self record on 93 of 93 topics, with 0 deeper and 0 shallower, in the comparison projection dated 2026-10-24. The series began on 2026-09-11 and documents re-readings through 2026-10-24. These latest retained rows include reviewer authored material and constrained shallower outcomes, so they are not independent replication or evidence of reader learning.",
-      "caption": "The current self record against the retained automated readings of 93 topics in the comparison.v1 projection dated 2026-10-24. The series began on 2026-09-11, and its description documents re-readings through 2026-10-24. These totals aggregate the latest retained topic scores rather than a single pass. The current aggregate agrees on 93 topics, reads 0 deeper and 0 shallower. At the thresholds the retained readings give 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed against the current record's 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed. The reviewer also authored parts of the course, so this is not an independent replication or evidence of reader learning. The shallower count is constrained by the audit's rule against inflated self scores.",
+      "caption": "The current self record against the retained automated readings of 93 topics in the comparison.v1 projection dated 2026-10-24. The compact upper strip gives the three outcome counts, and the lower markers pair the five threshold counts. The series began on 2026-09-11, and its description documents re-readings through 2026-10-24. These totals aggregate the latest retained topic scores rather than a single pass. The current aggregate agrees on 93 topics, reads 0 deeper and 0 shallower. At the thresholds the retained readings give 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed against the current record's 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed. The reviewer also authored parts of the course, so this is not an independent replication or evidence of reader learning. The shallower count is constrained by the audit's rule against inflated self scores.",
       "pages": [
-        "/audit/"
+        "/audit/",
+        "/zh-cn/audit/"
       ]
     },
     {
@@ -40,7 +56,14 @@
       "pdf": "plot-9-representation-ranking-flips.pdf",
       "source_stem": "plot_9_representation_ranking_flips",
       "width": 2125,
-      "height": 1635,
+      "height": 1890,
+      "previews": {
+        "480": "plot-9-representation-ranking-flips-480.webp",
+        "960": "plot-9-representation-ranking-flips-960.webp"
+      },
+      "reportNumber": 16,
+      "chapterAnchor": "the-completed-laboratory-evidence",
+      "detailHref": "/report/figures/plot-9-representation-ranking-flips/",
       "alt": "The baseline that wins the primary partition loses the separate assay replication by a wide margin, so a frozen evaluation fixes a protocol and a result, not a ranking that holds on the next evaluation.",
       "caption": "The same three baselines on the primary partition of 132 compounds and on the separate assay replication of 170 compounds. The Morgan ridge is the best of the three on the primary partition at 0.418 mean absolute error, while the descriptor ridge is the best on the replication at 0.579; the Morgan ridge reaches 3.132 there and its rank correlation falls from 0.505 to -0.041. The two evaluations are separate comparisons and success on one does not erase failure on the other, the acquisition lab had accessed labels shared with this evaluation before it ran, and no confidence intervals or p values are reported.",
       "pages": [
@@ -56,9 +79,16 @@
       "pdf": "schematic-07-frozen-lifecycle.pdf",
       "source_stem": "schematic-07-frozen-lifecycle",
       "width": 2126,
-      "height": 1300,
+      "height": 1737,
+      "previews": {
+        "480": "schematic-07-frozen-lifecycle-480.webp",
+        "960": "schematic-07-frozen-lifecycle-960.webp"
+      },
+      "reportNumber": 14,
+      "chapterAnchor": "the-completed-laboratory-evidence",
+      "detailHref": "/report/figures/schematic-07-frozen-lifecycle/",
       "alt": "A frozen lab writes the protocol before the held-out result is seen, runs its pretests on training and validation data, opens the test set once, and treats a bug found after the opening as an error that invalidates the protocol rather than a result to be reported.",
-      "caption": "Frozen evaluation lifecycle. The written protocol is frozen before structural and finite-output pretests on training and validation data. A successful pretest sequence precedes the one-time test opening and reviewed summary. The native dashed return to development applies only before test opening. After test opening, a bug is recorded as a protocol-invalidating error and result-driven retuning is prohibited. The summary retains observed values and limitations. No measured value or universal successful pretest is asserted. The computational illustration is AI-generated and conceptual.",
+      "caption": "Frozen evaluation lifecycle. The written protocol is frozen before structural and finite-output pretests on training and validation data. A prominent boundary separates these pretests from the one-time held-out test opening and reviewed summary. The dashed development return applies only before test opening. A separate post-test error branch records a protocol-invalidating bug and prohibits result-driven retuning. The summary retains observed values and limitations. The figure asserts no measured output or universally successful pretest. The computation illustration is AI-generated and conceptual.",
       "pages": [
         "/labs/",
         "/zh-cn/labs/"
@@ -72,241 +102,25 @@
       "pdf": "schematic-02-statement-classes.pdf",
       "source_stem": "schematic-02-statement-classes",
       "width": 2126,
-      "height": 1241,
+      "height": 1489,
+      "previews": {
+        "480": "schematic-02-statement-classes-480.webp",
+        "960": "schematic-02-statement-classes-960.webp"
+      },
+      "reportNumber": 2,
+      "chapterAnchor": "scope-and-boundary",
+      "detailHref": "/report/figures/schematic-02-statement-classes/",
       "alt": "Every statement in the report belongs to one of four classes, and the two classes that assert something are drawn apart from the two that do not, so a reader can tell an observed fact from a decision, an open question or a plan.",
-      "caption": "Four classes of statement. (a) An observed source fact connects an opened source to the claim it directly supports. (b) A project decision combines inputs into a recorded choice with rationale and version. (c) An open question retains missing, conflicting or inaccessible evidence as unverified. (d) Future work retains a planned contribution before implementation, review or measurement. Solid graphic boundaries distinguish the two asserting classes from the two unresolved or intended classes, whose boundaries are dashed. These are kinds of authority, not an evidence ranking. The source-record illustration is AI-generated and conceptual.",
+      "caption": "Four classes of statement. The four quadrants make statement authority and status explicit. (a) An observed source fact requires an opened source and a sentence-level citation. (b) A project decision records a choice with its rationale and version. (c) An open question preserves missing, conflicting or inaccessible evidence as unverified. (d) Future work is planned before implementation, review or measurement. Solid and dashed boundaries distinguish asserting and unresolved or intended classes. These classes are not an evidence ranking. The source-record illustration is AI-generated and conceptual.",
       "pages": [
-        "/report/"
+        "/report/",
+        "/zh-cn/report/"
       ],
       "pptx": "schematic-02-statement-classes.pptx",
       "native_source": "report/figures/build_schematic_masters.mjs"
     }
   ],
   "library": [
-    {
-      "id": "plot-1-registry-composition",
-      "title": "Registry composition",
-      "kind": "plot",
-      "file": "plot-1-registry-composition.png",
-      "pdf": "plot-1-registry-composition.pdf",
-      "source_stem": "plot_1_registry_composition",
-      "width": 2125,
-      "height": 1215,
-      "alt": "Ranked catalogue record counts and their shares by object kind; no verification or quality ranking is implied.",
-      "caption": "Registry composition by kind. 232 catalogue records: 84 model, 59 software, 27 benchmark, 22 database, 14 dataset, 11 agent, 7 tutorial, 4 paper, 3 standard, 1 model asset. The source is the canonical Atlas resources.v1 projection; individual record verification dates range from 2026-09-04 to 2026-10-25. A count of records says nothing about whether a record has been verified, and the figure carries no status, access or openness information.",
-      "source_dates": [
-        "2026-09-04",
-        "2026-10-25"
-      ],
-      "source_note": "Canonical Atlas resources.v1 projection; individual record verification dates range from 2026-09-04 to 2026-10-25. The visual reconstruction does not establish a new review of every record.",
-      "visual_revision_date": "2026-10-26"
-    },
-    {
-      "id": "plot-2-coverage-bounds",
-      "title": "Historical coverage bounds",
-      "kind": "plot",
-      "file": "plot-2-coverage-bounds.png",
-      "pdf": "plot-2-coverage-bounds.pdf",
-      "source_stem": "plot_2_coverage_bounds",
-      "width": 2125,
-      "height": 1995,
-      "alt": "The audit reports an interval rather than a leaderboard: all 93 AIDD Commons cells are direct observations, so this project's own row is an exact count at every threshold, while an external interval can remain open where depth or run basis is unverified, including in material that has been read.",
-      "caption": "Coverage bounds for thirteen providers across five thresholds, each bound a lower and an upper count out of 93 topics. AIDD Commons is the first row and its bounds are equal at every threshold, 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed, because all 93 of its cells are direct observations. Every external row is an interval, because unobserved cells contribute to an upper bound and nothing to a lower one. The bounds are not confidence intervals and no probability attaches to them.",
-      "source_dates": [
-        "2026-10-24"
-      ],
-      "source_note": "Historical comparison projection as of 2026-10-24; bounds are evidence bounds.",
-      "visual_revision_date": "2026-10-26"
-    },
-    {
-      "id": "plot-3-curriculum-units-per-track",
-      "title": "Curriculum units and lessons",
-      "kind": "plot",
-      "file": "plot-3-curriculum-units-per-track.png",
-      "pdf": "plot-3-curriculum-units-per-track.pdf",
-      "source_stem": "plot_3_curriculum_units_per_track",
-      "width": 2125,
-      "height": 1935,
-      "alt": "The exact core, research and practice unit counts are aligned by track, beside separate lesson counts. These are curriculum objects, not measured learning outcomes.",
-      "caption": "Curriculum units per track across the 18 tracks, split by layer, beside the number of lessons in each track. The curriculum holds 120 learning units in 127 lessons, 56 core, 44 research and 20 practice. A unit is a learning objective attached to a lesson, so the two counts differ, and neither one says how long a track takes or whether a learner reaches its end.",
-      "source_dates": [],
-      "source_note": "Canonical curriculum tracks.yaml, version 0.1. The source declares no review date; this drawing does not establish a new content review.",
-      "visual_revision_date": "2026-11-06"
-    },
-    {
-      "id": "plot-4-depth-distribution-per-track",
-      "title": "Observed depth and run basis",
-      "kind": "plot",
-      "file": "plot-4-depth-distribution-per-track.png",
-      "pdf": "plot-4-depth-distribution-per-track.pdf",
-      "source_stem": "plot_4_depth_distribution_per_track",
-      "width": 2125,
-      "height": 1935,
-      "alt": "Source-recorded topic depths and real-data versus authored run bases are kept separate for every track; a runnable task is not evidence of learner achievement.",
-      "caption": "Observed depth per track for this project's 93 audited topics, beside the basis each track's runnable topics rest on. 12 worked, 0 executable and 81 assessed, and of the 81 runnable topics 62 rest on real data and 19 rest on authored inputs. Depth records what a reviewer observed in the material, not what a learner achieved.",
-      "source_dates": [
-        "2026-10-24"
-      ],
-      "source_note": "Historical comparison projection as of 2026-10-24; bounds are evidence bounds.",
-      "visual_revision_date": "2026-11-06"
-    },
-    {
-      "id": "plot-5-self-record-vs-reading",
-      "title": "Retained reading agreement",
-      "kind": "plot",
-      "file": "plot-5-self-record-vs-reading.png",
-      "pdf": "plot-5-self-record-vs-reading.pdf",
-      "source_stem": "plot_5_self_record_vs_reading",
-      "width": 2125,
-      "height": 1545,
-      "alt": "The retained topic readings agree with the current self record on 93 of 93 topics, with 0 deeper and 0 shallower, in the comparison projection dated 2026-10-24. The series began on 2026-09-11 and documents re-readings through 2026-10-24. These latest retained rows include reviewer authored material and constrained shallower outcomes, so they are not independent replication or evidence of reader learning.",
-      "caption": "The current self record against the retained automated readings of 93 topics in the comparison.v1 projection dated 2026-10-24. The series began on 2026-09-11, and its description documents re-readings through 2026-10-24. These totals aggregate the latest retained topic scores rather than a single pass. The current aggregate agrees on 93 topics, reads 0 deeper and 0 shallower. At the thresholds the retained readings give 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed against the current record's 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed. The reviewer also authored parts of the course, so this is not an independent replication or evidence of reader learning. The shallower count is constrained by the audit's rule against inflated self scores.",
-      "source_dates": [
-        "2026-09-11",
-        "2026-10-24"
-      ],
-      "source_note": "Latest retained readings are aggregated separately from the series initiation and documented re-reading dates; they are not independent replication.",
-      "visual_revision_date": "2026-10-26"
-    },
-    {
-      "id": "plot-6-openness-matrix",
-      "title": "Seven-dimensional openness",
-      "kind": "plot",
-      "file": "plot-6-openness-matrix.png",
-      "pdf": "plot-6-openness-matrix.pdf",
-      "source_stem": "plot_6_openness_matrix",
-      "width": 2125,
-      "height": 1635,
-      "alt": "Every kind is crossed with seven availability dimensions. Exact available/applicable fractions sit above strips that retain available, unverified, unavailable and not-applicable records separately.",
-      "caption": "Openness by record kind and by the seven openness dimensions, over 232 catalogue records. The source is the canonical Atlas resources.v1 projection; individual record verification dates range from 2026-09-04 to 2026-10-25. Each cell labels available records over applicable records. Its strip retains all records in four separate states: available, unverified, not available and not applicable; not-applicable records are excluded only from the displayed fraction. Openness is recorded per dimension and is never collapsed here into a single open or closed label.",
-      "source_dates": [
-        "2026-09-04",
-        "2026-10-25"
-      ],
-      "source_note": "Canonical Atlas resources.v1 projection; individual record verification dates range from 2026-09-04 to 2026-10-25. The visual reconstruction does not establish a new review of every record.",
-      "visual_revision_date": "2026-10-26"
-    },
-    {
-      "id": "plot-7-access-and-licence",
-      "title": "Access and stated licence",
-      "kind": "plot",
-      "file": "plot-7-access-and-licence.png",
-      "pdf": "plot-7-access-and-licence.pdf",
-      "source_stem": "plot_7_access_and_licence",
-      "width": 2124,
-      "height": 1950,
-      "alt": "Access counts and the most restrictive stated licence layer describe the same record population in separate views, retaining unknown access and unread licence metadata.",
-      "caption": "Access level and licence layer for the 232 catalogue records. The source is the canonical Atlas resources.v1 projection; individual record verification dates range from 2026-09-04 to 2026-10-25. 6 records carry no verified access level and 20 record no licence. The verified access levels are 1 open weights, 164 open source, 42 source available, 7 research only, 10 gated, 2 closed. By licence layer, 8 public domain dedication, 125 permissive software licence, 31 creative commons attribution, 24 copyleft, 7 creative commons non-commercial, 17 other stated terms. The 34 records with more than one licence are counted once, in their most restrictive stated layer.",
-      "source_dates": [
-        "2026-09-04",
-        "2026-10-25"
-      ],
-      "source_note": "Canonical Atlas resources.v1 projection; individual record verification dates range from 2026-09-04 to 2026-10-25. The ASL classification was corrected on 2026-11-06 from the recorded academic non-commercial terms; this does not establish a new source review.",
-      "visual_revision_date": "2026-11-06"
-    },
-    {
-      "id": "plot-8-freesolv-split-calibration",
-      "title": "FreeSolv split and interval metrics",
-      "kind": "plot",
-      "file": "plot-8-freesolv-split-calibration.png",
-      "pdf": "plot-8-freesolv-split-calibration.pdf",
-      "source_stem": "plot_8_freesolv_split_calibration",
-      "width": 2125,
-      "height": 1635,
-      "alt": "Frozen scaffold and random split metrics are paired within each teaching baseline. The training-set mean has no interval; empirical coverage is marginal, and its reviewed source states no nominal interval level.",
-      "caption": "FreeSolv point and interval metrics for two fixed teaching baselines, on the predeclared scaffold split and the easier random split. The ridge reaches 1.13 kcal/mol mean absolute error on the scaffold split against 2.59 for the training-set mean, and 1.02 against 2.77 on the random split. On the scaffold split the intervals reach an empirical coverage of 0.875 for the ridge and 0.90625 for the forest, at mean widths of 5.48 and 6.01 kcal/mol. The coverage is marginal coverage and not conditional calibration, the nominal level of the intervals is not stated in the reviewed results, and these teaching baselines establish no state of the art.",
-      "source_dates": [
-        "2026-09-04"
-      ],
-      "source_note": "Retained source summaries: labs/freesolv/reviewed-results.json. The dates describe their reviewed on metadata; no experiment was rerun for this visual reconstruction.",
-      "visual_revision_date": "2026-10-26"
-    },
-    {
-      "id": "plot-9-representation-ranking-flips",
-      "title": "Representation ranking changes",
-      "kind": "plot",
-      "file": "plot-9-representation-ranking-flips.png",
-      "pdf": "plot-9-representation-ranking-flips.pdf",
-      "source_stem": "plot_9_representation_ranking_flips",
-      "width": 2125,
-      "height": 1635,
-      "alt": "The baseline that wins the primary partition loses the separate assay replication by a wide margin, so a frozen evaluation fixes a protocol and a result, not a ranking that holds on the next evaluation.",
-      "caption": "The same three baselines on the primary partition of 132 compounds and on the separate assay replication of 170 compounds. The Morgan ridge is the best of the three on the primary partition at 0.418 mean absolute error, while the descriptor ridge is the best on the replication at 0.579; the Morgan ridge reaches 3.132 there and its rank correlation falls from 0.505 to -0.041. The two evaluations are separate comparisons and success on one does not erase failure on the other, the acquisition lab had accessed labels shared with this evaluation before it ran, and no confidence intervals or p values are reported.",
-      "source_dates": [
-        "2026-09-08"
-      ],
-      "source_note": "Retained source summaries: labs/chembl_egfr/locked-summary.json. The dates describe their reviewed on metadata; no experiment was rerun for this visual reconstruction.",
-      "visual_revision_date": "2026-10-26"
-    },
-    {
-      "id": "plot-10-acquisition-policy-recovery",
-      "title": "Retrospective acquisition policies",
-      "kind": "plot",
-      "file": "plot-10-acquisition-policy-recovery.png",
-      "pdf": "plot-10-acquisition-policy-recovery.pdf",
-      "source_stem": "plot_10_acquisition_policy_recovery",
-      "width": 2125,
-      "height": 1860,
-      "alt": "All policy recovery and evaluation-error paths are retained for two retrospective assay replays, with the normalized recovery integral beside them. Five random seeds are fixed policy instances, not biological replicates.",
-      "caption": "Acquisition policies on two retrospective assay replays, on CHEMBL5736995, 124 compounds were acquired against a pool of 631, and the diversity policy reached normalized recovery AUC 0.0508 against 0.1133 for the ensemble-variance policy and on CHEMBL3705421, 24 compounds were acquired against a pool of 130, and the diversity policy reached normalized recovery AUC 0.0000 against 0.1635 for the ensemble-variance policy. The two named policies are drawn in colour and the five random policy instances in one colour with a distinct marker each, because they are five fixed seeds of one policy rather than five methods. Normalized recovery AUC is the trapezoidal integral over acquired-count checkpoints divided by the final acquired count. These are retrospective replays and not prospective experiments, the random seeds are not independent replicates, and no confidence intervals or p values are reported.",
-      "source_dates": [
-        "2026-09-08",
-        "2026-09-11"
-      ],
-      "source_note": "Retained source summaries: labs/pool_budget/real-summary.json, labs/pool_budget/uncertainty-summary.json. The dates describe their completed on metadata; no experiment was rerun for this visual reconstruction.",
-      "visual_revision_date": "2026-10-26"
-    },
-    {
-      "id": "plot-11-correlated-frames-error-bars",
-      "title": "Correlated frames and uncertainty",
-      "kind": "plot",
-      "file": "plot-11-correlated-frames-error-bars.png",
-      "pdf": "plot-11-correlated-frames-error-bars.pdf",
-      "source_stem": "plot_11_correlated_frames_error_bars",
-      "width": 2125,
-      "height": 1650,
-      "alt": "Naive and block standard errors, their reported ratios and block-count sensitivity are shown from the same retained rMD17 page; there is one trajectory per molecule.",
-      "caption": "The uncertainty of a trajectory observable, from the rMD17 lab page. Ethanol has a naive standard error of 0.000087 Å against a block-averaged standard error of 0.000288 Å at 100 blocks and Malonaldehyde has a naive standard error of 0.000235 Å against a block-averaged standard error of 0.001472 Å at 100 blocks. The upper-right panel is the ratio between the two estimates, which is the number the page reports. The lower panel is ethanol's block-averaged standard error against the block count, because a corrected estimate still carries a choice inside it. There is one trajectory per molecule and one level of theory, so nothing here speaks to replicate dependence or force-field sensitivity.",
-      "source_dates": [
-        "2026-09-11"
-      ],
-      "source_note": "The published rMD17 observable page is the retained numerical source. Its computation/review dates are separate from this visual reconstruction; no new simulation was run.",
-      "visual_revision_date": "2026-11-06"
-    },
-    {
-      "id": "plot-12-trajectory-convergence",
-      "title": "Trajectory convergence",
-      "kind": "plot",
-      "file": "plot-12-trajectory-convergence.png",
-      "pdf": "plot-12-trajectory-convergence.pdf",
-      "source_stem": "plot_12_trajectory_convergence",
-      "width": 2125,
-      "height": 1620,
-      "alt": "The full chronological convergence series and a magnified later-frame view use the same observations, retaining the nonmonotone malonaldehyde error.",
-      "caption": "The cumulative mean of the radius of gyration against the full 100,000-frame mean, from the rMD17 lab page. +0.00198 Å for ethanol and -0.02528 Å for malonaldehyde at 100 frames, +0.00254 Å for ethanol and -0.00743 Å for malonaldehyde at 1,000 frames and +0.00054 Å for ethanol and -0.00946 Å for malonaldehyde at 10,000 frames. The malonaldehyde curve is not monotone, being closer at a thousand frames than at ten thousand, and that is drawn as the data stands. One trajectory per molecule and one level of theory means nothing here speaks to replicate dependence or force-field sensitivity.",
-      "source_dates": [
-        "2026-09-11"
-      ],
-      "source_note": "The published rMD17 observable page is the retained numerical source. Its computation/review dates are separate from this visual reconstruction; no new simulation was run.",
-      "visual_revision_date": "2026-10-26"
-    },
-    {
-      "id": "plot-13-two-assay-systems-disagree",
-      "title": "Assay-system disagreement",
-      "kind": "plot",
-      "file": "plot-13-two-assay-systems-disagree.png",
-      "pdf": "plot-13-two-assay-systems-disagree.pdf",
-      "source_stem": "plot_13_two_assay_systems_disagree",
-      "width": 2125,
-      "height": 1935,
-      "alt": "Source-recorded coefficients and shared counts for CYP and clearance system pairs appear beside six selected CYP disagreement extremes. These examples are extremes, not a sample of the distribution.",
-      "caption": "Agreement between CYP and clearance assay systems. CYP2D6 against CYP3A4, all pairs reaches a Pearson r of 0.2987 and a Spearman rho of 0.2981 over 1195 shared molecules, CYP2D6 against CYP3A4, clean pairs reaches a Pearson r of 0.2990 and a Spearman rho of 0.3038 over 1015 shared molecules, microsome against rat hepatocyte reaches a Pearson r of 0.3410 and a Spearman rho of 0.3868 over 359 shared molecules, microsome against human hepatocyte reaches a Pearson r of 0.4083 and a Spearman rho of 0.4864 over 96 shared molecules and human hepatocyte against rat hepatocyte reaches a Pearson r of 0.3095 and a Spearman rho of 0.4732 over 106 shared molecules. The six largest disagreements between the two CYP systems span 2.46 to 2.90 pChEMBL in both directions, with the first system higher on three molecules and the second on three. A correlation near 0.3 means a measurement in one system carries little information about the other, which is not the same as saying either system is wrong, and the six molecules are the extremes the review found rather than a sample of the distribution.",
-      "source_dates": [
-        "2026-09-12"
-      ],
-      "source_note": "Retained source summaries: labs/cyp_assay_system/summary.json, labs/az_clearance_system/summary.json. The dates describe their computed on metadata; no experiment was rerun for this visual reconstruction.",
-      "visual_revision_date": "2026-10-26"
-    },
     {
       "id": "schematic-01-artifacts",
       "title": "Four connected artifacts",
@@ -315,12 +129,21 @@
       "pdf": "schematic-01-artifacts.pdf",
       "source_stem": "schematic-01-artifacts",
       "width": 2126,
-      "height": 1111,
+      "height": 1182,
+      "previews": {
+        "480": "schematic-01-artifacts-480.webp",
+        "960": "schematic-01-artifacts-960.webp"
+      },
+      "reportNumber": 1,
+      "chapterAnchor": "scope-and-boundary",
+      "detailHref": "/report/figures/schematic-01-artifacts/",
+      "sourceDate": null,
+      "visualRevision": "2026-11-07",
       "alt": "Four distinct learning artifacts share a source identifier and an editorial correction route. The drawing describes intended coupling, not measured propagation or learning.",
-      "caption": "Four artifacts, one system. (a) The curriculum is an ordered lesson sequence, the Atlas is a registry of source records, Labs implement executable procedures, and Report combines reviewed prose and figures. Native document motifs and separate conceptual computation and data illustrations distinguish their roles. (b) A shared-identifier rail links the four artifacts. Dashed correction routes denote the editorial rule that a source-backed correction should reach each affected surface. The figure reports no coverage count, measured propagation result or reader outcome. AI-generated conceptual illustrations are not scientific image data.",
+      "caption": "Four artifacts, one system. (a) Learn provides ordered lessons, the Atlas stores source records, Labs implement executable procedures, and Report combines reviewed prose and figures. (b) Shared resource identifiers connect the four forms. Dashed correction routes denote the editorial rule that a source-backed correction should reach every affected surface. The figure reports no measured propagation result or reader outcome. The separate data and computation illustrations are AI-generated concepts rather than scientific image data.",
       "source_dates": [],
       "source_note": "Native educational schematic derived from the canonical source relationships named in its caption. Illustration assets are conceptual. The visual date is not a new scientific measurement or source-review date.",
-      "visual_revision_date": "2026-10-26",
+      "visual_revision_date": "2026-11-07",
       "pptx": "schematic-01-artifacts.pptx",
       "native_source": "report/figures/build_schematic_masters.mjs"
     },
@@ -332,12 +155,21 @@
       "pdf": "schematic-02-statement-classes.pdf",
       "source_stem": "schematic-02-statement-classes",
       "width": 2126,
-      "height": 1241,
+      "height": 1489,
+      "previews": {
+        "480": "schematic-02-statement-classes-480.webp",
+        "960": "schematic-02-statement-classes-960.webp"
+      },
+      "reportNumber": 2,
+      "chapterAnchor": "scope-and-boundary",
+      "detailHref": "/report/figures/schematic-02-statement-classes/",
+      "sourceDate": null,
+      "visualRevision": "2026-11-07",
       "alt": "Every statement in the report belongs to one of four classes, and the two classes that assert something are drawn apart from the two that do not, so a reader can tell an observed fact from a decision, an open question or a plan.",
-      "caption": "Four classes of statement. (a) An observed source fact connects an opened source to the claim it directly supports. (b) A project decision combines inputs into a recorded choice with rationale and version. (c) An open question retains missing, conflicting or inaccessible evidence as unverified. (d) Future work retains a planned contribution before implementation, review or measurement. Solid graphic boundaries distinguish the two asserting classes from the two unresolved or intended classes, whose boundaries are dashed. These are kinds of authority, not an evidence ranking. The source-record illustration is AI-generated and conceptual.",
+      "caption": "Four classes of statement. The four quadrants make statement authority and status explicit. (a) An observed source fact requires an opened source and a sentence-level citation. (b) A project decision records a choice with its rationale and version. (c) An open question preserves missing, conflicting or inaccessible evidence as unverified. (d) Future work is planned before implementation, review or measurement. Solid and dashed boundaries distinguish asserting and unresolved or intended classes. These classes are not an evidence ranking. The source-record illustration is AI-generated and conceptual.",
       "source_dates": [],
       "source_note": "Native educational schematic derived from the canonical source relationships named in its caption. Illustration assets are conceptual. The visual date is not a new scientific measurement or source-review date.",
-      "visual_revision_date": "2026-10-26",
+      "visual_revision_date": "2026-11-07",
       "pptx": "schematic-02-statement-classes.pptx",
       "native_source": "report/figures/build_schematic_masters.mjs"
     },
@@ -349,12 +181,21 @@
       "pdf": "schematic-03-decision-pipeline.pdf",
       "source_stem": "schematic-03-decision-pipeline",
       "width": 2126,
-      "height": 1961,
+      "height": 2339,
+      "previews": {
+        "480": "schematic-03-decision-pipeline-480.webp",
+        "960": "schematic-03-decision-pipeline-960.webp"
+      },
+      "reportNumber": 3,
+      "chapterAnchor": "the-target-to-candidate-pipeline",
+      "detailHref": "/report/figures/schematic-03-decision-pipeline/",
+      "sourceDate": null,
+      "visualRevision": "2026-11-07",
       "alt": "Nine target-to-candidate stages each pair a decision with a recorded failure mode. Arrows denote stage order and do not report candidate survival.",
-      "caption": "Target to candidate. Nine numbered stages follow the canonical decision table, in a serpentine reading order. Each stage pairs a conceptual object with its decision and an explicitly labelled frequent failure. Native arrows indicate stage order only. AI-generated illustrations, repeated assay objects and their internal marks are conceptual and do not report candidate counts, binding, causal effects or success probabilities. The strong cheap baselines and complete evidence contracts remain in the adjacent source table.",
+      "caption": "Target to candidate. Nine numbered stages follow the active v0.2 decision table in three horizontal rows, each read from left to right. Edge-wrapped connectors carry stage order from the last stage of one row to the first stage of the next. Every stage pairs a conceptual object with a decision and an explicitly labelled frequent failure. Arrows denote order, not causality or advancement success. Illustrations are AI-generated concepts rather than candidate counts, measured binding or biological effects. Complete evidence contracts and strong cheap baselines remain in the adjacent source table.",
       "source_dates": [],
       "source_note": "Native educational schematic derived from the canonical source relationships named in its caption. Illustration assets are conceptual. The visual date is not a new scientific measurement or source-review date.",
-      "visual_revision_date": "2026-11-06",
+      "visual_revision_date": "2026-11-07",
       "pptx": "schematic-03-decision-pipeline.pptx",
       "native_source": "report/figures/build_schematic_masters.mjs"
     },
@@ -366,31 +207,74 @@
       "pdf": "schematic-04-stage-contracts.pdf",
       "source_stem": "schematic-04-stage-contracts",
       "width": 2126,
-      "height": 1890,
+      "height": 2764,
+      "previews": {
+        "480": "schematic-04-stage-contracts-480.webp",
+        "960": "schematic-04-stage-contracts-960.webp"
+      },
+      "reportNumber": 4,
+      "chapterAnchor": "the-target-to-candidate-pipeline",
+      "detailHref": "/report/figures/schematic-04-stage-contracts/",
+      "sourceDate": null,
+      "visualRevision": "2026-11-07",
       "alt": "Each of nine stages names the evidence its decision requires. Checklist marks denote required fields, not completed measurements.",
-      "caption": "Stage evidence contracts. Nine numbered stages retain the minimum required records from the canonical stage table. Each compact group pairs its stage identity and conceptual object with a native checklist. Filled squares denote required fields, not completed measurements. The rows follow the source-table order. The contracts describe what must be argued at each stage and do not establish that a candidate satisfies them. Baselines and frequent failures remain separate in the adjacent table. The illustrations are AI-generated and conceptual.",
+      "caption": "Stage evidence contracts. Nine rows retain every minimum required field from the active v0.2 stage table, grouped into mechanism and target, assay and hit, and lead and candidate bands. Hollow squares mark required records. They do not indicate completed measurements or that a candidate is ready to advance. Stage identity and field labels are native editable objects. Baselines and frequent failures remain separate in the adjacent table.",
       "source_dates": [],
       "source_note": "Native educational schematic derived from the canonical source relationships named in its caption. Illustration assets are conceptual. The visual date is not a new scientific measurement or source-review date.",
-      "visual_revision_date": "2026-11-06",
+      "visual_revision_date": "2026-11-07",
       "pptx": "schematic-04-stage-contracts.pptx",
       "native_source": "report/figures/build_schematic_masters.mjs"
     },
     {
-      "id": "schematic-05-prerequisite-graph",
-      "title": "Learning-path prerequisites",
-      "kind": "schematic",
-      "file": "schematic-05-prerequisite-graph.png",
-      "pdf": "schematic-05-prerequisite-graph.pdf",
-      "source_stem": "schematic-05-prerequisite-graph",
-      "width": 2126,
-      "height": 1725,
-      "alt": "An incidence matrix maps shared prerequisites across six learning paths and separately marks lessons also included in the core route. Badges count declared relationships, not difficulty or learning.",
-      "caption": "Prerequisites across six learning paths. The current curriculum YAML names 10 shared prerequisite lessons and 21 prerequisite relations across five specialist routes. A filled circle in the incidence matrix denotes a stated prerequisite. A dashed square denotes one of the 8 shared lessons also listed in the core route, a different relation. Row badges count the routes that require the lesson. Header badges count each route's listed lessons and are derived directly from the current YAML. The core route states no prerequisites. Counts describe the map, not difficulty, coverage or observed learning. Route illustrations are AI-generated and conceptual.",
+      "id": "plot-1-registry-composition",
+      "title": "Registry composition",
+      "kind": "plot",
+      "file": "plot-1-registry-composition.png",
+      "pdf": "plot-1-registry-composition.pdf",
+      "source_stem": "plot_1_registry_composition",
+      "width": 2125,
+      "height": 1275,
+      "previews": {
+        "480": "plot-1-registry-composition-480.webp",
+        "960": "plot-1-registry-composition-960.webp"
+      },
+      "reportNumber": 5,
+      "chapterAnchor": "the-aidd-education-and-infrastructure-landscape",
+      "detailHref": "/report/figures/plot-1-registry-composition/",
+      "sourceDate": "2026-10-25",
+      "visualRevision": "2026-11-07",
+      "alt": "Ranked catalogue record counts and their shares by object kind; no verification or quality ranking is implied.",
+      "caption": "Registry composition by kind. 232 catalogue records: 84 model, 59 software, 27 benchmark, 22 database, 14 dataset, 11 agent, 7 tutorial, 4 paper, 3 standard, 1 model asset. The source is the canonical Atlas resources.v1 projection; individual record verification dates range from 2026-09-04 to 2026-10-25. A count of records says nothing about whether a record has been verified, and the figure carries no status, access or openness information.",
+      "source_dates": [
+        "2026-09-04",
+        "2026-10-25"
+      ],
+      "source_note": "Canonical Atlas resources.v1 projection; individual record verification dates range from 2026-09-04 to 2026-10-25. The visual reconstruction does not establish a new review of every record.",
+      "visual_revision_date": "2026-11-07"
+    },
+    {
+      "id": "plot-3-curriculum-units-per-track",
+      "title": "Curriculum units and lessons",
+      "kind": "plot",
+      "file": "plot-3-curriculum-units-per-track.png",
+      "pdf": "plot-3-curriculum-units-per-track.pdf",
+      "source_stem": "plot_3_curriculum_units_per_track",
+      "width": 2125,
+      "height": 2220,
+      "previews": {
+        "480": "plot-3-curriculum-units-per-track-480.webp",
+        "960": "plot-3-curriculum-units-per-track-960.webp"
+      },
+      "reportNumber": 6,
+      "chapterAnchor": "the-aidd-education-and-infrastructure-landscape",
+      "detailHref": "/report/figures/plot-3-curriculum-units-per-track/",
+      "sourceDate": null,
+      "visualRevision": "2026-11-07",
+      "alt": "The exact core, research and practice unit counts are aligned by track, beside separate lesson counts. These are curriculum objects, not measured learning outcomes.",
+      "caption": "Curriculum units per track across the 18 tracks, split by layer, beside the number of lessons in each track. Stacked segments count core, research and practice units, with zero practice counts labelled explicitly; separate lollipops count lessons. The curriculum holds 120 learning units in 127 lessons, 56 core, 44 research and 20 practice. A unit is a learning objective attached to a lesson, so the two counts differ, and neither one says how long a track takes or whether a learner reaches its end.",
       "source_dates": [],
-      "source_note": "Native educational schematic derived from the canonical source relationships named in its caption. Illustration assets are conceptual. The visual date is not a new scientific measurement or source-review date.",
-      "visual_revision_date": "2026-10-26",
-      "pptx": "schematic-05-prerequisite-graph.pptx",
-      "native_source": "report/figures/build_schematic_masters.mjs"
+      "source_note": "Canonical curriculum tracks.yaml, version 0.1. The source declares no review date; this drawing does not establish a new content review.",
+      "visual_revision_date": "2026-11-07"
     },
     {
       "id": "schematic-06-openness-dimensions",
@@ -400,16 +284,184 @@
       "pdf": "schematic-06-openness-dimensions.pdf",
       "source_stem": "schematic-06-openness-dimensions",
       "width": 2126,
-      "height": 1784,
+      "height": 2174,
+      "previews": {
+        "480": "schematic-06-openness-dimensions-480.webp",
+        "960": "schematic-06-openness-dimensions-960.webp"
+      },
+      "reportNumber": 7,
+      "chapterAnchor": "the-open-development-frontier",
+      "detailHref": "/report/figures/schematic-06-openness-dimensions/",
+      "sourceDate": "2026-10-21",
+      "visualRevision": "2026-11-07",
       "alt": "Two actual catalogue records retain seven separate availability dimensions, while lifecycle and access remain distinct. Conceptual illustrations add no implementation or data evidence.",
-      "caption": "Seven-dimensional openness. Two source records illustrate why asset availability is recorded separately for inference code, training code, weights, architecture, data recipe, training data and evaluation code. The states are available, not available, not applicable and unverified, each with a redundant native symbol. The Img2Mol model and ADME-Fang-v1 dataset states are taken directly from their canonical records, both last verified 2026-10-21. Lifecycle and access remain separate axes. Available does not establish unrestricted use. AI-generated model and data illustrations are conceptual rather than evidence of an implementation or dataset.",
+      "caption": "Seven-dimensional openness. Two canonical source records give separate availability states for inference code, training code, weights, architecture, data recipe, training data and evaluation code. Redundant symbols and labels distinguish available, not available, not applicable and unverified. Actual access and lifecycle values are shown separately for each record, rather than inferred from these seven states. Both records were last verified 2026-10-21. Available does not establish unrestricted use, and unverified does not mean unavailable. The model and dataset illustrations are AI-generated concepts.",
       "source_dates": [
         "2026-10-21"
       ],
       "source_note": "Native educational schematic derived from the canonical source relationships named in its caption. Illustration assets are conceptual. The visual date is not a new scientific measurement or source-review date.",
-      "visual_revision_date": "2026-10-26",
+      "visual_revision_date": "2026-11-07",
       "pptx": "schematic-06-openness-dimensions.pptx",
       "native_source": "report/figures/build_schematic_masters.mjs"
+    },
+    {
+      "id": "plot-6-openness-matrix",
+      "title": "Seven-dimensional openness",
+      "kind": "plot",
+      "file": "plot-6-openness-matrix.png",
+      "pdf": "plot-6-openness-matrix.pdf",
+      "source_stem": "plot_6_openness_matrix",
+      "width": 2125,
+      "height": 2280,
+      "previews": {
+        "480": "plot-6-openness-matrix-480.webp",
+        "960": "plot-6-openness-matrix-960.webp"
+      },
+      "reportNumber": 8,
+      "chapterAnchor": "the-open-development-frontier",
+      "detailHref": "/report/figures/plot-6-openness-matrix/",
+      "sourceDate": "2026-10-25",
+      "visualRevision": "2026-11-07",
+      "alt": "Every kind is crossed with seven availability dimensions. Exact available/applicable fractions sit above strips that retain available, unverified, unavailable and not-applicable records separately.",
+      "caption": "Openness by record kind and by the seven openness dimensions, over 232 catalogue records. The source is the canonical Atlas resources.v1 projection; individual record verification dates range from 2026-09-04 to 2026-10-25. Each cell labels available records over applicable records. Its strip retains all records in four separate states: available, unverified, not available and not applicable; not-applicable records are excluded only from the displayed fraction. Openness is recorded per dimension and is never collapsed here into a single open or closed label.",
+      "source_dates": [
+        "2026-09-04",
+        "2026-10-25"
+      ],
+      "source_note": "Canonical Atlas resources.v1 projection; individual record verification dates range from 2026-09-04 to 2026-10-25. The visual reconstruction does not establish a new review of every record.",
+      "visual_revision_date": "2026-11-07"
+    },
+    {
+      "id": "plot-7-access-and-licence",
+      "title": "Access and stated licence",
+      "kind": "plot",
+      "file": "plot-7-access-and-licence.png",
+      "pdf": "plot-7-access-and-licence.pdf",
+      "source_stem": "plot_7_access_and_licence",
+      "width": 2125,
+      "height": 2160,
+      "previews": {
+        "480": "plot-7-access-and-licence-480.webp",
+        "960": "plot-7-access-and-licence-960.webp"
+      },
+      "reportNumber": 9,
+      "chapterAnchor": "the-open-development-frontier",
+      "detailHref": "/report/figures/plot-7-access-and-licence/",
+      "sourceDate": "2026-10-25",
+      "visualRevision": "2026-11-07",
+      "alt": "Access counts and the most restrictive stated licence layer describe the same record population in separate views, retaining unknown access and unread licence metadata.",
+      "caption": "Access level and licence layer for the 232 catalogue records. The source is the canonical Atlas resources.v1 projection; individual record verification dates range from 2026-09-04 to 2026-10-25. 6 records carry no verified access level and 20 record no licence. The verified access levels are 1 open weights, 164 open source, 42 source available, 7 research only, 10 gated, 2 closed. By licence layer, 8 public domain dedication, 125 permissive software licence, 31 creative commons attribution, 24 copyleft, 7 creative commons non-commercial, 17 other stated terms. The 34 records with more than one licence are counted once, in their most restrictive stated layer.",
+      "source_dates": [
+        "2026-09-04",
+        "2026-10-25"
+      ],
+      "source_note": "Canonical Atlas resources.v1 projection; individual record verification dates range from 2026-09-04 to 2026-10-25. The visual reconstruction does not establish a new review of every record.",
+      "visual_revision_date": "2026-11-07"
+    },
+    {
+      "id": "schematic-05-prerequisite-graph",
+      "title": "Learning-path prerequisites",
+      "kind": "schematic",
+      "file": "schematic-05-prerequisite-graph.png",
+      "pdf": "schematic-05-prerequisite-graph.pdf",
+      "source_stem": "schematic-05-prerequisite-graph",
+      "width": 2126,
+      "height": 2115,
+      "previews": {
+        "480": "schematic-05-prerequisite-graph-480.webp",
+        "960": "schematic-05-prerequisite-graph-960.webp"
+      },
+      "reportNumber": 10,
+      "chapterAnchor": "data-standards-tasks-and-benchmarks",
+      "detailHref": "/report/figures/schematic-05-prerequisite-graph/",
+      "sourceDate": null,
+      "visualRevision": "2026-11-07",
+      "alt": "An incidence matrix maps shared prerequisites across six learning paths and separately marks lessons also included in the core route. Badges count declared relationships, not difficulty or learning.",
+      "caption": "Prerequisites across six learning paths. The current curriculum YAML names 10 shared prerequisite lessons and 21 prerequisite relations across five specialist routes. Filled circles denote stated prerequisites. The separate core column uses dashed hollow squares for the 8 shared lessons also listed in the core route. Row badges count routes requiring each lesson; header counts give the listed lessons in each route. The core route states no prerequisites. These counts describe the map, not difficulty, coverage or observed learning. Route illustrations are AI-generated concepts.",
+      "source_dates": [],
+      "source_note": "Native educational schematic derived from the canonical source relationships named in its caption. Illustration assets are conceptual. The visual date is not a new scientific measurement or source-review date.",
+      "visual_revision_date": "2026-11-07",
+      "pptx": "schematic-05-prerequisite-graph.pptx",
+      "native_source": "report/figures/build_schematic_masters.mjs"
+    },
+    {
+      "id": "plot-2-coverage-bounds",
+      "title": "Historical coverage bounds",
+      "kind": "plot",
+      "file": "plot-2-coverage-bounds.png",
+      "pdf": "plot-2-coverage-bounds.pdf",
+      "source_stem": "plot_2_coverage_bounds",
+      "width": 2125,
+      "height": 2340,
+      "previews": {
+        "480": "plot-2-coverage-bounds-480.webp",
+        "960": "plot-2-coverage-bounds-960.webp"
+      },
+      "reportNumber": 11,
+      "chapterAnchor": "reproducibility-evaluation-and-failure-modes",
+      "detailHref": "/report/figures/plot-2-coverage-bounds/",
+      "sourceDate": "2026-10-24",
+      "visualRevision": "2026-11-07",
+      "alt": "The audit reports an interval rather than a leaderboard: all 93 AIDD Commons cells are direct observations, so this project's own row is an exact count at every threshold, while an external interval can remain open where depth or run basis is unverified, including in material that has been read.",
+      "caption": "Coverage bounds for thirteen providers across five thresholds, each bound a lower and an upper count out of 93 topics. AIDD Commons is the first row and its bounds are equal at every threshold, 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed, because all 93 of its cells are direct observations. Every external row is an interval, because unobserved cells contribute to an upper bound and nothing to a lower one. The bounds are not confidence intervals and no probability attaches to them.",
+      "source_dates": [
+        "2026-10-24"
+      ],
+      "source_note": "Historical comparison projection as of 2026-10-24; bounds are evidence bounds.",
+      "visual_revision_date": "2026-11-07"
+    },
+    {
+      "id": "plot-5-self-record-vs-reading",
+      "title": "Retained reading agreement",
+      "kind": "plot",
+      "file": "plot-5-self-record-vs-reading.png",
+      "pdf": "plot-5-self-record-vs-reading.pdf",
+      "source_stem": "plot_5_self_record_vs_reading",
+      "width": 2125,
+      "height": 1500,
+      "previews": {
+        "480": "plot-5-self-record-vs-reading-480.webp",
+        "960": "plot-5-self-record-vs-reading-960.webp"
+      },
+      "reportNumber": 12,
+      "chapterAnchor": "reproducibility-evaluation-and-failure-modes",
+      "detailHref": "/report/figures/plot-5-self-record-vs-reading/",
+      "sourceDate": "2026-10-24",
+      "visualRevision": "2026-11-07",
+      "alt": "The retained topic readings agree with the current self record on 93 of 93 topics, with 0 deeper and 0 shallower, in the comparison projection dated 2026-10-24. The series began on 2026-09-11 and documents re-readings through 2026-10-24. These latest retained rows include reviewer authored material and constrained shallower outcomes, so they are not independent replication or evidence of reader learning.",
+      "caption": "The current self record against the retained automated readings of 93 topics in the comparison.v1 projection dated 2026-10-24. The compact upper strip gives the three outcome counts, and the lower markers pair the five threshold counts. The series began on 2026-09-11, and its description documents re-readings through 2026-10-24. These totals aggregate the latest retained topic scores rather than a single pass. The current aggregate agrees on 93 topics, reads 0 deeper and 0 shallower. At the thresholds the retained readings give 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed against the current record's 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed. The reviewer also authored parts of the course, so this is not an independent replication or evidence of reader learning. The shallower count is constrained by the audit's rule against inflated self scores.",
+      "source_dates": [
+        "2026-09-11",
+        "2026-10-24"
+      ],
+      "source_note": "Latest retained readings are aggregated separately from the series initiation and documented re-reading dates; they are not independent replication.",
+      "visual_revision_date": "2026-11-07"
+    },
+    {
+      "id": "plot-4-depth-distribution-per-track",
+      "title": "Observed depth and run basis",
+      "kind": "plot",
+      "file": "plot-4-depth-distribution-per-track.png",
+      "pdf": "plot-4-depth-distribution-per-track.pdf",
+      "source_stem": "plot_4_depth_distribution_per_track",
+      "width": 2125,
+      "height": 2220,
+      "previews": {
+        "480": "plot-4-depth-distribution-per-track-480.webp",
+        "960": "plot-4-depth-distribution-per-track-960.webp"
+      },
+      "reportNumber": 13,
+      "chapterAnchor": "reproducibility-evaluation-and-failure-modes",
+      "detailHref": "/report/figures/plot-4-depth-distribution-per-track/",
+      "sourceDate": "2026-10-24",
+      "visualRevision": "2026-11-07",
+      "alt": "Source-recorded topic depths and real-data versus authored run bases are kept separate for every track; a runnable task is not evidence of learner achievement.",
+      "caption": "Highest observed depth per track for this project's 93 audited topics, beside the basis each track's runnable topics rest on. 12 worked, 0 executable and 81 assessed, and of the 81 runnable topics 62 rest on real data and 19 rest on authored inputs. Each topic appears once in the highest-depth stack; the separate run-basis stack partitions runnable topics. Depth records what a reviewer observed in the material, not what a learner achieved.",
+      "source_dates": [
+        "2026-10-24"
+      ],
+      "source_note": "Historical comparison projection as of 2026-10-24; bounds are evidence bounds.",
+      "visual_revision_date": "2026-11-07"
     },
     {
       "id": "schematic-07-frozen-lifecycle",
@@ -419,14 +471,180 @@
       "pdf": "schematic-07-frozen-lifecycle.pdf",
       "source_stem": "schematic-07-frozen-lifecycle",
       "width": 2126,
-      "height": 1300,
+      "height": 1737,
+      "previews": {
+        "480": "schematic-07-frozen-lifecycle-480.webp",
+        "960": "schematic-07-frozen-lifecycle-960.webp"
+      },
+      "reportNumber": 14,
+      "chapterAnchor": "the-completed-laboratory-evidence",
+      "detailHref": "/report/figures/schematic-07-frozen-lifecycle/",
+      "sourceDate": null,
+      "visualRevision": "2026-11-07",
       "alt": "A frozen lab writes the protocol before the held-out result is seen, runs its pretests on training and validation data, opens the test set once, and treats a bug found after the opening as an error that invalidates the protocol rather than a result to be reported.",
-      "caption": "Frozen evaluation lifecycle. The written protocol is frozen before structural and finite-output pretests on training and validation data. A successful pretest sequence precedes the one-time test opening and reviewed summary. The native dashed return to development applies only before test opening. After test opening, a bug is recorded as a protocol-invalidating error and result-driven retuning is prohibited. The summary retains observed values and limitations. No measured value or universal successful pretest is asserted. The computational illustration is AI-generated and conceptual.",
+      "caption": "Frozen evaluation lifecycle. The written protocol is frozen before structural and finite-output pretests on training and validation data. A prominent boundary separates these pretests from the one-time held-out test opening and reviewed summary. The dashed development return applies only before test opening. A separate post-test error branch records a protocol-invalidating bug and prohibits result-driven retuning. The summary retains observed values and limitations. The figure asserts no measured output or universally successful pretest. The computation illustration is AI-generated and conceptual.",
       "source_dates": [],
       "source_note": "Native educational schematic derived from the canonical source relationships named in its caption. Illustration assets are conceptual. The visual date is not a new scientific measurement or source-review date.",
-      "visual_revision_date": "2026-10-26",
+      "visual_revision_date": "2026-11-07",
       "pptx": "schematic-07-frozen-lifecycle.pptx",
       "native_source": "report/figures/build_schematic_masters.mjs"
+    },
+    {
+      "id": "plot-8-freesolv-split-calibration",
+      "title": "FreeSolv split and interval metrics",
+      "kind": "plot",
+      "file": "plot-8-freesolv-split-calibration.png",
+      "pdf": "plot-8-freesolv-split-calibration.pdf",
+      "source_stem": "plot_8_freesolv_split_calibration",
+      "width": 2125,
+      "height": 1920,
+      "previews": {
+        "480": "plot-8-freesolv-split-calibration-480.webp",
+        "960": "plot-8-freesolv-split-calibration-960.webp"
+      },
+      "reportNumber": 15,
+      "chapterAnchor": "the-completed-laboratory-evidence",
+      "detailHref": "/report/figures/plot-8-freesolv-split-calibration/",
+      "sourceDate": "2026-09-04",
+      "visualRevision": "2026-11-07",
+      "alt": "Frozen scaffold and random split metrics are paired within each teaching baseline. The training-set mean has no interval; empirical coverage is marginal, and its reviewed source states no nominal interval level.",
+      "caption": "FreeSolv point and interval metrics for two fixed teaching baselines, on the predeclared scaffold split and the easier random split. The ridge reaches 1.13 kcal/mol mean absolute error on the scaffold split against 2.59 for the training-set mean, and 1.02 against 2.77 on the random split. On the scaffold split the intervals reach an empirical coverage of 0.875 for the ridge and 0.90625 for the forest, at mean widths of 5.48 and 6.01 kcal/mol. The coverage is marginal coverage and not conditional calibration, the nominal level of the intervals is not stated in the reviewed results, and these teaching baselines establish no state of the art.",
+      "source_dates": [
+        "2026-09-04"
+      ],
+      "source_note": "Retained source summaries: labs/freesolv/reviewed-results.json. The dates describe their reviewed on metadata; no experiment was rerun for this visual reconstruction.",
+      "visual_revision_date": "2026-11-07"
+    },
+    {
+      "id": "plot-9-representation-ranking-flips",
+      "title": "Representation ranking changes",
+      "kind": "plot",
+      "file": "plot-9-representation-ranking-flips.png",
+      "pdf": "plot-9-representation-ranking-flips.pdf",
+      "source_stem": "plot_9_representation_ranking_flips",
+      "width": 2125,
+      "height": 1890,
+      "previews": {
+        "480": "plot-9-representation-ranking-flips-480.webp",
+        "960": "plot-9-representation-ranking-flips-960.webp"
+      },
+      "reportNumber": 16,
+      "chapterAnchor": "the-completed-laboratory-evidence",
+      "detailHref": "/report/figures/plot-9-representation-ranking-flips/",
+      "sourceDate": "2026-09-08",
+      "visualRevision": "2026-11-07",
+      "alt": "The baseline that wins the primary partition loses the separate assay replication by a wide margin, so a frozen evaluation fixes a protocol and a result, not a ranking that holds on the next evaluation.",
+      "caption": "The same three baselines on the primary partition of 132 compounds and on the separate assay replication of 170 compounds. The Morgan ridge is the best of the three on the primary partition at 0.418 mean absolute error, while the descriptor ridge is the best on the replication at 0.579; the Morgan ridge reaches 3.132 there and its rank correlation falls from 0.505 to -0.041. The two evaluations are separate comparisons and success on one does not erase failure on the other, the acquisition lab had accessed labels shared with this evaluation before it ran, and no confidence intervals or p values are reported.",
+      "source_dates": [
+        "2026-09-08"
+      ],
+      "source_note": "Retained source summaries: labs/chembl_egfr/locked-summary.json. The dates describe their reviewed on metadata; no experiment was rerun for this visual reconstruction.",
+      "visual_revision_date": "2026-11-07"
+    },
+    {
+      "id": "plot-11-correlated-frames-error-bars",
+      "title": "Correlated frames and uncertainty",
+      "kind": "plot",
+      "file": "plot-11-correlated-frames-error-bars.png",
+      "pdf": "plot-11-correlated-frames-error-bars.pdf",
+      "source_stem": "plot_11_correlated_frames_error_bars",
+      "width": 2125,
+      "height": 1890,
+      "previews": {
+        "480": "plot-11-correlated-frames-error-bars-480.webp",
+        "960": "plot-11-correlated-frames-error-bars-960.webp"
+      },
+      "reportNumber": 17,
+      "chapterAnchor": "the-completed-laboratory-evidence",
+      "detailHref": "/report/figures/plot-11-correlated-frames-error-bars/",
+      "sourceDate": "2026-09-11",
+      "visualRevision": "2026-11-07",
+      "alt": "Naive and block standard errors, their reported ratios and block-count sensitivity are shown from the same retained rMD17 page; there is one trajectory per molecule.",
+      "caption": "The uncertainty of a trajectory observable, from the rMD17 lab page. Ethanol has a naive standard error of 0.000087 Å against a block-averaged standard error of 0.000288 Å at 100 blocks and Malonaldehyde has a naive standard error of 0.000235 Å against a block-averaged standard error of 0.001472 Å at 100 blocks. The upper-right panel is the ratio between the two estimates, which is the number the page reports. The lower panel is ethanol's block-averaged standard error against the block count, because a corrected estimate still carries a choice inside it. There is one trajectory per molecule and one level of theory, so nothing here speaks to replicate dependence or force-field sensitivity.",
+      "source_dates": [
+        "2026-09-11"
+      ],
+      "source_note": "The published rMD17 observable page is the retained numerical source. Its computation/review dates are separate from this visual reconstruction; no new simulation was run.",
+      "visual_revision_date": "2026-11-07"
+    },
+    {
+      "id": "plot-12-trajectory-convergence",
+      "title": "Trajectory convergence",
+      "kind": "plot",
+      "file": "plot-12-trajectory-convergence.png",
+      "pdf": "plot-12-trajectory-convergence.pdf",
+      "source_stem": "plot_12_trajectory_convergence",
+      "width": 2125,
+      "height": 1890,
+      "previews": {
+        "480": "plot-12-trajectory-convergence-480.webp",
+        "960": "plot-12-trajectory-convergence-960.webp"
+      },
+      "reportNumber": 18,
+      "chapterAnchor": "the-completed-laboratory-evidence",
+      "detailHref": "/report/figures/plot-12-trajectory-convergence/",
+      "sourceDate": "2026-09-11",
+      "visualRevision": "2026-11-07",
+      "alt": "The full chronological convergence series and a magnified later-frame view use the same observations, retaining the nonmonotone malonaldehyde error.",
+      "caption": "Signed deviations of the cumulative mean radius of gyration from the full 100,000-frame mean, from the rMD17 lab page. +0.00198 Å for ethanol and -0.02528 Å for malonaldehyde at 100 frames, +0.00254 Å for ethanol and -0.00743 Å for malonaldehyde at 1,000 frames and +0.00054 Å for ethanol and -0.00946 Å for malonaldehyde at 10,000 frames. The malonaldehyde curve is not monotone, being closer at a thousand frames than at ten thousand, and that is drawn as the data stands. One trajectory per molecule and one level of theory means nothing here speaks to replicate dependence or force-field sensitivity.",
+      "source_dates": [
+        "2026-09-11"
+      ],
+      "source_note": "The published rMD17 observable page is the retained numerical source. Its computation/review dates are separate from this visual reconstruction; no new simulation was run.",
+      "visual_revision_date": "2026-11-07"
+    },
+    {
+      "id": "plot-10-acquisition-policy-recovery",
+      "title": "Retrospective acquisition policies",
+      "kind": "plot",
+      "file": "plot-10-acquisition-policy-recovery.png",
+      "pdf": "plot-10-acquisition-policy-recovery.pdf",
+      "source_stem": "plot_10_acquisition_policy_recovery",
+      "width": 2125,
+      "height": 2310,
+      "previews": {
+        "480": "plot-10-acquisition-policy-recovery-480.webp",
+        "960": "plot-10-acquisition-policy-recovery-960.webp"
+      },
+      "reportNumber": 19,
+      "chapterAnchor": "the-completed-laboratory-evidence",
+      "detailHref": "/report/figures/plot-10-acquisition-policy-recovery/",
+      "sourceDate": "2026-09-11",
+      "visualRevision": "2026-11-07",
+      "alt": "All policy recovery and evaluation-error paths are retained for two retrospective assay replays, with the normalized recovery integral beside them. Five random seeds are fixed policy instances, not biological replicates.",
+      "caption": "Acquisition policies on two retrospective assay replays, on CHEMBL5736995, 124 compounds were acquired against a pool of 631, and the diversity policy reached normalized recovery AUC 0.0508 against 0.1133 for the ensemble-variance policy and on CHEMBL3705421, 24 compounds were acquired against a pool of 130, and the diversity policy reached normalized recovery AUC 0.0000 against 0.1635 for the ensemble-variance policy. The two named policies are drawn in colour and the five random policy instances in one colour with a distinct marker each, because they are five fixed seeds of one policy rather than five methods. Normalized recovery AUC is the trapezoidal integral over acquired-count checkpoints divided by the final acquired count. These are retrospective replays and not prospective experiments, the random seeds are not independent replicates, and no confidence intervals or p values are reported.",
+      "source_dates": [
+        "2026-09-08",
+        "2026-09-11"
+      ],
+      "source_note": "Retained source summaries: labs/pool_budget/real-summary.json, labs/pool_budget/uncertainty-summary.json. The dates describe their completed on metadata; no experiment was rerun for this visual reconstruction.",
+      "visual_revision_date": "2026-11-07"
+    },
+    {
+      "id": "plot-13-two-assay-systems-disagree",
+      "title": "Assay-system disagreement",
+      "kind": "plot",
+      "file": "plot-13-two-assay-systems-disagree.png",
+      "pdf": "plot-13-two-assay-systems-disagree.pdf",
+      "source_stem": "plot_13_two_assay_systems_disagree",
+      "width": 2125,
+      "height": 2250,
+      "previews": {
+        "480": "plot-13-two-assay-systems-disagree-480.webp",
+        "960": "plot-13-two-assay-systems-disagree-960.webp"
+      },
+      "reportNumber": 20,
+      "chapterAnchor": "the-completed-laboratory-evidence",
+      "detailHref": "/report/figures/plot-13-two-assay-systems-disagree/",
+      "sourceDate": "2026-09-12",
+      "visualRevision": "2026-11-07",
+      "alt": "Source-recorded coefficients and shared counts for CYP and clearance system pairs appear beside six selected CYP disagreement extremes. These examples are extremes, not a sample of the distribution.",
+      "caption": "Agreement between CYP and clearance assay systems. CYP2D6 against CYP3A4, all pairs reaches a Pearson r of 0.2987 and a Spearman rho of 0.2981 over 1195 shared molecules, CYP2D6 against CYP3A4, clean pairs reaches a Pearson r of 0.2990 and a Spearman rho of 0.3038 over 1015 shared molecules, microsome against rat hepatocyte reaches a Pearson r of 0.3410 and a Spearman rho of 0.3868 over 359 shared molecules, microsome against human hepatocyte reaches a Pearson r of 0.4083 and a Spearman rho of 0.4864 over 96 shared molecules and human hepatocyte against rat hepatocyte reaches a Pearson r of 0.3095 and a Spearman rho of 0.4732 over 106 shared molecules. The six largest disagreements between the two CYP systems span 2.46 to 2.90 pChEMBL in both directions, with the first system higher on three molecules and the second on three. A correlation near 0.3 means a measurement in one system carries little information about the other, which is not the same as saying either system is wrong, and the six molecules are the extremes the review found rather than a sample of the distribution.",
+      "source_dates": [
+        "2026-09-12"
+      ],
+      "source_note": "Retained source summaries: labs/cyp_assay_system/summary.json, labs/az_clearance_system/summary.json. The dates describe their computed on metadata; no experiment was rerun for this visual reconstruction.",
+      "visual_revision_date": "2026-11-07"
     }
   ]
 }

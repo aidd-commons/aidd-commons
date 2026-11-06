@@ -1,0 +1,97 @@
+﻿Object / relation,Source label / relation identity
+contract-title-0,Disease and mechanism
+contract-0-field-0-label,Cohort
+contract-0-field-1-label,tissue
+contract-0-field-2-label,perturbation
+contract-0-field-3-label,time
+contract-0-field-4-label,phenotype
+contract-0-field-5-label,confounders
+contract-title-1,Target identification
+contract-1-field-0-label,Stable IDs
+contract-1-field-1-label,isoform/state
+contract-1-field-2-label,direction
+contract-1-field-3-label,disease context
+contract-title-2,Target validation
+contract-2-field-0-label,Intervention
+contract-2-field-1-label,dose
+contract-2-field-2-label,model system
+contract-2-field-3-label,rescue or orthogonal evidence
+contract-title-3,Assay and data strategy
+contract-3-field-0-label,Protocol
+contract-3-field-1-label,units
+contract-3-field-2-label,censoring
+contract-3-field-3-label,controls
+contract-3-field-4-label,batch
+contract-3-field-5-label,provenance
+contract-title-4,Hit discovery
+contract-4-field-0-label,Search space
+contract-4-field-1-label,target state
+contract-4-field-2-label,selection budget
+contract-4-field-3-label,prospective test
+contract-title-5,Hit confirmation
+contract-5-field-0-label,Orthogonal assay
+contract-5-field-1-label,purity
+contract-5-field-2-label,interference checks
+contract-5-field-3-label,concentration response
+contract-title-6,Hit-to-lead
+contract-6-field-0-label,Series identity
+contract-6-field-1-label,potency
+contract-6-field-2-label,selectivity
+contract-6-field-3-label,exposure
+contract-6-field-4-label,synthesis
+contract-title-7,Lead optimisation
+contract-7-field-0-label,Multi-parameter objectives
+contract-7-field-1-label,uncertainty
+contract-7-field-2-label,constraints
+contract-7-field-3-label,synthesis cycle
+contract-title-8,Candidate nomination
+contract-8-field-0-label,Integrated efficacy
+contract-8-field-1-label,safety
+contract-8-field-2-label,DMPK
+contract-8-field-3-label,CMC
+contract-8-field-4-label,translational rationale
+Stage 1 · name,Disease and mechanism
+Stage 1 · decision,Which process is causally relevant?
+Stage 1 · fields,Cohort; tissue; perturbation; time; phenotype; confounders
+Stage 1 · baseline,Replicated effect with covariate control
+Stage 1 · failure,Correlation relabelled as mechanism
+Stage 2 · name,Target identification
+Stage 2 · decision,Which entity is actionable?
+Stage 2 · fields,Stable IDs; isoform/state; direction; disease context
+Stage 2 · baseline,Curated evidence aggregation
+Stage 2 · failure,Gene/protein/pathway identities collapsed
+Stage 3 · name,Target validation
+Stage 3 · decision,Does perturbing it change the phenotype?
+Stage 3 · fields,Intervention; dose; model system; rescue or orthogonal evidence
+Stage 3 · baseline,Held-out perturbation or replicated assay
+Stage 3 · failure,Same evidence reused for discovery and validation
+Stage 4 · name,Assay and data strategy
+Stage 4 · decision,What quantity will guide optimisation?
+Stage 4 · fields,Protocol; units; censoring; controls; batch; provenance
+Stage 4 · baseline,Transparent assay QC and replicate model
+Stage 4 · failure,Incompatible endpoints pooled
+Stage 5 · name,Hit discovery
+Stage 5 · decision,Which candidates deserve confirmation?
+Stage 5 · fields,Search space; target state; selection budget; prospective test
+Stage 5 · baseline,"Similarity, docking, or simple supervised ranker"
+Stage 5 · failure,Retrospective enrichment treated as prospective success
+Stage 6 · name,Hit confirmation
+Stage 6 · decision,Is activity real and attributable?
+Stage 6 · fields,Orthogonal assay; purity; interference checks; concentration response
+Stage 6 · baseline,Rule-based nuisance filters plus retest
+Stage 6 · failure,Aggregation or assay artefact mistaken for binding
+Stage 7 · name,Hit-to-lead
+Stage 7 · decision,Which series has tractable headroom?
+Stage 7 · fields,Series identity; potency; selectivity; exposure; synthesis
+Stage 7 · baseline,Matched molecular-pair and medicinal-chemistry review
+Stage 7 · failure,Optimising one endpoint while losing the programme
+Stage 8 · name,Lead optimisation
+Stage 8 · decision,Which trade-off is worth making?
+Stage 8 · fields,Multi-parameter objectives; uncertainty; constraints; synthesis cycle
+Stage 8 · baseline,Pareto view plus calibrated per-endpoint models
+Stage 8 · failure,Scalar score hides unacceptable liabilities
+Stage 9 · name,Candidate nomination
+Stage 9 · decision,Is the package coherent enough to advance?
+Stage 9 · fields,Integrated efficacy; safety; DMPK; CMC; translational rationale
+Stage 9 · baseline,Predeclared evidence matrix
+Stage 9 · failure,Model confidence substituted for missing experiments

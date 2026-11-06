@@ -1,0 +1,66 @@
+﻿Threshold,Provider,Provider class,Lower,Upper,Topics
+explained,AIDD Commons,curriculum,93,93,93
+explained,AI-Guided Inquiry Learning for Computational Drug Discovery,curriculum,4,84,93
+explained,Advanced Machine Learning for Innovative Drug Discovery,curriculum,0,73,93
+explained,Build AI Drug Discovery Pipelines,curriculum,43,43,93
+explained,ChEMBL Quick Tour,curriculum,4,23,93
+explained,DeepChem Step-by-Step Tutorials,tutorial-collection,9,88,93
+explained,Machine Learning for Drug Discovery and Development,curriculum,0,75,93
+explained,O3DC Drug Discovery Benchmark Index,benchmark-hub,6,92,93
+explained,OpenMM Cookbook and Tutorials,tutorial-collection,3,17,93
+explained,Practical Cheminformatics Tutorials,tutorial-collection,8,78,93
+explained,RDKit Cookbook,specialist-reference,3,47,93
+explained,TeachOpenCADD,tutorial-collection,46,46,93
+explained,Therapeutics Data Commons,benchmark-hub,8,86,93
+worked,AIDD Commons,curriculum,93,93,93
+worked,AI-Guided Inquiry Learning for Computational Drug Discovery,curriculum,3,83,93
+worked,Advanced Machine Learning for Innovative Drug Discovery,curriculum,0,73,93
+worked,Build AI Drug Discovery Pipelines,curriculum,42,42,93
+worked,ChEMBL Quick Tour,curriculum,0,19,93
+worked,DeepChem Step-by-Step Tutorials,tutorial-collection,8,87,93
+worked,Machine Learning for Drug Discovery and Development,curriculum,0,75,93
+worked,O3DC Drug Discovery Benchmark Index,benchmark-hub,5,91,93
+worked,OpenMM Cookbook and Tutorials,tutorial-collection,2,16,93
+worked,Practical Cheminformatics Tutorials,tutorial-collection,8,78,93
+worked,RDKit Cookbook,specialist-reference,3,47,93
+worked,TeachOpenCADD,tutorial-collection,40,40,93
+worked,Therapeutics Data Commons,benchmark-hub,7,85,93
+executable,AIDD Commons,curriculum,81,81,93
+executable,AI-Guided Inquiry Learning for Computational Drug Discovery,curriculum,3,83,93
+executable,Advanced Machine Learning for Innovative Drug Discovery,curriculum,0,73,93
+executable,Build AI Drug Discovery Pipelines,curriculum,34,34,93
+executable,ChEMBL Quick Tour,curriculum,0,19,93
+executable,DeepChem Step-by-Step Tutorials,tutorial-collection,6,85,93
+executable,Machine Learning for Drug Discovery and Development,curriculum,0,75,93
+executable,O3DC Drug Discovery Benchmark Index,benchmark-hub,0,86,93
+executable,OpenMM Cookbook and Tutorials,tutorial-collection,2,16,93
+executable,Practical Cheminformatics Tutorials,tutorial-collection,6,76,93
+executable,RDKit Cookbook,specialist-reference,0,44,93
+executable,TeachOpenCADD,tutorial-collection,32,32,93
+executable,Therapeutics Data Commons,benchmark-hub,6,84,93
+executable-on-real-data,AIDD Commons,curriculum,62,62,93
+executable-on-real-data,AI-Guided Inquiry Learning for Computational Drug Discovery,curriculum,3,83,93
+executable-on-real-data,Advanced Machine Learning for Innovative Drug Discovery,curriculum,0,73,93
+executable-on-real-data,Build AI Drug Discovery Pipelines,curriculum,15,34,93
+executable-on-real-data,ChEMBL Quick Tour,curriculum,0,19,93
+executable-on-real-data,DeepChem Step-by-Step Tutorials,tutorial-collection,1,85,93
+executable-on-real-data,Machine Learning for Drug Discovery and Development,curriculum,0,75,93
+executable-on-real-data,O3DC Drug Discovery Benchmark Index,benchmark-hub,0,86,93
+executable-on-real-data,OpenMM Cookbook and Tutorials,tutorial-collection,2,16,93
+executable-on-real-data,Practical Cheminformatics Tutorials,tutorial-collection,3,76,93
+executable-on-real-data,RDKit Cookbook,specialist-reference,0,44,93
+executable-on-real-data,TeachOpenCADD,tutorial-collection,23,32,93
+executable-on-real-data,Therapeutics Data Commons,benchmark-hub,5,84,93
+assessed,AIDD Commons,curriculum,81,81,93
+assessed,AI-Guided Inquiry Learning for Computational Drug Discovery,curriculum,0,80,93
+assessed,Advanced Machine Learning for Innovative Drug Discovery,curriculum,0,73,93
+assessed,Build AI Drug Discovery Pipelines,curriculum,0,0,93
+assessed,ChEMBL Quick Tour,curriculum,0,19,93
+assessed,DeepChem Step-by-Step Tutorials,tutorial-collection,0,79,93
+assessed,Machine Learning for Drug Discovery and Development,curriculum,0,75,93
+assessed,O3DC Drug Discovery Benchmark Index,benchmark-hub,0,86,93
+assessed,OpenMM Cookbook and Tutorials,tutorial-collection,0,14,93
+assessed,Practical Cheminformatics Tutorials,tutorial-collection,0,70,93
+assessed,RDKit Cookbook,specialist-reference,0,44,93
+assessed,TeachOpenCADD,tutorial-collection,23,23,93
+assessed,Therapeutics Data Commons,benchmark-hub,0,78,93

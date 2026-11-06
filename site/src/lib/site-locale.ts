@@ -6,7 +6,7 @@ export function localizedPath(path: string, chinese: boolean): string {
   const pathname = match[1].replace(/^\/zh-cn(?=\/|$)/u, "") || "/";
   const suffix = match[2];
   const translated = pathname === "/" || /^\/(learn|labs|search|atlas)(\/|$)/u.test(pathname) ||
-    /^\/(audit|contribute)\/?$/u.test(pathname) || /^\/report\/(figures\/)?$/u.test(pathname);
+    /^\/(audit|contribute)\/?$/u.test(pathname) || /^\/report\/(figures\/([^/]+\/)?)?$/u.test(pathname);
   // These authored Atlas essays retain their canonical English source.
   const sourceEssay = /^\/atlas\/(target-to-candidate-map|open-cofolding-frontier)\/?$/u.test(pathname);
   return `${chinese && translated && !sourceEssay ? "/zh-cn" : ""}${pathname}${suffix}`;

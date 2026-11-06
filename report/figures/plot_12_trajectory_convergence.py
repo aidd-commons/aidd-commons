@@ -37,14 +37,15 @@ if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 import figure_style as style  # noqa: E402  (the module sits next to this script)
-from plot_11_correlated_frames_error_bars import read_observable_page  # noqa: E402
+from plot_data import load_plot_data  # noqa: E402
 
 FIGURE_NUMBER = 12
 STEM = "plot_12_trajectory_convergence"
 SYSTEMS = ["ethanol", "malonaldehyde"]
 
 CAPTION = (
-    "The cumulative mean of the radius of gyration against the full 100,000-frame mean, from the "
+    "Signed deviations of the cumulative mean radius of gyration from the full 100,000-frame "
+    "mean, from the "
     "rMD17 lab page. {values}. The malonaldehyde curve is not monotone, being closer at a thousand "
     "frames than at ten thousand, and that is drawn as the data stands. One trajectory per "
     "molecule and one level of theory means nothing here speaks to replicate dependence or "
@@ -52,14 +53,19 @@ CAPTION = (
 )
 
 
+def load_data() -> dict:
+    """Return the complete canonical population used by print and web."""
+    return load_plot_data(FIGURE_NUMBER, read_json=style.load_json, read_yaml=style.load_yaml)
+
+
 def build() -> dict[str, Path]:
     """Keep the full trajectory and explicitly inspect its later-frame reversals."""
     style.apply_style("light")
     tokens, colours = style.tokens(), style.categorical()
-    page = read_observable_page()
+    page = load_data()
     convergence = sorted(page["convergence"], key=lambda r: r["frames"])
     frames = [r["frames"] for r in convergence]
-    fig = style.figure(height=5.4)
+    fig = style.figure(height=6.3)
     style.heading(
         fig,
         "More frames do not guarantee monotone convergence",
@@ -105,7 +111,7 @@ def build() -> dict[str, Path]:
                     textcoords="offset points",
                     ha="center",
                     va="center",
-                    fontsize=8.1,
+                    fontsize=10.0,
                 )
         ax.set_xscale("log")
         xs = [r["frames"] for r in selected]
@@ -124,7 +130,7 @@ def build() -> dict[str, Path]:
         ncol=2,
         loc="lower center",
         bbox_to_anchor=(0.56, 0.072),
-        fontsize=8.5,
+        fontsize=10.0,
     )
     style.footnote(
         fig,

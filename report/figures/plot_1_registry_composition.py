@@ -20,7 +20,6 @@ has been read.
 from __future__ import annotations
 
 import sys
-from collections import Counter
 from pathlib import Path
 
 _HERE = Path(__file__).resolve().parent
@@ -29,6 +28,7 @@ if str(_HERE) not in sys.path:
 
 import figure_style as style  # noqa: E402  (the module sits next to this script)
 from figure_sources import catalogue_projection  # noqa: E402
+from plot_data import load_plot_data  # noqa: E402
 
 FIGURE_NUMBER = 1
 STEM = "plot_1_registry_composition"
@@ -46,17 +46,19 @@ def caption(resources: list[dict], ordered: list[tuple[str, int]]) -> str:
     )
 
 
+def load_data() -> dict:
+    """Return the complete canonical population used by print and web."""
+    return load_plot_data(FIGURE_NUMBER, read_json=style.load_json, read_yaml=style.load_yaml)
+
+
 def build() -> dict[str, Path]:
     """Rank the canonical record counts, retaining exact counts and shares."""
     style.apply_style("light")
     tokens, colours = style.tokens(), style.categorical()
-    resources = style.load_json(style.DATA_DIR / "resources.v1.json")
-    ordered = sorted(
-        Counter(record["kind"] for record in resources).items(),
-        key=lambda item: (-item[1], item[0]),
-    )
+    data = load_data()
+    resources, ordered = data["resources"], data["ordered"]
     snapshot = catalogue_projection(resources)
-    fig = style.figure(height=4.05)
+    fig = style.figure(height=4.25)
     style.heading(
         fig,
         "What the Atlas contains",
@@ -96,11 +98,17 @@ def build() -> dict[str, Path]:
         "Records",
         transform=ax.transAxes,
         ha="right",
-        fontsize=8.2,
+        fontsize=10.0,
         color=tokens["muted"],
     )
     ax.text(
-        1.23, 1.04, "Share", transform=ax.transAxes, ha="right", fontsize=8.2, color=tokens["muted"]
+        1.23,
+        1.04,
+        "Share",
+        transform=ax.transAxes,
+        ha="right",
+        fontsize=10.0,
+        color=tokens["muted"],
     )
     style.footnote(
         fig,

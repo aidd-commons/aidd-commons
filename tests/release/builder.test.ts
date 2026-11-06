@@ -201,7 +201,7 @@ async function fixtureSource(): Promise<string> {
 }
 
 describe("curated public release builder", () => {
-  it("delivers scientific PDF and PNG without legacy scientific SVG copies", async () => {
+  it("delivers canonical figures, responsive previews and optional media without legacy scientific SVG", async () => {
     const { buildPublicRelease, exclusionReason } = await loadBuilder();
     const sourceRoot = await fixtureSource();
     const workspace = await mkdtemp(join(tmpdir(), "aidd-figure-output-"));
@@ -209,6 +209,17 @@ describe("curated public release builder", () => {
     const delivered = [
       "site/public/figures/current.pdf",
       "site/public/figures/current.png",
+      "site/public/figures/current-480.webp",
+      "site/public/figures/current-960.webp",
+      "site/public/media/figures/decision-pipeline-en.mp4",
+      "site/public/media/figures/decision-pipeline-en.webm",
+      "site/public/media/figures/decision-pipeline-en.gif",
+      "site/public/media/figures/decision-pipeline-en.webp",
+      "site/public/data/figures/current.csv",
+      "site/src/data/figure-details.json",
+      "tests/helpers/figure-source-table.ts",
+      "site/src/pages/report/figures/[id].astro",
+      "site/src/pages/zh-cn/report/figures/[id].astro",
       "report/figures/out/current.pdf",
       "site/public/favicon.svg",
     ];

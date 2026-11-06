@@ -29,7 +29,6 @@ claim about any system this repository has not directly loaded.
 
 from __future__ import annotations
 
-import re
 import sys
 from pathlib import Path
 
@@ -39,6 +38,7 @@ if str(_HERE) not in sys.path:
 
 import figure_style as style  # noqa: E402  (the module sits next to this script)
 from matplotlib.ticker import FuncFormatter  # noqa: E402
+from plot_data import load_plot_data  # noqa: E402
 
 FIGURE_NUMBER = 11
 STEM = "plot_11_correlated_frames_error_bars"
@@ -57,71 +57,23 @@ CAPTION = (
 
 
 def read_observable_page() -> dict:
-    """Read the numbers of the rMD17 observable lab page.
+    """Compatibility entrypoint for the canonical observable-page parser."""
+    from plot_data import read_observable_page as parse
 
-    The page carries two markdown tables and one sentence with the block
-    sweep. All three are parsed rather than transcribed, and a missing number
-    raises instead of being silently dropped.
-    """
-    path = style.REPO_ROOT / PAGE
-    text = path.read_text(encoding="utf-8").replace("−", "-")
+    return parse()
 
-    sem: dict[str, dict[str, float]] = {}
-    for line in text.splitlines():
-        if not line.strip().startswith("|"):
-            continue
-        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
-        if cells[0] in SYSTEMS and len(cells) == 5:
-            sem[cells[0]] = {
-                "mean_rg": float(cells[1]),
-                "naive_sem": float(cells[2]),
-                "block_sem": float(cells[3]),
-                "ratio": float(cells[4]),
-            }
-    missing = [system for system in SYSTEMS if system not in sem]
-    if missing:
-        raise ValueError(f"the observable page has no standard error row for {missing}")
 
-    convergence: list[dict[str, float]] = []
-    for line in text.splitlines():
-        if not line.strip().startswith("|"):
-            continue
-        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
-        if len(cells) == 3 and cells[0].replace(",", "").isdigit():
-            convergence.append(
-                {
-                    "frames": int(cells[0].replace(",", "")),
-                    "ethanol": float(cells[1]),
-                    "malonaldehyde": float(cells[2]),
-                }
-            )
-    if not convergence:
-        raise ValueError("the observable page has no convergence table")
-
-    sweep = [
-        {"blocks": int(blocks.replace(",", "")), "sem": float(value)}
-        for blocks, value in re.findall(
-            r"(?:block SEM )?at ([\d,]+) blocks \([^)]*\)\s+(?:is|it is)\s+([0-9.]+)",
-            re.sub(r"\s+", " ", text),
-        )
-    ]
-    if len(sweep) < 2:
-        raise ValueError("the observable page has no block-count sweep")
-
-    # The page reports the hundred-block estimate in the table and the other
-    # block counts in the sentence, so the sweep is completed from the table.
-    if not any(entry["blocks"] == 100 for entry in sweep):
-        sweep.append({"blocks": 100, "sem": sem["Ethanol"]["block_sem"]})
-
-    return {"sem": sem, "convergence": convergence, "sweep": sweep}
+def load_data() -> dict:
+    """Return the complete canonical population used by print and web."""
+    return load_plot_data(FIGURE_NUMBER, read_json=style.load_json, read_yaml=style.load_yaml)
 
 
 def build() -> dict[str, Path]:
     """Read uncertainty magnitude, understatement and block-choice sensitivity separately."""
     style.apply_style("light")
     tokens, colours = style.tokens(), style.categorical()
-    page = read_observable_page()
-    fig = style.figure(height=5.5)
+    page = load_data()
+    fig = style.figure(height=6.3)
     style.heading(
         fig,
         "Correlated frames change the uncertainty estimate",
@@ -144,7 +96,7 @@ def build() -> dict[str, Path]:
                 textcoords="offset points",
                 ha="center",
                 va="center",
-                fontsize=8,
+                fontsize=10.0,
             )
         ratio = values["ratio"]
         ratio_ax.plot([1, ratio], [y, y], color=colours["teal"], lw=1.6)
@@ -155,7 +107,7 @@ def build() -> dict[str, Path]:
             xytext=(0, 10),
             textcoords="offset points",
             ha="center",
-            fontsize=8.5,
+            fontsize=10.0,
             fontweight="bold",
         )
     sem_ax.set_yticks([1, 0], SYSTEMS)
@@ -188,7 +140,7 @@ def build() -> dict[str, Path]:
             xytext=(0, 10),
             textcoords="offset points",
             ha="center",
-            fontsize=8.3,
+            fontsize=10.0,
         )
     sweep_ax.text(
         0.99,
@@ -196,7 +148,7 @@ def build() -> dict[str, Path]:
         "Dashed: naive SEM",
         transform=sweep_ax.transAxes,
         ha="right",
-        fontsize=8.2,
+        fontsize=10.0,
         color=tokens["muted"],
     )
     sweep_ax.set_xscale("log")
@@ -218,7 +170,7 @@ def build() -> dict[str, Path]:
         ncol=2,
         loc="lower center",
         bbox_to_anchor=(0.58, 0.07),
-        fontsize=8.5,
+        fontsize=10.0,
     )
     style.footnote(
         fig,

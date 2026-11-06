@@ -1,0 +1,10 @@
+﻿Metric,Model,Primary partition · n=132,Assay replication · n=170
+mae,train_mean,0.47889315075040634,0.898379755056597
+mae,descriptor_ridge,0.4685270107977128,0.57926487123557
+mae,morgan_ridge,0.41833032711934154,3.1316760122202343
+rmse,train_mean,0.6495843791022325,1.0791288848195268
+rmse,descriptor_ridge,0.6351792580844096,0.7696649596666987
+rmse,morgan_ridge,0.5496120042196945,3.2242088095499253
+spearman,train_mean,undefined · constant prediction,undefined · constant prediction
+spearman,descriptor_ridge,0.12912484977725286,0.11339681823688325
+spearman,morgan_ridge,0.5050760258476744,-0.04095526286121213

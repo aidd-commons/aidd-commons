@@ -179,12 +179,12 @@ def apply_style(theme: str = THEME) -> dict[str, Any]:
         {
             "font.family": "sans-serif",
             "font.sans-serif": list(FONT_STACK),
-            "font.size": 9.0,
-            "axes.labelsize": 9.0,
-            "axes.titlesize": 9.4,
-            "xtick.labelsize": 8.4,
-            "ytick.labelsize": 8.4,
-            "legend.fontsize": 8.5,
+            "font.size": 10.0,
+            "axes.labelsize": 10.0,
+            "axes.titlesize": 10.2,
+            "xtick.labelsize": 9.2,
+            "ytick.labelsize": 10.0,
+            "legend.fontsize": 9.2,
             "legend.frameon": False,
             "axes.facecolor": tokens["panel"],
             "figure.facecolor": tokens["panel"],
@@ -325,12 +325,12 @@ def title(ax: Axes, text: str) -> None:
 def heading(fig: Figure, text: str, subtitle: str = "") -> None:
     """Place the editorial reading entry, outside every data coordinate system."""
     ink = tokens()["ink"]
-    fig.text(0.035, 0.965, text, fontsize=11, fontweight="bold", color=ink, va="top")
+    fig.text(0.035, 0.965, text, fontsize=12, fontweight="bold", color=ink, va="top")
     if subtitle:
-        fig.text(0.035, 0.918, subtitle, fontsize=8.4, color=tokens()["muted"], va="top")
+        fig.text(0.035, 0.918, subtitle, fontsize=9.2, color=tokens()["muted"], va="top")
 
 
-def footnote(fig: Figure, text: str, *, y: float = 0.025, wrap_width: int = 118) -> None:
+def footnote(fig: Figure, text: str, *, y: float = 0.025, wrap_width: int = 108) -> None:
     """Keep a claim-defining limitation visible at the authored physical size."""
     import textwrap
 
@@ -338,7 +338,7 @@ def footnote(fig: Figure, text: str, *, y: float = 0.025, wrap_width: int = 118)
         0.035,
         y,
         textwrap.fill(text, width=wrap_width),
-        fontsize=8.0,
+        fontsize=8.9,
         color=tokens()["muted"],
         va="bottom",
         linespacing=1.3,

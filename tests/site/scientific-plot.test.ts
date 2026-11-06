@@ -1,7 +1,17 @@
 import {describe,expect,it} from "vitest";
-import {nearestRetainedX,pointsAtNearestX,retainedXValues,readablePlotValue} from "../../site/src/lib/scientific-plot.js";
+import {nearestRetainedX,pointsAtNearestX,retainedXValues,readablePlotValue,plotFraction,valueAtPlotFraction} from "../../site/src/lib/scientific-plot.js";
 
 describe("retained scientific plot inspection",()=>{
+  it("uses logarithmic display coordinates without replacing original data",()=>{
+    const source=[.01,.1,1,10];
+    source.forEach((value,index)=>expect(plotFraction(value,.01,10,"log")).toBeCloseTo(index/3));
+    expect(valueAtPlotFraction(2/3,.01,10,"log")).toBeCloseTo(1);
+    expect(source).toEqual([.01,.1,1,10]);
+    expect(nearestRetainedX([.1,1],.4,"log")).toBe(1);
+    expect(nearestRetainedX([.1,1],0,"log")).toBeUndefined();
+    expect(()=>plotFraction(0,.01,10,"log")).toThrow(/positive/);
+    expect(()=>plotFraction(1,0,10,"log")).toThrow(/positive/);
+  });
   it("rounds human readouts without changing source precision",()=>{
     const source=-.3979400086720376;
     expect(readablePlotValue(source)).toBe("-0.39794");

@@ -50,7 +50,7 @@ class AtlasFigureDeliveryTests(unittest.TestCase):
         (root / "components/AtlasFigure.astro").write_text("<figure />\n", encoding="utf-8")
         return root, page, nested
 
-    def test_active_generator_selection_matches_five_figure_nine_placement_manifest(self):
+    def test_active_generator_selection_matches_five_figure_bilingual_placement_manifest(self):
         manifest = checker.json.loads(checker.MANIFEST_PATH.read_text(encoding="utf-8"))
         expected = [(row["id"], row["stem"], row["pages"]) for row in renderer.placement_rows()]
         actual = [
@@ -59,7 +59,7 @@ class AtlasFigureDeliveryTests(unittest.TestCase):
         ]
         self.assertEqual(actual, expected)
         self.assertEqual(len(actual), 5)
-        self.assertEqual(sum(len(row[2]) for row in actual), 9)
+        self.assertEqual(sum(len(row[2]) for row in actual), 12)
         for home in ("/", "/zh-cn/"):
             self.assertEqual(
                 [row[0] for row in actual if home in row[2]],
@@ -163,8 +163,13 @@ class AtlasFigureDeliveryTests(unittest.TestCase):
             output = Path(directory)
             fig = plt.figure(figsize=(2, 1))
             fig.add_axes((0.2, 0.2, 0.7, 0.7)).bar([0], [93], hatch="//")
-            with patch.object(renderer, "FIGURE_OUT", output):
-                products = renderer.save_preview(fig, "plot_5_self_record_vs_reading")
+            products = {
+                suffix: output / f"plot-5-self-record-vs-reading.{suffix}"
+                for suffix in ("png", "pdf")
+            }
+            fig.savefig(products["png"], dpi=300)
+            fig.savefig(products["pdf"])
+            plt.close(fig)
             self.assertEqual(set(products), {"png", "pdf"})
             self.assertFalse(list(output.glob("*.svg")))
             self.assertFalse(plt.fignum_exists(fig.number))
@@ -218,6 +223,9 @@ class AtlasFigureDeliveryTests(unittest.TestCase):
                 shutil.copy2(native, source / native.name)
                 shutil.copy2(native, delivery / row[field])
 
+            for filename in row["previews"].values():
+                shutil.copy2(checker.FIGURE_DIR / filename, delivery / filename)
+
             def check(items):
                 return checker.check_library(items, delivery, source, {}, captions)
 
@@ -236,6 +244,91 @@ class AtlasFigureDeliveryTests(unittest.TestCase):
             self.assertIn(
                 f"{row['id']}: editable PPTX is not a readable presentation", check([row])
             )
+
+    def test_source_contract_allows_zero_images_and_rejects_a_missing_required_image(self):
+        import schematic_style
+
+        manifest = json.loads(checker.MANIFEST_PATH.read_text(encoding="utf-8"))
+        row = next(
+            item for item in manifest["library"] if item["id"] == "schematic-04-stage-contracts"
+        )
+
+        def check():
+            return checker.check_library(
+                [row], checker.FIGURE_DIR, checker.REPORT_OUT, {}, {"S4": row["caption"]}
+            )
+
+        self.assertEqual(check(), [])
+        contracts = schematic_style._native_source_contracts()
+        fixture = json.loads(
+            (ROOT / "tests/site/fixtures/native-image-count-mismatch.json").read_text()
+        )
+        changed = json.loads(json.dumps(contracts))
+        changed[row["source_stem"]]["native_contract"]["images"] = fixture["required_images"]
+        with patch.object(schematic_style, "_native_source_contracts", return_value=changed):
+            self.assertIn(f"{row['id']}: {fixture['expected_diagnostic']}", check())
+
+    def test_report_identity_and_responsive_preview_defects(self):
+        manifest = json.loads(checker.MANIFEST_PATH.read_text(encoding="utf-8"))
+        row = manifest["library"][0]
+        self.assertEqual(checker.check_web_metadata(row, checker.FIGURE_DIR), [])
+        fixture = json.loads(
+            (ROOT / "tests/site/fixtures/figure-report-number-mismatch.json").read_text()
+        )
+        wrong = {**row, **fixture["replacement"]}
+        self.assertIn(
+            f"{row['id']}: {fixture['expected_diagnostic']}",
+            checker.check_web_metadata(wrong, checker.FIGURE_DIR),
+        )
+        with tempfile.TemporaryDirectory(prefix="aidd-responsive-preview-") as directory:
+            output = Path(directory)
+            for filename in row["previews"].values():
+                shutil.copy2(checker.FIGURE_DIR / filename, output / filename)
+            fixture = json.loads(
+                (ROOT / "tests/site/fixtures/figure-preview-wrong-size.json").read_text()
+            )
+            from PIL import Image
+
+            Image.new("RGB", tuple(fixture["size"]), "white").save(
+                output / row["previews"]["480"], "WEBP"
+            )
+            self.assertIn(
+                f"{row['id']}: {fixture['expected_diagnostic']}",
+                checker.check_web_metadata(row, output),
+            )
+
+    def test_site_export_copies_canonical_products_without_redrawing(self):
+        from PIL import Image
+
+        with tempfile.TemporaryDirectory(prefix="aidd-canonical-figure-") as directory:
+            root = Path(directory)
+            native = root / "native"
+            (native / "out").mkdir(parents=True)
+            output = root / "web"
+            stem = "plot_5_self_record_vs_reading"
+            Image.new("RGB", (1200, 600), "white").save(native / "out" / f"{stem}.png")
+            pdf = b"%PDF-1.4\ncanonical source fixture\n%%EOF\n"
+            (native / "out" / f"{stem}.pdf").write_bytes(pdf)
+            with (
+                patch.object(renderer, "FIGURE_DIR", native),
+                patch.object(renderer, "FIGURE_OUT", output),
+                patch.object(
+                    renderer,
+                    "library_rows",
+                    return_value=[{"stem": stem.replace("_", "-"), "kind": "plot"}],
+                ),
+            ):
+                written, emitted = renderer.build_previews()
+            self.assertEqual(emitted, {})
+            self.assertEqual((output / "plot-5-self-record-vs-reading.pdf").read_bytes(), pdf)
+            self.assertEqual(
+                (output / "plot-5-self-record-vs-reading.png").read_bytes(),
+                (native / "out" / f"{stem}.png").read_bytes(),
+            )
+            self.assertEqual(set(written[0]["previews"]), {"480", "960"})
+            for width in (480, 960):
+                with Image.open(output / written[0]["previews"][str(width)]) as preview:
+                    self.assertEqual(preview.size, (width, width // 2))
 
     def test_native_master_valid_and_known_source_defects(self):
         import schematic_style

@@ -37,6 +37,7 @@ if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 import figure_style as style  # noqa: E402  (the module sits next to this script)
+from plot_data import load_plot_data  # noqa: E402
 
 FIGURE_NUMBER = 13
 STEM = "plot_13_two_assay_systems_disagree"
@@ -52,41 +53,18 @@ CAPTION = (
 )
 
 
+def load_data() -> dict:
+    """Return the complete canonical population used by print and web."""
+    return load_plot_data(FIGURE_NUMBER, read_json=style.load_json, read_yaml=style.load_yaml)
+
+
 def build() -> dict[str, Path]:
     """Give pairwise evidence and named extreme examples separate full-width rows."""
     style.apply_style("light")
     tokens, colours = style.tokens(), style.categorical()
-    cyp = style.load_json(style.REPO_ROOT / "labs/cyp_assay_system/summary.json")
-    clearance = style.load_json(style.REPO_ROOT / "labs/az_clearance_system/summary.json")
-    rows = [
-        (
-            "CYP2D6 against CYP3A4, all pairs",
-            cyp["correlation"]["full"]["count"],
-            cyp["correlation"]["full"]["pearson_r"],
-            cyp["correlation"]["full"]["spearman_rho"],
-        ),
-        (
-            "CYP2D6 against CYP3A4, clean pairs",
-            cyp["correlation"]["clean_pairs_only"]["count"],
-            cyp["correlation"]["clean_pairs_only"]["pearson_r"],
-            cyp["correlation"]["clean_pairs_only"]["spearman_rho"],
-        ),
-    ]
-    short = {
-        "CHEMBL3301370": "microsome",
-        "CHEMBL3301371": "rat hepatocyte",
-        "CHEMBL3301372": "human hepatocyte",
-    }
-    for pair in clearance["pairs"].values():
-        rows.append(
-            (
-                f"{short[pair['primary_system']]} against {short[pair['secondary_system']]}",
-                pair["clean_pair_count"],
-                pair["correlation"]["pearson_r"],
-                pair["correlation"]["spearman_rho"],
-            )
-        )
-    fig = style.figure(height=6.45)
+    data = load_data()
+    cyp, clearance, rows, examples = (data[k] for k in ("cyp", "clearance", "rows", "examples"))
+    fig = style.figure(height=7.5)
     style.heading(
         fig,
         "Assay-system agreement is an empirical question",
@@ -112,32 +90,26 @@ def build() -> dict[str, Path]:
             transform=ax.get_yaxis_transform(),
             ha="left",
             va="center",
-            fontsize=8.2,
+            fontsize=10.0,
         )
         ax.text(
-            1.66,
+            1.60,
             y,
             f"{n:,}",
             transform=ax.get_yaxis_transform(),
             ha="left",
             va="center",
-            fontsize=8.3,
+            fontsize=10.0,
         )
-    ax.set_yticks(list(range(len(rows)))[::-1], names, fontsize=8.0)
+    ax.set_yticks(list(range(len(rows)))[::-1], names, fontsize=10.0)
     ax.set_ylim(-0.65, len(rows) - 0.35)
     ax.set_xlim(-0.02, 0.72)
     ax.set_xticks([0, 0.2, 0.4, 0.6])
     ax.set_xlabel("Correlation coefficient")
     style.clean_axis(ax)
-    style.title(ax, "(a) Same molecules, different assay systems")
-    ax.text(1.08, 1.03, "r / ρ", transform=ax.transAxes, fontsize=8.1, color=tokens["muted"])
-    ax.text(1.66, 1.03, "Shared n", transform=ax.transAxes, fontsize=8.1, color=tokens["muted"])
-    examples = [
-        (r["parent_molecule_chembl_id"], r["primary_pchembl"], r["secondary_pchembl"])
-        for direction in ["primary_selective", "secondary_selective"]
-        for r in cyp["divergent_examples"][direction]
-    ]
-    examples.sort(key=lambda r: r[1] - r[2], reverse=True)
+    style.title(ax, "(a) System-pair correlations")
+    ax.text(1.08, 1.03, "r / ρ", transform=ax.transAxes, fontsize=10.0, color=tokens["muted"])
+    ax.text(1.60, 1.03, "Shared n", transform=ax.transAxes, fontsize=10.0, color=tokens["muted"])
     for y, (_identifier, a, b) in zip(list(range(len(examples)))[::-1], examples, strict=True):
         ex.plot([a, b], [y, y], color=tokens["rule"], lw=1.7)
         ex.plot(a, y, "o", ms=6, mfc=colours["teal"], mec=tokens["ink"], mew=0.5)
@@ -149,7 +121,7 @@ def build() -> dict[str, Path]:
             transform=ex.get_yaxis_transform(),
             ha="left",
             va="center",
-            fontsize=8.2,
+            fontsize=10.0,
         )
         ex.text(
             1.37,
@@ -158,7 +130,7 @@ def build() -> dict[str, Path]:
             transform=ex.get_yaxis_transform(),
             ha="left",
             va="center",
-            fontsize=8.6,
+            fontsize=10.0,
             fontweight="bold",
         )
     ex.set_yticks(list(range(len(examples)))[::-1], [r[0] for r in examples])
@@ -167,8 +139,8 @@ def build() -> dict[str, Path]:
     ex.set_xlabel("pChEMBL in each system")
     style.clean_axis(ex)
     style.title(ex, "(b) Largest CYP disagreements · selected extremes")
-    ex.text(1.04, 1.02, "2D6 / 3A4", transform=ex.transAxes, fontsize=8, color=tokens["muted"])
-    ex.text(1.37, 1.02, "Δ", transform=ex.transAxes, fontsize=8, color=tokens["muted"])
+    ex.text(1.04, 1.02, "2D6 / 3A4", transform=ex.transAxes, fontsize=10.0, color=tokens["muted"])
+    ex.text(1.37, 1.02, "Δ", transform=ex.transAxes, fontsize=10.0, color=tokens["muted"])
     from matplotlib.lines import Line2D
 
     fig.legend(
@@ -180,7 +152,7 @@ def build() -> dict[str, Path]:
         ncol=2,
         loc="lower center",
         bbox_to_anchor=(0.55, 0.065),
-        fontsize=8.2,
+        fontsize=10.0,
     )
     style.footnote(
         fig,

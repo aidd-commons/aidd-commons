@@ -41,6 +41,7 @@ if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 import figure_style as style  # noqa: E402  (the module sits next to this script)
+from plot_data import load_plot_data  # noqa: E402
 
 FIGURE_NUMBER = 9
 STEM = "plot_9_representation_ranking_flips"
@@ -64,13 +65,18 @@ CAPTION = (
 )
 
 
+def load_data() -> dict:
+    """Return the complete canonical population used by print and web."""
+    return load_plot_data(FIGURE_NUMBER, read_json=style.load_json, read_yaml=style.load_yaml)
+
+
 def build() -> dict[str, Path]:
     """Make the adverse replication visible on shared metric axes."""
     style.apply_style("light")
     tokens, colours = style.tokens(), style.categorical()
-    summary = style.load_json(style.REPO_ROOT / "labs/chembl_egfr/locked-summary.json")
-    results = summary["results"]
-    fig = style.figure(height=5.45)
+    data = load_data()
+    results = data["results"]
+    fig = style.figure(height=6.3)
     style.heading(
         fig,
         "The primary winner fails to retain its rank",
@@ -95,7 +101,7 @@ def build() -> dict[str, Path]:
                 textcoords="offset points",
                 ha="center",
                 va="center",
-                fontsize=8.5,
+                fontsize=10.0,
             )
         r1, r2 = [results[p]["metrics"][key]["spearman"] for p in PARTITIONS]
         if r1 is None or r2 is None:
@@ -105,7 +111,7 @@ def build() -> dict[str, Path]:
                 "Undefined: constant prediction",
                 transform=rho.get_yaxis_transform(),
                 va="center",
-                fontsize=8.3,
+                fontsize=10.0,
                 color=tokens["muted"],
             )
         else:
@@ -138,7 +144,8 @@ def build() -> dict[str, Path]:
                     textcoords="offset points",
                     ha="center",
                     va="center",
-                    fontsize=8.5,
+                    fontsize=10.0,
+                    fontweight="bold" if key == "morgan_ridge" else "normal",
                 )
     for axis in [ax, rho]:
         axis.set_yticks([2, 1, 0], [s[1] for s in SERIES])
@@ -165,7 +172,7 @@ def build() -> dict[str, Path]:
         ncol=2,
         loc="lower center",
         bbox_to_anchor=(0.57, 0.08),
-        fontsize=8.5,
+        fontsize=10.0,
     )
     style.footnote(
         fig,

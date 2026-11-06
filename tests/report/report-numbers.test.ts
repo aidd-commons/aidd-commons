@@ -109,12 +109,12 @@ describe("living report coverage numbers", () => {
     );
   });
 
-  it("states the outcome of the independent reading of the same topics", () => {
+  it("states the outcome of the retained automated readings of the same topics", () => {
     const reading = comparison.second_readings[0];
 
     expect(report).toContain(
-      `The reading agreed with the record on ${reading.equal} topics, read ${reading.reading_deeper} deeper ` +
-        `and read ${reading.reading_shallower} shallower.`,
+      `The upper panel reports agreement on ${reading.equal} topics, with ${reading.reading_deeper} deeper ` +
+        `and ${reading.reading_shallower} shallower.`,
     );
   });
 

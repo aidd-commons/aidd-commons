@@ -41,6 +41,7 @@ if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 import figure_style as style  # noqa: E402  (the module sits next to this script)
+from plot_data import load_plot_data  # noqa: E402
 
 FIGURE_NUMBER = 10
 STEM = "plot_10_acquisition_policy_recovery"
@@ -62,13 +63,18 @@ CAPTION = (
 )
 
 
+def load_data() -> dict:
+    """Return the complete canonical population used by print and web."""
+    return load_plot_data(FIGURE_NUMBER, read_json=style.load_json, read_yaml=style.load_yaml)
+
+
 def build() -> dict[str, Path]:
     """Keep every trajectory and expose the campaign's integral summary beside it."""
     style.apply_style("light")
     tokens, colours = style.tokens(), style.categorical()
-    real = style.load_json(style.REPO_ROOT / "labs/pool_budget/real-summary.json")
-    uncertainty = style.load_json(style.REPO_ROOT / "labs/pool_budget/uncertainty-summary.json")
-    fig = style.figure(height=6.2)
+    data = load_data()
+    real = data["real"]
+    fig = style.figure(height=7.7)
     style.heading(
         fig,
         "Acquisition policy changes recovery and evaluation error",
@@ -82,23 +88,15 @@ def build() -> dict[str, Path]:
         right=0.905,
         bottom=0.20,
         top=0.80,
-        wspace=0.48,
-        hspace=0.66,
-        width_ratios=[1.25, 1.25, 0.8],
+        wspace=0.66,
+        hspace=0.82,
+        width_ratios=[1.25, 1.25, 0.72],
     )
     summary_parts = []
     for row, assay in enumerate(ASSAYS):
         recovery_ax, mae_ax, auc_ax = axes[3 * row : 3 * row + 3]
-        checkpoints = real["assays"][assay]["budget"]["checkpoints"]
-        if checkpoints != uncertainty["assays"][assay]["budget"]["checkpoints"]:
-            raise ValueError("campaign checkpoints differ")
-        policies = {p["name"]: p for p in real["assays"][assay]["policies"]}
-        policies["ensemble-variance-uncertainty"] = uncertainty["assays"][assay]["policy"]
-        names = ["maxmin", "ensemble-variance-uncertainty"] + sorted(
-            n for n in policies if n.startswith("random")
-        )
-        if len(names) != 7:
-            raise ValueError("expected two named policies and five fixed random instances")
+        block = data["assays"][assay]
+        checkpoints, policies, names = block["checkpoints"], block["policies"], block["names"]
         for name in names:
             policy = policies[name]
             if name in NAMED:
@@ -118,11 +116,11 @@ def build() -> dict[str, Path]:
                     values,
                     color=colours[colour],
                     marker=marker,
-                    ms=4.2 if filled else 3.2,
+                    ms=5 if filled else 4,
                     mfc=colours[colour] if filled else tokens["panel"],
                     mec=colours[colour],
                     mew=0.8,
-                    lw=1.5 if filled else 0.8,
+                    lw=1.8 if filled else 1.0,
                     ls=dash,
                     zorder=4 if filled else 2,
                 )
@@ -143,27 +141,27 @@ def build() -> dict[str, Path]:
                 transform=auc_ax.get_yaxis_transform(),
                 ha="left",
                 va="center",
-                fontsize=8,
+                fontsize=10.0,
             )
         for axis in [recovery_ax, mae_ax]:
             axis.set_xticks(checkpoints)
-            axis.set_xlabel("Compounds acquired", fontsize=8.3)
+            axis.set_xlabel("Compounds acquired", fontsize=10.0)
             style.clean_axis(axis, axis="y")
         recovery_ax.set_ylim(0, 0.27)
-        recovery_ax.set_ylabel("Top-decile recovery", fontsize=8.3)
-        mae_ax.set_ylabel("Evaluation MAE", fontsize=8.3)
+        recovery_ax.set_ylabel("Top-decile recovery", fontsize=10.0)
+        mae_ax.set_ylabel("Evaluation MAE", fontsize=10.0)
         auc_ax.set_ylim(-0.6, 6.6)
         auc_ax.set_yticks(
-            range(7), ["R4", "R3", "R2", "R1", "R0", "Variance", "Maxmin"], fontsize=8
+            range(7), ["R4", "R3", "R2", "R1", "R0", "Variance", "Maxmin"], fontsize=10.0
         )
-        auc_ax.set_xlabel("Recovery AUC", fontsize=8.3)
+        auc_ax.set_xlabel("Recovery AUC", fontsize=10.0)
         auc_ax.set_xlim(-0.012, 0.20)
         auc_ax.set_xticks([0, 0.1, 0.2])
         style.clean_axis(auc_ax)
         style.title(recovery_ax, f"({chr(97 + row * 3)}) Recovery")
         style.title(mae_ax, f"({chr(98 + row * 3)}) Evaluation error")
-        style.title(auc_ax, f"({chr(99 + row * 3)}) Normalized AUC")
-        fig.text(0.08, 0.855 - row * 0.365, assay, fontsize=9.4, fontweight="bold")
+        style.title(auc_ax, f"({chr(99 + row * 3)}) AUC")
+        fig.text(0.08, 0.855 - row * 0.365, assay, fontsize=10.2, fontweight="bold")
         budget = real["assays"][assay]["budget"]
         maxmin = policies["maxmin"]
         ensemble = policies["ensemble-variance-uncertainty"]
@@ -182,7 +180,7 @@ def build() -> dict[str, Path]:
         loc="lower center",
         bbox_to_anchor=(0.5, 0.06),
         ncol=4,
-        fontsize=8,
+        fontsize=10.0,
         handlelength=1.8,
         columnspacing=1.2,
     )

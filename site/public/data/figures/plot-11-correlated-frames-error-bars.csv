@@ -1,0 +1,6 @@
+﻿Section,System / blocks,Mean radius · Å,Naive SEM · Å,100-block SEM / sweep SEM · Å,Source block/naive ratio
+100-block estimate,Ethanol,1.213,8.7e-05,0.000288,3.3
+100-block estimate,Malonaldehyde,1.6947,0.000235,0.001472,6.26
+Block sweep,10,,,0.000289,
+Block sweep,100,,,0.000288,
+Block sweep,1000,,,0.000158,

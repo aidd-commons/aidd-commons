@@ -23,3 +23,14 @@ automation and evidence dossier. The backend version was not exposed. It is not
 an identified structure, assay measurement, simulation trajectory or experimental
 result. Labels, navigation and animation state remain native website elements.
 The PNG is the retained master; Astro produces responsive WebP delivery variants.
+
+## Record, validation and evidence-package illustrations
+
+`target-identity-record-v3.png`, `orthogonal-validation-v3.png` and
+`candidate-evidence-v3.png` were generated with the built-in image tool on
+7 November 2026. Its backend version was not exposed. These transparent
+illustrations represent an identity record, complementary assay equipment and
+an evidence dossier. Their decorative internal marks are not measured data,
+verified biological structures, validated assays or approved candidate outcomes.
+They remain separate image objects in the editable report schematics; scientific
+labels, relationships and required evidence are native text and connectors.

@@ -1,0 +1,88 @@
+---
+import manifest from '../data/atlas-figures.json';
+import detailData from '../data/figure-details.json';
+import publications from '../data/publications.json';
+import CoverageBounds from './CoverageBounds.astro';
+import {figureGroups,commonPanels,figureGuides,type FigureData} from '../lib/figure-detail';
+import {figureMotionMedia,type FigureMotionId} from '../lib/figure-motion-media';
+import {withSiteBase} from '../lib/site-paths';
+import FigureDataPanel from './FigureDataPanel.astro';
+import FigureSchematicView from './FigureSchematicView.astro';
+import FigureSteps from './FigureSteps.astro';
+interface Props{id:string;chinese?:boolean}
+const {id,chinese=false}=Astro.props;const t=(en:string,zh:string)=>chinese?zh:en;
+const entry=manifest.library.find(e=>e.id===id);const d=detailData.find(e=>e.id===id) as unknown as FigureData;
+if(!entry||!d)throw new Error(`Unregistered figure detail: ${id}`);
+const ordered=[...manifest.library].sort((a,b)=>a.reportNumber-b.reportNumber);const index=ordered.findIndex(e=>e.id===id);const previous=ordered[index-1],next=ordered[index+1];
+const base=(path:string)=>withSiteBase(path,import.meta.env.BASE_URL);const localized=(path:string)=>base(`${chinese?'/zh-cn':''}${path}`);const asset=(name:string)=>base(`/figures/${name}`);
+const groups=figureGroups(d),common=commonPanels(d);const guide=figureGuides[d.key][chinese?1:0];
+const stepConfig={S1:{count:4,duration:8},S3:{count:9,duration:27},S7:{count:5,duration:15},P10:{count:5,duration:10}}[d.key as 'S1'|'S3'|'S7'|'P10'];
+const motionId=d.key==='S3'?'decision-pipeline':d.key==='S7'?'frozen-lifecycle':null;const media=motionId?figureMotionMedia(motionId as FigureMotionId,chinese?'zh-cn':'en'):null;
+---
+<article class="figure-detail not-content" data-figure-detail data-figure-id={id} data-figure-key={d.key}>
+ <nav class="figure-detail__breadcrumb" aria-label={t('Breadcrumb','当前位置')}><a href={localized('/report/')}>{t('Report','报告')}</a><span aria-hidden="true">/</span><a href={localized('/report/figures/')}>{t('Figure library','图件阅读台')}</a><span aria-hidden="true">/</span><span>{t('Figure','图')} {d.reportNumber}</span></nav>
+ <header class="figure-detail__header"><p class="figure-detail__eyebrow">{t('Report figure','报告图件')} {d.reportNumber}</p><h1>{entry.title}</h1><p class="figure-detail__guide">{guide}</p><p class="figure-detail__language">{t('English numerical labels are canonical. Tables and CSV retain source precision.','英文数值标签为规范版本。表格与 CSV 保留来源精度。')}</p></header>
+ <nav class="figure-detail__section-links" aria-label={t('Figure sections','图件区块')}><a href="#web-view">{t('Readable web view','网页阅读视图')}</a><a href="#original-figure">{t('Original figure','原图')}</a><a href="#figure-source-table">{t('Source table & CSV','来源表与 CSV')}</a><a href="#source-boundary">{t('Source boundary','来源边界')}</a></nav>
+ <section id="web-view" class="figure-detail__view"><h2>{t('Read the figure','阅读图件')}</h2>
+ {stepConfig&&<FigureSteps {...stepConfig} chinese={chinese} checkpoints={d.key==='P10'?Object.values(d.assays as Record<string,any>)[0].checkpoints:undefined}/>}
+ {entry.kind==='schematic'?<FigureSchematicView data={d} chinese={chinese}/>:d.key==='P2'?<CoverageBounds providers={d.providers} summaries={d.summaries} totalTopics={d.total} chinese={chinese}/>:<div data-figure-explorer>
+ {groups.length>1&&<label class="figure-detail__selector" data-figure-selector-control hidden>{t('Choose a view','选择视图')}<select data-figure-select><option value="all">{t('All views','所有视图')}</option>{groups.map(g=><option value={g.id}>{g.label}</option>)}</select></label>}
+ {groups.map(g=><section class="figure-detail__group" data-figure-group={g.id}><h3 class="figure-detail__group-title">{g.label}</h3><div class="figure-detail__panels">{g.panels.map(panel=><FigureDataPanel panel={panel} chinese={chinese}/>)}</div></section>)}
+ {common.map(panel=><FigureDataPanel panel={panel} chinese={chinese}/>)}
+ </div>}
+ </section>
+ <section id="original-figure" class="figure-detail__original"><div class="figure-detail__section-heading"><h2>{t('Original figure','原图')}</h2><a href={asset(entry.file)} data-detail-enlarge>{t('Enlarge original','放大原图')} ↗</a></div><a href={asset(entry.pdf)}><img src={asset(entry.previews?.[960]??entry.file)} srcset={entry.previews?`${asset(entry.previews[480])} 480w, ${asset(entry.previews[960])} 960w`:undefined} sizes="(max-width: 768px) 100vw, 960px" width={entry.width} height={entry.height} alt={entry.alt} loading="lazy" decoding="async"/></a><p class="figure-detail__caption">{entry.caption}</p>
+ <div class="figure-detail__downloads"><a href={asset(entry.pdf)} download>PDF ↓</a>{'pptx'in entry&&entry.pptx&&<a href={asset(entry.pptx)} download>{t('Editable PPTX','可编辑 PPTX')} ↓</a>}<a href={asset(entry.file)} download>PNG ↓</a><a href={base(`/data/figures/${id}.csv`)} download>CSV ↓</a></div>
+ {media&&<details class="figure-detail__media"><summary>{t('Optional walkthrough media','可选分步演示媒体')} · {media.stepCount} {t('steps','步')} / {media.durationSeconds} s</summary><p>{t('The animation highlights retained objects. It adds no simulated observations. Playback starts only on request.','动画仅高亮已有对象，不添加模拟观察。仅按需播放。')}</p><video controls preload="none" poster={base(media.poster)} aria-label={t('Source-bound figure walkthrough','基于来源图件的分步演示')}><source src={base(media.webm)} type="video/webm"/><source src={base(media.mp4)} type="video/mp4"/></video><div class="figure-detail__downloads"><a href={base(media.mp4)} download>MP4 ↓</a><a href={base(media.webm)} download>WebM ↓</a><a href={base(media.gif)} download>GIF ↓</a><a href={base(media.poster)} download>{t('Poster','静态图')} ↓</a></div></details>}
+ </section>
+ <section id="figure-source-table" class="figure-detail__table"><h2>{t('Complete source table','完整来源表')}</h2><p>{t('All values remain available without JavaScript. The CSV is generated from these exact rows; the chart inspector rounds only its displayed readout.','无需 JavaScript 即可阅读全部数值。CSV 由完全相同的数据行生成；图中检查器只对显示读数取整。')}</p><a href={base(`/data/figures/${id}.csv`)} download>{t('Download complete table CSV','下载完整表格 CSV')} ↓</a><details><summary>{t('Read all source rows','阅读全部来源行')} ({d.table.rows.length})</summary><div class="figure-detail__table-scroll" role="region" tabindex="0" aria-label={t('Complete figure source table','完整图件来源表')}><table><caption>Figure {d.reportNumber} · {entry.title} · {t('source values retained','保留来源数值')}</caption><thead><tr>{d.table.headers.map(h=><th scope="col">{h}</th>)}</tr></thead><tbody>{d.table.rows.map(row=><tr>{row.map((cell,i)=>i===0?<th scope="row">{String(cell)}</th>:<td>{String(cell)}</td>)}</tr>)}</tbody></table></div></details></section>
+ <section id="source-boundary" class="figure-detail__boundary"><h2>{t('Source and evidence boundary','来源与证据边界')}</h2><p>{entry.source_note}</p><p>{t('Source class','来源类别')}: {d.source.kind}. {t('No new experiment is represented by this web reconstruction.','本网页重构不表示开展了新实验。')}</p><p>{t('Source dates','来源日期')}: {entry.source_dates.length?entry.source_dates.join(' — '):t('Not declared by source','来源未声明')} · {t('Visual revision','视觉更新')}: {entry.visual_revision_date}</p><ul>{d.source.paths.map(path=><li><code>{path}</code></li>)}</ul><a href={base(`${publications.versions[0].href}#${entry.chapterAnchor}`)}>{t('Read the report section','阅读报告对应章节')} ↗</a></section>
+ <nav class="figure-detail__pagination" aria-label={t('Browse figures','浏览图件')}>{previous?<a href={localized(previous.detailHref)} rel="prev"><span>← {t('Previous','上一张')} · {previous.reportNumber}</span><strong>{previous.title}</strong></a>:<span/>}{next&&<a href={localized(next.detailHref)} rel="next"><span>{t('Next','下一张')} · {next.reportNumber} →</span><strong>{next.title}</strong></a>}</nav>
+ <dialog id="figure-original-zoom" class="figure-detail__zoom" data-detail-dialog aria-label={t('Enlarged original figure','放大的原图')}><header><strong>{t('Figure','图')} {d.reportNumber} · {entry.title}</strong><button type="button" data-detail-close>{t('Close','关闭')}</button></header><div tabindex="0" role="region" aria-label={t('Scroll full-size figure','滚动阅读完整尺寸图件')}><img src={asset(entry.file)} width={entry.width} height={entry.height} alt={entry.alt} loading="lazy"/></div><a href={asset(entry.pdf)}>{t('Open PDF','打开 PDF')} ↗</a></dialog>
+</article>
+<script>
+function initializeFigureDetails() {
+ document.querySelectorAll<HTMLElement>('[data-figure-detail]').forEach(root => {
+  if (root.dataset.ready) return;
+  root.dataset.ready = 'true';
+  const select = root.querySelector<HTMLSelectElement>('[data-figure-select]');
+  if (select) {
+   root.querySelector<HTMLElement>('[data-figure-selector-control]')!.hidden = false;
+   select.addEventListener('change', () => root.querySelectorAll<HTMLElement>('[data-figure-group]').forEach(group => {
+    group.hidden = select.value !== 'all' && group.dataset.figureGroup !== select.value;
+   }));
+  }
+  const dialog = root.querySelector<HTMLDialogElement>('[data-detail-dialog]')!;
+  const open = root.querySelector<HTMLAnchorElement>('[data-detail-enlarge]')!;
+  const close = root.querySelector<HTMLButtonElement>('[data-detail-close]')!;
+  if (typeof dialog.showModal !== 'function') return;
+  open.setAttribute('aria-haspopup', 'dialog');
+  open.setAttribute('aria-controls', dialog.id);
+  open.addEventListener('click', event => {
+   if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+   event.preventDefault();
+   dialog.showModal();
+   close.focus({preventScroll: true});
+  });
+  dialog.addEventListener('keydown', event => {
+   if (event.key !== 'Tab') return;
+   const targets = [...dialog.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]')]
+    .filter(element => element.tabIndex >= 0 && element.getClientRects().length > 0 && getComputedStyle(element).visibility !== 'hidden');
+   const index = targets.indexOf(document.activeElement as HTMLElement);
+   if (!targets.length) return;
+   if (event.shiftKey ? index <= 0 : index < 0 || index === targets.length - 1) {
+    event.preventDefault();
+    (event.shiftKey ? targets.at(-1)! : targets[0]).focus();
+   }
+  });
+  close.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
+  // Covers the close button, backdrop and the native Escape/cancel path.
+  dialog.addEventListener('close', () => open.focus({preventScroll: true}));
+ });
+}
+initializeFigureDetails();document.addEventListener('astro:page-load',initializeFigureDetails);
+</script>
+<style>
+.figure-detail{max-width:1120px;margin:0 auto;padding:1.5rem 0 3rem;min-width:0}.figure-detail__breadcrumb{display:flex;flex-wrap:wrap;gap:.5rem;font-size:.78rem;color:var(--atlas-muted);margin-bottom:1.5rem}.figure-detail__header h1{font-size:clamp(1.8rem,4vw,3rem);line-height:1.12;letter-spacing:-.035em;margin:.6rem 0 1rem;max-width:24ch}.figure-detail__eyebrow{text-transform:uppercase;font-size:.75rem;font-weight:650;letter-spacing:.1em;color:var(--atlas-teal-deep)}.figure-detail__eyebrow span{color:var(--atlas-muted);text-transform:none;letter-spacing:0}.figure-detail__guide{font-size:1.05rem;line-height:1.7;max-width:75ch}.figure-detail__language{font-size:.8rem;color:var(--atlas-muted);line-height:1.6}.figure-detail__section-links{display:flex;flex-wrap:wrap;gap:.25rem 1rem;margin:1rem 0 2rem;padding-block:.75rem;border-block:1px solid var(--atlas-rule);font-size:.8rem}.figure-detail__section-links a{min-height:44px;display:flex;align-items:center}.figure-detail h2{font-size:1.4rem;letter-spacing:-.02em;margin:1.25rem 0 1rem}.figure-detail__selector{display:grid;gap:.4rem;font-size:.8rem;max-width:32rem;margin:.75rem 0 1rem}.figure-detail select{max-width:100%;min-height:44px;background:var(--atlas-panel);color:var(--atlas-ink);border:1px solid var(--atlas-rule);padding:.5rem}.figure-detail__group{border-top:1px solid var(--atlas-rule);padding-top:.7rem}.figure-detail__group-title{font-size:.8rem;color:var(--atlas-teal-deep);text-transform:uppercase;letter-spacing:.05em;overflow-wrap:anywhere}.figure-detail__panels{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem}.figure-detail__original,.figure-detail__table,.figure-detail__boundary{border-top:1px solid var(--atlas-rule);padding:1.2rem 0;margin-top:1.5rem}.figure-detail__section-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}.figure-detail__section-heading a{font-size:.8rem;min-height:44px;display:flex;align-items:center}.figure-detail__original> a>img{display:block;width:100%;height:auto;background:white;max-height:720px;object-fit:contain}.figure-detail__caption,.figure-detail__boundary p,.figure-detail__table>p,.figure-detail__media p{font-size:.85rem;line-height:1.75;color:var(--atlas-muted)}.figure-detail__downloads{display:flex;flex-wrap:wrap;gap:.4rem 1rem;margin:1rem 0}.figure-detail__downloads a{font-size:.8rem;display:flex;align-items:center;min-height:44px;gap:.4rem}.figure-detail details{margin-top:1rem}.figure-detail summary{cursor:pointer;min-height:44px;padding:.6rem 0;font-size:.85rem;font-weight:600}.figure-detail__media video{display:block;max-width:100%;width:100%;max-height:600px;background:white}.figure-detail__table-scroll{max-width:100%;overflow:auto;margin-top:.5rem;border:1px solid var(--atlas-rule)}.figure-detail table{width:100%;border-collapse:collapse;font-size:.75rem;font-variant-numeric:tabular-nums}.figure-detail caption{text-align:left;padding:.6rem;font-size:.75rem;color:var(--atlas-muted)}.figure-detail th,.figure-detail td{border-bottom:1px solid var(--atlas-rule);padding:.6rem;text-align:left;vertical-align:top;white-space:nowrap}.figure-detail thead th{font-weight:650;background:var(--atlas-panel)}.figure-detail__boundary ul{font-size:.75rem;padding-left:1.2rem}.figure-detail__boundary code{overflow-wrap:anywhere;white-space:normal;font-size:.75rem}.figure-detail__pagination{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;border-top:1px solid var(--atlas-rule);padding-top:1rem;margin-top:1rem}.figure-detail__pagination a{font-size:.8rem;min-height:44px;display:grid;gap:.4rem;overflow-wrap:anywhere}.figure-detail__pagination strong{font-size:.85rem}.figure-detail__pagination a:last-child{text-align:right}.figure-detail__zoom{width:calc(100vw - 2rem);height:calc(100dvh - 2rem);max-width:1400px;max-height:none;padding:1rem;background:var(--atlas-panel);color:var(--atlas-ink);border:1px solid var(--atlas-rule)}.figure-detail__zoom::backdrop{background:#000b}.figure-detail__zoom header{display:flex;justify-content:space-between;gap:1rem;align-items:center;margin-bottom:.75rem;font-size:.85rem}.figure-detail__zoom button{min-height:44px;padding:.5rem .8rem;background:var(--atlas-panel);color:var(--atlas-ink);border:1px solid var(--atlas-rule)}.figure-detail__zoom>div{height:calc(100% - 6rem);overflow:auto;background:white}.figure-detail__zoom img{display:block;max-width:none;width:auto;height:auto}.figure-detail__zoom>a{font-size:.8rem;display:block;margin-top:.5rem}.figure-detail [hidden]{display:none!important}@media(min-width:1100px){.figure-detail__panels{grid-template-columns:repeat(auto-fit,minmax(min(100%,27rem),1fr))}}@media(max-width:480px){.figure-detail{padding-top:.75rem}.figure-detail__pagination{gap:.75rem}.figure-detail__caption{font-size:.8rem}}
+</style>

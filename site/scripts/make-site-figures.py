@@ -1,21 +1,13 @@
 #!/usr/bin/env python3
-"""Build source-derived PNG previews and vector PDFs for the figures the site places.
+"""Copy canonical report PNG/PDF/PPTX exports and derive responsive WebP previews.
 
-Selected data generators draw their native Matplotlib Figure once. Schematic placements
-consume the canonical editable PowerPoint master and its actual PDF/PNG exports through
-``ensure_native_master``. No complete schematic is flattened or independently redrawn.
-The preview retains the measured light identity on paper in either site theme. No SVG
-is generated, transformed or removed.
-
-Plot captions are captured from the same build and must agree with the report's caption
-manifest. Schematic captions remain in their canonical authored manifest. The site
-manifest binds those captions, meaningful alt text, intrinsic PNG dimensions and vector
-PDF downloads to the active page placements.
+No figure is independently redrawn for the website. The manifest derives numbering
+and chapter anchors from the cumulative report while preserving source dates,
+stable library IDs and existing original download paths. No SVG is generated.
 """
 
 from __future__ import annotations
 
-import importlib
 import json
 import os
 import re
@@ -23,7 +15,6 @@ import shutil
 import sys
 from pathlib import Path
 from typing import Any
-from unittest.mock import patch
 
 HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parents[1]
@@ -45,79 +36,75 @@ def site_name(stem: str) -> str:
     return stem.replace("_", "-")
 
 
-def save_preview(fig, stem: str, theme: str = "light") -> dict[str, Path]:
-    """Save the same native drawing as a vector PDF and a 300 dpi PNG."""
-    import matplotlib as mpl
-    import matplotlib.pyplot as plt
+def report_figure_order() -> dict[str, dict[str, Any]]:
+    """Read the actual cumulative report order and containing chapter anchors."""
+    source = (REPO_ROOT / "report/aidd-commons-living-report-v0.2.md").read_text(encoding="utf-8")
+    order: dict[str, dict[str, Any]] = {}
+    chapter = ""
+    for line in source.splitlines():
+        if line.startswith("# "):
+            title = re.sub(r"[^\w\s-]", "", line[2:].lower())
+            chapter = re.sub(r"\s+", "-", title.strip())
+        match = re.search(r"\(figures/out/([a-z0-9_-]+)\.pdf\)", line)
+        if match:
+            stem = site_name(match.group(1))
+            if stem in order or not chapter:
+                raise ValueError(f"{stem}: repeated figure or missing report chapter")
+            order[stem] = {"reportNumber": len(order) + 1, "chapterAnchor": chapter}
+    if len(order) != 20:
+        raise ValueError(f"the cumulative report must contain 20 figures, found {len(order)}")
+    return order
 
-    if theme != "light":
-        raise ValueError("site previews use the measured light palette on paper")
-    FIGURE_OUT.mkdir(parents=True, exist_ok=True)
-    pdf = FIGURE_OUT / f"{site_name(stem)}.pdf"
-    png = FIGURE_OUT / f"{site_name(stem)}.png"
-    with mpl.rc_context({"savefig.bbox": None, "savefig.pad_inches": 0}):
-        fig.savefig(
-            pdf,
-            format="pdf",
-            metadata={"CreationDate": None, "Producer": "AIDD Commons report figures"},
-        )
-        fig.savefig(
-            png,
-            format="png",
-            dpi=300,
-            metadata={"Software": "AIDD Commons report figures"},
-        )
-    plt.close(fig)
-    return {"pdf": pdf, "png": png}
+
+def write_responsive_previews(png: Path) -> dict[str, str]:
+    """Derive small web previews from the canonical PNG, never redraw scientific marks."""
+    from PIL import Image
+
+    previews = {}
+    with Image.open(png) as source:
+        for width in (480, 960):
+            height = round(source.height * width / source.width)
+            target = png.with_name(f"{png.stem}-{width}.webp")
+            source.convert("RGB").resize((width, height), Image.Resampling.LANCZOS).save(
+                target, "WEBP", quality=88, method=6
+            )
+            previews[str(width)] = target.name
+    return previews
 
 
 def build_previews() -> tuple[list[dict[str, Any]], dict[str, str]]:
-    """Draw placed data panels and copy the actual native schematic master exports."""
-    import figure_style
-    import matplotlib
-    import schematic_style
+    """Copy canonical native exports and derive bounded web-only raster previews."""
     from PIL import Image
 
+    FIGURE_OUT.mkdir(parents=True, exist_ok=True)
     written: list[dict[str, Any]] = []
-    captions: dict[str, str] = {}
-
-    def capture_caption(number: int, text: str) -> Path:
-        captions[str(number)] = text
-        return MANIFEST_PATH
-
-    with (
-        patch.object(figure_style, "save", save_preview),
-        patch.object(figure_style, "register_caption", capture_caption),
-    ):
-        for row in library_rows():
-            module_name = row["stem"].replace("-", "_")
-            matplotlib.rcParams.update(matplotlib.rcParamsDefault)
-            if module_name.startswith("schematic_"):
-                matplotlib.rcParams.update(schematic_style.house_rc())
-            module = importlib.import_module(module_name)
-            if site_name(module.STEM) != row["stem"]:
-                raise ValueError(f"{module_name}: generator stem does not match its placement")
-            extra = {}
-            if module_name.startswith("schematic_"):
-                products = schematic_style.ensure_native_master(module.STEM)
-                FIGURE_OUT.mkdir(parents=True, exist_ok=True)
-                for suffix in ("pdf", "png", "pptx"):
-                    source = Path(products[suffix])
-                    if not source.is_file() or source.is_symlink():
-                        raise ValueError(f"{module.STEM}: missing regular native {suffix} export")
-                    destination = FIGURE_OUT / f"{row['stem']}.{suffix}"
-                    shutil.copyfile(source, destination)
-                extra = {
-                    "pptx": f"{row['stem']}.pptx",
-                    "native_source": "report/figures/build_schematic_masters.mjs",
-                }
-            else:
-                module.build()
-            png = FIGURE_OUT / f"{row['stem']}.png"
-            with Image.open(png) as image:
-                width, height = image.size
-            written.append({"stem": module.STEM, "width": width, "height": height, **extra})
-    return written, captions
+    for row in library_rows():
+        native_stem = row["stem"].replace("-", "_") if row["kind"] == "plot" else row["stem"]
+        extra = {}
+        suffixes = ("pdf", "png", "pptx") if row["kind"] == "schematic" else ("pdf", "png")
+        for suffix in suffixes:
+            source = FIGURE_DIR / "out" / f"{native_stem}.{suffix}"
+            if not source.is_file() or source.is_symlink():
+                raise ValueError(f"{native_stem}: missing regular native {suffix} export")
+            shutil.copyfile(source, FIGURE_OUT / f"{row['stem']}.{suffix}")
+        if row["kind"] == "schematic":
+            extra = {
+                "pptx": f"{row['stem']}.pptx",
+                "native_source": "report/figures/build_schematic_masters.mjs",
+            }
+        png = FIGURE_OUT / f"{row['stem']}.png"
+        with Image.open(png) as image:
+            width, height = image.size
+        written.append(
+            {
+                "stem": native_stem,
+                "width": width,
+                "height": height,
+                "previews": write_responsive_previews(png),
+                **extra,
+            }
+        )
+    return written, {}
 
 
 def comparison_payload() -> dict[str, Any]:
@@ -143,7 +130,7 @@ def placement_rows() -> list[dict[str, Any]]:
         {
             "id": "coverage-bounds",
             "stem": "plot-2-coverage-bounds",
-            "pages": ["/audit/"],
+            "pages": ["/audit/", "/zh-cn/audit/"],
             "alt": (
                 f"The audit reports an interval rather than a leaderboard: all {topics} AIDD "
                 "Commons cells are direct observations, so this project's own row is an exact "
@@ -154,7 +141,7 @@ def placement_rows() -> list[dict[str, Any]]:
         {
             "id": "second-reading",
             "stem": "plot-5-self-record-vs-reading",
-            "pages": ["/audit/"],
+            "pages": ["/audit/", "/zh-cn/audit/"],
             "alt": (
                 f"The retained topic readings agree with the current self record on "
                 f"{reading['equal']} of {reading['cells']} topics, with "
@@ -190,7 +177,7 @@ def placement_rows() -> list[dict[str, Any]]:
         {
             "id": "statement-classes",
             "stem": "schematic-02-statement-classes",
-            "pages": ["/report/"],
+            "pages": ["/report/", "/zh-cn/report/"],
             "alt": (
                 "Every statement in the report belongs to one of four classes, and the two "
                 "classes that assert something are drawn apart from the two that do not, so a "
@@ -343,7 +330,10 @@ def library_rows() -> list[dict[str, Any]]:
             "new simulation was run.",
         )
     rows = []
-    for path in sorted(FIGURE_DIR.glob("plot_*.py"), key=lambda item: int(item.stem.split("_")[1])):
+    for path in sorted(
+        (path for path in FIGURE_DIR.glob("plot_*.py") if re.match(r"plot_\d+_", path.stem)),
+        key=lambda item: int(item.stem.split("_")[1]),
+    ):
         number = int(path.stem.split("_")[1])
         title, alt = definitions[number]
         dates, note = source_info[number]
@@ -454,6 +444,8 @@ def write_manifest(written: list[dict[str, Any]], emitted: dict[str, str]) -> di
                 f"plot {key}: report caption is stale; run its native figure generator first"
             )
     products = {site_name(entry["stem"]): entry for entry in written}
+    order = report_figure_order()
+    library_by_stem = {row["stem"]: row for row in library_rows()}
     figures = []
     for row in placement_rows():
         product = products.get(row["stem"])
@@ -467,6 +459,9 @@ def write_manifest(written: list[dict[str, Any]], emitted: dict[str, str]) -> di
                 "source_stem": product["stem"],
                 "width": product["width"],
                 "height": product["height"],
+                "previews": product["previews"],
+                **order[row["stem"]],
+                "detailHref": f"/report/figures/{library_by_stem[row['stem']]['id']}/",
                 "alt": row["alt"],
                 "caption": caption_for(row["stem"], captions, schematics),
                 "pages": row["pages"],
@@ -486,30 +481,26 @@ def write_manifest(written: list[dict[str, Any]], emitted: dict[str, str]) -> di
                 "source_stem": product["stem"],
                 "width": product["width"],
                 "height": product["height"],
+                "previews": product["previews"],
+                **order[row["stem"]],
+                "detailHref": f"/report/figures/{row['id']}/",
+                "sourceDate": max(row["source_dates"], default=None),
+                "visualRevision": "2026-11-07",
                 "alt": row["alt"],
                 "caption": caption_for(row["stem"], captions, schematics),
                 "source_dates": row["source_dates"],
                 "source_note": row["source_note"],
-                "visual_revision_date": (
-                    "2026-11-06"
-                    if row["stem"]
-                    in {
-                        "plot-3-curriculum-units-per-track",
-                        "plot-4-depth-distribution-per-track",
-                        "plot-11-correlated-frames-error-bars",
-                        "schematic-03-decision-pipeline",
-                        "schematic-04-stage-contracts",
-                    }
-                    else "2026-10-26"
-                ),
+                "visual_revision_date": "2026-11-07",
                 **{key: product[key] for key in ("pptx", "native_source") if key in product},
             }
         )
+    library.sort(key=lambda row: row["reportNumber"])
     payload = {
         "name": "atlas-figures",
         "description": (
             "Source-derived data plots and native editable illustrated schematic masters, with "
-            "PNG previews and actual PDF exports at their authored dimensions. The existing "
+            "responsive WebP previews and canonical PNG/PDF exports at authored dimensions. "
+            "The existing "
             "measured light identity is retained on paper; schematics include a PPTX source."
         ),
         "generated_by": "site/scripts/make-site-figures.py",

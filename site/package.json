@@ -12,8 +12,9 @@
     "data:check": "node ../node_modules/tsx/dist/cli.mjs ../scripts/catalog/check-site-data.ts",
     "workbench:build": "node ../node_modules/tsx/dist/cli.mjs ../scripts/workbench/export.ts",
     "workbench:check": "node ../node_modules/tsx/dist/cli.mjs ../scripts/workbench/export.ts --check",
-    "figures:check": "../.venv/bin/python scripts/check-site-figures.py",
-    "figures:build": "../.venv/bin/python scripts/make-site-figures.py"
+    "figures:check": "../.venv/bin/python scripts/check-site-figures.py && ../.venv/bin/python scripts/export-figure-details.py --check",
+    "figures:build": "../.venv/bin/python scripts/make-site-figures.py && ../.venv/bin/python scripts/export-figure-details.py",
+    "figures:media:check": "node ../node_modules/tsx/dist/cli.mjs scripts/export-figure-motions.ts --check"
   },
   "dependencies": {
     "@astrojs/starlight": "0.42.0",

@@ -89,17 +89,21 @@ class FigureAuthorityTests(unittest.TestCase):
         self.assertEqual(series.initiated_on, "2026-09-11")
         self.assertEqual(series.documented_through, "2026-10-24")
 
-    def test_the_actual_93_topic_plot_does_not_clip_the_equal_bar(self):
+    def test_the_actual_93_topic_plot_labels_all_three_compact_outcome_counts(self):
         payload = reading_payload()
         captured: dict = {}
 
         def inspect_figure(fig, stem):
             ax = fig.axes[0]
-            counts = [patch_.get_width() for patch_ in ax.patches]
+            texts = {text.get_gid(): text.get_text() for text in ax.texts if text.get_gid()}
+            counts = [
+                int(texts[f"reading-outcome-{key}"])
+                for key in ("equal", "reading_deeper", "reading_shallower")
+            ]
             self.assertEqual(counts, [93, 0, 0])
-            sources.validate_count_bounds(counts, ax.get_xlim())
-            self.assertGreater(ax.get_xlim()[1], 93)
-            self.assertEqual(ax.get_xlabel(), "Topics out of 93")
+            sources.validate_count_bounds(counts, (0, payload["taxonomy"]["topics"]))
+            self.assertEqual(len(ax.patches), 0)
+            self.assertTrue(any(text.get_text() == "Topics out of 93" for text in ax.texts))
             plt.close(fig)
             return {}
 

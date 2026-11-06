@@ -1,0 +1,13 @@
+﻿Metric,Model,Scaffold split · primary,Random split · contrast,Unit
+mae,train_mean,2.590685189688716,2.767137645914397,kcal/mol
+mae,morgan_ridge,1.1280482645936036,1.0188311172825968,kcal/mol
+mae,morgan_random_forest,1.2568836078869037,1.367663970058587,kcal/mol
+rmse,train_mean,3.2880606447088776,3.450364249313157,kcal/mol
+rmse,morgan_ridge,1.7597471244251413,1.350762375741371,kcal/mol
+rmse,morgan_random_forest,2.0375968699271554,1.940465105055399,kcal/mol
+coverage,train_mean,undefined · no interval,undefined · no interval,fraction
+coverage,morgan_ridge,0.875,0.734375,fraction
+coverage,morgan_random_forest,0.90625,0.875,fraction
+mean_width,train_mean,undefined · no interval,undefined · no interval,kcal/mol
+mean_width,morgan_ridge,5.478728133879933,3.165296633480907,kcal/mol
+mean_width,morgan_random_forest,6.013026666666674,5.158025714285704,kcal/mol

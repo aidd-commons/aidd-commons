@@ -1,0 +1,32 @@
+{
+  "library_ids": [
+    "schematic-01-artifacts",
+    "schematic-02-statement-classes",
+    "schematic-03-decision-pipeline",
+    "schematic-04-stage-contracts",
+    "plot-1-registry-composition",
+    "plot-3-curriculum-units-per-track",
+    "schematic-06-openness-dimensions",
+    "plot-6-openness-matrix",
+    "plot-7-access-and-licence",
+    "schematic-05-prerequisite-graph",
+    "plot-2-coverage-bounds",
+    "plot-5-self-record-vs-reading",
+    "plot-4-depth-distribution-per-track",
+    "schematic-07-frozen-lifecycle",
+    "plot-8-freesolv-split-calibration",
+    "plot-9-representation-ranking-flips",
+    "plot-11-correlated-frames-error-bars",
+    "plot-12-trajectory-convergence",
+    "plot-10-acquisition-policy-recovery",
+    "plot-13-two-assay-systems-disagree"
+  ],
+  "placement_ids": {
+    "coverage-bounds": "plot-2-coverage-bounds",
+    "second-reading": "plot-5-self-record-vs-reading",
+    "representation-flips": "plot-9-representation-ranking-flips",
+    "frozen-lifecycle": "schematic-07-frozen-lifecycle",
+    "statement-classes": "schematic-02-statement-classes"
+  },
+  "group_anchors": ["schematics", "plots", "teaching-views"]
+}

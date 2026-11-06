@@ -1,0 +1,9 @@
+﻿Aggregate,Category,Self / outcome,Retained reading
+outcome,equal,93,
+outcome,reading_deeper,0,
+outcome,reading_shallower,0,
+threshold,explained,93,93
+threshold,worked,93,93
+threshold,executable,81,81
+threshold,executable-on-real-data,62,62
+threshold,assessed,81,81

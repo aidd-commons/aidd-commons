@@ -1,0 +1,14 @@
+﻿Object / relation,Source label / relation identity
+class-title-0,(a)  Observed source fact
+class-status-0,Source-backed
+class-title-1,(b)  Project decision
+class-status-1,Decided
+class-title-2,(c)  Open question
+class-status-2,Unresolved
+class-title-3,(d)  Future work
+class-status-3,Planned
+relation,source-supports-claim
+relation,decision-input-route-0
+relation,decision-input-route-1
+relation,decision-input-route-2
+relation,unresolved-source-route

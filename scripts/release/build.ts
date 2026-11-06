@@ -443,6 +443,7 @@ export const directoryAllowlist = [
   "tests/comparisons",
   "tests/curriculum",
   "tests/e2e",
+  "tests/helpers",
   "tests/links",
   // The release ships its own gates, so the release ships the tests that prove
   // them, known-bad fixtures included. Without them a reader cannot show that

@@ -74,6 +74,28 @@ describe("CI workflow contracts", () => {
     }
   });
 
+  it("checks shared-source figure projections before every ordinary site build without regenerating masters", async () => {
+    const manifest = JSON.parse(
+      await readFile(`${repositoryRoot}/site/package.json`, "utf8"),
+    ) as { scripts: Record<string, string> };
+    expect(manifest.scripts["figures:check"]).toBe(
+      "../.venv/bin/python scripts/check-site-figures.py && ../.venv/bin/python scripts/export-figure-details.py --check",
+    );
+    expect(manifest.scripts["build"]).toContain("npm run figures:check");
+    expect(manifest.scripts["check"]).toContain("npm run figures:check");
+    expect(manifest.scripts["build"]).not.toContain("figures:build");
+    expect(manifest.scripts["check"]).not.toContain("figures:build");
+    expect(manifest.scripts["figures:build"]).toContain(
+      "scripts/make-site-figures.py",
+    );
+    expect(manifest.scripts["figures:build"]).toContain(
+      "scripts/export-figure-details.py",
+    );
+    expect(manifest.scripts["figures:media:check"]).toContain(
+      "scripts/export-figure-motions.ts --check",
+    );
+  });
+
   it("stages pull-request checks without secrets and installs pnpm explicitly", async () => {
     const workflow = await readFile(
       `${repositoryRoot}/.github/workflows/ci.yml`,

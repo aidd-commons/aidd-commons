@@ -3,7 +3,7 @@ import { languageAlternate, localizedPath } from "../../site/src/lib/site-locale
 import { localizedAtlasLabel } from "../../site/src/lib/atlas-presentation.js";
 
 describe("bilingual interface routes", () => {
-  it.each(["/", "/atlas/", "/atlas/browse/", "/atlas/freesolv-v0-52/", "/audit/", "/report/", "/report/figures/", "/contribute/", "/learn/tracks/foundations/", "/labs/notebook-guide/", "/search/"])("keeps the current destination for %s", (path) => {
+  it.each(["/", "/atlas/", "/atlas/browse/", "/atlas/freesolv-v0-52/", "/audit/", "/report/", "/report/figures/", "/report/figures/plot-2-coverage-bounds/", "/contribute/", "/learn/tracks/foundations/", "/labs/notebook-guide/", "/search/"])("keeps the current destination for %s", (path) => {
     const chinese = localizedPath(path, true);
     expect(chinese).toBe(`/zh-cn${path}`);
     expect(localizedPath(chinese, false)).toBe(path);

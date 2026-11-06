@@ -6,7 +6,7 @@ import { it } from "vitest";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 
-it("retains complete scientific plot populations and rejects four known defects", () => {
+it("retains complete scientific plot populations and rejects source defects", () => {
   execFileSync(join(root, ".venv/bin/python"), ["tests/report/test_plot_reconstruction.py"], {
     cwd: root,
     env: {

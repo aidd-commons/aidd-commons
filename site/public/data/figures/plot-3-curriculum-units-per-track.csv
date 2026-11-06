@@ -1,0 +1,19 @@
+﻿Track,Core units,Research units,Practice units,Lessons
+foundations,3,1,1,9
+drug-discovery-foundations,3,1,1,5
+machine-learning,4,4,1,6
+data-governance,3,2,1,6
+representations,3,3,0,8
+mechanism-targets,3,3,1,8
+qsar-properties,5,3,1,6
+admet-pk,3,1,1,7
+dti-screening,3,2,0,5
+structure-and-pockets,2,3,1,8
+physics-based-modeling,4,3,1,8
+molecular-generation,2,5,2,8
+biologics-design,3,4,1,13
+synthesis-and-automation,3,2,1,5
+active-learning,2,2,2,6
+scientific-agents,4,2,1,6
+evaluation-and-reproducibility,4,1,2,8
+candidate-nomination,2,2,2,5
