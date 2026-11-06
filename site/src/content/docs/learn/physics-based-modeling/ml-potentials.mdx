@@ -5,9 +5,12 @@ description: Read the open machine-learned interatomic potentials as artefacts r
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="physics-based-modeling/ml-potentials" />
 <ScrollableRegions />
+
+<TeachingViewLink track="physics-based-modeling" />
 
 ## Learning goals and prerequisites
 
@@ -242,13 +245,11 @@ with the table in the openness section.
 <details data-worked-answer>
 <summary>Worked answer</summary>
 
-1. Training code is available in 6 of 6. The data recipe is unverified in 6 of
-   6, so the count for the training inputs is 0. The difference is the whole
-   point: running the training script is not the same as reproducing the
-   training, because a script that has been run once on a corpus nobody can
-   obtain is a script whose output cannot be checked. A reader who wants to
-   retrain has the code and, in two cases, the corpus, and in the other four
-   has the code and a name.
+1. Training code is available in 6 of 6 records; the data recipe is verified
+   in 0 of 6. That does not mean no training files exist: two records mark
+   training data available. Code, input availability and a complete recipe
+   are separate requirements, so these records alone do not establish exact
+   reproduction of the original training.
 2. The two are CHGNet and SevenNet. A licence record tells you the terms under
    which the artefact may be used and redistributed. It does not tell you
    whether the artefact exists in a form that can be obtained, whether the
@@ -258,9 +259,9 @@ with the table in the openness section.
    records, and the terms of the second OMat24 asset are the other case. A
    reader who cannot obtain the corpus can still use the released weights,
    because the weights are published under their own licence and the corpus is
-   not needed to evaluate them. What they lose is the ability to retrain, to
-   fine-tune on a related chemistry, or to establish how far the weights
-   extrapolate, since that judgement is a statement about the corpus.
+   not needed to evaluate them. Missing the original corpus prevents exact reproduction of that training
+   and limits audits of its coverage. A separate fine-tune on newly obtained,
+   permitted labelled data may still be possible, with its own evaluation.
 
 </details>
 

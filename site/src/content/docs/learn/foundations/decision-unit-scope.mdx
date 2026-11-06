@@ -1,19 +1,22 @@
 ---
 title: The scope of one decision unit
-description: Ground the decision unit in a runnable count of how many independent measurements a compound really has, and what each surviving measurement must carry with it.
+description: Ground the decision unit in a runnable count of how many distinct measurement keys a compound really has, and what each surviving measurement must carry with it.
 ---
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="foundations/decision-unit-scope" />
 <ScrollableRegions />
+
+<TeachingViewLink track="foundations" />
 
 ## Learning goals and prerequisites
 
 After this lesson you should be able to:
 
-1. state the three rules that turn database rows into independent measurements, and
+1. state the three rules that turn database rows into distinct measurement keys, and
    the order they apply in;
 2. read a per-compound census and say which count answers which question;
 3. name the seven pieces of context that travel with every surviving measurement; and
@@ -91,7 +94,7 @@ wrong one of the three is the mistake this lesson exists to prevent.
 | --- | --- | --- |
 | Reported row count | every activity row a database files under the entity | counts non-endpoint rows, uncurated rows, bounds and duplicates alike |
 | Distinct assay count | the number of assays the entity was measured in | drops the document, so one assay entered twice from one paper counts once, and one paper's two assays count twice |
-| Independent measurement count | the number of distinct assay, document and endpoint keys among admitted point measurements | the quantity a comparison actually needs |
+| Distinct measurement-key count | the number of distinct assay, document and endpoint keys among admitted point measurements | the quantity a comparison actually needs |
 
 For a declared cohort of fifteen ChEMBL molecules that resolve to ten parent
 molecules, against ChEMBL 37 released 2026-05-01, the three counts read as
@@ -102,8 +105,8 @@ follows.
 | Activity rows filed under the ten parents | 13,305 |
 | Admitted point measurements | 488 |
 | Admitted bounds | 516 |
-| Independent measurements, grouping unit (assay, document, endpoint) | 486 |
-| Independent experiments, grouping unit (assay, document) | 484 |
+| Distinct measurement keys, grouping unit (assay, document, endpoint) | 486 |
+| Distinct assay–document keys, grouping unit (assay, document) | 484 |
 | Point measurements reported on the parent structure | 417 |
 | Point measurements reported on a salt or mixture form | 71 |
 
@@ -119,7 +122,7 @@ own free base.
 A surviving measurement is a row in a context, and the context is not decoration.
 Seven pieces of it change what the number means.
 
-| Context field | What it tells you | VALPROIC ACID, 27 independent measurements |
+| Context field | What it tells you | VALPROIC ACID, 27 distinct measurement keys |
 | --- | --- | --- |
 | Tested form | which physical form was in the assay | 25 on the parent structure, 2 on the salt CHEMBL433 |
 | Assay | what kind of experiment produced the number | 27 distinct assays, 20 binding and 7 functional |
@@ -134,11 +137,10 @@ not carry the assay organism or the confidence score, so both have to be fetched
 from the assay record separately, and an assay whose organism is not recorded is
 reported as not recorded rather than guessed.
 
-The relation field is the one that quietly changes arithmetic. A row with ">" says
-the value lies on one side of a threshold, and it is a real measurement and a
-useless number, because it cannot be averaged with a point value. A compound
-whose only surviving evidence is a bound above 10,000 nM has not been shown to be
-potent at all.
+A relation of ">" places the endpoint above a threshold. This bound is
+informative but cannot be averaged as if it were an exact point value.
+A bound above 10,000 nM limits potency for that endpoint under that assay;
+it does not establish absence of all biological activity.
 
 ## Worked case
 
@@ -151,19 +153,19 @@ report something outside the declared nanomolar potency family, 3,674 were never
 curated into ChEMBL's standard fields, 99 carry a data-validity comment, 10 are
 flagged as potential duplicates and 10 carry no relation symbol. That leaves 152
 admitted rows, of which 125 are bounds and 27 are point measurements, and the 27
-point measurements collapse to 27 independent measurements under the assay,
+point measurements collapse to 27 distinct measurement keys under the assay,
 document and endpoint key.
 
-The surviving evidence is also mostly negative. All 125 bounds carry the relation
-">", and 124 of them place the value above 10,000 nM. A count of 6,294 and a count
-of 27 are not two answers to the same question. The first is how often the compound
-was written about. The second is how many independent experiments measured it, and
-only the second can serve as a denominator.
+All 125 admitted bounds carry ">", and 124 place the endpoint above
+10,000 nM. The 6,294 rows and 27 measurement keys answer different questions:
+database row volume versus distinct admitted point-measurement keys.
+Choose the denominator for the stated estimand and report bounds separately.
+Neither count alone establishes statistically independent experiments.
 
 The grouping rule has a visible effect on a second compound. Pravastatin has
 1,594 reported rows and 37 admitted point measurements, which collapse to 36
-independent measurements under the assay, document and endpoint key, and then to
-34 independent experiments once the endpoint type is dropped. Those 34
+distinct measurement keys under the assay, document and endpoint key, and then to
+34 distinct assay–document keys once the endpoint type is dropped. Those 34
 experiments sit in 34 distinct assays drawn from 17 distinct documents and reach
 14 distinct targets. Dropping the endpoint type is what turns two measurements of
 one experiment into one.
@@ -211,11 +213,11 @@ measurement counts here are counts within that family. A different declared fami
 would give different counts, and the protocol's own exclusion list says so
 rather than leaving it implied.
 
-The grouping rule is a judgement about what an independent experiment is. A
-different judgement would give different counts. ChEMBL's own schema
-documentation notes that a potential-duplicate marker of zero does not guarantee
-that a measurement is novel or independent, and this material counts what the
-markers say without claiming more.
+The grouping rule defines an operational deduplication key, not a proof of
+statistical independence. Shared source material, protocols or laboratories
+may remain dependent across distinct keys. ChEMBL also warns that a zero
+potential-duplicate marker does not guarantee a novel or independent
+measurement. The lab's historical output labels are read under this limit.
 
 Nothing is fitted, nothing is held out and nothing is predicted, so there is no
 split, no fitted parameter and no held-out evaluation to report. The material
@@ -250,16 +252,13 @@ the best-characterised in the cohort.
    ChEMBL's standard fields, 99 rows with a data-validity comment, 10 potential
    duplicates and 10 rows with no relation symbol. The grouping rule then splits
    the 152 into 125 bounds and 27 point measurements, and the 27 point
-   measurements collapse to 27 independent measurements under the assay, document
+   measurements collapse to 27 distinct measurement keys under the assay, document
    and endpoint key. The two rules together account for the whole gap.
-2. The independent measurement count, 27, because a claim about a compound's
-   evidence needs independent experiments, and replicates from one assay and one
-   paper are not independent evidence. The row count of 6,294 would have
-   overstated the compound's evidence base by more than two orders of magnitude,
-   and it would have counted as evidence 2,349 rows that report something other
-   than a potency at all. The 125 bounds that were admitted alongside the 27 make
-   the point sharper, because 124 of them place the value above 10,000 nM, which is
-   evidence of the absence of a potency rather than evidence of one.
+2. For the distinct admitted point-measurement count, use 27 keys rather
+   than 6,294 database rows. The 2,349 out-of-family rows do not answer that
+   endpoint question. Report the 125 admitted bounds separately: 124 are
+   above 10,000 nM, giving endpoint-specific limits, not absence of every
+   kind of activity. The keys do not prove statistical independence.
 3. The rule is to admit the child row, count it on the parent, and report it
    separately as a salt-form measurement, which is what the protocol does and what
    its sibling lab explicitly does not do. Deleting the 2 salt rows would drop

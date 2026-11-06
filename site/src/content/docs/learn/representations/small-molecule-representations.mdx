@@ -6,6 +6,7 @@ description: Choose identifiers, descriptors, fingerprints, graphs, strings, and
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import RepresentationDecisionMap from "../../../../components/RepresentationDecisionMap.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import ScientificTeachingView from "../../../../components/ScientificTeachingView.astro";
 
 <LessonProgress lessonId="representations/small-molecule-representations" />
 <ScrollableRegions />
@@ -46,6 +47,8 @@ After this chapter, you should be able to:
    preprocessing or entity leakage;
 5. audit stereochemistry, protonation, tautomer, conformer, hashing, and
    applicability-domain failures before trusting a score.
+
+<ScientificTeachingView track="representations" />
 
 ## Scientific assumptions
 
@@ -336,9 +339,26 @@ is a useful nonparametric control when local analogues are the intended evidence
 The [label-free representation inspector](/labs/molecule-representation-inspector/)
 uses seven authored examples. Run it from the repository root:
 
+**Execution mode: a fresh local inspection run.** This parses the supplied
+example structures and writes a report; it does not rerun the frozen EGFR
+evaluation. Create a fresh output directory on every run:
+
+```sh
+representation_run_dir="$(mktemp -d "${TMPDIR:-/tmp}/aidd-representations.XXXXXX")"
+env UV_CACHE_DIR=.cache/uv uv run python labs/molecule_representations/run_lab.py inspect --output "$representation_run_dir/report.json"
+```
+
+<details>
+<summary>Original default-output command</summary>
+
+This command writes `tmp/molecule-representations/report.json` and replaces
+that file if it already exists. Use it only when that replacement is intended.
+
 ```sh
 env UV_CACHE_DIR=.cache/uv uv run python labs/molecule_representations/run_lab.py inspect
 ```
+
+</details>
 
 It writes `tmp/molecule-representations/report.json` and records the installed
 RDKit version plus every fingerprint option. Inspect three contrasts:

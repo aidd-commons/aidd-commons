@@ -15,13 +15,25 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 模式是依照冻结协议，对已提交目录进行全新独立计算。使用项目的 Python 3.11 环境和 CPU。命令无需网络、下载或加速器。`check` 与 `show` 不写入文件。导出程序仅在全部检查通过后覆盖已提交的精简汇总。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/asset_openness_audit/run_lab.py check
 .venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py show
 .venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py check
-.venv/bin/python labs/asset_openness_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/asset_openness_audit -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/asset_openness_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/asset_openness_audit/export_summary.py
+```
+
+</details>
 
 ## 来源记录与检查
 
@@ -78,6 +90,17 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 ## 材料局限
 
 本实验核查目录记录的陈述和内部证据引用是否可解析。它不会重新打开每个外部链接、运行模型，或判定某项资源是否可用于特定目的。`unverified` 只反映相应字段已记录的来源审阅及日期，不证明资产不存在。`not_applicable` 是关于资源类型的另一种判断，并保留它的证据条目。冻结选集用于说明区别，并非全部资源的代表性样本。
+
+## 独立检查任务
+
+在已检查记录中找到权重可得而训练数据未验证的一项，分别追溯两个状态各自的 evidence identifier。权重许可是否能建立训练数据的复用权限？在不改变状态的前提下记录未解决字段。
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+不能。七个维度描述不同资产，许可仅适用于其声明范围。权重可得不能填补训练数据未验证的字段。可解析 evidence identifier 让读者找到引用页面，但不会独立验证所有上游主张，也不会扩大许可。
+
+</details>
 
 ## 来源与条款
 

@@ -1,84 +1,86 @@
 ---
 import SiteShell from "../../components/SiteShell.astro";
+import ContributionDraft from "../../components/ContributionDraft.astro";
+const chinese = Astro.props.chinese ?? false;
+const t = (english: string, chineseText: string) => chinese ? chineseText : english;
 ---
 
-<SiteShell
-  title="Contribute"
-  description="Ask learning questions and contribute source corrections, lessons, labs, and reproducible evidence."
+<SiteShell lang={chinese ? "zh-CN" : "en"}
+  title={t("Contribute","参与贡献")}
+  description={t("Ask learning questions and contribute source corrections, lessons, labs, and reproducible evidence.","提出学习问题，贡献来源更正、课程、实验及可复现证据。")}
 >
   <section aria-labelledby="contribute-title">
-    <p class="eyebrow">Community review</p>
-    <h1 id="contribute-title" class="page-heading">Contribute</h1>
+    <p class="eyebrow">{t("Community review","社区评阅")}</p>
+    <h1 id="contribute-title" class="page-heading">{t("Contribute","参与贡献")}</h1>
     <p class="page-intro">
-      Ask about an explanation, share a reproduction, or propose a source, lesson
-      or lab. Start with the scientific question and the evidence a reader can inspect.
+      {t("Ask about an explanation, share a reproduction, or propose a source, lesson or lab. Start with the scientific question and the evidence a reader can inspect.", "讨论解释、分享复现，或推荐来源、课程与实验。请从科学问题和读者可检查的证据开始。")}
     </p>
     <p class="section-intro">
-      <a href="https://github.com/gxCaesar/aidd-commons/issues">Read existing questions and reports</a>{" "}
-      before opening a new issue. GitHub sign-in is required to submit an issue;
-      reading the teaching material and public issues does not require an account.
+      <a href="https://github.com/gxCaesar/aidd-commons/issues">{t("Read existing questions and reports","阅读已有问题与报告")}</a>{" "}
+      {t("before opening a new issue. GitHub sign-in is required to submit an issue; reading the teaching material and public issues does not require an account.", "，再创建新 Issue。提交 Issue 需要登录 GitHub；阅读教学材料与公开 Issue 无需账号。")}
     </p>
   </section>
 
+  <ContributionDraft chinese={chinese} />
   <section class="section" aria-labelledby="contribution-routes-title">
     <div class="section__header">
-      <h2 id="contribution-routes-title">Ask a question or contribute</h2>
+      <h2 id="contribution-routes-title">{t("Ask a question or contribute","提问或贡献")}</h2>
     </div>
     <div class="track-grid">
       <article class="track-card">
-        <h3>Ask a learning question</h3>
-        <p>Discuss an explanation, worked example or student exercise in English or Chinese. A partial interpretation is welcome.</p>
-        <a class="button-secondary" href="https://github.com/gxCaesar/aidd-commons/issues/new?template=learning-question.yml">Ask a learning question / 学习提问</a>
+        <h3>{t("Ask a learning question","提出学习问题")}</h3>
+        <p>{t("Discuss an explanation, worked example or student exercise in English or Chinese. A partial interpretation is welcome.","可用英语或中文讨论解释、完整示例或学生练习，也欢迎尚不完整的理解。")}</p>
+        <a class="button-secondary" href="https://github.com/gxCaesar/aidd-commons/issues/new?template=learning-question.yml">{t("Ask a learning question / 学习提问","提出学习问题")}</a>
       </article>
       <article class="track-card">
-        <h3>Correct the record</h3>
-        <p>Point to a factual, scientific, citation, licence, translation or accessibility problem and the evidence for a correction.</p>
-        <a class="button-secondary" href="https://github.com/gxCaesar/aidd-commons/issues/new?template=correction.yml">Report a correction</a>
+        <h3>{t("Correct the record","更正记录")}</h3>
+        <p>{t("Point to a factual, scientific, citation, licence, translation or accessibility problem and the evidence for a correction.","指出事实、科学、引文、许可、翻译或无障碍问题，并提供更正证据。")}</p>
+        <a class="button-secondary" href="https://github.com/gxCaesar/aidd-commons/issues/new?template=correction.yml">{t("Report a correction","报告更正")}</a>
       </article>
       <article class="track-card">
-        <h3>Propose a source</h3>
-        <p>Suggest a paper, dataset, model, tool or standard. Explain the task it supports and which claims remain unverified.</p>
-        <a class="button-secondary" href="https://github.com/gxCaesar/aidd-commons/issues/new?template=source-proposal.yml">Propose a source</a>
+        <h3>{t("Propose a source","推荐来源")}</h3>
+        <p>{t("Suggest a paper, dataset, model, tool or standard. Explain the task it supports and which claims remain unverified.","推荐论文、数据集、模型、工具或标准，说明其支持的任务以及仍未核实的主张。")}</p>
+        <a class="button-secondary" href="https://github.com/gxCaesar/aidd-commons/issues/new?template=source-proposal.yml">{t("Propose a source","推荐来源")}</a>
       </article>
       <article class="track-card">
-        <h3>Develop a lesson</h3>
-        <p>Name a learner question, prerequisites, a worked example and an independent exercise. Connect it to an existing track.</p>
-        <a class="button-secondary" href="https://github.com/gxCaesar/aidd-commons/issues/new?template=lesson-proposal.yml">Propose a lesson</a>
+        <h3>{t("Develop a lesson","开发课程")}</h3>
+        <p>{t("Name a learner question, prerequisites, a worked example and an independent exercise. Connect it to an existing track.","明确学习问题、先修要求、完整示例与独立练习，并关联现有学习方向。")}</p>
+        <a class="button-secondary" href="https://github.com/gxCaesar/aidd-commons/issues/new?template=lesson-proposal.yml">{t("Propose a lesson","提议课程")}</a>
       </article>
       <article class="track-card">
-        <h3>Design a lab</h3>
-        <p>Define inputs, expected artifacts and compute needs. For a predictive lab, specify the split, baseline and evaluation before running it.</p>
-        <a class="button-secondary" href="https://github.com/gxCaesar/aidd-commons/issues/new?template=lab-proposal.yml">Propose a lab</a>
+        <h3>{t("Design a lab","设计实验")}</h3>
+        <p>{t("Define inputs, expected artifacts and compute needs. For a predictive lab, specify the split, baseline and evaluation before running it.","定义输入、预期产物和计算需求。预测实验应在运行前明确划分、基线与评估。")}</p>
+        <a class="button-secondary" href="https://github.com/gxCaesar/aidd-commons/issues/new?template=lab-proposal.yml">{t("Propose a lab","提议实验")}</a>
       </article>
       <article class="track-card">
-        <h3>Share a reproduction or failure</h3>
-        <p>Report a fresh result, replication, timeout or failure analysis with the command, environment and observed output.</p>
-        <a class="button-secondary" href="https://github.com/gxCaesar/aidd-commons/issues/new?template=experiment-report.yml">Share an experiment report</a>
+        <h3>{t("Share a reproduction or failure","分享复现或失败")}</h3>
+        <p>{t("Report a fresh result, replication, timeout or failure analysis with the command, environment and observed output.","分享新结果、复现、超时或失败分析，并附上命令、环境与实际输出。")}</p>
+        <a class="button-secondary" href="https://github.com/gxCaesar/aidd-commons/issues/new?template=experiment-report.yml">{t("Share an experiment report","分享实验报告")}</a>
       </article>
       <article class="track-card">
-        <h3>Propose a project change</h3>
-        <p>Request discussion of a material scope, curriculum, schema, governance or evaluation-policy change, including credible alternatives.</p>
-        <a class="button-secondary" href="https://github.com/gxCaesar/aidd-commons/issues/new?template=rfc.yml">Open a request for comments</a>
+        <h3>{t("Propose a project change","提议项目变更")}</h3>
+        <p>{t("Request discussion of a material scope, curriculum, schema, governance or evaluation-policy change, including credible alternatives.","讨论范围、课程、模式、治理或评估政策的实质变更，并提供可信的替代方案。")}</p>
+        <a class="button-secondary" href="https://github.com/gxCaesar/aidd-commons/issues/new?template=rfc.yml">{t("Open a request for comments","发起意见征集")}</a>
       </article>
     </div>
   </section>
 
   <section class="section" aria-labelledby="question-context-title">
     <article class="detail-panel">
-      <h2 id="question-context-title">Give a useful scientific question or reproduction context</h2>
-      <p>Use the learning-question form for help understanding a passage, and the correction form for an error. Include the details relevant to your question:</p>
+      <h2 id="question-context-title">{t("Give a useful scientific question or reproduction context","提供明确的科学问题或复现上下文")}</h2>
+      <p>{t("Use the learning-question form for help understanding a passage, and the correction form for an error. Include the details relevant to your question:","理解段落时使用学习提问表单，报告错误时使用更正表单。请提供与问题相关的信息：")}</p>
       <ul>
-        <li><strong>Where:</strong> page URL, lesson or lab identifier, section, and release or commit.</li>
-        <li><strong>Question:</strong> what you expected, what you observed, and the source or reasoning behind the difference. Keep observations and hypotheses separate.</li>
-        <li><strong>Reproduction:</strong> exact command, software and data versions, input and output, environment, and the original error or negative result. For modelling, name the endpoint, split, baseline, metric and independent unit.</li>
-        <li><strong>Reuse:</strong> asset-specific licences, source attribution and relevant conflicts of interest. Share only material you are permitted to make public.</li>
+        <li><strong>{t("Where:","位置：")}</strong>{t(" page URL, lesson or lab identifier, section, and release or commit.","页面 URL、课程或实验标识符、章节，以及发布版本或提交。")}</li>
+        <li><strong>{t("Question:","问题：")}</strong>{t(" what you expected, what you observed, and the source or reasoning behind the difference. Keep observations and hypotheses separate.","预期、实际观察，以及差异背后的来源或推理。请区分观察与假设。")}</li>
+        <li><strong>{t("Reproduction:","复现：")}</strong>{t(" exact command, software and data versions, input and output, environment, and the original error or negative result. For modelling, name the endpoint, split, baseline, metric and independent unit.","准确命令、软件与数据版本、输入输出、环境，以及原始错误或负结果。建模时请说明终点、划分、基线、指标和独立单位。")}</li>
+        <li><strong>{t("Reuse:","复用：")}</strong>{t(" asset-specific licences, source attribution and relevant conflicts of interest. Share only material you are permitted to make public.","各项资产的许可、来源署名和相关利益冲突。仅分享有权公开的材料。")}</li>
       </ul>
-      <p>Use fresh student outputs for a new exercise. Keep frozen author results and the original failure evidence intact.</p>
-      <p>Issues are public. Do not post credentials, personal or patient information, or restricted datasets.</p>
+      <p>{t("Use fresh student outputs for a new exercise. Keep frozen author results and the original failure evidence intact.","新练习使用新的学生输出。保留冻结的作者结果和原始失败证据。")}</p>
+      <p>{t("Issues are public. Do not post credentials, personal or patient information, or restricted datasets.","Issue 公开可见。请勿发布凭据、个人或患者信息、受限数据集。")}</p>
       <p>
-        The <a href="https://github.com/gxCaesar/aidd-commons/blob/main/CONTRIBUTING.md">contribution guide</a>{" "}
-        explains the review process; <a href="https://github.com/gxCaesar/aidd-commons/blob/main/GOVERNANCE.md">governance</a>{" "}
-        describes how evidence-backed corrections and project decisions are handled.
+        {t("The ", "请参阅")}<a href="https://github.com/gxCaesar/aidd-commons/blob/main/CONTRIBUTING.md">{t("contribution guide","贡献指南")}</a>{" "}
+        {t("explains the review process; ", "了解评阅流程；")}<a href="https://github.com/gxCaesar/aidd-commons/blob/main/GOVERNANCE.md">{t("governance","治理说明")}</a>{" "}
+        {t("describes how evidence-backed corrections and project decisions are handled.", "介绍有证据依据的更正与项目决策如何处理。")}
       </p>
     </article>
   </section>

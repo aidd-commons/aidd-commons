@@ -62,7 +62,7 @@ describe("rMD17 development lab route", () => {
         "utf8",
       ),
       readFile(
-        join(repositoryRoot, "site", "src", "pages", "labs", "index.astro"),
+        join(repositoryRoot, "site", "dist", "labs", "index.html"),
         "utf8",
       ),
     ]);
@@ -120,7 +120,10 @@ describe("rMD17 development lab route", () => {
     }
     expect(component).not.toContain("locked-metrics.json");
     expect(labsIndex).toContain(`href="${labRoute}"`);
-    expect(labsIndex).toContain("Benzene and uracil evaluations completed");
+    const row = labsIndex.match(
+      /<li data-lab-id="rmd17-system-state-energy-baselines"[^>]*>[\s\S]*?<\/li>/u,
+    )?.[0];
+    expect(row).toContain("Read saved results");
   });
 
   it("forces a fresh Astro build before the browser preview starts", async () => {
@@ -131,7 +134,10 @@ describe("rMD17 development lab route", () => {
       ? playwrightConfig.webServer[0]
       : playwrightConfig.webServer;
 
-    expect(sitePackage.scripts.prepreview).toBe("astro build");
+    expect(sitePackage.scripts.prepreview).toBe("npm run build");
+    expect(sitePackage.scripts.build).toMatch(
+      /data:check.*figures:check.*astro build/u,
+    );
     expect(webServer?.command).toContain("npm --prefix site run preview");
     expect(webServer?.reuseExistingServer).toBe(false);
   });

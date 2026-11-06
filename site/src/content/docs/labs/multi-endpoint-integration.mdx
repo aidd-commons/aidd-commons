@@ -15,13 +15,25 @@ Read the [multi-endpoint lesson](/learn/admet-pk/multi-endpoint-integration/) an
 
 The mode is a fresh independent computation under a frozen ChEMBL 37 protocol. Use the project's Python 3.11 environment. The first command validates the existing caches and writes nothing. All commands use no network once the snapshots are cached and need no accelerator. The export command overwrites the committed summary only after the contract and summary checks pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/multi_endpoint_integration/run_lab.py download
 .venv/bin/python labs/multi_endpoint_integration/inspect_multi_endpoint_integration.py show
 .venv/bin/python labs/multi_endpoint_integration/inspect_multi_endpoint_integration.py check
-.venv/bin/python labs/multi_endpoint_integration/export_summary.py
 .venv/bin/python -m pytest labs/tests/multi_endpoint_integration -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/multi_endpoint_integration/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/multi_endpoint_integration/export_summary.py
+```
+
+</details>
 
 ## Measured families and units
 

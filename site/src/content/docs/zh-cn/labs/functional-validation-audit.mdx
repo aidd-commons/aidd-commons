@@ -11,8 +11,8 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 ## 准备与学习目标
 
-先读[独立单元课程](/learn/foundations/decision-unit-scope/)和
-[归档测定能够支持什么](/labs/assay-endpoint-controls/)。本实验要求依据每条记录自身的字段判断
+先读[独立单元课程](/zh-cn/learn/foundations/decision-unit-scope/)和
+[归档测定能够支持什么](/zh-cn/labs/assay-endpoint-controls/)。本实验要求依据每条记录自身的字段判断
 它能支持哪种主张。读者将区分有明确关系的终点数值、界限值与数值响应序列，并指出数据表无法测量的
 结局路径。项目环境中的 Python 3.11.15 已足够，无需加速器。
 
@@ -22,19 +22,31 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 专用缓存中，不发起网络请求。开始前须通过原有实验取得源缓存。后续命令只读取本地数据。
 导出器仅在检查通过后覆盖派生摘要，不覆盖任一源快照或作者结果。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/functional_validation_audit/run_lab.py download
 .venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py show
 .venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py check
-.venv/bin/python labs/functional_validation_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/functional_validation_audit -q
 ```
 
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/functional_validation_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/functional_validation_audit/export_summary.py
+```
+
+</details>
+
 ## 两个数据表
 
-ChEMBL 37 数据表仅纳入[决策单元实验](/labs/decision-unit-scope/)按规则接收的行。
+ChEMBL 37 数据表仅纳入[决策单元实验](/zh-cn/labs/decision-unit-scope/)按规则接收的行。
 该规则保留以 nM 表示、具有等号或明确界限关系的指定终点类型。这些是活性记录行，不是独立实验。
-PubChem BioAssay 数据表来自[测定终点实验](/labs/assay-endpoint-controls/)读取的六项测定，
+PubChem BioAssay 数据表来自[测定终点实验](/zh-cn/labs/assay-endpoint-controls/)读取的六项测定，
 每个保留行代表一项测定中的一个化合物。每行可能含有一个或多个终点数值以及一组浓度读数。
 两个数据表分别计数。
 
@@ -83,8 +95,19 @@ PubChem 数据表含有五种终点标签。终点列按数值计数，限定符
 
 本审核不把测量转为响应，也不把响应转为结局。缺少临床终点的记录不能说明临床结果。
 它不对记录排名，也不预测结局。读者学习成效尚未观察。
-可继续阅读[结合、响应与结局课程](/learn/biologics-design/binding-functional-and-clinical-claims/)，
+可继续阅读[结合、响应与结局课程](/zh-cn/learn/biologics-design/binding-functional-and-clinical-claims/)，
 其中有完整示例和独立练习。
+
+## 独立检查任务
+
+选择一个浓度响应表和一条精确值测量记录，按本指南分别写出各记录类型允许的结论。任意一项能否单独建立靶点依赖性、正交检测对照或临床响应？
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+每种记录仅支持其记录系统中声明的读出。浓度序列增加响应模式，精确值记录给出一个值或界限。两者均不能单独补足因果对照、正交检测证据或临床终点。记录数不是独立实验数或验证深度。
+
+</details>
 
 ## 来源与署名
 

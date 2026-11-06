@@ -49,7 +49,7 @@ evidence:
     label: FlowMol MIT LICENSE
     supports: []
   - id: model-flowmol3-readme
-    url: https://raw.githubusercontent.com/dunni3/FlowMol/HEAD/README.md
+    url: https://raw.githubusercontent.com/Dunni3/FlowMol/main/readme.md
     label: The project page the training-data statement was read from (reviewed 2026-10-23)
     supports: [caveats]
 caveats:

@@ -36,7 +36,7 @@ def positives(data: dict, threshold: float) -> list[str]:
 
 
 def undetermined(data: dict, threshold: float) -> list[str]:
-    """Compounds the measurement did not place on either side of the cutoff."""
+    """Constructed values within the declared sensitivity distance of the cutoff."""
     slack = data["endpoint"]["assay_uncertainty"]
     return [row["id"] for row in data["measured"] if abs(row["value"] - threshold) <= slack]
 
@@ -85,7 +85,7 @@ def show(data: dict) -> None:
     slack = data["endpoint"]["assay_uncertainty"]
     measured = data["measured"]
 
-    print(f"ONE SET OF {len(measured)} MEASURED COMPOUNDS, FIVE CUTOFFS")
+    print(f"ONE SET OF {len(measured)} CONSTRUCTED COMPOUND VALUES, FIVE CUTOFFS")
     print(f"  {'cutoff':>7} {'positives':>10} {'undetermined':>13}   ids")
     for cutoff in data["threshold_grid"]:
         found = positives(data, cutoff)
@@ -100,7 +100,7 @@ def show(data: dict) -> None:
     print()
 
     near = undetermined(data, primary)
-    print(f"SOME CLASSES ARE DECIDED BY NOISE  cutoff {primary}, assay uncertainty {slack}")
+    print(f"CLASSES NEAR THE DECLARED CUTOFF  cutoff {primary}, assay uncertainty {slack}")
     for row in measured:
         if row["id"] in near:
             side = "positive" if row["value"] >= primary else "negative"
@@ -109,8 +109,8 @@ def show(data: dict) -> None:
                 f" from the cutoff and is filed as {side}"
             )
     print(f"  {len(near)} of {len(measured)} compounds are within the assay uncertainty of the")
-    print("  cutoff. A repeat measurement is expected to move them across it, so their")
-    print("  class is a property of one reading rather than of the compound.")
+    print("  cutoff. This is a sensitivity flag, not a probability of crossing it. Their")
+    print("  label follows the supplied value and cutoff; no repeat assay was performed.")
     print()
 
     without = composition(data, primary, include_decoys=False)
@@ -130,7 +130,7 @@ def show(data: dict) -> None:
         f"  Adding decoys moved prevalence from {without['prevalence']:.3f} to"
         f" {with_decoys['prevalence']:.3f} without measuring anything."
     )
-    print("  Precision of a random selector equals prevalence, so the number any")
+    print("  Expected precision of a random selector equals prevalence, so the number any")
     print("  reported precision must beat was moved by a choice about untested molecules.")
     print(f"  In the larger dataset {with_decoys['never_measured_share']:.0%} of the negative")
     print("  class carries no measurement at all, and calling it 'negatives' hides that.")
@@ -148,7 +148,7 @@ def show_units(data: dict) -> None:
     for core, members in sorted(counts["groups"].items(), key=lambda kv: -len(kv[1])):
         if len(members) > 1:
             print(f"    {len(members)} molecules share {core}: {', '.join(members)}")
-    print("  A random split over molecules puts members of the same scaffold on both")
+    print("  A random split over molecules can put members of the same scaffold on both")
     print("  sides, so a held-out molecule can be a near copy of a training one.")
     print()
     if counts["undefined"]:
@@ -162,8 +162,9 @@ def show_units(data: dict) -> None:
     positive_rows = [row for row in data["measured"] if row["id"] in set(positives(data, primary))]
     positive_units = unit_counts(positive_rows)
     print(f"  At the primary cutoff there are {positive_units['molecules']} positives, sitting on")
-    print(f"  {positive_units['scaffolds']} scaffolds. The number of independent positive")
-    print("  units is the second number, and it is the one a test set can spend.")
+    print(f"  {positive_units['scaffolds']} scaffold groups. These are grouping units;")
+    print("  they are not proven independent positive replicates.")
+    print("  Scaffold separation alone does not establish independence.")
     print()
 
 
@@ -194,7 +195,7 @@ def check(data: dict) -> list[str]:
     record_result(
         data["endpoint"]["assay_uncertainty"] > 0,
         f"the endpoint declares a positive assay uncertainty,"
-        f" {data['endpoint']['assay_uncertainty']}, so no class can look exactly determined",
+        f" {data['endpoint']['assay_uncertainty']}, for this constructed sensitivity exercise",
     )
     record_result(
         all(set(row) == {"id", "smiles", "value"} for row in data["measured"])
@@ -263,7 +264,7 @@ def check(data: dict) -> list[str]:
         bool(shared),
         f"the {units['molecules']} molecules collapse to {units['scaffolds']} scaffolds,"
         f" with {len(shared)} scaffold(s) carrying more than one molecule,"
-        " so molecules are not independent units",
+        " so molecule counts and scaffold-group counts differ",
     )
     record_result(
         len(units["undefined"]) > 0,
@@ -275,7 +276,7 @@ def check(data: dict) -> list[str]:
     record_result(
         positive_units["scaffolds"] < positive_units["molecules"],
         f"the {positive_units['molecules']} positives sit on"
-        f" {positive_units['scaffolds']} scaffolds, which is the number a test set spends",
+        f" {positive_units['scaffolds']} scaffold groups; independence needs further assumptions",
     )
     return failures
 
@@ -286,7 +287,7 @@ def main() -> None:
     action = parser.parse_args().action
     data = load()
 
-    print(f"Dataset {DATASET.relative_to(ROOT)}")
+    print(f"Constructed teaching dataset {DATASET.relative_to(ROOT)}; no real assay measurements")
     print(
         f"{len(data['measured'])} measured compounds and"
         f" {len(data['decoys']['members'])} decoys, no class labels stored"

@@ -5,12 +5,14 @@ import { withSiteBase } from "../lib/site-paths";
 /** The PNG and vector PDF are saved from the same native report figure. */
 interface Props {
   id: string;
+  chinese?: boolean;
 }
 
 interface FigureEntry {
   id: string;
   file: string;
   pdf: string;
+  pptx?: string;
   width: number;
   height: number;
   alt: string;
@@ -18,13 +20,14 @@ interface FigureEntry {
   pages: string[];
 }
 
-const { id } = Astro.props;
+const { id, chinese = Astro.url.pathname.includes("/zh-cn/") } = Astro.props;
 const figure = (manifest.figures as FigureEntry[]).find((entry) => entry.id === id);
 if (!figure) {
   throw new Error(`AtlasFigure: no figure is registered under the id "${id}".`);
 }
 const preview = withSiteBase(`/figures/${figure.file}`, import.meta.env.BASE_URL);
 const pdf = withSiteBase(`/figures/${figure.pdf}`, import.meta.env.BASE_URL);
+const pptx = figure.pptx ? withSiteBase(`/figures/${figure.pptx}`, import.meta.env.BASE_URL) : undefined;
 ---
 
 <figure class="atlas-figure" data-atlas-figure={id}>
@@ -41,8 +44,9 @@ const pdf = withSiteBase(`/figures/${figure.pdf}`, import.meta.env.BASE_URL);
     </a>
   </div>
   <figcaption class="atlas-figure__caption">
-    {figure.caption}
-    <a class="atlas-figure__download" href={pdf} download>Download PDF</a>
+    <span lang="en">{figure.caption}</span>
+    <a class="atlas-figure__download" href={pdf} download>{chinese ? "下载 PDF" : "Download PDF"}</a>
+    {pptx && <a class="atlas-figure__download" href={pptx} download>{chinese ? "可编辑示意图" : "Editable diagram"}</a>}
   </figcaption>
 </figure>
 

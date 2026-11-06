@@ -4,6 +4,7 @@ description: 按 6 部分工具契约检查项目已提交的实验室返回记�
 ---
 
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import ScientificTeachingView from "../../../../components/ScientificTeachingView.astro";
 
 <ScrollableRegions />
 
@@ -13,13 +14,25 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 本实验采用冻结协议下的全新独立计算模式，读取本地已提交的返回记录。使用项目的 Python 3.11 环境和 CPU。无需网络、下载或加速器。`download` 命令只验证本地材料，不写入文件。检查命令也不写入文件。导出程序仅在检查通过后覆盖精简摘要。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/tool_contract_audit/run_lab.py download
 .venv/bin/python labs/tool_contract_audit/inspect_tool_contract_audit.py show
 .venv/bin/python labs/tool_contract_audit/inspect_tool_contract_audit.py check
-.venv/bin/python labs/tool_contract_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/tool_contract_audit -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/tool_contract_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/tool_contract_audit/export_summary.py
+```
+
+</details>
 
 ## 返回记录契约
 
@@ -33,6 +46,8 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 | Side effects | `side_effects.allowed_writes` 必须是仓库相对路径列表。空列表声明不允许写入，使该声明可以用独立轨迹核查。 |
 | Error states | `outcome_status` 只能是 `complete`、`no_result` 或 `halt`。`no_result` 不许可可用结果，`halt` 还要求停止。源实验室没有统一的顶层错误字段，因此不能把状态缺失当成成功。 |
 | Scientific meaning | `scientific_meaning.licenses` 与 `scientific_meaning.does_not_license` 必须是非空文本。本审核另行计数已有的明确限制字段，不把它们当作完整的意义说明。 |
+
+<ScientificTeachingView track="scientific-agents" chinese compact />
 
 ## 字段完整度
 

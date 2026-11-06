@@ -4,12 +4,15 @@ description: 在模型开发前让身份、溯源、法律范围和实体对齐�
 ---
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 英文原文：[Data contracts and licences](/learn/data-governance/data-contracts/)。
 
 译文更新：2026-09-08。
 
 <LessonProgress lessonId="data-governance/data-contracts" />
+
+<TeachingViewLink track="data-governance" chinese />
 
 ## 基础
 
@@ -34,6 +37,21 @@ import LessonProgress from "../../../../../components/LessonProgress.astro";
 
 模型卡和数据卡只有在将主张绑定到已发布资产时才有用。困难的问题是，数据配方能否在
 没有隐藏来源数据库、变动 API 或未记录人工整理的情况下重新运行。
+
+## 有边界的推演与独立任务
+
+阅读[发现情境](/zh-cn/learn/drug-discovery-foundations/discovery-context/)后，先识别模型行中的对象。在既有[构造记录示例](/zh-cn/learn/data-governance/records-to-model-table/)中，parent A 的两个精确 assay 记录报告 IC50 100、1000 nM。它们转为 pIC50 7、6；声明的 parent-assay 目标是在变换后取中位数，即 6.5。第一条记录的导出副本按重复删除，不计为另一次测量。
+
+把具有相同 target identifier 的全部 assay 聚合，是否保持原任务？指出一个会丢失的字段，以及更大的数据表可能回答不同问题的原因。
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+不能。靶点身份不固定 assay 条件、终点或测量系统。原任务是在声明聚合下预测精确 parent-assay 终点。混合不同 assay 可能同时改变标签生成过程和预测单位。增加行数不能修复这种不匹配。
+
+</details>
+
+本教学任务新增于 2026-10-26；原来源审阅日期保持如下。
 
 ## v0.1 尚未教授的内容
 

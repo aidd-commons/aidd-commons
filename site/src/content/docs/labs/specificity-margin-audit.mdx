@@ -13,13 +13,25 @@ This laboratory supports `t13-specificity-negative-selection`. It asks whether a
 
 Mode is fresh independent computation under the frozen protocol. Use the project Python 3.11 environment and CPU. Once the snapshot is cached, these commands need no network or accelerator. The download step keeps a separate cache copy. The inspection commands leave the committed summary unchanged. The export command overwrites only that small summary after its checks pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/specificity_margin_audit/run_lab.py download
 .venv/bin/python labs/specificity_margin_audit/inspect_specificity_margin_audit.py show
 .venv/bin/python labs/specificity_margin_audit/inspect_specificity_margin_audit.py check
-.venv/bin/python labs/specificity_margin_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/specificity_margin_audit -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/specificity_margin_audit/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/specificity_margin_audit/export_summary.py
+```
+
+</details>
 
 ## What the laboratory reads
 
@@ -223,6 +235,17 @@ The table gives source labels exactly as counted, row measurements for each labe
 ## Limits of the material
 
 This census does not estimate a selectivity margin, say that a protein is selective, or treat a protein with one observed partner as measured against alternatives. It makes no prediction for unmeasured proteins and no ranking by row or partner count. Labels are not entity-resolved, so a differently written alias could change a count. The 57 measured rows without both labels cannot repair that limitation. No reader learning outcome has been observed.
+
+## Independent inspection task
+
+The archive names 154 proteins with one counted partner. For one such protein, write the contrast that would be needed to estimate a specificity margin. Explain why repeated affinity measurements against that same partner cannot substitute for an alternative partner.
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+A specificity margin needs matched measurements against the intended and an explicit alternative partner under compatible constructs, conditions and endpoint definitions. Repeated observations of one pair may inform that pair but cannot create a second partner. The partner-count flag reports coverage, not measured selectivity or absence of other binding.
+
+</details>
 
 ## Sources and attribution
 

@@ -5,18 +5,21 @@ description: 用两个实测数据表判断字段能支持哪些陈述，并找�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="biologics-design/binding-functional-and-clinical-claims" />
 <ScrollableRegions />
 
 英文原文：[Binding, response and outcome claims in public records](/learn/biologics-design/binding-functional-and-clinical-claims/)。
 
+<TeachingViewLink track="biologics-design" chinese />
+
 ## 学习目标与预备知识
 
 学完后，你应能指出终点测量所需的记录，区分该记录与浓度响应记录，并解释两者为何都不能
-确立临床结局。先读[可开发性与验证](/learn/biologics-design/developability-and-validation/)和
-[独立单元课程](/learn/foundations/decision-unit-scope/)。
-[功能验证审核](/labs/functional-validation-audit/)是可运行的配套实验。下面的计数来自它的
+确立临床结局。先读[可开发性与验证](/zh-cn/learn/biologics-design/developability-and-validation/)和
+[独立单元课程](/zh-cn/learn/foundations/decision-unit-scope/)。
+[功能验证审核](/zh-cn/labs/functional-validation-audit/)是可运行的配套实验。下面的计数来自它的
 冻结协议和两个已缓存的公共数据表。
 
 ## 三种主张及其记录
@@ -34,8 +37,8 @@ import ScrollableRegions from "../../../../../components/ScrollableRegions.astro
 
 ## 记录规则
 
-[ChEMBL 37 源实验](/labs/decision-unit-scope/)先按冻结规则接收以 nM 为单位的终点行。
-[PubChem 源实验](/labs/assay-endpoint-controls/)保留指定测定的化合物行。然后，
+[ChEMBL 37 源实验](/zh-cn/labs/decision-unit-scope/)先按冻结规则接收以 nM 为单位的终点行。
+[PubChem 源实验](/zh-cn/labs/assay-endpoint-controls/)保留指定测定的化合物行。然后，
 本审核依记录明确写出的字段分配类型，不因为某条记录有利于预设结论而选入。
 结果于 2026-10-23 使用 Python 3.11.15 和 RDKit 2025.09.6 计算，
 所用快照读取于 2026-10-21。
@@ -87,7 +90,7 @@ ChEMBL 的关系符只许可结合界限，不能许可精确点值。点值主�
 
 ## 运行审核
 
-[实验指南](/labs/functional-validation-audit/)在命令之前说明全新独立计算模式，
+[实验指南](/zh-cn/labs/functional-validation-audit/)在命令之前说明全新独立计算模式，
 并列出源缓存准备、检查以及已提交的小型摘要。
 
 ## 来源与署名

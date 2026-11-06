@@ -1,186 +1,92 @@
 ---
-import {
-  filterResources,
-  parseAtlasQuery,
-} from "../lib/atlas-state.js";
 import type { Resource } from "../data/resource.js";
+import { localizedAtlasLabel, buildAtlasIndex, emptyAtlasQuery } from "../lib/atlas-presentation.js";
+import { sortAtlasResources } from "../lib/atlas-state.js";
+import { withSiteBase } from "../lib/site-paths.js";
+import AtlasResourceCard from "./AtlasResourceCard.astro";
+import AtlasPagination from "./AtlasPagination.astro";
+import "../styles/atlas-explorer.css";
 
-interface Props {
-  resources: Resource[];
-}
-
-const { resources } = Astro.props;
-const initialQuery = parseAtlasQuery(Astro.url.searchParams);
-const initialResults = filterResources(resources, initialQuery);
+import { localizedPath } from "../lib/site-locale.js";
+interface Props { resources: Resource[]; chinese?: boolean; }
+const { resources, chinese = false } = Astro.props;
+const atlasLabel = (value: string) => localizedAtlasLabel(value, chinese);
+const t = (en: string, zh: string) => chinese ? zh : en;
+const local = (path: string) => localizedPath(path, chinese);
+const index = buildAtlasIndex(resources);
+const initial = sortAtlasResources(index, emptyAtlasQuery, "name").slice(0, 12);
 const values = (items: string[]) => [...new Set(items)].sort();
-const stages = values(resources.flatMap((resource) => resource.stages));
-const kinds = values(resources.map((resource) => resource.kind));
-const accessLevels = values(resources.map((resource) => resource.access_level.value));
-const lifecycles = values(resources.map((resource) => resource.status.value));
-const label = (value: string) => value.replaceAll("-", " ").replaceAll("_", " ");
+const facets = [
+  { name: "stage", label: t("Stage","阶段"), all: t("All stages","全部阶段"), values: values(resources.flatMap((resource) => resource.stages)) },
+  { name: "kind", label: t("Kind","类型"), all: t("All kinds","全部类型"), values: values(resources.map((resource) => resource.kind)) },
+  { name: "access", label: t("Access","访问"), all: t("All access levels","全部访问等级"), values: values(resources.map((resource) => resource.access_level.value)) },
+  { name: "lifecycle", label: t("Lifecycle","生命周期"), all: t("All lifecycle states","全部生命周期状态"), values: values(resources.map((resource) => resource.status.value)) },
+];
+const base = import.meta.env.BASE_URL;
 ---
 
-<resource-explorer data-resources={JSON.stringify(resources)}>
-  <form class="atlas-controls" data-atlas-controls aria-label="Filter atlas resources">
-    <label>
-      <span>Search</span>
-      <input name="q" type="search" value={initialQuery.q} placeholder="Name, summary, or identifier" />
+<resource-explorer data-locale={chinese ? "zh-cn" : "en"} data-index-url={withSiteBase("/data/atlas-index.json", base)} data-site-base={base}>
+  <form class="atlas-controls" data-atlas-controls aria-label={t("Filter atlas resources","筛选图谱资源")} role="search" action={local("/atlas/browse/")}>
+    <label class="atlas-search">
+      <span>{t("Search","搜索")}</span>
+      <input disabled name="q" type="search" placeholder={t("Name, purpose, identifier, task or modality","名称、用途、标识符、任务或模态")} autocomplete="off" aria-describedby="atlas-search-help" />
     </label>
-    <label>
-      <span>Stage</span>
-      <select name="stage">
-        <option value="" selected={!initialQuery.stage}>All stages</option>
-        {stages.map((stage) => <option value={stage} selected={initialQuery.stage === stage}>{label(stage)}</option>)}
+    {facets.map((facet) => <label for={`atlas-${facet.name}`}>
+      <span id={`atlas-${facet.name}-label`}>{facet.label}</span>
+      <select disabled id={`atlas-${facet.name}`} name={facet.name} aria-labelledby={`atlas-${facet.name}-label`} data-all-label={facet.all}>
+        <option value="">{facet.all}</option>
+        {facet.values.map((value) => <option value={value}>{atlasLabel(value)}</option>)}
       </select>
-    </label>
-    <label>
-      <span>Kind</span>
-      <select name="kind">
-        <option value="" selected={!initialQuery.kind}>All kinds</option>
-        {kinds.map((kind) => <option value={kind} selected={initialQuery.kind === kind}>{label(kind)}</option>)}
-      </select>
-    </label>
-    <label>
-      <span>Access</span>
-      <select name="access">
-        <option value="" selected={!initialQuery.access}>All access levels</option>
-        {accessLevels.map((access) => <option value={access} selected={initialQuery.access === access}>{label(access)}</option>)}
-      </select>
-    </label>
-    <label>
-      <span>Lifecycle</span>
-      <select name="lifecycle">
-        <option value="" selected={!initialQuery.lifecycle}>All lifecycle states</option>
-        {lifecycles.map((lifecycle) => <option value={lifecycle} selected={initialQuery.lifecycle === lifecycle}>{label(lifecycle)}</option>)}
-      </select>
-    </label>
-    <button type="reset">Clear filters</button>
+    </label>)}
+    <button disabled type="reset">{t("Clear filters","清除筛选")}</button>
   </form>
-  <p class="result-count" data-result-count aria-live="polite">
-    {initialResults.length} {initialResults.length === 1 ? "resource" : "resources"}
-  </p>
-  <p class="notice" data-empty-state hidden={initialResults.length !== 0}>
-    No resources match this filter set. Remove a filter or inspect another pipeline stage.
-  </p>
-  <ul class="resource-grid" data-atlas-results hidden={initialResults.length === 0}>
-    {initialResults.map((resource) => (
-      <li>
-        <article class="resource-card">
-          <p class="meta-label">{resource.kind} · {resource.status.value}</p>
-          <h2><a href={`/atlas/${resource.id}/`}>{resource.name}</a></h2>
-          <p>{resource.summary}</p>
-          <p class="resource-card__meta">Access: {label(resource.access_level.value)}</p>
-          <a class="resource-card__visit" href={resource.canonical_url}>Visit resource</a>
-        </article>
-      </li>
-    ))}
+  <p id="atlas-search-help" class="atlas-help">{t("Search recorded purpose, task, modality and source identifiers. Filters combine. Record prose is canonical English.","搜索已记录的用途、任务、模态和来源标识符。筛选条件共同生效，记录正文为英语原文。")}</p>
+  <div class="atlas-active" role="group" aria-label={t("Active filters","当前筛选")}>
+    <span class="meta-label">{t("Selected","已选")}</span>
+    <div data-active-filters><span class="atlas-help">{t("No active filters","未设置筛选")}</span></div>
+  </div>
+  <section id="compare" class="atlas-comparison" aria-labelledby="compare-title">
+    <div class="atlas-comparison__heading">
+      <div><p class="meta-label">{t("Reuse and evidence","复用与证据")}</p><h2 id="compare-title">{t("Compare resource records","比较资源记录")}</h2></div>
+      <button type="button" data-compare-clear disabled>{t("Clear comparison","清空比较")}</button>
+    </div>
+    <p class="atlas-help">{t("Choose 2–4 resources. Compare scientific scope, licences and seven independent asset dimensions. These metadata do not establish a matched performance ranking.","选择 2–4 项资源，比较科学范围、许可与七个独立资产维度。这些元数据不构成同一评估方案下的性能排名。")}</p>
+    <ul class="atlas-compare-tray" data-compare-tray aria-label={t("Selected resources","已选资源")}><li>{t("No resources selected","尚未选择资源")}</li></ul>
+    <p data-compare-status role="status" aria-live="polite">{t("Select resources using the Compare controls in the results.","使用结果中的“比较”控件选择资源。")}</p>
+    <div data-compare-panel></div>
+  </section>
+  <div class="atlas-result-bar">
+    <p class="result-count" data-result-count aria-live="polite" aria-atomic="true">{chinese ? `共 ${resources.length} 项资源` : `${resources.length} of ${resources.length} resources`}</p>
+    <a data-share-query href={local("/atlas/")}>{t("Link to these results","分享当前结果")}</a>
+  </div>
+  <div class="atlas-display-controls">
+    <div class="atlas-view-buttons" role="group" aria-label={t("Result view","结果视图")}>
+      {(["list", "table", "landscape"] as const).map((view) => <button disabled type="button" data-atlas-view={view} aria-pressed={view === "list"}>{atlasLabel(view)}</button>)}
+    </div>
+    <label class="atlas-sort">{t("Sort", "排序")}
+      <select disabled name="sort" data-atlas-sort>
+        <option value="relevance">{t("Text match, then name","文本相关度，然后按名称")}</option>
+        <option value="name">{t("Name A–Z","名称 A–Z")}</option>
+        <option value="checked">{t("Record check date, newest first","记录核查日期，从新到旧")}</option>
+      </select>
+    </label>
+    <button type="button" data-atlas-export disabled>{t("Export matching records","导出匹配记录")}</button>
+  </div>
+  <p class="atlas-help" data-initial-preview>{t("Initial preview: ", "初始预览：")}{initial.length}{t(" records. ", " 条记录。")}<a href={local("/atlas/browse/")}>{chinese ? `无需交互筛选，浏览全部 ${resources.length} 条记录 →` : `Browse all ${resources.length} records without interactive filters →`}</a></p>
+  <p class="notice" data-index-status role="status" hidden>{t("Loading the searchable catalogue…","正在加载可检索目录…")}</p>
+  <button type="button" data-retry-index hidden>{t("Retry loading the search index","重新加载检索索引")}</button>
+  <p class="notice" data-empty-state hidden>{t("No resources match this selection. Remove a filter or clear the search.","没有匹配当前条件的资源。请移除筛选或清空搜索。")}</p>
+  <noscript><p>{t("Interactive search and comparison need JavaScript. ", "交互检索与比较需要 JavaScript。")}<a href={local("/atlas/browse/")}>{t("Browse the complete catalogue and open each evidence record","浏览完整目录并打开各条证据记录")}</a>.</p></noscript>
+  <AtlasPagination position="top" chinese={chinese} />
+  <ul class="atlas-results" data-atlas-results aria-label={t("Resource results","资源结果")}>
+    {initial.map((resource) => <AtlasResourceCard resource={resource} selectable chinese={chinese} />)}
   </ul>
+  <div data-atlas-table hidden></div>
+  <div data-atlas-landscape hidden></div>
+  <AtlasPagination position="bottom" chinese={chinese} />
 </resource-explorer>
 
 <script>
-  import {
-    filterResources,
-    parseAtlasQuery,
-    serializeAtlasQuery,
-  } from "../lib/atlas-state";
-  import type { AtlasQuery } from "../lib/atlas-state";
-  import type { Resource } from "../data/resource";
-  import { withSiteBase } from "../lib/site-paths";
-
-  class ResourceExplorer extends HTMLElement {
-    private form?: HTMLFormElement;
-    private resources: Resource[] = [];
-    private readonly onPopState = () => this.syncFromLocation();
-
-    connectedCallback() {
-      this.form = this.querySelector<HTMLFormElement>("[data-atlas-controls]") ?? undefined;
-      this.resources = JSON.parse(this.dataset.resources ?? "[]") as Resource[];
-      if (!this.form) return;
-
-      this.form.addEventListener("input", () => this.applyFormQuery());
-      this.form.addEventListener("change", () => this.applyFormQuery());
-      this.form.addEventListener("reset", () => {
-        requestAnimationFrame(() => this.applyFormQuery());
-      });
-      window.addEventListener("popstate", this.onPopState);
-      this.syncFromLocation();
-    }
-
-    disconnectedCallback() {
-      window.removeEventListener("popstate", this.onPopState);
-    }
-
-    private applyFormQuery() {
-      if (!this.form) return;
-      const formData = new FormData(this.form);
-      const query = {
-        access: String(formData.get("access") ?? "").trim(),
-        kind: String(formData.get("kind") ?? "").trim(),
-        lifecycle: String(formData.get("lifecycle") ?? "").trim(),
-        q: String(formData.get("q") ?? "").trim(),
-        stage: String(formData.get("stage") ?? "").trim(),
-      } satisfies AtlasQuery;
-      history.replaceState({}, "", `${location.pathname}${serializeAtlasQuery(query)}`);
-      this.render(query);
-    }
-
-    private syncFromLocation() {
-      const query = parseAtlasQuery(new URLSearchParams(location.search));
-      if (this.form) {
-        for (const [key, value] of Object.entries(query)) {
-          const field = this.form.elements.namedItem(key);
-          if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) {
-            field.value = value;
-          }
-        }
-      }
-      this.render(query);
-    }
-
-    private render(query: AtlasQuery) {
-      const results = filterResources(this.resources, query);
-      const count = this.querySelector<HTMLElement>("[data-result-count]");
-      const list = this.querySelector<HTMLUListElement>("[data-atlas-results]");
-      const emptyState = this.querySelector<HTMLElement>("[data-empty-state]");
-      if (!count || !list || !emptyState) return;
-
-      count.textContent = `${results.length} ${results.length === 1 ? "resource" : "resources"}`;
-      emptyState.hidden = results.length !== 0;
-      list.hidden = results.length === 0;
-      list.replaceChildren(
-        ...results.map((resource) => this.createResourceCard(resource)),
-      );
-    }
-
-    private createResourceCard(resource: Resource) {
-      const item = document.createElement("li");
-      const card = document.createElement("article");
-      const category = document.createElement("p");
-      const heading = document.createElement("h2");
-      const link = document.createElement("a");
-      const summary = document.createElement("p");
-      const metadata = document.createElement("p");
-      const visit = document.createElement("a");
-
-      card.className = "resource-card";
-      category.className = "meta-label";
-      category.textContent = `${resource.kind} · ${resource.status.value}`;
-      link.href = withSiteBase(`/atlas/${encodeURIComponent(resource.id)}/`, import.meta.env.BASE_URL);
-      link.textContent = resource.name;
-      summary.textContent = resource.summary;
-      metadata.className = "resource-card__meta";
-      metadata.textContent = `Access: ${resource.access_level.value.replaceAll("_", " ")}`;
-      heading.append(link);
-      visit.className = "resource-card__visit";
-      visit.href = resource.canonical_url;
-      visit.textContent = "Visit resource";
-      card.append(category, heading, summary, metadata, visit);
-      item.append(card);
-      return item;
-    }
-  }
-
-  if (!customElements.get("resource-explorer")) {
-    customElements.define("resource-explorer", ResourceExplorer);
-  }
+  import { ResourceExplorer } from "../lib/atlas-explorer.js";
+  if (!customElements.get("resource-explorer")) customElements.define("resource-explorer", ResourceExplorer);
 </script>

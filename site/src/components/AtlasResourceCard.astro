@@ -1,0 +1,37 @@
+---
+import type { AtlasSearchEntry } from "../lib/atlas-presentation.js";
+import { localizedAtlasLabel } from "../lib/atlas-presentation.js";
+import { localizedPath } from "../lib/site-locale.js";
+interface Props { resource: AtlasSearchEntry; selectable?: boolean; chinese?: boolean; }
+const { resource, selectable = false, chinese = false } = Astro.props;
+const atlasLabel = (value: string) => localizedAtlasLabel(value, chinese);
+const t = (en: string, zh: string) => chinese ? zh : en;
+const local = (path: string) => localizedPath(path, chinese);
+---
+<li data-resource-id={resource.id}>
+  <article class="resource-card atlas-result">
+    <div class="atlas-result__main">
+      <p class="meta-label">{atlasLabel(resource.kind)} · {atlasLabel(resource.status.value)}</p>
+      <h2><a href={local(`/atlas/${resource.id}/`)}>{resource.name}</a></h2>
+      <p class="atlas-result__summary" lang="en">{resource.summary}</p>
+      {resource.caveat && <p class="atlas-result__caveat"><span>{t("Scope note:","范围说明：")}</span> {resource.caveat}</p>}
+      <div class="atlas-result__links">
+        <a href={local(`/atlas/${resource.id}/#evidence-title`)}>{resource.sourceCount}{chinese ? " 条已记录来源" : ` recorded ${resource.sourceCount === 1 ? "source" : "sources"}`}</a>
+        <a href={local(`/atlas/${resource.id}/#openness-title`)}>{t("7 asset dimensions","7 个资产维度")}</a>
+        <a class="resource-card__visit" href={resource.canonical_url}>{t("Visit resource","访问资源")}</a>
+      </div>
+    </div>
+    <dl class="atlas-result__facts">
+      <div><dt>{t("Access","访问")}</dt><dd>{atlasLabel(resource.access_level.value)}</dd></div>
+      <div><dt>{t("Lifecycle","生命周期")}</dt><dd>{atlasLabel(resource.status.value)}</dd></div>
+      <div><dt>{t("Licences by scope","按范围划分的许可")}</dt><dd>{resource.licenses.length
+        ? resource.licenses.map((license) => `${license.name} (${license.scope})`).join("; ")
+        : t("No verified licence claim", "暂无已核实的许可声明")}</dd></div>
+      <div><dt>{t("Record checked","记录核查日期")}</dt><dd><time datetime={resource.last_verified}>{resource.last_verified}</time></dd></div>
+    </dl>
+    {selectable && <label class="atlas-select" data-compare-label hidden>
+      <input type="checkbox" data-compare-id={resource.id} aria-label={`${t("Compare", "比较")} ${resource.name}`} />
+      <span>{t("Compare","比较")}</span>
+    </label>}
+  </article>
+</li>

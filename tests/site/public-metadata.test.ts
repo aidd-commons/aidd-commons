@@ -20,7 +20,7 @@ describe("public discovery metadata", () => {
 
     expect(llms).toMatch(/^# AIDD Commons/m);
     for (const [label, href] of [
-      ["Learn", "/learn/foundations/getting-started/"],
+      ["Learn", "/learn/"],
       ["Atlas", "/atlas/"],
       ["Labs", "/labs/"],
       ["Audit", "/audit/"],

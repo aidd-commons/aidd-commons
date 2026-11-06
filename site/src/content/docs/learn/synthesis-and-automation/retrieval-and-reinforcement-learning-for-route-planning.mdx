@@ -5,9 +5,12 @@ description: Read two 2026 route-planning systems that both turn planning into a
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="synthesis-and-automation/retrieval-and-reinforcement-learning-for-route-planning" />
 <ScrollableRegions />
+
+<TeachingViewLink track="synthesis-and-automation" />
 
 ## Learning goals and prerequisites
 
@@ -179,8 +182,9 @@ penalty is 0.02 × (35 − 20) = 0.3, at its cap. The tool penalty is 2 × 0.05
 = 0.10. The reward is clip(−1, 1, 1.0 − 0.3 − 0.3 − 0.10) = 0.30. (b) Both
 penalties are zero because twenty calls and depth twenty are exactly the
 thresholds, and there are no failed tool calls, so the reward is clip(−1, 1,
-1.0) = 1.0. The term you might expect to bind is the one that binds earliest,
-the call penalty, and it does not bind at all at twenty calls. (c) An
+1.0) = 1.0. Neither penalty applies at its threshold. Call count and route depth
+are different quantities; their equal thresholds do not determine which
+penalty activates first in a search. (c) An
 incomplete route earns −1.0 regardless of how much budget it consumed, so
 200 calls and depth 60 change nothing: the reward is −1.0. This is the
 sharpest point about the released constants: the budget penalties are applied
@@ -189,7 +193,7 @@ indistinguishable in the reward, and the "search-budget efficiency" framing
 describes the behaviour on routes that succeed. (d) 48.0% of 150 is 72
 targets, 46.0% is 69, and 14.7% is 22. The full system beats its own
 baseline by three targets out of 150, one target being 0.67 percentage
-points, and trails the native model by fifty. Before that three-target gap
+points, and exceeds the native model by fifty. Before that three-target gap
 could be read as a separation, the report would have to give an interval or
 a paired test over the same sampled targets, and would have to fix the
 comparison at one sample count rather than comparing a prefix of a Top-10

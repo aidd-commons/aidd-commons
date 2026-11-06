@@ -15,13 +15,25 @@ Read the [target product profile lesson](/learn/drug-discovery-foundations/produ
 
 The mode is a fresh independent computation under a frozen protocol. The illustrative requirements and thresholds are declared before the cached measurements are read. They are teaching decisions, not thresholds fitted or selected from this cohort. Use the project's Python 3.11 environment. Once the owning laboratories' snapshots are cached, all commands run without network access or an accelerator. The first command validates those existing snapshots and writes nothing. Export writes the small committed summary only after the audit passes.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/target_product_profile/run_lab.py download
 .venv/bin/python labs/target_product_profile/inspect_target_product_profile.py show
 .venv/bin/python labs/target_product_profile/inspect_target_product_profile.py check
-.venv/bin/python labs/target_product_profile/export_summary.py
 .venv/bin/python -m pytest labs/tests/target_product_profile -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/target_product_profile/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/target_product_profile/export_summary.py
+```
+
+</details>
 
 The `show` command lists every joined parent with gates passed or failed, preferences missed, and requirements left unmeasured. The `check` command recomputes the outcomes from the validated readers and exits non-zero if a gate-failing parent is reported as profile-satisfying or if any other invariant fails.
 

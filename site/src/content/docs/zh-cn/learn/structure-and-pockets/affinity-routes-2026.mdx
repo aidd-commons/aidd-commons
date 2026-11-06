@@ -5,14 +5,17 @@ description: 区分学习得到的亲和力输出与力场参数，并比较四�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="structure-and-pockets/affinity-routes-2026" />
 <ScrollableRegions />
 
+<TeachingViewLink track="structure-and-pockets" chinese />
+
 ## 学习目标与前置知识
 
-学完[结构、亲和力与预测输出的含义](/learn/structure-and-pockets/structure-affinity-mechanisms/)
-和[开放结构预测工具链](/learn/structure-and-pockets/open-structure-stack/)后，
+学完[结构、亲和力与预测输出的含义](/zh-cn/learn/structure-and-pockets/structure-affinity-mechanisms/)
+和[开放结构预测工具链](/zh-cn/learn/structure-and-pockets/open-structure-stack/)后，
 辨别每条路径的输出、内部折叠复合物与输入结构的区别，以及记录中的资产允许读者
 核查什么。本课是附带书面练习的阅读课，没有运行这些资源。
 [英文原版](/learn/structure-and-pockets/affinity-routes-2026/)是规范版本。
@@ -34,7 +37,7 @@ Nesso-1 是学习式预测路径。ByteFF 和 ByteFF2 为分子模拟提供力�
 | ByteFF | 对分子进行数据驱动的力场参数化 | 与 GROMACS 兼容的 ITP 文件 | 参数不是结合自由能或结合观测 |
 | ByteFF2 | 面向药物样分子的图神经网络力场 | 用于下游模拟的已发布力场权重 | 力场发布本身不提供特定分子对的结合结果 |
 
-[结构指标课程](/learn/structure-and-pockets/structure-metrics-and-benchmarks/)
+[结构指标课程](/zh-cn/learn/structure-and-pockets/structure-metrics-and-benchmarks/)
 同样区分比较分数与读者可能附加的生物学结论。这里的区别更早出现，在输出对象
 本身就已存在。
 

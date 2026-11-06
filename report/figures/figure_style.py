@@ -75,6 +75,9 @@ __all__ = [
     "THEME",
     "apply_style",
     "bar_labels",
+    "heading",
+    "footnote",
+    "clean_axis",
     "categorical",
     "tokens",
     "figure",
@@ -91,14 +94,42 @@ __all__ = [
     "title",
 ]
 
+# Readable track names preserve the canonical IDs and curriculum order in plots.
+TRACK_LABELS = {
+    "foundations": "Orientation",
+    "drug-discovery-foundations": "Drug discovery foundations",
+    "machine-learning": "Machine learning",
+    "data-governance": "Data governance",
+    "representations": "Representations",
+    "mechanism-targets": "Mechanisms and targets",
+    "qsar-properties": "QSAR and properties",
+    "admet-pk": "ADMET and PK",
+    "dti-screening": "Interactions and screening",
+    "structure-and-pockets": "Structures and pockets",
+    "physics-based-modeling": "Physics-based modelling",
+    "molecular-generation": "Molecular generation",
+    "biologics-design": "Biologics design",
+    "synthesis-and-automation": "Synthesis and automation",
+    "active-learning": "Active learning",
+    "scientific-agents": "Scientific agents",
+    "evaluation-and-reproducibility": "Evaluation and reproducibility",
+    "candidate-nomination": "Candidate nomination",
+}
+
+
+def track_labels(track_ids: Sequence[str]) -> list[str]:
+    """Readable labels in the caller's unchanged canonical track order."""
+    return [f"{index:02d}  {TRACK_LABELS[track_id]}" for index, track_id in enumerate(track_ids, 1)]
+
+
 # ---------------------------------------------------------------- the canvas
 
 REPO_ROOT = _HERE.parents[1]
 DATA_DIR = REPO_ROOT / "site" / "public" / "data"
 OUT_DIR = _HERE / "out"
 
-#: The report's text width in inches. Every figure is authored at this width.
-FIGURE_WIDTH = 7.0
+#: Resolved 180 mm report/web master width, represented in inches.
+FIGURE_WIDTH = 180.0 / 25.4
 #: The default figure height in inches. A figure that needs a different height
 #: passes one; nothing is ever rescaled after the fact.
 FIGURE_HEIGHT = 4.6
@@ -137,6 +168,7 @@ _LADDER_INDEX: dict[int, tuple[int, ...]] = {
 
 # ---------------------------------------------------------------- the style
 
+
 def apply_style(theme: str = THEME) -> dict[str, Any]:
     """Set the rcParams every figure in this set draws under.
 
@@ -149,9 +181,9 @@ def apply_style(theme: str = THEME) -> dict[str, Any]:
             "font.sans-serif": list(FONT_STACK),
             "font.size": 9.0,
             "axes.labelsize": 9.0,
-            "axes.titlesize": 9.5,
-            "xtick.labelsize": 8.5,
-            "ytick.labelsize": 8.5,
+            "axes.titlesize": 9.4,
+            "xtick.labelsize": 8.4,
+            "ytick.labelsize": 8.4,
             "legend.fontsize": 8.5,
             "legend.frameon": False,
             "axes.facecolor": tokens["panel"],
@@ -163,7 +195,7 @@ def apply_style(theme: str = THEME) -> dict[str, Any]:
             "xtick.color": tokens["muted"],
             "ytick.color": tokens["muted"],
             "grid.color": tokens["rule"],
-            "grid.linewidth": 0.6,
+            "grid.linewidth": 0.5,
             "axes.spines.top": False,
             "axes.spines.right": False,
             "axes.unicode_minus": False,
@@ -176,7 +208,7 @@ def apply_style(theme: str = THEME) -> dict[str, Any]:
             "svg.hashsalt": "aidd-commons-report-figures",
             "savefig.bbox": None,
             "savefig.pad_inches": 0,
-            "hatch.linewidth": 0.6,
+            "hatch.linewidth": 0.45,
             "lines.solid_capstyle": "round",
             "figure.autolayout": False,
         }
@@ -185,6 +217,7 @@ def apply_style(theme: str = THEME) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------- the colours
+
 
 def categorical(theme: str = THEME) -> dict[str, str]:
     """The measured categorical set for one theme."""
@@ -242,6 +275,7 @@ def hatch_for_index(index: int) -> str:
 
 # ---------------------------------------------------------------- the canvas
 
+
 def figure(width: float = FIGURE_WIDTH, height: float = FIGURE_HEIGHT) -> Figure:
     """A blank figure at its authored size."""
     return plt.figure(figsize=(width, height))
@@ -283,10 +317,56 @@ def axes_grid(
 
 def title(ax: Axes, text: str) -> None:
     """A panel title, which is a label and never a sentence."""
-    ax.set_title(text, loc="left", fontweight="bold", color=atlas_palette.tokens(THEME)["ink"])
+    ax.set_title(
+        text, loc="left", fontweight="bold", color=atlas_palette.tokens(THEME)["ink"], pad=11
+    )
+
+
+def heading(fig: Figure, text: str, subtitle: str = "") -> None:
+    """Place the editorial reading entry, outside every data coordinate system."""
+    ink = tokens()["ink"]
+    fig.text(0.035, 0.965, text, fontsize=11, fontweight="bold", color=ink, va="top")
+    if subtitle:
+        fig.text(0.035, 0.918, subtitle, fontsize=8.4, color=tokens()["muted"], va="top")
+
+
+def footnote(fig: Figure, text: str, *, y: float = 0.025, wrap_width: int = 118) -> None:
+    """Keep a claim-defining limitation visible at the authored physical size."""
+    import textwrap
+
+    fig.text(
+        0.035,
+        y,
+        textwrap.fill(text, width=wrap_width),
+        fontsize=8.0,
+        color=tokens()["muted"],
+        va="bottom",
+        linespacing=1.3,
+    )
+
+
+def clean_axis(ax: Axes, *, axis: str = "x") -> None:
+    """Use one thin numeric baseline and subordinate reference rules."""
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    ax.spines["left"].set_visible(axis == "y")
+    ax.spines["bottom"].set_visible(axis == "x")
+    for spine in ax.spines.values():
+        spine.set_linewidth(0.55)
+    ax.tick_params(axis="y" if axis == "x" else "x", length=0)
+    ax.tick_params(axis=axis, length=2.5, width=0.55)
+    if axis == "x":
+        lower, upper = ax.get_xlim()
+        ax.set_xticks([tick for tick in ax.get_xticks() if lower <= tick <= upper])
+    else:
+        lower, upper = ax.get_ylim()
+        ax.set_yticks([tick for tick in ax.get_yticks() if lower <= tick <= upper])
+    ax.grid(axis=axis, linewidth=0.45, alpha=0.7)
+    ax.set_axisbelow(True)
 
 
 # ---------------------------------------------------------------- the labels
+
 
 def bar_labels(
     ax: Axes,
@@ -323,6 +403,7 @@ def bar_labels(
 
 
 # ---------------------------------------------------------------- the outputs
+
 
 def save(fig: Figure, stem: str, theme: str = THEME) -> dict[str, Path]:
     """Write the vector PDF and the site PNG for a finished figure.
@@ -370,6 +451,7 @@ def register_caption(number: int, text: str) -> Path:
 
 
 # ---------------------------------------------------------------- the inputs
+
 
 def load_json(path: Path) -> Any:
     """Read a committed artefact."""

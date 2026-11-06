@@ -1,11 +1,20 @@
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { parse } from "yaml";
 import type { Resource } from "../../site/src/data/resource.js";
 
 const resources = JSON.parse(
   await readFile("site/public/data/resources.v1.json", "utf8"),
 ) as Resource[];
+const curriculum = parse(
+  await readFile("catalog/curriculum/tracks.yaml", "utf8"),
+) as { tracks: { id: string }[] };
+const labGuideCount = (
+  await readdir("site/src/content/docs/labs", { recursive: true })
+).filter(
+  (path) => path.endsWith(".mdx") && path !== "notebook-guide.mdx",
+).length;
 
 type Rgb = [number, number, number];
 
@@ -53,20 +62,36 @@ async function computedContrast(page: Page, selector: string) {
   return contrastRatio(colors.foreground as Rgb, colors.background as Rgb);
 }
 
-test("English home exposes the four artifacts and primary product navigation", async ({
+test("English home offers resource search and primary product navigation", async ({
   page,
 }, testInfo) => {
   await page.goto("/");
 
   await expect(
-    page.getByText("building the most comprehensive open AIDD learning system"),
+    page.getByRole("heading", { name: "Follow the evidence from target to candidate." }),
   ).toBeVisible();
   await expect(
-    page.getByRole("link", { name: "Choose a pathway" }),
-  ).toHaveAttribute("href", "/learn/foundations/getting-started/");
-  await expect(
-    page.getByRole("link", { name: "Explore the atlas" }),
-  ).toHaveAttribute("href", "/atlas/");
+    page.locator(".site-header .workbench-search-entry input"),
+  ).toBeInViewport();
+  await expect(page.locator("#discovery-workflow-title")).toBeInViewport();
+  const workbenchOrder = await page.evaluate(() => {
+    const sections = [
+      ".aidd-home-hero",
+      "workflow-navigator",
+      ".aidd-home-case",
+      ".aidd-home-search-section",
+    ].map((selector) => document.querySelector(selector));
+    return sections.every((section, index) => {
+      if (!section) return false;
+      const previous = sections[index - 1];
+      return index === 0 || Boolean(previous && (
+        previous.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING
+      ));
+    });
+  });
+  expect(workbenchOrder, "introduction → workflow → retained result → search").toBe(true);
+  await expect(page.getByRole("link", { name: "Find your learning route" })).toHaveAttribute("href", "/learn/");
+  await expect(page.getByRole("link", { name: "Choose a resource" })).toHaveAttribute("href", "/atlas/");
 
   if (testInfo.project.name === "mobile-chromium") {
     await page.getByRole("button", { name: "Open navigation" }).click();
@@ -89,32 +114,54 @@ test("English home exposes the four artifacts and primary product navigation", a
   );
 });
 
-test("dark primary actions retain AA text contrast at rest and on hover", async ({
+test("resource search actions retain AA text contrast in both themes", async ({
   page,
 }) => {
-  await page.emulateMedia({ colorScheme: "dark" });
-  await page.goto("/");
-
-  const primaryAction = page.getByRole("link", { name: "Choose a pathway" });
-  expect(await computedContrast(page, ".button-link")).toBeGreaterThanOrEqual(
-    4.5,
-  );
-
-  await primaryAction.hover();
-  expect(await computedContrast(page, ".button-link")).toBeGreaterThanOrEqual(
-    4.5,
-  );
+  for (const colorScheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme });
+    await page.goto("/");
+    const primaryAction = page.getByRole("button", { name: "Search Commons" });
+    expect(
+      await computedContrast(page, ".home-search button"),
+    ).toBeGreaterThanOrEqual(4.5);
+    await primaryAction.hover();
+    expect(
+      await computedContrast(page, ".home-search button"),
+    ).toBeGreaterThanOrEqual(4.5);
+  }
 });
 
-test("active lesson navigation retains readable text in both themes", async ({
-  page,
-}) => {
+for (const locale of [
+  {
+    path: "/",
+    label: "What are you working on?",
+    button: "Search Commons",
+  },
+  { path: "/zh-cn/", label: "你正在研究什么？", button: "搜索 Commons" },
+]) {
+  test(`home resource query uses unified search (${locale.path})`, async ({
+    page,
+  }) => {
+    await page.goto(locale.path);
+    await page.getByLabel(locale.label, { exact: true }).fill("Boltz");
+    await page
+      .getByRole("button", { name: locale.button, exact: true })
+      .click();
+    await expect(page).toHaveURL(
+      (url) =>
+        url.pathname === (locale.path === "/zh-cn/" ? "/zh-cn/search/" : "/search/") && url.searchParams.get("q") === "Boltz",
+    );
+  });
+}
+
+test("active learning navigation retains readable text in both themes", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   for (const colorScheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme });
-    await page.goto("/learn/foundations/getting-started/");
-    const selector = 'nav a[aria-current="page"]';
-    await expect(page.locator(selector)).toHaveText("Learn");
+    await page.goto("/learn/");
+    const selector = '.primary-nav a[aria-current="page"]';
+    await expect(page.locator(selector)).toBeVisible();
+    await expect(page.locator(selector)).toHaveAttribute("href", "/learn/");
     expect(await computedContrast(page, selector)).toBeGreaterThanOrEqual(4.5);
     await page.locator(selector).hover();
     expect(await computedContrast(page, selector)).toBeGreaterThanOrEqual(4.5);
@@ -139,7 +186,7 @@ test("Linux search shortcuts retain AA text contrast in both themes", async ({
     for (const colorScheme of ["light", "dark"] as const) {
       await page.emulateMedia({ colorScheme });
       await page.goto("/learn/foundations/getting-started/");
-      const selector = "site-search button[data-open-modal] > kbd";
+      const selector = ".workbench-search-entry kbd";
       const shortcut = page.locator(selector);
       await expect(shortcut).toHaveText("CtrlK");
       await expect(shortcut).toBeVisible();
@@ -147,11 +194,13 @@ test("Linux search shortcuts retain AA text contrast in both themes", async ({
         await computedContrast(page, selector),
         colorScheme,
       ).toBeGreaterThanOrEqual(4.5);
-      await page.locator("site-search button[data-open-modal]").hover();
+      await page.locator(".workbench-search-entry button").hover();
       expect(
         await computedContrast(page, selector),
         `${colorScheme} hover`,
       ).toBeGreaterThanOrEqual(4.5);
+      await page.keyboard.press("Control+k");
+      await expect(page.locator(".workbench-search-entry input")).toBeFocused();
       const results = await new AxeBuilder({ page }).analyze();
       expect(
         results.violations.filter((violation) =>
@@ -164,16 +213,46 @@ test("Linux search shortcuts retain AA text contrast in both themes", async ({
   }
 });
 
-test("Chinese onboarding provides an entry route and all eighteen pathway summaries", async ({
+test("lesson code remains readable on the shared surface in both themes", async ({
+  page,
+}) => {
+  for (const colorScheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme });
+    await page.goto("/learn/foundations/first-session/");
+    await expect(page.locator(".expressive-code").first()).toBeVisible();
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(
+      results.violations.filter((violation) =>
+        ["serious", "critical"].includes(violation.impact ?? ""),
+      ),
+      `${colorScheme} lesson reading surface`,
+    ).toEqual([]);
+  }
+});
+
+test("Chinese home exposes derived counts and the full optional track directory", async ({
   page,
 }) => {
   await page.goto("/zh-cn/");
 
-  await expect(page.getByRole("heading", { name: "从这里开始" })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "18 条学习路径" }),
+    page.getByRole("heading", { name: "从靶点到候选，循着证据前进。" }),
   ).toBeVisible();
-  await expect(page.locator("[data-track-summary]")).toHaveCount(18);
+  await expect(page.locator(".aidd-home-collection")).toContainText(
+    `${resources.length} 条记录`,
+  );
+  await expect(page.locator(".aidd-home-language-note")).toContainText(
+    `${labGuideCount} 个实验说明`,
+  );
+  const directory = page.locator(".home-track-directory");
+  await expect(directory).not.toHaveAttribute("open", "");
+  await directory.locator("summary").click();
+  await expect(directory.locator("li")).toHaveCount(curriculum.tracks.length);
+  for (const { id } of curriculum.tracks) {
+    await expect(
+      directory.locator(`a[href="/zh-cn/learn/tracks/${id}/"]`),
+    ).toBeVisible();
+  }
 });
 
 test("atlas query deep-link renders the matching resource", async ({
@@ -190,9 +269,13 @@ test("atlas query deep-link renders the matching resource", async ({
   for (const metadata of await cards.locator(".meta-label").allTextContents()) {
     expect(metadata).toMatch(/^dataset ·/u);
   }
-  await expect(
-    page.getByRole("link", { name: "FreeSolv v0.52" }),
-  ).toHaveAttribute("href", "/atlas/freesolv-v0-52/");
+  const detailHref = await page
+    .getByRole("link", { name: "FreeSolv v0.52" })
+    .getAttribute("href");
+  expect(detailHref).toBeTruthy();
+  const detailUrl = new URL(detailHref!, page.url());
+  expect(detailUrl.pathname).toBe("/atlas/freesolv-v0-52/");
+  expect(detailUrl.searchParams.get("kind")).toBe("dataset");
   await expect(page).toHaveURL(/kind=dataset/);
 });
 
@@ -217,12 +300,17 @@ test("resource-card title links meet the minimum touch target height", async ({
   ).toBe(true);
 });
 
-test("track and pipeline action links meet the minimum touch target height", async ({
+test("home task and directory links meet the minimum touch target height", async ({
   page,
 }) => {
   await page.goto("/");
+  await page.locator(".home-track-directory summary").click();
 
-  for (const selector of [".track-card a", ".pipeline-stage__links a"]) {
+  for (const selector of [
+    ".aidd-home-hero__actions a",
+    ".aidd-home-search__examples a",
+    ".home-track-directory a",
+  ]) {
     const boxes = await page.locator(selector).evaluateAll((actions) =>
       actions.map((action) => {
         const box = action.getBoundingClientRect();
@@ -281,7 +369,7 @@ test("Starlight pages retain links to every product area", async ({
   test.skip(testInfo.project.name !== "chromium", "desktop-only assertion");
 
   const productAreas = [
-    ["Learn", "/learn/foundations/getting-started/"],
+    ["Learn", "/learn/"],
     ["Atlas", "/atlas/"],
     ["Labs", "/labs/"],
     ["Audit", "/audit/"],
@@ -479,6 +567,14 @@ test("mobile navigation remains operable", async ({ page }, testInfo) => {
   await expect(
     page.getByRole("navigation").getByRole("link", { name: "Atlas" }),
   ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(
+    page.getByRole("button", { name: "Open navigation" }),
+  ).toHaveAttribute("aria-expanded", "false");
+  await expect(
+    page.getByRole("button", { name: "Open navigation" }),
+  ).toBeFocused();
+  await expect(page.getByRole("navigation")).not.toBeVisible();
 });
 
 test("mobile dropdown does not shrink the brand at 320 CSS pixels", async ({

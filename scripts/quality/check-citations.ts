@@ -40,7 +40,7 @@ export async function findUnresolvedCitationKeys(
 
 async function main(): Promise<void> {
   const [
-    reportPath = "report/aidd-commons-living-report-v0.1.md",
+    reportPath = "report/aidd-commons-living-report-v0.2.md",
     bibliographyPath = "report/references.bib",
   ] = process.argv.slice(2);
   const unresolved = await findUnresolvedCitationKeys(

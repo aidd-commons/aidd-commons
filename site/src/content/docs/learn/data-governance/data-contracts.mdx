@@ -4,8 +4,11 @@ description: Make identity, provenance, legal scope, and entity alignment visibl
 ---
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="data-governance/data-contracts" />
+
+<TeachingViewLink track="data-governance" />
 
 ## Foundations
 
@@ -34,6 +37,21 @@ linkage, licence compatibility, or a valid experimental endpoint.
 Model cards and data cards are useful only when they bind claims to released
 assets. The hard question is whether a data recipe can be rerun without hidden
 source databases, changing APIs, or unrecorded manual curation.
+
+## A bounded worked decision and independent task
+
+After [the discovery context](/learn/drug-discovery-foundations/discovery-context/), identify the object in a modelling row. In the existing constructed [record example](/learn/data-governance/records-to-model-table/), two exact assay records of parent A report IC50 100 and 1000 nM. They become pIC50 7 and 6; the declared parent-assay target is the median after transformation, 6.5. A copied export of the first record is removed as a duplicate rather than counted as another measurement.
+
+Would aggregating all assays with the same target identifier preserve that task? Name one field that would be lost and one reason the larger table could answer a different question.
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+No. Target identity does not fix assay conditions, endpoint or measurement system. The original task predicts an exact parent-assay endpoint under a declared aggregation. Combining different assays may change both the label-generating process and prediction unit. A larger row count cannot repair that mismatch.
+
+</details>
+
+Teaching task added on 2026-10-26; the original source-review date remains below.
 
 ## What v0.1 does not yet teach
 

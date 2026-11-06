@@ -5,9 +5,12 @@ description: Read the open ADMET and DMPK tooling as dated evidence, and see wha
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="admet-pk/admet-and-dmpk-tool-frontier" />
 <ScrollableRegions />
+
+<TeachingViewLink track="admet-pk" />
 
 ## Learning goals and prerequisites
 
@@ -283,8 +286,8 @@ ADMETlab, Polaris, or Therapeutics Data Commons.
 
 A reader who wants a comparison has to supply the protocol that the records do
 not. It would need one split with its construction rules published, one
-endpoint definition with units, one metric, the same weights on both sides, and
-a stated domain of applicability. A ranking of the family without that is an
+endpoint definition with units, one metric, the same evaluation weighting on both sides, and
+a stated domain of applicability. Each method retains its stated model parameters. A ranking of the family without that is an
 invention rather than a reading.
 
 ## Entities, splits, metrics and resources
@@ -459,7 +462,7 @@ Answer the following using only the Atlas records for this family.
    licence.
 4. A matched comparison needs one protocol applied to both sides. It would need
    the same split with its construction rules published, the same endpoint
-   definition with units, the same metric, the same weights on both sides, and
+   definition with units, the same metric, the same evaluation weighting on both sides, and
    a stated domain of applicability. The records supply none of that. The
    ADMETlab service publishes neither its training database of 0.37M entries
    nor its model definitions, the Hub's curation guidance is marked Planned
@@ -468,19 +471,9 @@ Answer the following using only the Atlas records for this family.
    and ADMET-AI's own record states that its version 2 models do not exactly
    match its version 1 models or the published paper. Ranking the family would
    be an invention.
-5. A supportable sentence is this. We inspected the records for the six artefacts
-   in this family and their licence files, READMEs, archives, platform terms
-   and commit histories. ADMETlab 3.0 publishes a catalogue of 34 ADME
-   endpoints, 36 toxicity endpoints and 8 toxicophore rules, trained on an
-   internal database that it does not publish, and the site does not reconcile
-   those figures with the 88 to 119 figure or the 77-endpoint database it also
-   reports. The service states no licence and its only licence link does not
-   resolve, and the repository's LICENSE file and README name different
-   licences, so the terms for the archives and for the service output are
-   unverified. The Polaris client can load splits and evaluate a method, but
-   the Hub's curation rules are unpublished and its model listing provides no
-   checkpoints. No model was run, no endpoint was predicted, and no ranking or
-   benchmark score is claimed.
+5. We inspected the documented capabilities and reuse terms of these tools,
+   but unresolved asset access and licence scope, together with the absence
+   of a matched execution, prevent a supported prediction or ranking claim.
 
 </details>
 

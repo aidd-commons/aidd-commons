@@ -4,8 +4,11 @@ description: Evaluate exposure, toxicity, DMPK, and PK/PD evidence as linked dec
 ---
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="admet-pk/admet-evaluation" />
+
+<TeachingViewLink track="admet-pk" />
 
 ## Foundations
 
@@ -33,6 +36,21 @@ Physical-property tools such as the
 [OpenFF Evaluator](https://github.com/openforcefield/openff-evaluator) may
 constrain a hypothesis, but they do not replace metabolism, transporter, or
 toxicology experiments.
+
+## A bounded worked decision and independent task
+
+Read [assay controls](/learn/drug-discovery-foundations/assay-controls-dose-response/) first. The task is to identify an ADMET endpoint before comparing predictions. In a constructed record pair, one value is intrinsic clearance per million hepatocytes and the other is clearance per gram of microsomal protein. The species name can match while the measurement basis differs. A numerical ratio between those raw values does not have a validated physiological meaning.
+
+An independent reviewer asks for a single clearance ranking across the pair. Write the fields that must be retained and explain the first obstacle to that ranking.
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+Retain species, matrix, endpoint, units, parent identity, conditions and the source. The immediate obstacle is the incompatible measurement basis, before model choice or rank correlation. A defensible comparison needs a specified, validated bridge or separate endpoint-specific analysis. Continue to [exposure and PK/PD](/learn/admet-pk/exposure-clearance-pkpd/) for the derived-quantity boundary.
+
+</details>
+
+Teaching task added on 2026-10-26; the original source-review date remains below.
 
 ## What v0.1 does not yet teach
 

@@ -23,7 +23,7 @@ claim conditions.
 
 ## Public correction window
 
-First publication was recorded at 2026-10-25T03:02:17Z. The public 30-day correction window ends at 2026-11-24T03:02:17.000Z; its status was open when checked on 2026-10-25 (UTC). Submit source-backed corrections through [the public correction route](https://github.com/gxCaesar/aidd-commons/issues/new?template=correction.yml). Elapsed time alone does not establish either claim; submitted corrections and the other claim conditions still need review.
+First publication was recorded at 2026-10-25T03:02:17Z. The public 30-day correction window ends at 2026-11-24T03:02:17.000Z; its status was open when checked on 2026-11-06 (UTC). Submit source-backed corrections through [the public correction route](https://github.com/gxCaesar/aidd-commons/issues/new?template=correction.yml). Elapsed time alone does not establish either claim; submitted corrections and the other claim conditions still need review.
 
 ## Method
 

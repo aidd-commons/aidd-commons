@@ -37,6 +37,16 @@ for (const track of curriculum.tracks) {
         const answers = page.locator("details[data-worked-answer]");
         expect(await answers.count(), id).toBeGreaterThan(0);
         for (const answer of await answers.all()) {
+          // Nested teaching-view answers first require their exercise disclosure.
+          // Open it by keyboard, preserving coverage of every declared answer.
+          for (const parent of await answer.locator("xpath=ancestor::details").all()) {
+            if ((await parent.getAttribute("open")) === null) {
+              await parent.locator(":scope > summary").focus();
+              await page.keyboard.press("Enter");
+              await expect(parent).toHaveAttribute("open", "");
+            }
+          }
+          await expect(answer).toBeVisible();
           await expect(answer).not.toHaveAttribute("open", "");
           await answer.locator("summary").focus();
           await page.keyboard.press("Enter");

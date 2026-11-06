@@ -25,13 +25,25 @@ owning laboratories before starting. Later commands read only local data. The
 exporter overwrites the derived summary only after its checks pass. It does not
 overwrite either source snapshot or any author result.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/functional_validation_audit/run_lab.py download
 .venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py show
 .venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py check
-.venv/bin/python labs/functional_validation_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/functional_validation_audit -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/functional_validation_audit/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/functional_validation_audit/export_summary.py
+```
+
+</details>
 
 ## The two tables
 
@@ -104,6 +116,17 @@ result. It does not rank records or predict an outcome. Reader learning has
 not been observed. Continue to the
 [binding, response and outcome lesson](/learn/biologics-design/binding-functional-and-clinical-claims/)
 for a worked case and an independent exercise.
+
+## Independent inspection task
+
+Choose one concentration-response table and one point-measurement record. State what each record kind permits under this guide. Would either alone establish target dependence, an orthogonal detection control or a clinical response?
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+Each record supports only its declared readout in its recorded system. A concentration series adds a response pattern, while a point record states a value or bound. Neither alone supplies the missing causal contrast, orthogonal detection evidence or clinical endpoint. Record counts are not independent experiments or validation depth.
+
+</details>
 
 ## Sources and attribution
 

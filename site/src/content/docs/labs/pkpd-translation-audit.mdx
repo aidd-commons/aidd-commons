@@ -2,6 +2,7 @@
 title: Tracing intrinsic clearance through a PK/PD model
 description: Run an explicit exposure, engagement and effect model over paired human and rat hepatocyte measurements, then inspect its assumptions.
 ---
+import ScientificTeachingView from "../../../components/ScientificTeachingView.astro";
 
 ## Preparation and learning objectives
 
@@ -11,15 +12,29 @@ Read [From clearance and exposure to PK/PD](/learn/admet-pk/exposure-clearance-p
 
 The mode is a fresh independent CPU computation over a frozen protocol. It reads an existing validated ChEMBL 37 cache. No network or accelerator is needed once the cache is present. The `download` command checks and reuses that cache without writing it. `show` and `check` write nothing. `export_summary.py` replaces only the small committed summary after checks pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/pkpd_translation_audit/run_lab.py download
 .venv/bin/python labs/pkpd_translation_audit/inspect_pkpd_translation_audit.py show
 .venv/bin/python labs/pkpd_translation_audit/inspect_pkpd_translation_audit.py check
-.venv/bin/python labs/pkpd_translation_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/pkpd_translation_audit -q
 ```
 
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/pkpd_translation_audit/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/pkpd_translation_audit/export_summary.py
+```
+
+</details>
+
 Python 3.11 and the pinned lab environment are required.
+
+<ScientificTeachingView track="admet-pk" compact />
 
 ## Measured material and cohort
 
@@ -83,6 +98,17 @@ Two measured compounds show why the species step matters. The clearance columns 
 | `CHEMBL361546` | 134.9 | 14.79 | 0.31742 | 0.00262104 to 0.886112 |
 
 This lab connects measured intrinsic clearance to an illustrative exposure curve, modeled target engagement and modeled response. It represents species differences with a leave-one-out rule and propagates declared uncertainty through each step. It cannot supply measured plasma or target-site exposure, a compound-specific binding constant, measured engagement, response or validated species translation. Target-site concentration is assumed equal to free compartment concentration, binding is instantaneous, and the effect has no delay. A predicted response is not a measured one. These outputs do not predict clinical benefit and do not rank compounds.
+
+## Independent inspection task
+
+For either named compound, separate the measured clearance columns from the modeled effect and its sensitivity envelope. If the envelope contains a favorable effect, can the compound be ranked for clinical benefit? Identify one assumed parameter whose direct measurement would answer a different question.
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+Only intrinsic clearance is measured here. Concentration, occupancy and effect are model outputs, and the envelope propagates stated assumptions rather than a calibrated prediction interval. A favorable bound does not establish a clinical benefit or a compound ranking. Measuring binding, unbound fraction or target-site exposure would test a missing input or bridge; it would not by itself validate the remaining response model.
+
+</details>
 
 ## Sources and licences
 

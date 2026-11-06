@@ -17,13 +17,25 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 模式是依据冻结协议和仓库自身已提交的比较记录进行全新独立计算。使用 Python 3.11.15、PyYAML 6.0.3 和 CPU。命令不需要网络、下载或加速器。请在仓库根目录运行。`download`、`show` 和 `check` 不写入文件。导出程序仅在检查通过后覆盖本实验的精简汇总。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/claim_chain_audit/run_lab.py download
 .venv/bin/python labs/claim_chain_audit/inspect_claim_chain_audit.py show
 .venv/bin/python labs/claim_chain_audit/inspect_claim_chain_audit.py check
-.venv/bin/python labs/claim_chain_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/claim_chain_audit -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/claim_chain_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/claim_chain_audit/export_summary.py
+```
+
+</details>
 
 ## 链与链接
 

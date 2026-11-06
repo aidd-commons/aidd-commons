@@ -5,14 +5,17 @@ description: 结合原子对应关系、基准构建方法和核查结果所需�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="structure-and-pockets/structure-metrics-and-benchmarks" />
 <ScrollableRegions />
 
+<TeachingViewLink track="structure-and-pockets" chinese />
+
 ## 学习目标与前置知识
 
-学完[口袋状态与置信度](/learn/structure-and-pockets/pocket-states-and-confidence/)
-和[指标与不确定性](/learn/evaluation-and-reproducibility/metrics-and-uncertainty/)后，
+学完[口袋状态与置信度](/zh-cn/learn/structure-and-pockets/pocket-states-and-confidence/)
+和[指标与不确定性](/zh-cn/learn/evaluation-and-reproducibility/metrics-and-uncertainty/)后，
 使用 PXMeter 记录辨别结构比较指标测量的对象、原子对应关系为何必要，以及核查另一
 时间窗口内的基准结论需要什么。本课是附带书面练习的阅读课，没有运行工具或其基准。
 [英文原版](/learn/structure-and-pockets/structure-metrics-and-benchmarks/)是规范版本。
@@ -41,7 +44,7 @@ PXMeter 将模型结构与参考结构比较。它的命令行和 Python 接口�
 
 PXMeter 在计算指标之前，先建立参考结构与模型结构之间的全原子对应关系。如果原子
 配对没有可靠依据，报告的差异可能反映原子如何配对或结构如何对齐，而非被评估的
-预测本身。[评估课程](/learn/evaluation-and-reproducibility/metrics-and-uncertainty/)
+预测本身。[评估课程](/zh-cn/learn/evaluation-and-reproducibility/metrics-and-uncertainty/)
 要求说明指标汇总了什么。这里还要先确定究竟比较了哪些结构特征。指标的名称无法
 纠正配错的结构。
 

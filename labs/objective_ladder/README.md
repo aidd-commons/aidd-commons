@@ -34,7 +34,7 @@ The download cache is reused when its records are present. The inspector and tes
 
 ## What to inspect
 
-The committed summary resolves 36 cells across six entities and six objectives. A record occupies 31 cells and 5 are empty. Sequence recovery, folding, structural plausibility, binding, catalysis, and function have records for 6, 6, 6, 3, 4, and 6 entities respectively. Inspect the position counts beside sequence fractions, the examined-entity row count beside each full coordinate audit, and the reason attached to every empty cell. The single DHFR clash belongs to the entry's NADPH cofactor, not to the examined entity. The ABCD1 accession has 7 catalytic-activity annotations but 2 distinct catalogue numbers.
+The committed summary resolves 36 cells across six entities and six objectives. A record occupies 31 cells and 5 are empty. Sequence recovery, folding, structural plausibility, binding, catalysis, and function have records for 6, 6, 6, 3, 4, and 6 entities respectively. Inspect the position counts beside sequence fractions, the examined-entity row count beside each full coordinate audit, and the reason attached to every empty cell. The single DHFR clash belongs to the entry's NADPH cofactor, not to the examined entity. The ABCB1 accession has 7 catalytic-activity annotations but 2 distinct catalogue numbers.
 
 ## Source terms
 

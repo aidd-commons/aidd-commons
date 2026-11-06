@@ -5,11 +5,14 @@ description: 连接代谢路径、DDI 角色、毒性终点和多参数选择，
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 英文原文：[From metabolism to safety decisions](/learn/admet-pk/metabolism-to-safety/)。
 
 <LessonProgress lessonId="admet-pk/metabolism-to-safety" />
 <ScrollableRegions />
+
+<TeachingViewLink track="admet-pk" chinese />
 
 ## 学习目标与前置知识
 
@@ -42,13 +45,13 @@ import ScrollableRegions from "../../../../../components/ScrollableRegions.astro
 （p=4.10e-23）。这两个估计彼此吻合，构成一次稳健性检验，且两者都远离 0 或
 1：在这里，表观 CYP3A4 效力对 CYP2D6 效力是一个真实但微弱的正向信号。
 
-干净配对子集中的两个具名例子，展示了这个微弱相关性掩盖了什么。阿巴康唑
-（`CHEMBL298817`）明显偏向 CYP3A4 选择性：同一篇文献中，对 CYP3A4 的
-pIC50 为 7.40，对 CYP2D6 为 4.50。奎尼丁（`CHEMBL1294`）根本不是一个干净
-配对，而这一缺失本身就有信息量：它唯一一条被准入的 CYP3A4 记录报告
-pIC50 4.55，旁边是 32 条独立的 CYP2D6 记录，其 pIC50 极差为 4.1，即报告
-效力跨度超过 10,000 倍，中位数 pIC50 为 7.37。要给"奎尼丁与 CYP"一个单一
-数字，得先在 33 项真实测量之间做出选择，才谈得上指代任何具体内容。
+两个具名例子展示不同的记录结构：一个干净配对，以及一个异质记录集合。
+阿巴康唑（`CHEMBL298817`）明显偏向 CYP3A4 选择性：同一篇文献中，对 CYP3A4 的
+pIC50 为 7.40，对 CYP2D6 为 4.50。奎尼丁（`CHEMBL1294`）不是干净配对：它只有
+一条被准入的 CYP3A4 记录（pIC50 4.55），以及 32 条被准入的 CYP2D6 记录，
+后者 pIC50 极差为 4.1，即报告效力跨度超过 10,000 倍，中位数 pIC50 为 7.37。
+不同记录不一定是独立测量。要给“奎尼丁与 CYP”一个单一数字，必须说明它汇总了
+这 33 条记录中的哪些记录。
 
 **独立练习：** 一份安全性总结写道:"化合物 Z 抑制 CYP450，IC50 = 50 nM。"
 仅用本案例所作的检测体系区分，说出这句话遗漏的三个字段——在能把这个主张
@@ -157,7 +160,7 @@ S 未过溶解度、T 未过清除率；R 过四个门槛但绝非“安全”�
 
 ## 替代方法、局限与独立练习
 
-Pareto 选择在两个候选项互不支配时可同时保留它们，尤其适合权重没有正当含义时。加权 desirability function 可辅助资源分配，但需预先固定归一化和权重。若终点系统不同、浓度和预期暴露不可比或安全机制未知，两者均会失败。FDA DDI 框架是风险导向的，不会把体外结果变成临床标签 [FDA in-vitro DDI guidance](https://www.fda.gov/media/134582/download)。
+Pareto 选择在两个候选项互不支配时可同时保留它们，尤其适合权重没有正当含义时。加权 desirability function 可辅助资源分配，但需预先固定归一化和权重。若终点系统不同、浓度和预期暴露不可比或安全机制未知，两者均会失败。FDA DDI 框架是风险导向的，不会把体外结果变成临床标签 [FDA ICH M12 guidance](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/m12-drug-interaction-studies)。
 
 **手算练习（不可运行、非实证）：** 同一构造门槛下，U：`pIC50 5.95`、溶解度 `32`、清除率 `30`、存活 `91%`；V：`pIC50 6.20`、溶解度 `22`、清除率 `34`、存活 `72%`。各失败哪一门槛？第三个候选 W 若 `CL = 24`，R 为 `31`，且 `F·D` 相同，计算 `AUC_W/AUC_R`。为什么该比不是临床安全主张？若 W 改变另一药物暴露，哪个是其相关 DDI 角色？
 
@@ -170,11 +173,10 @@ U 失败于效力（`5.95 < 6.00`），V 失败于存活（`72% < 75%`）。在�
 
 ## 自己把各层分开
 
-[安全性证据实验](/zh-cn/labs/safety-evidence/)把结构警报从结构现算出来，
-而只存需要做实验才能得到的发现，因此两者永远不会被打印成同一列。
-十二个化合物里七个触发警报、其中五个从未被测量过；
-让人安心的那个方向直接失效——在什么警报都没触发的化合物上出现了阳性发现；
-而带有整体动物层面证据的只有十二分之一。
+[安全性证据实验](/zh-cn/labs/safety-evidence/)从结构计算警报，并把它们与模拟实验
+发现的**构造教学记录**分开保存。在这个虚构数据集中，十二个化合物里七个触发警报，
+其中五个没有测量记录；一些没有警报的化合物有阳性发现；十二个中只有一个带有
+整体动物层面的证据。这些计数用于说明证据层次，并非真实化合物的安全性测量结果。
 
 ## 来源与下一课
 
@@ -184,7 +186,7 @@ U 失败于效力（`5.95 < 6.00`），V 失败于存活（`72% < 75%`）。在�
 <div data-case-sources>
 
 - [ICH M12 Drug Interaction Studies: Questions and Answers — FDA](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/m12-drug-interaction-studies-questions-and-answers)
-- [In Vitro Drug Interaction Studies — FDA final guidance](https://www.fda.gov/media/134582/download)
+- [ICH M12 Drug Interaction Studies — FDA guidance](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/m12-drug-interaction-studies)
 - [FDA examples of drugs that interact with CYP enzymes and transporters](https://www.fda.gov/drugs/drug-interactions-labeling/healthcare-professionals-fdas-examples-drugs-interact-cyp-enzymes-and-transporter-systems)
 - [ChEMBL 37 中 CYP3A4（CHEMBL340）与 CYP2D6（CHEMBL289）的活性记录](https://www.ebi.ac.uk/chembl/api/data/status.json)，通过 [CYP 检测体系实验](/zh-cn/labs/cyp-assay-system/) 读取
 

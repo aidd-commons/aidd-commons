@@ -4,16 +4,21 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "astro dev",
-    "build": "npm run figures:build && astro build",
-    "prepreview": "astro build",
+    "dev": "npm run data:check && astro dev",
+    "build": "npm run data:check && npm run figures:check && astro build",
+    "prepreview": "npm run build",
     "preview": "astro preview",
-    "check": "npm run figures:build && astro check",
+    "check": "npm run data:check && npm run figures:check && astro check",
+    "data:check": "node ../node_modules/tsx/dist/cli.mjs ../scripts/catalog/check-site-data.ts",
+    "workbench:build": "node ../node_modules/tsx/dist/cli.mjs ../scripts/workbench/export.ts",
+    "workbench:check": "node ../node_modules/tsx/dist/cli.mjs ../scripts/workbench/export.ts --check",
+    "figures:check": "../.venv/bin/python scripts/check-site-figures.py",
     "figures:build": "../.venv/bin/python scripts/make-site-figures.py"
   },
   "dependencies": {
     "@astrojs/starlight": "0.42.0",
-    "astro": "7.3.1"
+    "astro": "7.3.1",
+    "sharp": "0.35.4"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10"

@@ -101,35 +101,29 @@ Name what that number does and does not tell you, and give the one question that
 would make it informative.
 
 <details data-worked-answer>
-<summary>Worked answer — what a size is, and the question that gives it meaning</summary>
+<summary>Worked answer: distinguish enumeration from chemical coverage</summary>
 
-**The number is a property of the inputs, and it is cheap to increase.** A
-combinatorial library's size is the product of its reagent lists. Adding one
-reagent to each of three positions multiplies the total, and does so without
-reaching any chemistry the construction could not already reach. Ten billion tells
-you the lists are long. It does not tell you the space is broad.
+A product of reagent-list sizes counts possible combinations under a declared
+construction. It does not by itself count distinct valid products, physically
+available compounds or experimentally demonstrated syntheses. Added reagents
+can yield new products; the amount of new structural diversity must be measured
+rather than inferred from the larger product.
 
-**"Synthesisable" is doing a lot of work and usually means "the reaction is
-expected to run".** That is a claim about a transformation class, not about each
-of ten billion products, and it does not cover selectivity, purification, or
-whether the specific combination behaves. It is a generator's claim, not a plan's.
+Ask whether the compared screening collection is physically stocked, available
+on demand or itself enumerated. Those inventories can be compared, but the
+comparison must state which objects are counted and use a compatible definition
+of availability.
 
-**Comparison to a screening collection is a category error.** A screening
-collection is a set of compounds that exist in vials. A combinatorial space is a
-set of molecules a construction can write down. **Orders of magnitude larger** is
-comparing a description to an inventory.
+Scaffold diversity is one useful view of structural coverage. It is not a complete
+definition of chemical space, and different structures within one scaffold can
+still have different properties. In this constructed lab, growing one space
+fourfold reaches one additional declared target while another remains
+unreachable. That is evidence about these specific constructions and targets.
 
-**What the size cannot tell you is the part that decides everything: the number of
-distinct cores.** A ten-billion-member space built on three scaffolds reaches
-exactly three regions of chemistry, however densely. In this lab, growing a space
-fourfold reached one extra molecule and left a target that differs by one ring
-atom exactly as unreachable as before.
-
-**The question: how many distinct scaffolds does the library contain, and what
-does the size become when counted per scaffold?** It converts a number about
-inputs into a number about reach. If the answer is a handful, the honest
-description is a deep exploration of a few cores, which may be exactly what is
-wanted, and is a different claim from the one on the slide.
+Ask how many distinct valid products and scaffold groups the library contains,
+and which declared target structures its construction can reach. Then inspect
+what supports the synthesis claim. A large enumerated count alone answers
+neither reachability nor experimental feasibility.
 
 </details>
 

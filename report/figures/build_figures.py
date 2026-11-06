@@ -8,9 +8,10 @@ runs, and it does four things.
 1. It runs every generator in this directory, the `plot_*.py` data figures and the
    `schematic_*.py` drawings, in name order. Each generator exposes its own entry point:
    a plot exposes `build()`, which saves the vector PDF and the site PNG and registers its
-   caption; a schematic exposes `build()`, which returns the canvas, and `main()`, which
-   saves it as a PDF and a PNG. The orchestrator calls `build()` on both, and the shared
-   save helper writes the schematic's two products from the same native canvas.
+   caption; a schematic exposes `main()`, which reuses its source-checked native PPTX master
+   and actual office-exported PDF/PNG. A changed source contract requests explicit
+   native regeneration rather than a parallel Matplotlib or mtime-driven redraw.
+   Preserved historical SVGs are untouched.
 
 2. It writes the raster copy of every schematic, so that every figure in the set has a
    vector file and a raster file, and the site can take either.
@@ -110,18 +111,10 @@ def draw_plots() -> list[str]:
 
 def draw_schematics() -> list[str]:
     """Run every schematic generator and return the stems it wrote."""
-    import matplotlib
-    import matplotlib.pyplot as plt
-    import schematic_style
-
     stems: list[str] = []
     for name in generator_names(SCHEMATIC_PATTERN):
-        reset_style()
-        matplotlib.rcParams.update(schematic_style.house_rc())
         module = importlib.import_module(name)
-        canvas = module.build()
-        canvas.save(OUT_DIR, module.STEM)
-        plt.close(canvas.fig)
+        module.main()
         stems.append(module.STEM)
     return stems
 

@@ -4,12 +4,15 @@ description: 围绕实际实验决策设计药物—靶点相互作用和虚拟�
 ---
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 英文原文：[Screening and affinity](/learn/dti-screening/screening-and-affinity/)。
 
 译文更新：2026-09-08。
 
 <LessonProgress lessonId="dti-screening/screening-and-affinity" />
+
+<TeachingViewLink track="dti-screening" chinese />
 
 ## 基础
 
@@ -36,6 +39,21 @@ import LessonProgress from "../../../../../components/LessonProgress.astro";
 [Uni-Dock](https://github.com/dptech-corp/Uni-Dock) 和
 [NeuralPLexer](https://github.com/zrqiao/NeuralPLexer) 展示了不同的资产和协议；不要将其
 报告的数值合并为一个排行榜。
+
+## 有边界的推演与独立任务
+
+阅读[分子表示](/zh-cn/learn/representations/small-molecule-representations/)后，区分 pose 与排序终点。既有[构造候选案例](/zh-cn/learn/dti-screening/screening-prevalence-and-transfer/)含 1000 个库化合物、20 个 assay 定义的活性物，top 50 中有 8 个活性物。其 EF50 为 (8/50)/(20/1000) = 8。该计算描述此库中的富集，不提供结合自由能或新的 assay 观察。
+
+第二个库具有不同活性流行率。在解释其候选列表前，旧结果的哪些部分必须重新定义？较好的 docking 分数能否替代缺失 assay 标签？
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+应声明新库、标签定义、活性数量、top fraction 和后续行动。富集与预测值依赖该总体。Docking 分数描述自身评分约定，不是观察到的结合，也不是可互换亲和力常数。下一课推导流行率依赖，并保留 pose 假设。
+
+</details>
+
+本教学任务新增于 2026-10-26；原来源审阅日期保持如下。
 
 ## v0.1 尚未教授的内容
 

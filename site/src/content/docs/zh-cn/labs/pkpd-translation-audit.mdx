@@ -2,26 +2,41 @@
 title: 用 PK/PD 模型追踪内在清除率
 description: 基于人和大鼠肝细胞的成对测量，运行显式的暴露、靶点占有和效应模型，并检查其假设。
 ---
+import ScientificTeachingView from "../../../../components/ScientificTeachingView.astro";
 
 英文原文：[Tracing intrinsic clearance through a PK/PD model](/labs/pkpd-translation-audit/)。
 
 ## 准备与学习目标
 
-请先阅读[从清除率和暴露到 PK/PD](/learn/admet-pk/exposure-clearance-pkpd/)和[清除率检测体系实验](/labs/az-clearance-system/)。本实验要求把一项实测量送入带假设的 PK/PD 模型，并指出证据在哪里止步。你将区分实测清除率与模型计算的浓度、靶点占有和效应，同时检验大鼠到人的转换是否能用单一因子表示。
+请先阅读[从清除率和暴露到 PK/PD](/zh-cn/learn/admet-pk/exposure-clearance-pkpd/)和[清除率检测体系实验](/zh-cn/labs/az-clearance-system/)。本实验要求把一项实测量送入带假设的 PK/PD 模型，并指出证据在哪里止步。你将区分实测清除率与模型计算的浓度、靶点占有和效应，同时检验大鼠到人的转换是否能用单一因子表示。
 
 ## 模式与命令
 
 运行模式是依据冻结协议进行的全新独立 CPU 计算。实验读取已有的、经过验证的 ChEMBL 37 缓存。缓存存在后无需网络或加速器。`download` 检查并复用该缓存，不写入文件。`show` 和 `check` 也不写入文件。`export_summary.py` 仅在检查通过后替换已提交的小型摘要。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/pkpd_translation_audit/run_lab.py download
 .venv/bin/python labs/pkpd_translation_audit/inspect_pkpd_translation_audit.py show
 .venv/bin/python labs/pkpd_translation_audit/inspect_pkpd_translation_audit.py check
-.venv/bin/python labs/pkpd_translation_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/pkpd_translation_audit -q
 ```
 
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/pkpd_translation_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/pkpd_translation_audit/export_summary.py
+```
+
+</details>
+
 需要 Python 3.11 和本项目固定版本的实验环境。
+
+<ScientificTeachingView track="admet-pk" chinese compact />
 
 ## 测量材料与队列
 
@@ -85,6 +100,17 @@ effect(t) = Emax × occupancy(t) × (1 + EC50_occupancy)
 | `CHEMBL361546` | 134.9 | 14.79 | 0.31742 | 0.00262104 至 0.886112 |
 
 本实验把实测内在清除率与示意性的暴露曲线、模型计算的靶点占有和效应连接起来。它用留一规则表示物种差异，并将已声明的不确定性沿每一步传播。材料没有实测血浆或靶点部位暴露、化合物特异的结合常数、实测占有、实测效应或经验证的物种转换。模型假设靶点部位浓度等于游离的区室浓度，结合立即达到平衡，效应没有延迟。预测的反应不是实测反应。这些输出不能预测临床获益，也不能用于按预测效应排序化合物。
+
+## 独立检查任务
+
+对任一已命名化合物，区分实测清除率列、模型效应与其敏感性包络。如果包络包含有利效应，是否能据此按临床获益排序？指出一个假设参数，其直接测量会回答另一个问题。
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+这里仅实测了内在清除率。浓度、占有率与效应均是模型输出，包络传播声明假设，而不是校准后的预测区间。有利界限不能建立临床获益或化合物排序。测量结合、游离比例或靶位暴露可以检验缺失输入或连接，但不能单独验证其余响应模型。
+
+</details>
 
 ## 来源与许可
 

@@ -2,7 +2,7 @@
 
 **AIDD Commons is building the most comprehensive open learning system for AI drug discovery.**
 
-It joins a graduate-level curriculum, an evidence-backed atlas of methods and resources, reproducible labs, and a living technical report. English is canonical. Chinese readers have onboarding, pathway summaries, and translations of the current 111 Learn pages (including the curriculum and resource maps), 56 lab guides and a shared notebook practice guide. Four editable exercises have paired English/Chinese notebooks with identical code; existing numerical panels and historical downloads retain their original format. This is not a translation of the entire Atlas or report.
+It joins a graduate-level curriculum, an evidence-backed atlas of methods and resources, reproducible labs, and a living technical report. English is canonical. Chinese readers have onboarding, pathway summaries, and translations of the current 111 Learn pages (including the curriculum and resource maps), 56 lab guides and a shared notebook practice guide. Four editable exercises have paired English/Chinese notebooks with identical code; existing numerical panels and historical downloads retain their original format. Atlas, Audit, Report and Contribute offer Chinese interface controls; original resource descriptions and historical reports remain in English.
 
 ## What the repository contains
 
@@ -27,6 +27,20 @@ also completed its paired within-system energy evaluation, where Ridge had lower
 MAE than the train mean in benzene and uracil. Neither result is a SOTA or broad
 generalization claim. The audit does **not** establish a “most comprehensive” or
 “most detailed” claim, so the public language remains “building.”
+
+## Development workbench
+
+The working interface connects a discovery question to lessons, resources, saved
+results and a personal exercise. Bilingual learning hubs expose the 18 tracks,
+prerequisites and existing local progress. Unified search spans the collection;
+Atlas supports source-linked comparisons of 2–4 resources, table/list/landscape
+views and complete no-JavaScript browsing. Scientific teaching views use declared
+examples, retained laboratory summaries and selected actual molecular coordinates.
+The figure library supports search and enlargement. Plot filters retain fixed axes and keep tables and CSV downloads aligned. They preserve their units, limitations and source dates. Software checks do not
+establish learning or research utility.
+
+These workbench changes are under local development. The public website and
+v0.3.1 archive remain the earlier release until a new delivery is published.
 
 ## Local development
 
@@ -80,11 +94,27 @@ The browser checks cover bilingual routes, downloads, progress, worked answers a
 serious/critical accessibility findings. Cloud execution and reader learning remain
 unverified; local software acceptance does not establish either.
 
-Current version: **0.3.1**. The [website](https://gxcaesar.github.io/aidd-commons/)
+Most recent public version: **0.3.1**. The [website](https://gxcaesar.github.io/aidd-commons/)
 and [source repository](https://github.com/gxCaesar/aidd-commons) provide the
 same curated learning materials. See the
 [changes](CHANGELOG.md) and [v0.2 report addendum](report/aidd-commons-v0.2-addendum.md).
 The [v0.1 report](report/aidd-commons-living-report-v0.1.md) remains a historical snapshot.
+The [complete v0.2 PDF](site/public/reports/aidd-commons-living-report-v0.2.pdf)
+and [online reading edition](site/public/reports/aidd-commons-living-report-v0.2.html)
+share the [complete canonical source](report/aidd-commons-living-report-v0.2.md).
+They retain the original report's twelve chapters and twenty figures and add a
+chapter on linked scientific teaching views. The dated addendum remains a
+separate historical companion, not the current full report.
+
+To rebuild both complete editions, install Pandoc, XeLaTeX with Georgia and Arial
+fonts, `xurl`, `caption`, `pdflscape` and Poppler, then run
+`python3 scripts/report/build-v02-pdf.py`. The command checks canonical prose,
+table cells, figure captions and references before updating `output/pdf/` and
+`site/public/reports/`. Use `python3 scripts/report/build-v02-pdf.py --check` to
+check the existing website PDF and `python3 tests/report/test_report_pdf.py` to
+exercise the checker, including a real truncated PDF. The build uses the current
+reviewed figures without rerunning their experiments. Historical v0.1 is unchanged.
+
 The [resource-link review](docs/RESOURCE_LINK_REVIEW.md) records the corrected
 Atlas, lesson and lab-download entries and the remaining content gaps.
 See the [Chinese edition scope](docs/CHINESE_EDITION.md) for translated routes,
@@ -173,6 +203,7 @@ the command is missing. Check your environment before installing dependencies:
 node --version
 pnpm --version
 pnpm install
+pnpm data:build
 pnpm dev
 ```
 
@@ -183,8 +214,25 @@ no `pnpm`, the following starts the same site without reinstalling packages:
 ```sh
 npm run catalog:build
 npm run comparisons:build
+npm run workbench:build
 npm --prefix site run dev
 ```
+
+Website build and check commands verify generated data projections and figure placements without rewriting them. After changing catalogue, curriculum or document metadata, run `pnpm data:build` to update the resource, comparison, workbench and search projections. Run `npm --prefix site run figures:build` only when deliberately updating figure assets from their maintained sources.
+
+The bilingual `/report/figures/` reading desk collects 13 source-derived plots
+and seven method diagrams, with PDF downloads and editable PPTX masters for
+the diagrams. Their sources live in `report/figures/`. Ordinary site builds
+check the committed masters without requiring a presentation authoring runtime.
+Explicit native-diagram regeneration uses `build_schematic_masters.mjs` and
+requires `RUNTIME_NODE_MODULES`, `PRESENTATIONS_SKILL_DIR`, `RUNTIME_PYTHON` and
+a working LibreOffice executable (`LIBREOFFICE_BIN` when needed).
+
+Eight website concept illustrations were generated with an image tool on
+26 October 2026. Their backend version was not exposed. They explain generic
+objects and are not observed images, identified structures or experimental
+results. Native labels and relationships remain separate. The illustration
+sources and scope are documented in `site/src/assets/editorial/README.md`.
 
 Source packages pin direct dependencies but omit lockfiles; full transitive
 dependency identity is not promised. The declared Node and Python versions

@@ -1,0 +1,4 @@
+{
+  "replacement": "This is not the retained conceptual illustration.",
+  "expected_diagnostic": "embedded illustration differs from its original PNG"
+}

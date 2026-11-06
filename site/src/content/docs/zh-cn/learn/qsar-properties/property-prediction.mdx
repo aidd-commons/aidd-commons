@@ -4,6 +4,7 @@ description: 在使用前沿表示之前构建诚实的 QSAR 和分子性质基�
 ---
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
+import ScientificTeachingView from "../../../../../components/ScientificTeachingView.astro";
 
 英文原文：[Property prediction](/learn/qsar-properties/property-prediction/)。
 
@@ -11,11 +12,19 @@ import LessonProgress from "../../../../../components/LessonProgress.astro";
 
 <LessonProgress lessonId="qsar-properties/property-prediction" />
 
+## 阅读目标与路线
+
+本页是性质预测的导览。先完成[来源与实体素养](/zh-cn/learn/foundations/source-and-entity-literacy/)，再用本页确定预测主张所依赖的终点、分子单元与划分。本页不包含模型训练练习。
+
+需要完整讲解和独立任务时，继续学习[回归与分类误差](/zh-cn/learn/qsar-properties/regression-classification-errors/)。随后阅读[已完成的 FreeSolv 比较](/zh-cn/labs/freesolv-honest-baselines/)，解释为何其骨架主划分结果回答的问题比所有性质终点上的表现更窄。
+
 ## 基础
 
 性质预测将已声明的分子输入映射到已声明的终点。终点可能以不同的测定、单位和删失规则
 测量，因此“数据集”并不足够。[Therapeutics Data Commons](https://tdcommons.ai/) 和
 [OGB](https://ogb.stanford.edu/) 组织任务，但并不消除阅读每一项划分和许可的需要。
+
+<ScientificTeachingView track="qsar-properties" chinese />
 
 ## 实践工作流
 

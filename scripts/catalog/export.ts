@@ -1,33 +1,12 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
-import { type Resource } from "../../catalog/schema/resource.js";
 import {
   CatalogValidationError,
   formatDiagnostic,
   loadCatalog,
 } from "./catalog.js";
-
-const csvColumns: Array<keyof Resource> = [
-  "id",
-  "name",
-  "kind",
-  "summary",
-  "canonical_url",
-  "identifiers",
-  "stages",
-  "modalities",
-  "tasks",
-  "relations",
-  "status",
-  "access_level",
-  "openness",
-  "licenses",
-  "evidence",
-  "caveats",
-  "acknowledgements",
-  "last_verified",
-];
+import { renderCatalogArtifacts } from "./projections.js";
 
 function parseArguments(argumentsList: string[]): {
   input: string;
@@ -61,46 +40,17 @@ function parseArguments(argumentsList: string[]): {
   return { input, output, today };
 }
 
-function csvValue(value: unknown): string {
-  const raw = typeof value === "string" ? value : JSON.stringify(value);
-  return /[",\n\r]/.test(raw) ? `"${raw.replaceAll('"', '""')}"` : raw;
-}
-
-function resourcesToCsv(resources: Resource[]): string {
-  const rows = resources.map((resource) =>
-    csvColumns.map((column) => csvValue(resource[column])).join(","),
-  );
-  return `${csvColumns.join(",")}\n${rows.join("\n")}\n`;
-}
-
 async function main(): Promise<void> {
   const { input, output, today } = parseArguments(process.argv.slice(2));
   const resources = await loadCatalog(input, { today });
   const outputDirectory = resolve(output);
-  const opennessProjection = resources.map(({ evidence, id, openness }) => {
-    const referencedEvidenceIds = new Set(
-      Object.values(openness).flatMap((claim) => claim.evidence ?? []),
-    );
-
-    return {
-      id,
-      openness,
-      evidence: evidence.filter((item) => referencedEvidenceIds.has(item.id)),
-    };
-  });
-
+  const artifacts = renderCatalogArtifacts(resources);
   await mkdir(outputDirectory, { recursive: true });
-  await Promise.all([
-    writeFile(
-      `${outputDirectory}/resources.v1.json`,
-      `${JSON.stringify(resources, null, 2)}\n`,
+  await Promise.all(
+    Object.entries(artifacts).map(([name, source]) =>
+      writeFile(`${outputDirectory}/${name}`, source),
     ),
-    writeFile(`${outputDirectory}/resources.v1.csv`, resourcesToCsv(resources)),
-    writeFile(
-      `${outputDirectory}/openness.v1.json`,
-      `${JSON.stringify(opennessProjection, null, 2)}\n`,
-    ),
-  ]);
+  );
 
   console.log(
     `Exported ${resources.length} resource${resources.length === 1 ? "" : "s"}.`,

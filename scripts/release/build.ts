@@ -23,6 +23,7 @@ import {
   publicRoadmapPointer,
   roadmapCompatibilityPath,
   scanPublicTree,
+  unreleasedStudyDirectory,
   type HygieneFinding,
 } from "./hygiene.js";
 
@@ -404,17 +405,16 @@ export const fileAllowlist = [
   "labs/screening_transport/inspect_transport.py",
   "report/aidd-commons-living-report-v0.1.md",
   "report/aidd-commons-v0.2-addendum.md",
+  "report/aidd-commons-living-report-v0.2.md",
   "report/CITATION-v0.1.cff",
   "report/build.sh",
   "report/fix_pdf_id.py",
   "report/metadata.yaml",
+  "report/metadata-v0.2.yaml",
   "report/references.bib",
-  // The living-report PDF is not listed here. It ships once, through the
-  // site/public route, because the published report page links to
-  // /reports/aidd-commons-living-report-v0.1.pdf and that copy is the one a
-  // reader can open. The identical file under output/pdf/ is the pandoc build
-  // artifact written by report/build.sh; listing it as well published the same
-  // PDF twice, under two paths.
+  // Versioned report PDFs ship once through site/public, where Report links
+  // to them. Matching output/pdf copies are local build artifacts, not a
+  // second public distribution.
 ];
 
 export const directoryAllowlist = [
@@ -424,6 +424,7 @@ export const directoryAllowlist = [
   "catalog/curriculum",
   "catalog/resources",
   "catalog/schema",
+  "catalog/workbench",
   "report/figures",
   "docs",
   "labs/src",
@@ -434,6 +435,7 @@ export const directoryAllowlist = [
   "scripts/quality",
   "scripts/release",
   "scripts/report",
+  "scripts/workbench",
   "site/public",
   "site/src",
   "site/scripts",
@@ -448,6 +450,7 @@ export const directoryAllowlist = [
   "tests/release",
   "tests/report",
   "tests/site",
+  "tests/workbench",
 ];
 
 const privateDirectoryNames = new Set([
@@ -496,6 +499,10 @@ export const excludedReleasePaths = new Set([
 // against a release path, and the builder refuses to publish a path that
 // carries one of these prefixes even if it is listed by mistake.
 export const intentionalReleaseExclusions = new Map<string, string>([
+  [
+    `${unreleasedStudyDirectory}/`,
+    "unreleased registration provenance and study planning; referenced development tools are not curated for this tutorial release",
+  ],
   [
     "labs/freesolv/results/",
     "raw evaluation output stays in the repository, not in the curated export",
@@ -552,6 +559,9 @@ export function isLegacyScientificSvg(path: string): boolean {
 }
 
 export function exclusionReason(path: string): string | undefined {
+  if (path === unreleasedStudyDirectory) {
+    return intentionalReleaseExclusions.get(`${unreleasedStudyDirectory}/`);
+  }
   // The deliberate negative controls ship verbatim. A fixture for the
   // agent-instruction rule has to be called AGENTS.md, one for the
   // environment-file rule has to be called .env, and one for the receipt rule

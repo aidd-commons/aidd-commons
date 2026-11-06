@@ -15,13 +15,25 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 模式是依照冻结协议，对缓存的 ChEMBL 37 快照进行全新独立计算。使用项目的 Python 3.11 环境和 CPU。快照已在本地缓存，因此这些命令无需网络或加速器。下载命令只把经验证的工件复制到独立缓存。`show` 和 `check` 不写入文件。导出程序仅在所有检查通过后覆盖精简汇总。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/generalization_unit_audit/run_lab.py download
 .venv/bin/python labs/generalization_unit_audit/inspect_generalization_unit_audit.py show
 .venv/bin/python labs/generalization_unit_audit/inspect_generalization_unit_audit.py check
-.venv/bin/python labs/generalization_unit_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/generalization_unit_audit -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/generalization_unit_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/generalization_unit_audit/export_summary.py
+```
+
+</details>
 
 ## 测量与单位规则
 
@@ -57,6 +69,17 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 ## 材料局限
 
 种子是为了覆盖纳入规则而特意选取的。其单位分布不是对整个 ChEMBL 的估计。骨架是结构分组规则，并非完整的类似物关系度量。测定标识不能揭示所有实验室条件。数据表不能支持跨时间、站点或患者的泛化主张。本实验不拟合模型、不评分预测，也不宣称某个单位正确。按单位留一的划分按定义会使每个留出单位都没有同单位训练观测。单次测量取值数描述的则是取值层面的按测量留一。
+
+## 独立检查任务
+
+表中有 487 个 molecule-record 成员归属，却只有 486 个分组测量。解释为何这不是算术错误。假设保留 assay 或 document 这一轴，说明相对于保留 parent 时，问题发生了什么改变。
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+一个分组测量可以携带多个来源 molecule-record identifier，所以成员归属数不必等于唯一测量数。保留 assay 或 document 改变了泛化情境，不能从 parent 保留结果成功直接推出。分组规则计数单元，但不独立建立生物学独立性。
+
+</details>
 
 ## 来源与条款
 

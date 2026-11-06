@@ -1,0 +1,522 @@
+---
+import ScientificPlot from "./ScientificPlot.astro";
+import ScientificIcon from "./ScientificIcon.astro";
+import ScientificObjectView from "./ScientificObjectView.astro";
+import IdentitySplitView from "./IdentitySplitView.astro";
+import { teachingViews, localTeachingText } from "../data/teaching-views";
+import molecules from "../data/teaching/molecules.json";
+import chembl from "../../../labs/chembl_egfr/locked-summary.json";
+import rmd17 from "../../../labs/rmd17_system_state/locked-summary.json";
+import pool from "../../../labs/pool_budget/real-summary.json";
+import uncertainty from "../../../labs/pool_budget/uncertainty-summary.json";
+import biologics from "../../../labs/biologic_construct_audit/summary.json";
+import paperqa from "../../../labs/paperqa_local/reviewed-example.json";
+import pyridine from "../assets/teaching/pyridine.png";
+import alanine1 from "../assets/teaching/alanine-one.png";
+import alanine2 from "../assets/teaching/alanine-two.png";
+import candidate1 from "../assets/teaching/generation-c01.png";
+import candidate2 from "../assets/teaching/generation-c02.png";
+import candidate3 from "../assets/teaching/generation-c03.png";
+import retroProduct from "../assets/teaching/retro-product.png";
+import retroAcid from "../assets/teaching/retro-acid.png";
+import retroAmine from "../assets/teaching/retro-amine.png";
+interface Props {track:string;chinese?:boolean;compact?:boolean}
+const {track,chinese=false,compact=false}=Astro.props;
+const view=teachingViews[track];
+if(!view) throw new Error("No scientific teaching view for track: "+track);
+const t=(en:string,zh:string)=>chinese?zh:en;
+const tx=(field:keyof Pick<typeof view,"question"|"mechanism"|"worked"|"task"|"answer"|"limit"|"state">)=>localTeachingText(view[field],chinese);
+const href=(path:string)=>chinese&&(/^\/(learn|labs)\//.test(path))?"/zh-cn"+path:path;
+const moleculeAssets=[pyridine,alanine1,alanine2];
+const moleculeIds=["pyridine","alanine-one","alanine-two"];
+const representationMolecules=moleculeIds.map(id=>molecules.molecules.find(m=>m.id===id)!);
+const modelNames={train_mean:t("Train mean","训练均值"),descriptor_ridge:"Descriptor Ridge",morgan_ridge:"Morgan Ridge"};
+const assayLabels={primary_test:t("Primary assay · 132 parents","主要 assay · 132 个 parent"),assay_replication:t("Separate assay · 170 parents","独立 assay · 170 个 parent")};
+const assayIds=Object.keys(chembl.results) as (keyof typeof chembl.results)[];
+const poolIds=Object.keys(pool.assays) as (keyof typeof pool.assays)[];
+const pip=[.44,.27,.16,.08,.05];
+const domainFields=["modality","construct","expression_system","intended_function"] as const;
+const domainLabels=[t("Modality","模态"),t("Construct","构造"),t("Host","宿主"),t("Intended function","预期功能")];
+const dossier=[{id:"N1",potency:20,selectivity:8,exposure:4,safety:true},{id:"N2",potency:40,selectivity:30,exposure:2,safety:true},{id:"N3",potency:45,selectivity:25,exposure:3.5,safety:false}];
+const checkpoints=[0,1,2,3,4];
+const dosePoints = Array.from({ length:25 }, (_, i) => {
+  const x = -2 + i * 3 / 24;
+  return { x, residual: 2 + 96 / (1 + (10 ** x / 0.4) ** 1.2) };
+});
+const doseSeries = (mode:string) => [{
+  name: mode === "residual" ? t("Calculated residual activity", "计算残余活性") : t("Calculated inhibition", "计算抑制率"),
+  points: dosePoints.map(point => ({x:point.x, y:mode === "residual" ? point.residual : 100 - point.residual})),
+}];
+const fingerprintBins = (m:typeof representationMolecules[number]) => Array.from({length:64}, (_,i) => ({
+  count:m.morgan_on_bits.filter(bit => Math.floor(bit/32) === i).length,
+  start:i*32,
+  end:i*32+31,
+}));
+type ContextIcon = "cell" | "protein" | "molecule" | "assay" | "simulation" | "robot" | "data" | "model";
+type ContextStage = [ContextIcon, string, string];
+const contexts: Record<string, ContextStage[]> = {
+  "data-governance": [["data", t("Source records", "来源记录"), t("Keep endpoint + provenance", "保留终点与来源")], ["molecule", t("Parent identity", "Parent 身份"), t("Resolve the grouping unit", "确定分组单位")], ["data", t("Model table", "模型数据表"), t("Keep lineage inspectable", "保持谱系可检查")]],
+  representations: [["molecule", t("Molecular graph", "分子图"), t("Authored, label-free input", "构造、无标签输入")], ["data", t("Computed descriptors", "计算描述符"), t("Named quantities + units", "明确的量与单位")], ["model", t("Hashed bit vector", "哈希位向量"), t("Representation, not attribution", "表示而非归因")]],
+  "mechanism-targets": [["data", t("Regional signal", "区域信号"), t("Conditional variant support", "条件性变异支持")], ["cell", t("Effector question", "效应基因问题"), t("Context remains necessary", "仍需情境证据")], ["data", t("Target hypothesis", "靶点假设"), t("Independent validation gap", "独立验证缺口")]],
+  "qsar-properties": [["assay", t("Named assay", "指定 assay"), t("Endpoint defines the task", "终点定义任务")], ["model", t("Frozen comparison", "冻结比较"), t("Retain every baseline", "保留所有基线")], ["data", t("Held-out parents", "保留 parent"), t("Read the population first", "先读取评估总体")]],
+  "admet-pk": [["molecule", t("Concentration", "浓度"), t("Total and unbound differ", "总浓度与游离浓度不同")], ["simulation", t("Elimination model", "消除模型"), t("Constructed first-order case", "构造一级消除案例")], ["data", t("Exposure readout", "暴露读出"), t("Keep units and context", "保留单位与情境")]],
+  "dti-screening": [["molecule", t("Original library", "原始库"), t("Preserve the base rate", "保留基础阳性率")], ["model", t("Shortlist", "候选列表"), t("A ranking under a rule", "规则下的排序")], ["assay", t("Endpoint boundary", "终点边界"), t("Assay activity is contextual", "Assay 活性依赖情境")]],
+  "structure-and-pockets": [["protein", t("Experimental coordinates", "实验坐标"), t("A retained structural state", "保留的结构状态")], ["molecule", t("Ligand context", "配体情境"), t("Inspect the source geometry", "检查来源几何")], ["data", t("Interpretation", "解释"), t("Geometry does not decide affinity", "几何不能决定亲和力")]],
+  "physics-based-modeling": [["molecule", t("Molecular system", "分子系统"), t("Identity + physical state", "身份与物理状态")], ["simulation", t("Frame geometry", "帧几何"), t("Correlated configurations", "相关构型")], ["data", t("Energy evaluation", "能量评估"), t("Separate retained aggregates", "另行保留的汇总值")]],
+  "molecular-generation": [["molecule", t("Authored graphs", "构造分子图"), t("A separate structure gallery", "独立的结构图库")], ["model", t("Constructed scores", "构造分数"), t("Two objectives to maximize", "两个最大化目标")], ["data", t("Hard constraint", "硬约束"), t("Eligibility precedes ranking", "先确定资格，再排序")]],
+  "biologics-design": [["data", t("Construct record", "构造记录"), t("Identity, domains and host", "身份、结构域与宿主")], ["protein", t("Domain schematic", "结构域示意"), t("Identity only, not coordinates", "仅表示身份，非坐标")], ["assay", t("Function evidence", "功能证据"), t("Requires its own contrast", "需要独立功能对照")]],
+  "synthesis-and-automation": [["molecule", t("Product graph", "产物图"), t("An authored graph-edit case", "构造图编辑案例")], ["data", t("Decomposition", "分解"), t("Recorded reactant graphs", "记录的反应物图")], ["robot", t("Laboratory requirements", "实验室要求"), t("Feasibility remains unassessed", "可行性仍未评估")]],
+  "active-learning": [["data", t("Retained pool", "保留数据池"), t("Fixed original denominators", "固定的原始分母")], ["model", t("Acquisition policy", "获取策略"), t("Matched parent budgets", "匹配的 parent 预算")], ["data", t("Label lookup", "标签查询"), t("Retrospective, not live feedback", "回顾性查询，非实时反馈")]],
+  "scientific-agents": [["data", t("Supplied sources", "给定来源"), t("A saved local corpus", "保留的本地语料")], ["robot", t("Typed return", "带类型返回"), t("Observation or failure", "观察或失败")], ["data", t("Source review", "来源审查"), t("Support remains claim-specific", "支持须对应具体主张")]],
+  "evaluation-and-reproducibility": [["data", t("Observed rows", "观察行"), t("Membership is explicit", "明确成员归属")], ["molecule", t("Grouping unit", "分组单位"), t("Identity can cross a split", "身份可能跨越划分")], ["data", t("Allowed information", "允许的信息"), t("Fit transforms on training only", "仅在训练数据拟合变换")]],
+  "candidate-nomination": [["molecule", t("Candidate record", "候选记录"), t("Endpoint-specific evidence", "终点特异证据")], ["assay", t("Required gates", "必要门槛"), t("Logical conditions, not averages", "逻辑条件而非平均值")], ["data", t("Complete dossier", "完整档案"), t("Missing evidence stays missing", "缺失证据仍为缺失")]],
+};
+const contextStages = contexts[track];
+const trackNumber = String(Object.keys(teachingViews).indexOf(track) + 1).padStart(2, "0");
+const energyScale = Math.max(...Object.values(rmd17.results).flatMap(result => [result.train_mean.mae, result.ridge.mae]));
+
+---
+<figure class:list={["teaching-view","not-content",{"teaching-view--compact":compact}]} id={"scientific-view-"+track} data-teaching-view={track} data-chinese={chinese ? "true" : "false"}>
+  <figcaption class="teaching-view__heading"><span class="teaching-view__eyebrow"><b>{t("TRACK", "专题")} {trackNumber}</b><span>{t("Scientific object view","科学对象视图")}</span><em>{tx("state")}</em></span><strong>{tx("question")}</strong></figcaption>
+  <noscript>
+    <p class="teaching-note">{t("Scripting is unavailable. All retained states and checkpoint tables are displayed below; controls do not perform computation.", "脚本不可用。下方显示所有保留状态与检查点表格；控件不执行计算。")}</p>
+    <style is:global>[data-teaching-view] .teaching-control, [data-teaching-view] .science-object__toolbar, [data-teaching-view] .science-object__controls { display: none !important; } [data-teaching-view] [data-teaching-panel][hidden], [data-teaching-view] [data-budget-step][hidden], [data-teaching-view] [data-identity-state][hidden] { display: block !important; }</style>
+  </noscript>
+  <div class="teaching-view__composition">
+    <div class="teaching-view__visual">
+      {track==="foundations"&&<ol class="decision-route" aria-label={t("Discovery decisions and their scientific objects","发现决策及其科学对象")}>
+        {[
+          ["01","cell",t("Disease context","疾病情境"),t("Population · phenotype · alternative explanation","总体 · 表型 · 竞争解释"),"mechanism-targets/disease-state-definition"],
+          ["02","data",t("Target hypothesis","靶点假设"),t("Gene or protein · intervention direction · validation gap","基因或蛋白 · 干预方向 · 验证缺口"),"mechanism-targets/perturbation-to-target-validation"],
+          ["03","assay",t("Molecule + assay","分子与 assay"),t("Entity · endpoint · controls · measured context","实体 · 终点 · 对照 · 测量情境"),"drug-discovery-foundations/assay-controls-dose-response"],
+          ["04","simulation",t("Exposure + constraints","暴露与约束"),t("Time course · selectivity · safety · feasibility","时程 · 选择性 · 安全性 · 可行性"),"admet-pk/exposure-clearance-pkpd"],
+          ["05","data",t("Candidate dossier","候选档案"),t("Complete requirements · unknown fields · next decision","完整要求 · 未知字段 · 下一决策"),"candidate-nomination/capstone-workbook"]
+        ].map(([number,icon,label,body,lesson])=><li><span class="decision-route__number">{number}</span><ScientificIcon name={icon as ContextIcon} size={88} /><div><a href={href("/learn/"+lesson+"/")}>{label}</a><p>{body}</p></div><small>{t("Inspect this decision","检查此决策")} ↗</small></li>)}
+      </ol>}
+      {track==="drug-discovery-foundations"&&<div data-teaching-switch>
+        <label class="teaching-control">{t("Response definition","响应定义")}<select data-panel-select><option value="residual">{t("Residual activity, %","残余活性，%")}</option><option value="inhibition">{t("Inhibition, %","抑制率，%")}</option></select></label>
+        {["residual","inhibition"].map((mode,index)=><div data-teaching-panel={mode} hidden={index>0}><ScientificPlot title={t("Constructed concentration-response curve","构造浓度响应曲线")} xLabel={t("log10(concentration / µM)","log10(浓度 / µM)")} yLabel={mode==="residual"?t("Residual activity, %","残余活性，%"):t("Inhibition, %","抑制率，%")} xMin={-2} xMax={1} yMin={0} yMax={100} chinese={chinese} series={doseSeries(mode)} /></div>)}
+        <p class="teaching-note">{t("Top = 98%, Bottom = 2%, IC50 = 0.40 µM, Hill = 1.2. All points come from the displayed lesson's constructed equation, not an assay fit.","Top = 98%、Bottom = 2%、IC50 = 0.40 µM、Hill = 1.2。所有点均来自课程构造方程，不是实际 assay 拟合。")}</p>
+        <div class="assay-context"><div><ScientificIcon name="molecule" size={76} /><strong>{t("Molecule + biological system","分子与生物系统")}</strong><span>{t("Define the measured context", "定义测量情境")}</span></div><b aria-hidden="true">→</b><div><ScientificIcon name="assay" size={76} /><strong>{t("Signal + controls","信号与对照")}</strong><span>{t("Name the response definition", "明确响应定义")}</span></div><b aria-hidden="true">→</b><div><ScientificIcon name="data" size={76} /><strong>{t("Normalized endpoint","归一化终点")}</strong><span>{t("Keep the denominator visible", "保留归一化分母")}</span></div></div>
+      </div>}
+      {track==="machine-learning"&&<div data-teaching-switch>
+        <label class="teaching-control">{t("Declared candidate","声明候选")}<select data-panel-select><option value="alpha0">alpha = 0</option><option value="alpha2">alpha = 2</option></select></label>
+        {[0,2].map((alpha,index)=><div data-teaching-panel={"alpha"+alpha} hidden={index>0}><ScientificPlot title={t("Constructed Ridge fit and validation point","构造 Ridge 拟合与验证点")} xLabel={t("Feature x, arbitrary units","特征 x，任意单位")} yLabel={t("Target / prediction, arbitrary units","目标 / 预测，任意单位")} xMin={0} xMax={3} yMin={0} yMax={8} xTicks={[0,1,2,3]} chinese={chinese} series={[{name:t("Training observations","训练观察"),connect:false,points:[{x:0,y:1},{x:1,y:3},{x:2,y:5}]},{name:alpha===0?"ŷ = 1 + 2x":"ŷ = 2 + x",points:[{x:0,y:alpha===0?1:2},{x:3,y:alpha===0?7:5}],dashed:true},{name:t("Validation target, not fitted","验证目标，不参与拟合"),connect:false,points:[{x:3,y:6}]}]} /></div>)}
+        <p class="teaching-note">{t("No test target is shown. The lesson's validation tie rule chooses smaller alpha; evaluation cannot resolve that tie.","不显示测试目标。课程的验证平局规则选择较小 alpha；不能用评估数据打破平局。")}</p>
+        <div class="partition-strip"><div><ScientificIcon name="model" size={70} /><span><b>{t("Train", "训练")}</b>{t("Fit parameters + transforms", "拟合参数与变换")}</span></div><div><ScientificIcon name="data" size={70} /><span><b>{t("Validate", "验证")}</b>{t("Select declared candidate", "选择声明候选")}</span></div><div><ScientificIcon name="assay" size={70} /><span><b>{t("Evaluate", "评估")}</b>{t("Report once under protocol", "按协议报告一次")}</span></div></div>
+      </div>}
+      {(track==="data-governance"||track==="evaluation-and-reproducibility")&&<IdentitySplitView chinese={chinese} context={track==="data-governance"?"lineage":"evaluation"} />}
+      {track==="representations"&&<div data-teaching-switch>
+        <label class="teaching-control">{t("Authored molecular input","构造分子输入")}<select data-panel-select>{representationMolecules.map(m=><option value={m.id}>{m.id}</option>)}</select></label>
+        {representationMolecules.map((m,index)=><div data-teaching-panel={m.id} hidden={index>0}>
+          <div class="molecule-encoding"><img src={moleculeAssets[index].src} width="560" height="320" alt={t("RDKit 2D depiction of ","RDKit 二维结构图：")+m.id} loading="lazy"/><div><p class="meta-label">{t("Same graph, different objects","同一图，不同计算对象")}</p><code>{m.input_smiles}</code><dl><div><dt>{t("Formula","分子式")}</dt><dd>{m.formula}</dd></div><div><dt>{t("Graph","图")}</dt><dd>{m.atoms} {t("heavy atoms","重原子")} · {m.bonds} {t("bonds","键")}</dd></div><div><dt>{t("Computed molecular weight","计算分子量")}</dt><dd>{m.molecular_weight} g/mol</dd></div><div><dt>TPSA</dt><dd>{m.tpsa} Å²</dd></div></dl></div></div>
+          <div class="encoding-heading"><strong>{t("Morgan bit occupancy", "Morgan 位占用")}</strong><span>{t("Consecutive bins · radius 2 · 2048 bits", "连续分箱 · radius 2 · 2048 bits")}</span></div>
+          <div class="fingerprint-bins" role="img" aria-label={t("Occupied Morgan bits grouped in consecutive 32-bit bins; exact positions below","Morgan 占用位按连续 32-bit 分箱；下方列出精确位置")}>{fingerprintBins(m).map(bin => <span class:list={{occupied:bin.count>0}} title={"bits "+bin.start+"–"+bin.end+": "+bin.count}>{bin.count||"·"}</span>)}</div>
+          <p class="teaching-note">{t("Each cell counts occupied hashed positions in one consecutive 32-bit bin. Empty cells are shown as dots. These are not atoms or attributed substructures.","每格计数一个连续 32-bit 分箱中的占用哈希位置；空格显示为点。这些不是原子，也不是归因到的子结构。")}</p>
+          <details class="teaching-data"><summary>{t("Encoding values and exact occupied positions","编码值与精确占用位置")}</summary><dl><div><dt>Canonical isomeric SMILES</dt><dd><code>{m.canonical_smiles}</code></dd></div><div><dt>Morgan radius / bits / chirality</dt><dd>2 / 2048 / true</dd></div><div><dt>{t("Occupied bit positions","占用位位置")}</dt><dd><code>{m.morgan_on_bits.join(", ")}</code></dd></div></dl></details>
+        </div>)}
+      </div>}
+      {track==="mechanism-targets"&&<div>
+        <div class="evidence-questions"><div><span class="question-bridge">{t("Which gene?","哪个基因？")}</span><strong>{t("Association + conditional fine mapping","关联与条件性精细定位")}</strong><span>{t("Context + molecular link","情境与分子连接")}</span></div><div><span class="question-bridge">{t("Which intervention?","哪种干预？")}</span><strong>{t("Effector hypothesis","效应基因假设")}</strong><span>{t("Direction + independent validation","方向与独立验证")}</span></div></div>
+        <p class="teaching-note">{t("Dashed bridges mark unresolved questions, not causal arrows.","虚线连接表示未解决的问题，不是因果箭头。")}</p>
+        <div class="encoding-heading"><strong>{t("Posterior inclusion probability", "后验纳入概率")}</strong><span>{t("PIP · dimensionless · common 0–1 scale", "PIP · 无量纲 · 共同 0–1 尺度")}</span></div>
+        <div class="pip-bars" role="img" aria-label={t("Constructed PIPs of five variants; first four sum to 0.95","五个变异的构造 PIP；前四项合计为 0.95")}>{pip.map((value,i)=><div class:list={{"is-outside":i===4}}><span>v{i+1}</span><span class="pip-bars__track"><i style={{width:(value*100)+"%"}}/></span><b>{value}</b><small>{i<4?t("95% set","95% 可信集"):t("outside","集外")}</small></div>)}</div>
+        <details class="teaching-data"><summary>{t("Conditional-support data and competing explanation","条件性支持数据与竞争解释")}</summary><div class="teaching-scroll" tabindex="0" role="region" aria-label={t("Conditional-support table","条件性支持表")}> <table><caption>{t("PIP, dimensionless; one causal variant assumed among these candidates","PIP，无量纲；假设这些候选中有一个因果变异")}</caption><thead><tr><th>{t("Variant","变异")}</th><th>PIP</th><th>{t("Cumulative mass","累计质量")}</th></tr></thead><tbody>{pip.map((value,i)=><tr><th scope="row">v{i+1}</th><td>{value}</td><td>{Number(pip.slice(0,i+1).reduce((a,b)=>a+b,0).toFixed(2))}</td></tr>)}</tbody></table></div><p>{t("An untested second effector gene, a context-specific molecular effect, or an incorrect single-causal assumption remains compatible with a regional signal. Neither this table nor proximity resolves those alternatives.","未测试的第二效应基因、情境特异分子效应或错误的单因果假设，均可能与区域信号相容。此表和邻近性都不能排除这些解释。")}</p></details>
+      </div>}
+      {track==="qsar-properties"&&<div data-teaching-switch>
+        <label class="teaching-control">{t("Evaluation population","评估总体")}<select data-panel-select>{assayIds.map(id=><option value={id}>{assayLabels[id]}</option>)}</select></label>
+        {assayIds.map((id,index)=>{const result=chembl.results[id];return <section data-teaching-panel={id} hidden={index>0}>
+          <div class="readout-heading"><strong>{assayLabels[id]}</strong><span>{t("MAE in pChEMBL units, lower is better","MAE，pChEMBL 单位，越低越好")}</span></div>
+          <div class="result-bars">{Object.entries(result.metrics).map(([key,value],i)=><div><strong>{modelNames[key as keyof typeof modelNames]}</strong><span class="result-bars__track"><span class={"result-bars__bar result-bars__bar--"+i} style={{width:(value.mae/3.5*100)+"%"}}/></span><code>{value.mae.toFixed(4)}</code></div>)}</div>
+          <div class="result-axis" aria-hidden="true"><span>0</span><span>3.5</span></div>
+          <details class="teaching-data"><summary>{t("Exact aggregate values and denominator","精确汇总值与分母")}</summary><div class="teaching-scroll" tabindex="0" role="region" aria-label={assayLabels[id]}><table><caption>{assayLabels[id]} · n = {result.count} · {t("MAE/RMSE: pChEMBL units; Spearman: dimensionless","MAE/RMSE：pChEMBL 单位；Spearman：无量纲")}</caption><thead><tr><th>{t("Model","模型")}</th><th>MAE</th><th>RMSE</th><th>Spearman</th></tr></thead><tbody>{Object.entries(result.metrics).map(([key,value])=><tr><th scope="row">{modelNames[key as keyof typeof modelNames]}</th><td>{value.mae}</td><td>{value.rmse}</td><td>{value.spearman===null?t("Undefined: constant prediction","未定义：恒定预测"):value.spearman}</td></tr>)}</tbody></table></div></details>
+        </section>})}
+        <p class="teaching-note">{t("Both populations use a common 0–3.5 MAE display scale. Rounded bar labels are for reading; the table preserves the source values. No residuals or uncertainty bands are inferred.","两个总体均使用共同的 0–3.5 MAE 显示尺度。柱旁数值仅为阅读而舍入，表中保留源值。不推断残差或不确定性带。")}</p>
+      </div>}
+      {track==="admet-pk"&&<div data-teaching-switch>
+        <label class="teaching-control">{t("Exposure quantity","暴露量")}<select data-panel-select><option value="total">{t("Total concentration","总浓度")}</option><option value="unbound">{t("Unbound concentration","游离浓度")}</option></select></label>
+        {["total","unbound"].map((mode,index)=><div data-teaching-panel={mode} hidden={index>0}><ScientificPlot title={t("Constructed first-order exposure curves","构造一级消除暴露曲线")} xLabel={t("Time, h","时间，h")} yLabel={mode==="total"?t("Total C, µmol/L","总 C，µmol/L"):t("Unbound C, µmol/L","游离 C，µmol/L")} xMin={0} xMax={24} yMin={0} yMax={mode==="total"?2:.4} chinese={chinese} series={[{name:"A · CL 2 L/h · fu 0.05",points:Array.from({length:13},(_,i)=>({x:i*2,y:2*Math.exp(-.1*i*2)*(mode==="total"?1:.05)}))},{name:"B · CL 4 L/h · fu 0.20",dashed:true,points:Array.from({length:13},(_,i)=>({x:i*2,y:2*Math.exp(-.2*i*2)*(mode==="total"?1:.2)}))}]} /></div>)}
+        <div class="quantity-chain"><div><strong>CL</strong><span>L/h</span></div><b aria-hidden="true">÷</b><div><strong>V</strong><span>L</span></div><b aria-hidden="true">=</b><div><strong>k</strong><span>h⁻¹</span></div></div>
+      </div>}
+      {track==="dti-screening"&&<div>
+        <div class="ranking-population"><div><span>{t("Original constructed library","原始构造库")}</span><strong>20 / 1000</strong><small>{t("2% assay-defined actives","2% assay 定义的活性物")}</small></div><div><span>{t("Top 50","Top 50")}</span><strong>8 / 50</strong><small>{t("16% assay-defined actives","16% assay 定义的活性物")}</small></div><div><span>EF50</span><strong>8×</strong><small>{t("Relative to this library","相对于此库")}</small></div></div>
+        <div class="ranking-detail"><div class="ranking-strip" role="img" aria-label={t("50 illustrative shortlist positions; 8 active marked by filled circles and 42 inactive by dashes","50 个示意候选位置；8 个活性物标为实心圆，42 个非活性物标为横线")}>{Array.from({length:50},(_,i)=><span class:list={{"is-active":i<8}}>{i<8?"●":"–"}</span>)}</div><div class="ranking-legend"><span><b>●</b> {t("Assay-defined active", "Assay 定义的活性物")}</span><span><b>–</b> {t("Remaining shortlist", "其余候选")}</span></div></div>
+        <p class="teaching-note">{t("Positions illustrate counts only. Their ordering is authored for legibility, not a model's retained rank order.","位置仅表示计数；为便于阅读而构造的顺序不是模型保留的排序。")}</p>
+        <details class="teaching-data"><summary>{t("Counts, formula and comparison boundary","计数、公式与比较边界")}</summary><div class="teaching-scroll" tabindex="0" role="region" aria-label={t("Library and shortlist counts","库与候选计数")}> <table><caption>{t("Constructed library and shortlist; no docking or assay execution","构造库与候选列表；不执行 docking 或 assay")}</caption><thead><tr><th>{t("Population","总体")}</th><th>{t("Active","活性")}</th><th>{t("Inactive","非活性")}</th><th>{t("Total","合计")}</th></tr></thead><tbody><tr><th scope="row">{t("Library","库")}</th><td>20</td><td>980</td><td>1000</td></tr><tr><th scope="row">Top 50</th><td>8</td><td>42</td><td>50</td></tr></tbody></table></div><p><code>EF50 = (8 / 50) / (20 / 1000) = 8</code></p><p>{t("A pose score → hypothesis for geometry. A binding assay → endpoint under named conditions. Neither arrow can be silently replaced with a clinical claim.","Pose 分数 → 几何假设。结合 assay → 指定条件下的终点。两种映射都不能暗中替换成临床主张。")}</p></details>
+      </div>}
+      {track==="structure-and-pockets"&&<ScientificObjectView kind="egfr" chinese={chinese}/>}
+      {track==="physics-based-modeling"&&<div>
+        <ScientificObjectView kind="rmd17" chinese={chinese}/>
+        <div class="readout-heading"><strong>{t("Separate frozen energy evaluation", "另行保留的冻结能量评估")}</strong><span>{t("MAE · kcal/mol · common zero-based scale", "MAE · kcal/mol · 共同零起点尺度")}</span></div>
+        <div class="energy-comparison">{Object.entries(rmd17.results).map(([system,result])=><section><h4>{system}</h4><div class="energy-comparison__row"><span>{t("Train mean", "训练均值")}</span><span class="result-bars__track"><span class="result-bars__bar result-bars__bar--0" data-value={result.train_mean.mae} style={{width:(result.train_mean.mae/energyScale*100)+"%"}}/></span><code>{result.train_mean.mae.toFixed(4)}</code></div><div class="energy-comparison__row"><span>Ridge</span><span class="result-bars__track"><span class="result-bars__bar result-bars__bar--1" data-value={result.ridge.mae} style={{width:(result.ridge.mae/energyScale*100)+"%"}}/></span><code>{result.ridge.mae.toFixed(4)}</code></div></section>)}</div>
+        <p class="teaching-note">{t("Every bar uses the same zero baseline and source maximum. Labels are rounded; the table retains exact values. Geometry frames and energy-evaluation frames are separate.", "所有柱使用共同零基线与源数据最大值。标签作了舍入，表中保留精确值。几何帧与能量评估帧彼此独立。")}</p>
+        <details class="teaching-data"><summary>{t("Separate frozen energy evaluation: systems, not frames","另行保留的冻结能量评估：系统而不是帧")}</summary><div class="teaching-scroll" tabindex="0" role="region" aria-label={t("Frozen energy MAE table","冻结能量 MAE 表")}><table><caption>{t("MAE, kcal/mol; 200 evaluation frames per system. These are not the ethanol geometry frames above.","MAE，kcal/mol；每系统 200 个评估帧。这些不是上方的乙醇几何帧。")}</caption><thead><tr><th>{t("System","系统")}</th><th>{t("Train-mean control","训练均值对照")}</th><th>Ridge</th></tr></thead><tbody>{Object.entries(rmd17.results).map(([system,result])=><tr><th scope="row">{system}</th><td>{result.train_mean.mae}</td><td>{result.ridge.mae}</td></tr>)}</tbody></table></div><p>{t("Each system supplies its own training frames. Alpha is shared after development selection. Original per-frame Ridge predictions were not retained; no confidence interval is shown.","每个系统提供自己的训练帧。Alpha 在开发选择后共享。未保留原始逐帧 Ridge 预测，不显示置信区间。")}</p></details>
+      </div>}
+      {track==="molecular-generation"&&<div class="generation-case">
+        <div class="generation-case__scores">
+        <div class="constraint-strip"><strong>h ≥ 0.70</strong><span>{t("Eligibility gate", "资格门槛")}</span><b>A ✓</b><b class="is-excluded">B ×</b><b>C ✓</b></div>
+        <ScientificPlot title={t("Constructed Pareto and hard-gate example","构造 Pareto 与硬约束示例")} xLabel={t("Score a, arbitrary units; maximize","分数 a，任意单位；最大化")} yLabel={t("Score b, arbitrary units; maximize","分数 b，任意单位；最大化")} xMin={.75} xMax={1} yMin={.5} yMax={.9} scatter={true} chinese={chinese} series={[{name:t("A: h = 0.76, eligible","A：h = 0.76，有资格"),points:[{x:.82,y:.61,label:"A"}]},{name:t("B: h = 0.68, excluded","B：h = 0.68，已排除"),points:[{x:.91,y:.77,label:"B ×"}]},{name:t("C: h = 0.79, eligible","C：h = 0.79，有资格"),points:[{x:.84,y:.64,label:"C"}]}]}/>
+        <p class="teaching-note">{t("Hard gate h ≥ 0.70. The separate gallery contains authored structures; A/B/C do not refer to these molecules.","硬约束为 h ≥ 0.70。独立图库包含构造结构，A/B/C 不对应这些分子。")}</p>
+        </div>
+        <div class="generation-case__gallery">
+        <div class="encoding-heading"><strong>{t("Separate authored structures", "独立的构造结构")}</strong><span>{t("RDKit depictions · no score assignment", "RDKit 结构图 · 未赋予分数")}</span></div>
+        <div class="candidate-gallery">{[candidate1,candidate2,candidate3].map((asset,i)=><figure><div class="candidate-gallery__id">c0{i+1}<span>{t("authored input","构造输入")}</span></div><img src={asset.src} width="560" height="320" alt={t("RDKit depiction of authored candidate ","构造候选的 RDKit 二维图：")+"c0"+(i+1)} loading="lazy"/><figcaption><code>{molecules.molecules.find(m=>m.id==="generation-c0"+(i+1))?.input_smiles}</code></figcaption></figure>)}</div>
+        </div>
+      </div>}
+      {track==="biologics-design"&&<div>
+        <div class="construct-assembly" role="img" aria-label={t("Source-grounded schematic of a dimeric receptor–Fc fusion; no sequence-length or coordinate scale","基于来源的二聚体 receptor–Fc 融合示意图；无序列长度或坐标尺度")}><div class="construct-assembly__heading"><strong>{t("Etanercept: dimeric fusion","Etanercept：二聚融合构造")}</strong><span>{t("Domain identity · not to scale", "结构域身份 · 非比例图")}</span></div><div class="construct-assembly__pair"><div class="construct-assembly__chain"><span class="construct-assembly__receptor">p75 TNFR</span><i/><span class="construct-assembly__fc">IgG1 Fc</span></div><div class="construct-assembly__chain"><span class="construct-assembly__receptor">p75 TNFR</span><i/><span class="construct-assembly__fc">IgG1 Fc</span></div></div><small>{t("Domain identity only · CHO host stated in the label","仅表示结构域身份 · 标签注明 CHO 宿主")}</small></div>
+        <div class="objective-evidence"><span>{t("Sequence / construct","序列 / 构造")}</span><b aria-hidden="true">?</b><span>{t("Fold / structure","折叠 / 结构")}</span><b aria-hidden="true">?</b><span>{t("Binding assay","结合 assay")}</span><b aria-hidden="true">?</b><span>{t("Functional contrast","功能对照")}</span></div>
+        <p class="teaching-note">{t("Each question mark needs its own evidence bridge. A structure prediction is not a binding or function measurement.","每个问号都需要各自的证据连接。结构预测不是结合或功能测量。")}</p>
+        <details class="teaching-data"><summary>{t("Six-entity source-field matrix","六实体来源字段矩阵")}</summary><div class="teaching-scroll" tabindex="0" role="region" aria-label={t("Construct source-field matrix","构造来源字段矩阵")}><table class="evidence-matrix"><caption>{t("Source fields, computed 2026-10-23. Filled = stated by at least one selected source; open = unstated. Construct definition additionally requires construct and host in the same record.","来源字段，计算于 2026-10-23。实心表示至少一个所选来源注明；空心表示未注明。定义完整构造还要求同一记录中同时注明构造和宿主。")}</caption><thead><tr><th>{t("Entity","实体")}</th>{domainLabels.map(label=><th>{label}</th>)}</tr></thead><tbody>{biologics.per_entity.map(entity=><tr><th scope="row">{entity.entity}</th>{domainFields.map(field=><td><span class:list={{stated:entity.field_stated[field]}}>{entity.field_stated[field]?"●":"○"} {entity.field_stated[field]?t("Stated","已注明"):t("Unstated","未注明")}</span></td>)}</tr>)}</tbody></table></div></details>
+      </div>}
+      {track==="synthesis-and-automation"&&<div>
+        <div class="retrosynthesis-tree"><figure class="retrosynthesis-tree__product"><span class="object-role">{t("Product graph", "产物图")}</span><img src={retroProduct.src} width="560" height="320" alt={t("Authored acetanilide product graph","构造 acetanilide 产物图")} loading="lazy"/><figcaption>p01 · CC(=O)Nc1ccccc1</figcaption></figure><span class="retrosynthesis-tree__arrow"><b aria-hidden="true">⇓</b>{t("Retrosynthetic decomposition","逆合成分解")}</span><div class="retrosynthesis-tree__reactants"><figure><span class="object-role">{t("Recorded reactant", "记录反应物")}</span><img src={retroAcid.src} width="560" height="320" alt={t("Acetic acid reactant graph","Acetic acid 反应物图")} loading="lazy"/><figcaption>CC(=O)O</figcaption></figure><span aria-hidden="true">+</span><figure><span class="object-role">{t("Recorded reactant", "记录反应物")}</span><img src={retroAmine.src} width="560" height="320" alt={t("Aniline reactant graph","Aniline 反应物图")} loading="lazy"/><figcaption>Nc1ccccc1</figcaption></figure></div></div>
+        <div class="feasibility-fields">{[t("Conditions: unassessed","条件：未评估"),t("Selectivity: unassessed","选择性：未评估"),t("Scale / cost: unassessed","规模 / 成本：未评估"),t("Yield: not observed","收率：未观察")].map(label=><span>{label}</span>)}</div>
+        <details class="teaching-data"><summary>{t("Read the graph-edit record","读取图编辑记录")}</summary><div class="teaching-scroll" tabindex="0" role="region" aria-label={t("Constructed graph-edit records","构造图编辑记录")}> <table><caption>{t("Authored 2026-09-11; no reaction was run","构造于 2026-09-11；未进行反应")}</caption><thead><tr><th>{t("Role","角色")}</th><th>SMILES</th></tr></thead><tbody><tr><th scope="row">{t("Product","产物")}</th><td><code>CC(=O)Nc1ccccc1</code></td></tr><tr><th scope="row">{t("Recorded reactant","记录反应物")}</th><td><code>CC(=O)O</code></td></tr><tr><th scope="row">{t("Recorded reactant","记录反应物")}</th><td><code>Nc1ccccc1</code></td></tr></tbody></table></div><p>{t("A future laboratory return must distinguish valid observation, failed measurement and failed synthesis. None is supplied by graph recovery.","未来实验室返回应区分有效观察、测量失败与合成失败。图恢复不提供其中任何结果。")}</p></details>
+      </div>}
+      {track==="active-learning"&&<div data-teaching-switch>
+        <label class="teaching-control">{t("Frozen assay population","冻结 assay 总体")}<select data-panel-select>{poolIds.map(id=><option value={id}>{id}</option>)}</select></label>
+        {poolIds.map((id,index)=>{const assay=pool.assays[id];const policies=[...assay.policies,uncertainty.assays[id].policy];return <section data-teaching-panel={id} hidden={index>0} data-budget-panel>
+          <div class="pool-denominators"><div><span>{t("Original pool","原始池")}</span><strong>{assay.budget.original_pool_parent_count}</strong><small>{t("parents","个 parent")}</small></div><div><span>{t("Original top decile","原始 top decile")}</span><strong>{assay.budget.top_decile_size}</strong><small>{t("fixed denominator", "固定分母")}</small></div><p>{t("One assay population. Every policy uses the same acquisition checkpoints.", "同一 assay 总体。所有策略使用相同获取检查点。")}</p></div>
+          <ScientificPlot title={id+" · "+t("frozen recovery by acquired-parent budget","按已获取 parent 预算统计的冻结恢复率")} xLabel={t("Acquired parents","已获取 parent 数")} yLabel={t("Top-decile recovery, fraction","Top-decile 恢复率，比例")} xMin={0} xMax={assay.budget.acquired_count} yMin={0} yMax={1} xTicks={assay.budget.checkpoints} chinese={chinese} series={policies.map((policy,i)=>({name:policy.name,dashed:i>0&&i<6,marker:i,color:i===0?"var(--atlas-teal)":i===6?"var(--atlas-coral)":"var(--atlas-muted)",points:assay.budget.checkpoints.map((x,j)=>({x,y:policy.recovery[j]}))}))}/>
+          <label class="teaching-control teaching-control--budget" for={"budget-"+id}>{t("Inspect a retained budget checkpoint","检查保留的预算检查点")}<span class="teaching-budget-value">{t("Acquired parents", "已获取 parent 数")}: <output data-budget-output for={"budget-"+id}>{assay.budget.checkpoints[4]}</output></span><input id={"budget-"+id} data-budget-range type="range" min="0" max="4" step="1" value="4" aria-valuetext={String(assay.budget.checkpoints[4]) + t(" acquired parents", " 个已获取 parent")}/></label>
+          <div class="checkpoint-ruler" aria-hidden="true">{assay.budget.checkpoints.map(value=><span>{value}</span>)}</div>
+          <div class="budget-table" data-budget-tables>{checkpoints.map(step=><div data-budget-step={step} data-budget-count={assay.budget.checkpoints[step]} hidden={step!==4}><p class="budget-table__heading"><strong>{t("Acquired parents","已获取 parent 数")}: {assay.budget.checkpoints[step]}</strong><span>{t("same checkpoint for every policy","所有策略使用同一检查点")}</span></p><div class="teaching-scroll" tabindex="0" role="region" aria-label={id+" budget "+assay.budget.checkpoints[step]}><table><caption>{t("Retained values; fractions use the original assay pool and top-decile denominators","保留值；比例使用原 assay 池及 top-decile 分母")}</caption><thead><tr><th>{t("Policy","策略")}</th><th>{t("Recovery","恢复率")}</th><th>{t("Scaffold coverage","Scaffold 覆盖")}</th><th>{t("Evaluation MAE, pIC50","评估 MAE，pIC50")}</th></tr></thead><tbody>{policies.map(policy=><tr><th scope="row">{policy.name}</th><td>{policy.recovery[step]}</td><td>{policy.scaffold_fraction[step]}</td><td>{policy.evaluation_mae[step]}</td></tr>)}</tbody></table></div></div>)}</div>
+        </section>})}
+      </div>}
+      {track==="scientific-agents"&&<div class="agent-evidence">
+        <ol class="agent-trace"><li><span class="agent-trace__step">01</span><div><span>{t("Source retrieval","来源检索")}</span><strong>{t("Two supplied papers","两篇给定论文")}</strong><small>{t("Saved corpus; not a web search","保留语料，不是网页搜索")}</small></div></li><li><span class="agent-trace__step">02</span><div><span>{t("Saved local return","保留的本地返回")}</span><strong>5 {t("questions + answers","个问题与答案")}</strong><small>PaperQA {paperqa.software.paperqa} · {paperqa.date}</small></div></li><li><span class="agent-trace__step">03</span><div><span>{t("Source-level review","来源级审查")}</span><strong>{t("Support / error / abstention","支持 / 错误 / 弃答")}</strong><small>{t("No aggregate accuracy estimate","不估计汇总准确率")}</small></div></li></ol>
+        <div class="agent-failure"><span class="agent-failure__mark" aria-hidden="true">×</span><div><span>{t("Separate constructed tool branch","另行构造的工具分支")}</span><div class="agent-failure__return"><code>status: qc_failed</code><code>control_pass: false</code></div><strong>{t("Retain failure → no biological conclusion","保留失败 → 不作生物学结论")}</strong></div></div>
+        <details class="teaching-data"><summary>{t("Saved questions and review outcomes","保留问题与审查结果")}</summary><div class="teaching-scroll" tabindex="0" role="region" aria-label={t("Saved PaperQA review table","保留 PaperQA 审查表")}><table><caption>{t("Actual retained local software record, 2026-09-10; source questions are in English. This is not independent human grading.","实际保留的本地软件记录，2026-09-10；原问题为英文。这不是独立人工评分。")}</caption><thead><tr><th>{t("Question","问题")}</th><th>{t("Retained review verdict","保留审查结论")}</th></tr></thead><tbody>{paperqa.questions.map(question=><tr><th scope="row">{question.question}</th><td><code>{paperqa.source_review.find(review=>review.question_id===question.id)?.verdict}</code></td></tr>)}</tbody></table></div><p>{t("One extra-prose error is retained. The negative-control abstention retrieved only one Open Babel chunk, so it does not establish absence across two full papers. Recorded effective settings differed from the supplied base profile.","保留了一项多余文字错误。阴性对照弃答仅检索到一个 Open Babel 片段，因此不能建立两篇全文均不存在相关内容。记录的实际设置与提供的基础配置不同。")}</p></details>
+      </div>}
+      {track==="candidate-nomination"&&<div>
+        <div class="dossier-rule"><span>potency ≤ 50 nM</span><b>AND</b><span>selectivity ≥ 20</span><b>AND</b><span>exposure ≥ 3</span><b>AND</b><span>{t("reviewed safety + functional validation","已审查安全性与功能验证")}</span></div>
+        <div class="nomination-actions">{dossier.map(candidate=><div><strong>{candidate.id}</strong><span>{candidate.selectivity<20?t("× Selectivity fails", "× 选择性未达标"):candidate.exposure<3?t("× Exposure fails", "× 暴露未达标"):t("? Safety evidence missing", "? 安全性证据缺失")}</span></div>)}</div>
+        <div class="teaching-scroll" tabindex="0" role="region" aria-label={t("Constructed nomination dossier","构造提名档案")}><table class="dossier-matrix"><caption>{t("Constructed workbook case 5. Ratios are precomputed in compatible contexts; no universal thresholds are proposed.","构造工作簿案例 5。比值已在相容情境中预计算，不提出通用阈值。")}</caption><thead><tr><th>{t("Candidate","候选")}</th><th>{t("Potency, nM","Potency，nM")}</th><th>{t("Selectivity ratio","Selectivity ratio")}</th><th>{t("Exposure ratio","Exposure ratio")}</th><th>{t("Safety package","安全性包")}</th><th>{t("Function","功能")}</th></tr></thead><tbody>{dossier.map(candidate=><tr><th scope="row">{candidate.id}</th><td class="is-pass">✓ {candidate.potency}</td><td class:list={{"is-pass":candidate.selectivity>=20,"is-fail":candidate.selectivity<20}}>{candidate.selectivity>=20?"✓":"×"} {candidate.selectivity}</td><td class:list={{"is-pass":candidate.exposure>=3,"is-fail":candidate.exposure<3}}>{candidate.exposure>=3?"✓":"×"} {candidate.exposure}</td><td class:list={{"is-missing":!candidate.safety}}>{candidate.safety?t("Available for review","可供审查"):t("? Missing","? 缺失")}</td><td>{t("Interpretable","可解释")}</td></tr>)}</tbody></table></div>
+        <p class="dossier-decision">{t("Complete rule: no candidate passes. Next action follows the failed or missing requirement, not an average rank.","完整规则：没有候选通过。下一行动取决于失败或缺失要求，而不是平均排名。")}</p>
+      </div>}
+      {contextStages && <details class="teaching-context-disclosure"><summary>{t("Trace the scientific objects and evidence roles", "追踪科学对象与证据角色")}</summary><ol class="teaching-context">{contextStages.map(([, label, detail], index) => <li><span class="teaching-context__number">{String(index + 1).padStart(2, "0")}</span><div><strong>{label}</strong><span>{detail}</span></div></li>)}</ol></details>}
+    </div>
+    {!compact&&<div class="teaching-view__reading"><section><h3><span>(a)</span> {t("Mechanism","机制")}</h3><p>{tx("mechanism")}</p></section><section><h3><span>(b)</span> {t("Worked step","推演一步")}</h3><p>{tx("worked")}</p></section></div>}
+  </div>
+  <p class="teaching-art-note">{t("Object illustrations are conceptual. Quantitative marks and molecular or structural views use their stated sources.", "对象插画用于概念说明。定量标记、分子与结构视图使用所注明的来源。")}</p>
+  <p class="teaching-view__limit"><strong>{t("Interpretation boundary.","解释边界。")}</strong> {tx("limit")}</p>
+  {!compact&&<details class="teaching-view__exercise"><summary>{t("Independent task and a checkable answer","独立任务与可核对答案")}</summary><p>{tx("task")}</p><details data-worked-answer><summary>{t("Read the reasoning after your attempt","完成后读取推理")}</summary><p>{tx("answer")}</p></details></details>}
+  <div class="teaching-view__sources"><strong>{t("Source and date","来源与日期")}</strong><ul>{view.sources.map(source=><li><a href={href(source.url)}>{source.label}</a><span>{source.date}</span></li>)}</ul></div>
+  <div class="teaching-view__next"><a href={href("/learn/"+view.lesson+"/")}>{t("Read the worked lesson","阅读完整推演课程")} →</a>{view.lab&&<a href={href("/labs/"+view.lab+"/")}>{t("Open the practice guide","打开实践指南")} →</a>}</div>
+</figure>
+<script>
+  function initializeTeachingViews(){
+    document.querySelectorAll<HTMLElement>("[data-teaching-view]").forEach(root=>{
+      if(root.dataset.initialized)return;root.dataset.initialized="true";
+      const select=root.querySelector<HTMLSelectElement>("[data-panel-select]");
+      if(select){
+        const apply=()=>root.querySelectorAll<HTMLElement>("[data-teaching-panel]").forEach(panel=>panel.hidden=panel.dataset.teachingPanel!==select.value);
+        const supplied=new URL(window.location.href).searchParams.get("teaching-view");
+        if(supplied&&Array.from(select.options).some(option=>option.value===supplied))select.value=supplied;
+        apply();
+        select.addEventListener("change",()=>{apply();const url=new URL(window.location.href);url.searchParams.set("teaching-view",select.value);window.history.replaceState(null,"",url);});
+      }
+      root.querySelectorAll<HTMLElement>("[data-budget-panel]").forEach(panel=>{
+        const range=panel.querySelector<HTMLInputElement>("[data-budget-range]")!;
+        const applyBudget=()=>{
+          const steps=Array.from(panel.querySelectorAll<HTMLElement>("[data-budget-step]"));
+          steps.forEach(step=>step.hidden=step.dataset.budgetStep!==range.value);
+          const value=steps.find(step=>!step.hidden)?.dataset.budgetCount ?? "";
+          const output=panel.querySelector<HTMLOutputElement>("[data-budget-output]");
+          if(output)output.textContent=value;
+          range.setAttribute("aria-valuetext",value+(root.dataset.chinese==="true"?" 个已获取 parent":" acquired parents"));
+        };
+        range.addEventListener("input",()=>{
+          applyBudget();
+          const url=new URL(window.location.href);url.searchParams.set("teaching-budget",range.value);window.history.replaceState(null,"",url);
+        });
+        const supplied=new URL(window.location.href).searchParams.get("teaching-budget");
+        if(supplied&&/^[0-4]$/.test(supplied))range.value=supplied;
+        applyBudget();
+      });
+    });
+  }
+  initializeTeachingViews();document.addEventListener("astro:page-load",initializeTeachingViews);
+</script>
+<style>
+  .teaching-view { container-type:inline-size; margin:2rem 0; padding:1.3rem 0 1rem; border-top:2px solid var(--atlas-ink); border-bottom:1px solid var(--sl-color-gray-5); color:var(--sl-color-text); font-size:.9rem; min-width:0; scroll-margin-top:6rem; }
+  .teaching-view__heading { display:grid; gap:.8rem; margin:0 0 .9rem; }
+  .teaching-view__eyebrow { display:flex; align-items:center; flex-wrap:wrap; gap:.4rem .8rem; font-size:.75rem; line-height:1.45; color:var(--sl-color-gray-2); }
+  .teaching-view__eyebrow b { color:var(--sl-color-text-accent); font:650 .75rem var(--sl-font-mono,monospace); letter-spacing:.035em; }
+  .teaching-view__eyebrow em { padding-left:.7rem; border-left:1px solid var(--sl-color-gray-4); font-style:normal; }
+  .teaching-view__heading > strong { max-width:48rem; font-size:clamp(1.15rem,2vw,1.6rem); font-weight:650; line-height:1.35; letter-spacing:-.015em; }
+  .teaching-view__composition { display:grid; grid-template-columns:minmax(0,1fr); gap:.95rem; align-items:start; }
+  .teaching-view__visual { min-width:0; }
+  .teaching-view__reading { display:grid; grid-template-columns:1fr 1fr; gap:1.15rem; border-top:1px solid var(--sl-color-gray-5); padding-top:1.1rem; }
+  .teaching-view__reading h3 { font-size:.8rem; margin:0 0 .5rem!important; font-weight:650; }
+  .teaching-view__reading h3 span { color:var(--sl-color-text-accent); margin-right:.25rem; }
+  .teaching-view__reading p { font-size:.85rem; line-height:1.7; margin:0; }
+  .teaching-context { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.3rem; list-style:none; margin:0 0 1.2rem!important; padding:0 0 1.1rem!important; border-bottom:1px solid var(--sl-color-gray-5); }
+  .teaching-context li { position:relative; display:grid; justify-items:start; align-content:start; gap:.5rem; margin:0; min-width:0; padding-right:.4rem; }
+  .teaching-context__number { position:absolute; top:.2rem; right:0; font:.75rem var(--sl-font-mono,monospace); color:var(--sl-color-gray-3); }
+  .teaching-context strong { display:block; font-size:.84rem; line-height:1.45; }
+  .teaching-context div > span { display:block; margin-top:.25rem; font-size:.75rem; line-height:1.5; color:var(--sl-color-gray-2); }
+  .teaching-art-note { margin:1rem 0 .4rem!important; font-size:.75rem; line-height:1.6; color:var(--sl-color-gray-2); }
+  .teaching-view__limit { padding:.8rem 0 0; margin:.5rem 0 1rem!important; border-top:1px solid var(--sl-color-gray-5); font-size:.8rem; line-height:1.65; color:var(--sl-color-gray-2); }
+  .teaching-view__limit strong { color:var(--sl-color-text); }
+  .teaching-view__exercise { margin:.8rem 0; border-top:1px solid var(--sl-color-gray-5); font-size:.84rem; }
+  .teaching-view__exercise > summary { padding:.75rem 0; cursor:pointer; font-weight:600; }
+  .teaching-view__exercise details { border-left:2px solid var(--sl-color-text-accent); padding-left:1rem; }
+  .teaching-view__exercise details summary { cursor:pointer; font-size:.8rem; }
+  .teaching-view__sources { border-top:1px solid var(--sl-color-gray-5); padding-top:.8rem; font-size:.75rem; }
+  .teaching-view__sources > strong { font-size:.75rem; }
+  .teaching-view__sources ul { list-style:none; padding:0!important; margin:.5rem 0!important; display:flex; gap:.5rem 1.2rem; flex-wrap:wrap; }
+  .teaching-view__sources li { margin:0; }
+  .teaching-view__sources li span { margin-left:.4rem; color:var(--sl-color-gray-2); white-space:nowrap; }
+  .teaching-view__next { display:flex; gap:.6rem 1.4rem; flex-wrap:wrap; font-size:.8rem; margin-top:.85rem; }
+  .teaching-view__visual [hidden] { display:none; }
+  .teaching-control { display:flex; align-items:center; flex-wrap:wrap; justify-content:space-between; gap:.6rem 1rem; font-size:.8rem; font-weight:600; margin:1rem 0; padding:.65rem 0; border-top:1px solid var(--sl-color-gray-5); border-bottom:1px solid var(--sl-color-gray-5); }
+  .teaching-control select { max-width:100%; min-width:9rem; min-height:2.75rem; font:inherit; background:var(--sl-color-bg); color:var(--sl-color-text); padding:.5rem 2rem .5rem .7rem; border:1px solid var(--sl-color-gray-4); border-radius:.15rem; }
+  .teaching-control input[type=range] { min-width:8rem; max-width:100%; flex:1; min-height:2.75rem; accent-color:var(--sl-color-text-accent); }
+  .teaching-control--budget { display:grid; grid-template-columns:minmax(0,1fr); gap:.2rem; }
+  .teaching-control--budget input[type=range] { width:100%; }
+  .teaching-view select:focus-visible,.teaching-view input:focus-visible,.teaching-view summary:focus-visible,.teaching-view a:focus-visible,.teaching-scroll:focus-visible { outline:3px solid var(--sl-color-text-accent); outline-offset:3px; }
+  .teaching-note { font-size:.78rem; line-height:1.65; color:var(--sl-color-gray-2); margin:.75rem 0!important; }
+  .teaching-data { font-size:.8rem; margin-top:1rem; border-top:1px solid var(--sl-color-gray-5); }
+  .teaching-data > summary { padding:.7rem 0; cursor:pointer; font-weight:600; }
+  .teaching-scroll { overflow-x:auto; max-width:100%; overscroll-behavior-inline:contain; }
+  .teaching-data table,.teaching-scroll table { display:table; overflow:visible; width:100%; font-size:.75rem; border-collapse:collapse; }
+  .teaching-data caption,.teaching-scroll caption { text-align:left; font-size:.75rem; line-height:1.6; font-weight:550; padding:.6rem 0; color:var(--sl-color-gray-2); }
+  .teaching-data th,.teaching-data td,.teaching-scroll th,.teaching-scroll td { text-align:left; vertical-align:top; padding:.55rem .6rem; border-bottom:1px solid var(--sl-color-gray-5); font-variant-numeric:tabular-nums; }
+  .teaching-data p { font-size:.8rem; line-height:1.65; }
+  .teaching-data code,.molecule-encoding code,.candidate-gallery code { overflow-wrap:anywhere; white-space:normal; }
+  .decision-route { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:1rem 1.5rem; list-style:none; padding:0!important; margin:0!important; }
+  .decision-route li { position:relative; display:grid; grid-column:span 2; grid-template-columns:minmax(0,1fr); align-content:start; gap:.6rem; margin:0; padding:.2rem 0 1rem; border-bottom:1px solid var(--sl-color-gray-4); min-width:0; }
+  .decision-route li:nth-child(n+4) { grid-column:span 3; }
+  .decision-route__number { position:absolute; right:.2rem; top:.4rem; font:.85rem var(--sl-font-mono,monospace); color:var(--sl-color-gray-3); }
+  .decision-route a { font-size:.9rem; font-weight:650; text-underline-offset:.2em; }
+  .decision-route p { margin:.4rem 0 0!important; font-size:.8rem; line-height:1.6; color:var(--sl-color-gray-2); }
+  .decision-route small { margin-top:.25rem; font-size:.75rem; color:var(--sl-color-gray-2); }
+  .assay-context { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; gap:.6rem; align-items:center; padding:0 0 .6rem; }
+  .assay-context > div { display:grid; gap:.4rem; justify-items:start; min-width:0; }
+  .assay-context strong { font-size:.83rem; line-height:1.45; }
+  .assay-context div > span { font-size:.75rem; color:var(--sl-color-gray-2); line-height:1.5; }
+  .assay-context > b { font:400 1.35rem var(--sl-font); color:var(--sl-color-gray-3); }
+  .partition-strip { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.25rem; margin-bottom:1rem; }
+  .partition-strip > div { display:grid; gap:.5rem; align-content:start; padding-bottom:.8rem; border-bottom:2px solid var(--sl-color-text-accent); }
+  .partition-strip > div:nth-child(2) { border-bottom-style:dashed; }
+  .partition-strip > div:nth-child(3) { border-bottom-style:double; }
+  .partition-strip span { font-size:.77rem; line-height:1.55; color:var(--sl-color-gray-2); }
+  .partition-strip b { display:block; margin-bottom:.3rem; font-size:.86rem; color:var(--sl-color-text); }
+  .molecule-encoding { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:1.4rem; align-items:center; }
+  .molecule-encoding img { display:block; width:100%; height:auto; margin:0; background:white; border:1px solid var(--sl-color-gray-5); }
+  .molecule-encoding .meta-label { font-size:.75rem; font-weight:600; color:var(--sl-color-gray-2); margin:0 0 .5rem!important; }
+  .molecule-encoding dl,.teaching-data dl { font-size:.78rem; }
+  .molecule-encoding dl > div,.teaching-data dl > div { display:flex; flex-wrap:wrap; justify-content:space-between; border-bottom:1px solid var(--sl-color-gray-5); padding:.4rem 0; gap:.4rem; }
+  .molecule-encoding dt { color:var(--sl-color-gray-2); }
+  .molecule-encoding dd,.teaching-data dd { margin:0; font-variant-numeric:tabular-nums; }
+  .encoding-heading,.readout-heading { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:.4rem 1rem; margin:1.1rem 0 .8rem; font-size:.8rem; }
+  .encoding-heading > span,.readout-heading > span { font-size:.75rem; color:var(--sl-color-gray-2); }
+  .fingerprint-bins { display:grid; grid-template-columns:repeat(16,minmax(0,1fr)); gap:.22rem; margin:.6rem 0 .4rem; }
+  .fingerprint-bins span { display:grid; place-items:center; min-height:1.65rem; aspect-ratio:1; font:.75rem var(--sl-font-mono,monospace); border:1px solid var(--sl-color-gray-5); color:var(--sl-color-gray-3); }
+  .fingerprint-bins .occupied { background:color-mix(in srgb,var(--atlas-teal) 15%,var(--sl-color-bg)); border-color:var(--sl-color-text-accent); color:var(--sl-color-text); font-weight:650; }
+  .evidence-questions { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:.8rem 0; }
+  .evidence-questions > div { display:grid; align-content:start; gap:.4rem; padding:.7rem 0 .7rem .85rem; border-left:1px dashed var(--sl-color-gray-3); }
+  .evidence-questions strong { font-size:.8rem; line-height:1.5; font-weight:550; }
+  .evidence-questions div > span:last-child { font-size:.75rem; color:var(--sl-color-gray-2); line-height:1.5; }
+  .question-bridge { font-size:.85rem; font-weight:650; color:var(--sl-color-text-accent); }
+  .pip-bars { display:grid; gap:.6rem; margin:1rem 0; }
+  .pip-bars > div { display:grid; grid-template-columns:1.7rem minmax(0,1fr) 2.8rem 5.5rem; align-items:center; gap:.6rem; font:.78rem var(--sl-font-mono,monospace); }
+  .pip-bars__track { display:block; position:relative; height:.9rem; border-left:1px solid var(--sl-color-gray-3); border-bottom:1px solid var(--sl-color-gray-5); }
+  .pip-bars__track i { display:block; height:.8rem; background:var(--atlas-teal); border:1px solid var(--sl-color-text-accent); }
+  .pip-bars .is-outside i { background:transparent; border:1px dashed var(--sl-color-gray-3); }
+  .pip-bars small { font:.75rem var(--sl-font); color:var(--sl-color-gray-2); }
+  .result-bars > div { display:grid; grid-template-columns:9rem minmax(0,1fr) 4rem; align-items:center; gap:.7rem; margin:1rem 0; }
+  .result-bars strong { font-size:.78rem; font-weight:550; }
+  .result-bars__track { position:relative; display:block; min-width:0; height:1.15rem; border-left:1px solid var(--sl-color-gray-3); border-bottom:1px solid var(--sl-color-gray-5); background:repeating-linear-gradient(to right,transparent 0,transparent calc(25% - 1px),var(--sl-color-gray-6) calc(25% - 1px),var(--sl-color-gray-6) 25%); }
+  .result-bars__bar { position:relative; height:.85rem; display:block; background:var(--atlas-teal); border:1px solid var(--sl-color-text-accent); min-width:1px; }
+  .result-bars__bar--0 { background:repeating-linear-gradient(45deg,var(--sl-color-gray-3),var(--sl-color-gray-3) 1px,transparent 1px,transparent 5px); border-color:var(--sl-color-gray-3); }
+  .result-bars__bar--1 { background:var(--atlas-teal); }
+  .result-bars__bar--2 { background:color-mix(in srgb,var(--atlas-coral) 25%,var(--sl-color-bg)); border-color:var(--atlas-coral); border-style:dashed; }
+  .result-bars code,.energy-comparison code { font:.75rem var(--sl-font-mono,monospace); white-space:nowrap; padding:0; }
+  .result-axis { display:flex; justify-content:space-between; margin:0 4.7rem 0 9.7rem; font:.75rem var(--sl-font-mono,monospace); color:var(--sl-color-gray-2); }
+  .quantity-chain { display:flex; align-items:center; justify-content:center; gap:1.5rem; margin:1rem 0; padding:.85rem 0; border-top:1px solid var(--sl-color-gray-5); border-bottom:1px solid var(--sl-color-gray-5); }
+  .quantity-chain > div { display:grid; gap:.2rem; min-width:2.5rem; text-align:center; }
+  .quantity-chain strong { font:600 1rem var(--sl-font-mono,monospace); }
+  .quantity-chain span { font:.75rem var(--sl-font-mono,monospace); color:var(--sl-color-gray-2); }
+  .quantity-chain b { color:var(--sl-color-gray-3); font-weight:400; }
+  .ranking-population { display:grid; grid-template-columns:1fr 1fr .75fr; gap:1rem; }
+  .ranking-population div { display:flex; flex-direction:column; gap:.35rem; border-bottom:1px solid var(--sl-color-gray-4); padding:.6rem 0 .8rem; }
+  .ranking-population span,.ranking-population small { font-size:.75rem; line-height:1.5; color:var(--sl-color-gray-2); }
+  .ranking-population strong { font:600 clamp(1.15rem,2.5vw,1.6rem) var(--sl-font-mono,monospace); }
+  .ranking-detail { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:1.4rem; align-items:center; margin:1rem 0; }
+  .ranking-strip { display:grid; grid-template-columns:repeat(10,minmax(0,1fr)); gap:.3rem; }
+  .ranking-strip span { display:grid; place-items:center; min-height:1.8rem; border:1px solid var(--sl-color-gray-5); color:var(--sl-color-gray-3); font-size:.8rem; }
+  .ranking-strip .is-active { background:color-mix(in srgb,var(--atlas-teal) 12%,var(--sl-color-bg)); color:var(--sl-color-text-accent); border-color:var(--sl-color-text-accent); }
+  .ranking-legend { display:grid; gap:.75rem; max-width:10rem; font-size:.75rem; line-height:1.5; }
+  .ranking-legend b { display:inline-block; min-width:1rem; }
+  .energy-comparison { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1.2rem; margin:1rem 0; }
+  .energy-comparison h4 { font-size:.85rem; margin:0 0 .7rem!important; font-weight:600; }
+  .energy-comparison__row { display:grid; grid-template-columns:5.5rem minmax(0,1fr) 3.6rem; align-items:center; gap:.5rem; margin:.6rem 0; font-size:.75rem; }
+  .constraint-strip { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem 1rem; border-bottom:1px solid var(--sl-color-gray-5); padding:.6rem 0 .85rem; font-size:.8rem; }
+  .constraint-strip > strong { font:650 .95rem var(--sl-font-mono,monospace); }
+  .constraint-strip > span { color:var(--sl-color-gray-2); margin-right:auto; }
+  .constraint-strip > b { font:.8rem var(--sl-font-mono,monospace); }
+  .constraint-strip .is-excluded { text-decoration:line-through; text-decoration-thickness:1px; color:var(--sl-color-gray-2); }
+  .generation-case { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(11rem,1fr); gap:1.5rem; align-items:start; }
+  .generation-case__scores,.generation-case__gallery { min-width:0; }
+  .generation-case__gallery .encoding-heading { margin-top:.6rem; }
+  .generation-case .candidate-gallery { grid-template-columns:minmax(0,1fr); gap:.75rem; }
+  .generation-case .candidate-gallery figure { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:.4rem .7rem; align-items:center; }
+  .generation-case .candidate-gallery__id { grid-column:1/-1; margin-bottom:0; }
+  .generation-case .candidate-gallery img { max-height:8rem; object-fit:contain; }
+  .candidate-gallery { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+  .candidate-gallery figure,.retrosynthesis-tree figure { margin:0!important; min-width:0; }
+  .candidate-gallery__id { display:flex; flex-wrap:wrap; justify-content:space-between; gap:.3rem; margin-bottom:.45rem; font:600 .8rem var(--sl-font-mono,monospace); }
+  .candidate-gallery__id span { font:.75rem var(--sl-font); color:var(--sl-color-gray-2); }
+  .candidate-gallery img,.retrosynthesis-tree img { display:block; width:100%; height:auto; margin:0; background:white; border:1px solid var(--sl-color-gray-5); }
+  .candidate-gallery figcaption,.retrosynthesis-tree figcaption { font:.75rem var(--sl-font-mono,monospace); line-height:1.5; padding:.45rem 0; overflow-wrap:anywhere; }
+  .construct-assembly { padding:.6rem 0 1rem; margin:.5rem 0; border-bottom:1px solid var(--sl-color-gray-5); }
+  .construct-assembly__heading { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:.4rem; font-size:.85rem; }
+  .construct-assembly__heading span { font-size:.75rem; color:var(--sl-color-gray-2); }
+  .construct-assembly__pair { display:grid; gap:.4rem; width:min(100%,27rem); margin:1.5rem auto 1rem; position:relative; }
+  .construct-assembly__chain { display:grid; grid-template-columns:1.2fr 2.4rem 1fr; align-items:center; }
+  .construct-assembly__chain span { display:grid; place-items:center; min-height:3rem; padding:.55rem; font:.8rem var(--sl-font-mono,monospace); }
+  .construct-assembly__receptor { border:1px solid var(--sl-color-text-accent); border-radius:45% 45% 25% 25%; background:color-mix(in srgb,var(--atlas-teal) 9%,var(--sl-color-bg)); }
+  .construct-assembly__fc { border:1px solid var(--atlas-coral); border-radius:20% 20% 40% 40%; background:color-mix(in srgb,var(--atlas-coral) 9%,var(--sl-color-bg)); }
+  .construct-assembly__chain i { height:1px; background:var(--sl-color-gray-3); }
+  .construct-assembly > small { display:block; font-size:.75rem; text-align:center; color:var(--sl-color-gray-2); line-height:1.5; }
+  .objective-evidence { display:grid; grid-template-columns:1fr auto 1fr auto 1fr auto 1fr; align-items:center; gap:.6rem; font-size:.78rem; line-height:1.5; padding:1rem 0; }
+  .objective-evidence b { min-width:1rem; text-align:center; color:var(--sl-color-gray-3); border-bottom:1px dashed var(--sl-color-gray-3); }
+  .evidence-matrix td { white-space:nowrap; }
+  .evidence-matrix span { color:var(--sl-color-gray-2); }
+  .evidence-matrix .stated { color:var(--sl-color-text); }
+  .retrosynthesis-tree { display:grid; justify-items:center; padding:.5rem 0; }
+  .retrosynthesis-tree__product { width:min(65%,22rem); }
+  .object-role { display:block; font-size:.75rem; font-weight:600; margin-bottom:.4rem; }
+  .retrosynthesis-tree__arrow { display:grid; gap:.2rem; text-align:center; font-size:.78rem; padding:.6rem; color:var(--sl-color-gray-2); }
+  .retrosynthesis-tree__arrow b { font-size:1.65rem; font-weight:400; line-height:1.1; color:var(--sl-color-text-accent); }
+  .retrosynthesis-tree__reactants { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:1rem; width:100%; }
+  .retrosynthesis-tree__reactants > span { font-size:1.2rem; color:var(--sl-color-gray-3); }
+  .feasibility-fields { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.8rem; margin:1rem 0; }
+  .feasibility-fields span { font-size:.75rem; line-height:1.5; border-left:1px dashed var(--sl-color-gray-3); padding:.3rem .6rem; }
+  .pool-denominators { display:grid; grid-template-columns:auto auto minmax(0,1fr); gap:1.5rem; align-items:center; margin:.6rem 0 1.2rem; }
+  .pool-denominators > div { display:grid; gap:.3rem; }
+  .pool-denominators span,.pool-denominators small { font-size:.75rem; color:var(--sl-color-gray-2); }
+  .pool-denominators strong { font:600 1.45rem var(--sl-font-mono,monospace); }
+  .pool-denominators p { font-size:.78rem; color:var(--sl-color-gray-2); line-height:1.6; margin:0!important; padding-left:1.2rem; border-left:1px solid var(--sl-color-gray-5); }
+  .checkpoint-ruler { display:flex; justify-content:space-between; margin:-.65rem 0 1rem; font:.75rem var(--sl-font-mono,monospace); color:var(--sl-color-gray-2); }
+  .budget-table__heading { display:flex; flex-wrap:wrap; justify-content:space-between; gap:.4rem; font-size:.8rem; margin:.8rem 0!important; }
+  .budget-table__heading span { font-size:.75rem; color:var(--sl-color-gray-2); }
+  .agent-trace { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.2rem; list-style:none; padding:0!important; margin:1rem 0!important; }
+  .agent-trace li { display:flex; flex-direction:column; gap:.6rem; padding:0 0 .8rem; border-bottom:1px solid var(--sl-color-gray-4); margin:0; min-width:0; }
+  .agent-trace__step { font:.8rem var(--sl-font-mono,monospace); color:var(--sl-color-text-accent); }
+  .agent-trace li div { display:grid; gap:.4rem; }
+  .agent-trace li div > span { font-size:.75rem; color:var(--sl-color-gray-2); }
+  .agent-trace strong { font-size:.85rem; line-height:1.5; }
+  .agent-trace small { font-size:.75rem; line-height:1.55; color:var(--sl-color-gray-2); }
+  .agent-failure { display:flex; gap:1rem; border-top:1px dashed var(--atlas-coral); border-bottom:1px dashed var(--atlas-coral); padding:.9rem 0; margin:1.2rem 0; }
+  .agent-failure__mark { flex:0 0 2rem; width:2rem; height:2rem; display:grid; place-items:center; border:1px solid var(--atlas-coral); color:var(--atlas-coral); font-size:1.4rem; border-radius:50%; }
+  .agent-failure > div { min-width:0; }
+  .agent-failure div > span { display:block; font-size:.75rem; color:var(--sl-color-gray-2); }
+  .agent-failure__return { display:flex; flex-wrap:wrap; gap:.4rem 1rem; margin:.5rem 0; font-size:.78rem; }
+  .agent-failure strong { display:block; font-size:.82rem; line-height:1.5; }
+  .dossier-rule { display:flex; align-items:center; flex-wrap:wrap; gap:.6rem; margin:1rem 0; padding:.8rem 0; border-top:1px solid var(--sl-color-gray-5); border-bottom:1px solid var(--sl-color-gray-5); font-size:.8rem; line-height:1.5; }
+  .dossier-rule > span { padding:.25rem 0; }
+  .dossier-rule b { font:.75rem var(--sl-font-mono,monospace); color:var(--sl-color-gray-3); }
+  .nomination-actions { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; margin:1rem 0; }
+  .nomination-actions > div { display:grid; gap:.4rem; padding:0 0 .65rem; border-bottom:1px dashed var(--sl-color-gray-3); }
+  .nomination-actions strong { font:.9rem var(--sl-font-mono,monospace); }
+  .nomination-actions span { font-size:.78rem; line-height:1.5; }
+  .dossier-matrix td { min-width:4rem; }
+  .dossier-matrix .is-fail { background:color-mix(in srgb,var(--atlas-coral) 10%,var(--sl-color-bg)); }
+  .dossier-matrix .is-missing { outline:1px dashed var(--sl-color-gray-3); outline-offset:-3px; }
+  .dossier-decision { border-left:3px solid var(--atlas-coral); padding:.7rem 1rem; font-size:.84rem; line-height:1.65; }
+  @container(max-width:35rem){
+    .teaching-context{gap:.8rem}
+    .teaching-view__reading{grid-template-columns:1fr;gap:1rem}
+    .decision-route{grid-template-columns:1fr 1fr}
+    .decision-route li,.decision-route li:nth-child(n+4){grid-column:auto}
+    .decision-route li:last-child{grid-column:1/-1}
+    .molecule-encoding{grid-template-columns:1fr}
+    .molecule-encoding img{max-height:15rem;object-fit:contain}
+    .result-bars > div{grid-template-columns:7rem minmax(0,1fr) 3.6rem;gap:.4rem}
+    .result-axis{margin-left:7.4rem;margin-right:4rem}
+    .energy-comparison{grid-template-columns:1fr}
+    .generation-case{grid-template-columns:1fr}
+    .ranking-detail{grid-template-columns:1fr;gap:.8rem}
+    .ranking-legend{max-width:none;display:flex;flex-wrap:wrap}
+    .feasibility-fields{grid-template-columns:1fr 1fr}
+    .pool-denominators{grid-template-columns:1fr 1fr;gap:1rem}
+    .pool-denominators p{grid-column:1/-1;padding:.6rem 0 0;border-left:0;border-top:1px solid var(--sl-color-gray-5)}
+    .objective-evidence{grid-template-columns:1fr auto 1fr}
+    .objective-evidence b:nth-of-type(2){display:none}
+  }
+  @container(max-width:23rem){
+    .teaching-context{grid-template-columns:1fr;gap:.8rem}
+    .teaching-context li{grid-template-columns:4rem minmax(0,1fr);align-items:center;gap:.7rem;padding-right:1.4rem}
+    .teaching-context li :global(.scientific-icon){width:4rem;height:4rem}
+    .teaching-context__number{top:.2rem;right:0}
+    .decision-route{grid-template-columns:1fr}
+    .decision-route li,.decision-route li:last-child{grid-column:auto;grid-template-columns:4.7rem minmax(0,1fr);gap:.5rem .7rem;align-items:center;padding-right:1.3rem}
+    .decision-route li :global(.scientific-icon){width:4.7rem;height:4.7rem;grid-row:1/3}
+    .decision-route__number{right:0;top:.2rem}
+    .decision-route small{grid-column:2;margin-top:0}
+    .assay-context{grid-template-columns:1fr}
+    .assay-context > div{grid-template-columns:4.3rem minmax(0,1fr);gap:.25rem .7rem;align-items:center}
+    .assay-context :global(.scientific-icon){grid-row:1/3;width:4.3rem;height:4.3rem}
+    .assay-context > b{display:none}
+    .partition-strip{grid-template-columns:1fr;gap:.7rem}
+    .partition-strip > div{grid-template-columns:4rem minmax(0,1fr);align-items:center;gap:.7rem}
+    .partition-strip :global(.scientific-icon){width:4rem;height:4rem}
+    .fingerprint-bins{grid-template-columns:repeat(8,minmax(0,1fr))}
+    .evidence-questions{grid-template-columns:1fr}
+    .pip-bars > div{grid-template-columns:1.4rem minmax(0,1fr) 2.5rem 4.5rem;gap:.4rem}
+    .ranking-population{gap:.5rem}
+    .ranking-population strong{font-size:1rem}
+    .ranking-population span,.ranking-population small{font-size:.75rem}
+    .quantity-chain{gap:1rem}
+    .candidate-gallery{grid-template-columns:1fr}
+    .candidate-gallery figure{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:.4rem .7rem;align-items:center}
+    .candidate-gallery__id{grid-column:1/-1;margin-top:.4rem}
+    .candidate-gallery img{max-height:9rem;object-fit:contain}
+    .candidate-gallery figcaption{font-size:.75rem}
+    .agent-trace{grid-template-columns:1fr;gap:.8rem}
+    .agent-trace li{flex-direction:row;gap:.8rem}
+    .agent-trace__step{flex:0 0 1.5rem}
+    .nomination-actions{grid-template-columns:1fr;gap:.7rem}
+    .nomination-actions > div{grid-template-columns:2rem minmax(0,1fr);align-items:center}
+    .retrosynthesis-tree__product{width:85%}
+    .retrosynthesis-tree__reactants{gap:.45rem}
+    .teaching-control select{width:100%;min-width:0}
+  }
+
+  .teaching-context-disclosure { margin:.85rem 0 0; border-top:1px solid var(--sl-color-gray-5); }
+  .teaching-context-disclosure > summary { cursor:pointer; min-height:44px; padding:.65rem 0; font-size:.78rem; font-weight:600; }
+  .teaching-context-disclosure .teaching-context { margin:0 0 .2rem!important; padding:.3rem 0 .65rem!important; border:0; gap:.75rem 1rem; }
+  .teaching-context-disclosure .teaching-context li { grid-template-columns:1.25rem minmax(0,1fr); gap:.45rem; }
+  .teaching-context-disclosure .teaching-context__number { position:static; font-size:.7rem; padding-top:.1rem; }
+  .teaching-context-disclosure .teaching-context strong { font-size:.78rem; }
+  .teaching-context-disclosure .teaching-context div > span { margin-top:.15rem; }
+  .teaching-budget-value { color:var(--sl-color-text); font-variant-numeric:tabular-nums; font-weight:600; }
+  .teaching-scroll { max-height:27rem; overflow:auto; }
+  .teaching-scroll thead th { position:sticky; top:0; z-index:2; background:var(--sl-color-bg); box-shadow:0 1px var(--sl-color-gray-4); }
+  .teaching-scroll tbody tr:nth-child(even) { background:color-mix(in srgb,var(--sl-color-gray-6) 50%,transparent); }
+  .teaching-scroll tbody tr:hover { background:var(--sl-color-gray-6); }
+  .teaching-view summary,.teaching-view__next a,.teaching-view__sources a { min-height:44px; }
+  .teaching-view__sources a,.teaching-view__next a { display:inline-flex; align-items:center; }
+  .teaching-view summary:focus-visible,.teaching-view a:focus-visible,.teaching-scroll:focus-visible,.teaching-control select:focus-visible,.teaching-control input:focus-visible { outline:3px solid var(--sl-color-text-accent); outline-offset:3px; }
+  .assay-context,.partition-strip { margin-top:1rem; border-top:1px solid var(--sl-color-gray-5); padding-top:.7rem; }
+  .assay-context > div { grid-template-columns:2rem minmax(0,1fr); gap:.15rem .5rem; }
+  .assay-context :global(.scientific-icon) { width:2rem; height:2rem; grid-row:1/3; }
+  .assay-context strong { font-size:.76rem; }
+  .assay-context div > span { font-size:.72rem; }
+  .partition-strip { gap:.6rem; margin-bottom:0; }
+  .partition-strip > div { grid-template-columns:2rem minmax(0,1fr); gap:.4rem; padding-bottom:.4rem; }
+  .partition-strip :global(.scientific-icon) { width:2rem; height:2rem; }
+  .partition-strip span { font-size:.73rem; }
+  .partition-strip b { font-size:.78rem; margin-bottom:.15rem; }
+  @container(min-width:40rem){
+    .retrosynthesis-tree { grid-template-columns:minmax(0,1fr) auto minmax(0,1.4fr); gap:1rem; align-items:center; }
+    .retrosynthesis-tree__product { width:100%; }
+    .retrosynthesis-tree__arrow b { transform:rotate(-90deg); }
+    .retrosynthesis-tree__reactants { gap:.65rem; }
+  }
+
+</style>

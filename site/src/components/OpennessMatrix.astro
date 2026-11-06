@@ -2,53 +2,39 @@
 import { opennessDimensions } from "../data/resource.js";
 import type { Resource } from "../data/resource.js";
 import ClaimEvidence from "./ClaimEvidence.astro";
-
-interface Props {
-  resource: Resource;
-}
-
+interface Props { resource: Resource; }
 const { resource } = Astro.props;
-const labels = {
-  inference_code: "Inference code",
-  training_code: "Training code",
-  weights: "Weights",
-  architecture: "Architecture",
-  data_recipe: "Data recipe",
-  training_data: "Training data",
-  evaluation_code: "Evaluation code",
-};
-const valueLabels = {
-  available: "Available",
-  not_available: "Not available",
-  not_applicable: "Not applicable",
-  unverified: "Unknown",
-};
+const chinese = Astro.url.pathname.includes("/zh-cn/");
+const t = (en: string, zh: string) => chinese ? zh : en;
+const labels = { inference_code: t("Inference code","推理代码"), training_code: t("Training code","训练代码"), weights: t("Weights","权重"), architecture: t("Architecture","架构"), data_recipe: t("Data recipe","数据配方"), training_data: t("Training data","训练数据"), evaluation_code: t("Evaluation code","评估代码") };
+const valueLabels = { available: t("Available","可用"), not_available: t("Not available","不可用"), not_applicable: t("Not applicable","不适用"), unverified: t("Unknown","未知") };
+const symbols = { available: "✓", not_available: "—", not_applicable: "∅", unverified: "?" };
 ---
 
-<div class="openness-matrix" role="region" aria-label="Openness matrix" tabindex="0">
-  <table>
-    <caption>Openness claims remain dimension-specific. Unknown is not a closed claim.</caption>
-    <thead>
-      <tr>
-        {opennessDimensions.map((dimension) => <th scope="col">{labels[dimension]}</th>)}
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        {opennessDimensions.map((dimension) => {
-          const value = resource.openness[dimension].value;
-          return (
-            <td class={`openness-${value}`}>
-              <div>{valueLabels[value as keyof typeof valueLabels] ?? value}</div>
-              <ClaimEvidence
-                evidence={resource.evidence}
-                ids={resource.openness[dimension].evidence}
-                emptyMessage="Unknown — no direct evidence is recorded."
-              />
-            </td>
-          );
-        })}
-      </tr>
-    </tbody>
-  </table>
-</div>
+<section class="openness-view" aria-label={t("Dimension-specific openness evidence","各维度的开放性证据")}>
+  <header><p>{t("Seven independent claims","七项独立主张")}</p><h3>{t("Inspect the reusable parts","检查可复用部分")}</h3><p>{t("Availability, licence and access are separate questions. Unknown is not a closed claim.","可用性、许可与访问是不同问题。未知不意味着问题已定论。")}</p></header>
+  <ol class="openness-profile" aria-label={t("Openness dimension profile","开放性维度概况")}>
+    {opennessDimensions.map((dimension,index)=>{
+      const value=resource.openness[dimension].value as keyof typeof valueLabels;
+      return <li class={`openness-state-${value}`}><span class="openness-profile__number">{String(index+1).padStart(2,"0")}</span><strong>{labels[dimension]}</strong><span class="openness-profile__claim"><i aria-hidden="true">{symbols[value]??"?"}</i>{valueLabels[value]??value}</span></li>;
+    })}
+  </ol>
+  <div class="openness-matrix" role="region" aria-label={t("Openness matrix","开放性矩阵")} tabindex="0">
+    <table>
+      <caption>{t("Openness claims remain dimension-specific. Each row links its own supporting evidence.","开放性主张按维度分别记录，每行链接各自的支持证据。")}</caption>
+      <thead><tr><th scope="col">{t("Dimension","维度")}</th><th scope="col">{t("Recorded claim","已记录主张")}</th><th scope="col">{t("Claim evidence","主张证据")}</th></tr></thead>
+      <tbody>{opennessDimensions.map(dimension=>{
+        const value=resource.openness[dimension].value as keyof typeof valueLabels;
+        return <tr><th scope="row">{labels[dimension]}</th><td class={`openness-state-${value}`}><span class="openness-table-claim"><i aria-hidden="true">{symbols[value]??"?"}</i>{valueLabels[value]??value}</span></td><td><ClaimEvidence evidence={resource.evidence} ids={resource.openness[dimension].evidence} emptyMessage={t("Unknown — no direct evidence is recorded.","未知：未记录直接证据。")} /></td></tr>;
+      })}</tbody>
+    </table>
+  </div>
+</section>
+
+<style>
+  .openness-view{min-width:0;color:var(--atlas-ink)}header{padding-block:1rem;border-top:1px solid var(--atlas-rule-strong)}header>p:first-child{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--atlas-teal-deep);font-weight:650;margin:0 0 .4rem}header h3{font-size:1.15rem;margin:0}header>p:last-child{font-size:.82rem;line-height:1.6;color:var(--atlas-muted);margin:.45rem 0 0}
+  .openness-profile{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));list-style:none;margin:.5rem 0 1.5rem;padding:0;gap:.7rem}.openness-profile li{min-width:0;display:flex;flex-direction:column;gap:.6rem;align-items:start;border-top:3px solid var(--atlas-rule-strong);padding:.7rem 0;font-size:.75rem;line-height:1.4}.openness-profile__number{font-size:.75rem;color:var(--atlas-muted);font-variant-numeric:tabular-nums}.openness-profile strong{font-size:.8rem;font-weight:600;min-height:2.3em}.openness-profile__claim{display:flex;gap:.4rem;align-items:center;margin-top:auto}.openness-profile__claim i,.openness-table-claim i{display:inline-grid;place-items:center;flex:0 0 1.2rem;width:1.2rem;height:1.2rem;border:1px solid currentColor;border-radius:50%;font-style:normal;font-size:.85rem;line-height:1}
+  .openness-state-available{color:var(--atlas-teal-deep);border-color:var(--atlas-teal-deep)!important}.openness-state-not_available{color:var(--atlas-ink)}.openness-state-not_available i{border-radius:0}.openness-state-not_applicable{color:var(--atlas-muted)}.openness-state-unverified{color:var(--atlas-ink);border-top-style:double!important}.openness-state-unverified i{border-style:dashed}
+  .openness-matrix{max-width:100%;overflow-x:auto;border:0;border-top:1px solid var(--atlas-rule)}.openness-matrix table{width:100%;min-width:32rem;border-collapse:collapse;font-size:.8rem}.openness-matrix caption{text-align:left;color:var(--atlas-muted);font-size:.78rem;padding:.75rem 0}.openness-matrix th,.openness-matrix td{text-align:left;vertical-align:top;border:0;border-top:1px solid var(--atlas-rule);padding:.75rem .65rem;letter-spacing:normal}.openness-matrix thead th{font-size:.75rem;color:var(--atlas-muted);font-weight:600}.openness-matrix tbody th{font-size:.8rem;font-weight:600;width:22%}.openness-matrix tbody td:nth-child(2){width:24%}.openness-table-claim{display:flex;gap:.5rem;align-items:center;font-size:.78rem}.openness-matrix:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
+  @media(max-width:55rem){.openness-profile{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:32rem){.openness-profile{grid-template-columns:repeat(2,minmax(0,1fr))}.openness-profile strong{min-height:0}}
+</style>

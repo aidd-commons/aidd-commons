@@ -85,14 +85,42 @@ test("all Atlas cards expose their canonical URL before and after filtering", as
   page,
 }) => {
   await page.goto("/atlas/");
-  for (const resource of resources) {
-    const card = page.locator(".resource-card").filter({
-      has: page.locator(`h2 a[href="/atlas/${resource.id}/"]`),
-    });
-    await expect(
-      card.getByRole("link", { name: "Visit resource", exact: true }),
-    ).toHaveAttribute("href", resource.canonical_url);
+  const navigation = page.locator('[data-pagination-position="top"]');
+  const seen: string[] = [];
+  for (
+    let pageNumber = 1;
+    pageNumber <= Math.ceil(resources.length / 24);
+    pageNumber++
+  ) {
+    const end = Math.min(pageNumber * 24, resources.length);
+    await expect(navigation.locator("[data-page-range]")).toHaveText(
+      `Showing ${(pageNumber - 1) * 24 + 1}–${end} of ${resources.length} matching resources`,
+    );
+    const cards = await page
+      .locator("[data-atlas-results] [data-resource-id]")
+      .evaluateAll((rows) =>
+        rows.map((row) => ({
+          id: row.getAttribute("data-resource-id")!,
+          url: Array.from(row.querySelectorAll("a"))
+            .find((link) => link.textContent === "Visit resource")
+            ?.getAttribute("href"),
+        })),
+      );
+    expect(cards).toHaveLength(
+      Math.min(24, resources.length - (pageNumber - 1) * 24),
+    );
+    for (const card of cards) {
+      expect(card.url).toBe(
+        resources.find(({ id }) => id === card.id)!.canonical_url,
+      );
+      seen.push(card.id);
+    }
+    if (end < resources.length)
+      await navigation
+        .getByRole("button", { name: "Next result page", exact: true })
+        .click();
   }
+  expect(seen.sort()).toEqual(resources.map(({ id }) => id).sort());
   await page
     .getByRole("searchbox", { name: "Search", exact: true })
     .fill("RDKit");
@@ -104,20 +132,24 @@ test("all Atlas cards expose their canonical URL before and after filtering", as
   );
   expect(expected.length).toBeGreaterThan(0);
   await expect(page.locator(".resource-card")).toHaveCount(expected.length);
+  expect(new URL(page.url()).searchParams.has("page")).toBe(false);
   await expect(
     page
-      .locator(".resource-card")
-      .filter({ has: page.locator('h2 a[href="/atlas/tool-rdkit/"]') })
+      .locator('[data-atlas-results] [data-resource-id="tool-rdkit"]')
       .getByRole("link", { name: "Visit resource", exact: true }),
   ).toHaveAttribute("href", "https://github.com/rdkit/rdkit");
 });
 
 test("Atlas card resource links work without JavaScript", async ({
   browser,
+  baseURL,
 }) => {
-  const context = await browser.newContext({ javaScriptEnabled: false });
+  const context = await browser.newContext({
+    baseURL,
+    javaScriptEnabled: false,
+  });
   const page = await context.newPage();
-  await page.goto("http://127.0.0.1:4324/atlas/");
+  await page.goto("/atlas/browse/");
   await expect(
     page.getByRole("link", { name: "Visit resource", exact: true }),
   ).toHaveCount(resources.length);

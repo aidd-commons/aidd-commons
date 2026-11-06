@@ -5,11 +5,14 @@ description: 阅读十三个考察协议如何影响已报分数的基准与评�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 英文原文：[What four 2026 benchmarks say about reported scores](/learn/evaluation-and-reproducibility/benchmark-honesty-2026/)。
 
 <LessonProgress lessonId="evaluation-and-reproducibility/benchmark-honesty-2026" />
 <ScrollableRegions />
+
+<TeachingViewLink track="evaluation-and-reproducibility" chinese />
 
 ## 学习目标与前置知识
 
@@ -21,14 +24,14 @@ import ScrollableRegions from "../../../../../components/ScrollableRegions.astro
 
 ## 这些案例，以及各自提出的问题
 
-**PLABench** 问的是：已报的深度学习亲和力数字，在移除基准审计过的训练语料之后是否还成立。
-它在同一批靶点、同一套指标下运行 9 个序列模型与结构模型，并把评估分为三种情形：暖启动、
-冷药物、冷靶点。在它的 ChEMBL35 臂上，未过滤的集合是 84 个靶点上的 7,650 个配体。
-基准的相似度过滤会丢掉每一个与 14 个受审计训练语料中任一配体的 ECFP4 Tanimoto 超过
-0.85 的测试配体，随后丢掉剩下的不足 10 个配体的靶点。剩下的臂是 71 个靶点上的
-4,862 个配体。README 报告说：受审计的语料之一 SAIR 达到了该相似度阈值、命中未过滤基准的
-32.7%，对应被移除的 2,413 行；而领先模型在过滤之后仍然领先，README 自己的说法是：
-是过滤让这个结果变得可读。
+**PLABench** 在暖启动、冷药物与冷靶点设置下评估 9 个序列与结构模型。ChEMBL35 臂
+从 84 个靶点上的 7,650 个配体开始。[README](https://raw.githubusercontent.com/BioinfoMachineLearning/PLABench/main/README.md)
+报告，14 个受审计训练语料的 ECFP4 Tanimoto ≥ 0.85 过滤合计移除 2,735 行，
+随后移除少于 10 个配体的靶点，留下 71 个靶点上的 4,862 个配体。
+[逐语料表](https://raw.githubusercontent.com/BioinfoMachineLearning/PLABench/main/results/chembl35_leakage/leak_by_corpus.csv)
+另列出 SAIR 的 2,501 个阈值命中（占未过滤集合的 32.69%）与 2,413 个归属行。
+阈值命中、归属行与合并后移除总数是不同计数。README 报告领先模型在过滤后仍领先，
+这一结论的范围仍是该基准及其受审计语料。
 
 **多范式对接基准（Multi-Paradigm Docking Benchmark）** 问的是：对接分数与共折叠分数能不能
 放进同一张排行榜而不误导读者。它评测 6 个基于物理的对接方法（Vina、GNINA、ICM、
@@ -157,7 +160,7 @@ BioStudyBench 报告，在八个模型上，数据与工具使平均通过率提
 ## 手工作练习
 
 **手工作练习（不可运行、非实证）：** 某基准未过滤的臂有 84 个靶点上的 7,650 个配体。
-它的相似度过滤移除 2,413 行，随后第二条规则移除每一个剩余不足 10 个配体的靶点，
+它的相似度过滤移除 2,735 行，随后第二条规则移除每一个剩余不足 10 个配体的靶点，
 留下 71 个靶点上的 4,862 个配体。另一个基准比较三种范式下的 15 个生成方法，并报告
 三维方法达到更强的亲和力，而其有效性与位姿一致性可能更弱。第三个基准在一致条件下评测
 20 多种方法，全部是图方法。(a) 相似度过滤之后剩下多少配体？占未过滤臂的比例是多少？
@@ -168,8 +171,8 @@ BioStudyBench 报告，在八个模型上，数据与工具使平均通过率提
 <details data-worked-answer>
 <summary>参考答案</summary>
 
-(a) 7,650 − 2,413 = 5,237 个配体，占未过滤臂的 68.5%。(b) 稀疏靶点规则随后移除
-5,237 − 4,862 = 375 行，所以相似度过滤移除的行数约为靶点规则的六倍半。这两条规则并不等价，
+(a) 7,650 − 2,735 = 4,915 个配体，约占未过滤臂的 64.25%。(b) 稀疏靶点规则随后移除
+4,915 − 4,862 = 53 行，所以相似度过滤移除的行数约为靶点规则的 51.6 倍。这两条规则并不等价，
 而一个报告"我们移除了近重复项"的读者，只说出了做了大部分工作量的那一条。(c) 就第二个基准，
 是那个亲和力数字本身：它是 docking oracle 分数，继承了对接函数的偏置，而且对这个基准另外
 单独报告的化学有效性一无所知。就第三个基准，是任何形如"图方法优于更简单的方法"的陈述，

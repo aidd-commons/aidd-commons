@@ -4,8 +4,11 @@ description: Treat molecular generation as constrained search followed by experi
 ---
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="molecular-generation/generation-and-search" />
+
+<TeachingViewLink track="molecular-generation" />
 
 ## Foundations
 
@@ -43,6 +46,21 @@ The [generation resource guide](/learn/molecular-generation/generation-resource-
 distinguishes REINVENT 4 from the archived 3.2 implementation, separates
 distribution-learning and goal-directed tasks, and works through candidate
 validity, uniqueness and novelty denominators.
+
+## A bounded worked decision and independent task
+
+After [property prediction](/learn/qsar-properties/property-prediction/), define the selection decision before a proposal model. In the existing constructed [constrained-search case](/learn/molecular-generation/flows-and-constrained-search/), B has favorable scores but resource proxy h = 0.68 fails the fixed h ≥ 0.70 gate. C dominates A on the two maximized scores, yet can fail a separate batch-diversity requirement after A is fixed. These are authored scores, not activities of the displayed molecule gallery.
+
+Can a weighted average rescue B after the hard gate? What would need to be recorded if the first batch member changes from A to C?
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+No. A hard exclusion precedes ranking. Changing the first member requires applying the same declared diversity rule from the new reference and retaining the alternatives. A larger generated set or a higher model density supplies no experimental confirmation. The linked lesson separates proposal mechanism, gate definitions and batch policy.
+
+</details>
+
+Teaching task added on 2026-10-26; the original source-review date remains below.
 
 ## What v0.1 does not yet teach
 

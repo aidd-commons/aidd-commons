@@ -6,10 +6,10 @@ rows carry one of three observed depths (worked, executable, assessed) and, for
 every row that has a runnable task, the basis that task rests on (real-data or
 authored).
 
-What the figure shows. The left panel counts each track's topics by observed
-depth. Depth is an ordered quantity, so it takes the palette's ordered ladder,
-pale for worked and dark for assessed. The right panel splits the runnable
-topics of each track by what their runnable task rests on. A task that computes
+What the figure shows. The first three columns count each track's topics by
+observed depth. Depth is an ordered quantity, so it takes the palette's
+ordered ladder, pale for worked and dark for assessed. The final two columns
+separate runnable topics by what their runnable task rests on. A task that computes
 on measured records, or that runs a real simulation, docking or structure
 prediction, rests on real data; a task that runs on hand-written or synthetic
 inputs rests on authored inputs. The audit counts an executable-on-real-data
@@ -18,10 +18,9 @@ threshold.
 
 What it does not show. The depth is what a reviewer of this project observed
 in the material, not what a learner achieved and not what a model scored. The
-run basis says what the task rests on, not whether the task is correct. Five
-tracks have no runnable topic at all, which the figure shows as an empty bar
-rather than as a zero, because a track with no runnable topic is a different
-fact from a track whose runnable topics were not counted.
+run basis says what the task rests on, not whether the task is correct. A track with
+no runnable topic is labelled explicitly rather than receiving an implied
+zero-openness or zero-quality interpretation.
 """
 
 from __future__ import annotations
@@ -51,165 +50,122 @@ CAPTION = (
 
 
 def build() -> dict[str, Path]:
-    """Draw the figure and write its two files plus its caption fragment."""
+    """Retain all depth and run-basis counts without stacked-bar ambiguity."""
     style.apply_style("light")
-    tokens = style.tokens("light")
-    colours = style.categorical("light")
-    hatches = style.atlas_palette.HATCH
-    ladder = style.ladder_steps("light", len(DEPTHS))
-
+    tokens, colours = style.tokens(), style.categorical()
     payload = style.load_json(style.DATA_DIR / "comparison.v1.json")
-    rows = [row for row in payload["rows"] if row["provider_id"] == SELF_ID]
-
-    order: list[str] = []
-    depth_by_track: dict[str, Counter] = defaultdict(Counter)
-    base_by_track: dict[str, Counter] = defaultdict(Counter)
-    track_order: dict[str, int] = {}
-    for row in sorted(rows, key=lambda item: item["track_order"]):
+    rows = [r for r in payload["rows"] if r["provider_id"] == SELF_ID]
+    order = []
+    depth_by_track = defaultdict(Counter)
+    base_by_track = defaultdict(Counter)
+    for row in sorted(rows, key=lambda r: r["track_order"]):
         track = row["track_id"]
         if track not in depth_by_track:
             order.append(track)
-            track_order[track] = row["track_order"]
         depth_by_track[track][row["depth"]] += 1
         if row["run_basis"]:
             base_by_track[track][row["run_basis"]] += 1
-
-    labels = list(order)
-    positions = list(range(len(order)))[::-1]
-
-    fig = style.figure(style.FIGURE_WIDTH, 6.5)
-    axes = style.axes_grid(
+    fig = style.figure(height=6.45)
+    style.heading(
         fig,
-        1,
-        2,
-        left=0.255,
-        right=0.985,
-        bottom=0.085,
-        top=0.915,
-        wspace=0.12,
-        width_ratios=[1.55, 1.0],
+        "Observed depth and the basis of runnable work",
+        f"{len(rows)} historical topics · material observations, not learner achievements",
     )
-    depth_ax, basis_ax = axes
-
-    left_edges = [0.0] * len(order)
-    for depth, colour in zip(DEPTHS, ladder, strict=True):
-        values = [depth_by_track[track][depth] for track in order]
-        container = depth_ax.barh(
-            positions,
-            values,
-            left=left_edges,
-            height=0.68,
-            color=colour,
-            edgecolor=tokens["ink"],
-            linewidth=0.5,
-            label=depth,
-            zorder=3,
-        )
-        for bar in container:
-            bar.set_hatch(style.hatch_for_index(DEPTHS.index(depth)))
-        left_edges = [edge + value for edge, value in zip(left_edges, values, strict=True)]
-
-    depth_ax.set_yticks(positions)
-    depth_ax.set_yticklabels(labels, fontsize=7.4)
-    depth_ax.tick_params(axis="y", length=0)
-    depth_ax.set_xlabel("Topics", fontsize=8.5)
-    depth_ax.set_xlim(0, max(left_edges) * 1.18)
-    depth_ax.set_xticks([0, 2, 4, 6, 8])
-    depth_ax.grid(axis="x", linewidth=0.6, alpha=0.7)
-    depth_ax.set_axisbelow(True)
-    style.title(depth_ax, "Observed depth per track")
-    depth_ax.legend(
-        loc="lower right",
-        fontsize=8.0,
-        handlelength=1.4,
-        handletextpad=0.5,
-        borderpad=0.3,
-        frameon=False,
-    )
-    for position, total in zip(positions, left_edges, strict=True):
-        depth_ax.annotate(
-            str(int(total)),
-            xy=(total, position),
-            xytext=(4, 0),
-            textcoords="offset points",
-            ha="left",
-            va="center",
-            fontsize=7.4,
-            color=tokens["ink"],
-        )
-
-    left_edges = [0.0] * len(order)
-    for basis in BASES:
-        values = [base_by_track[track][basis] for track in order]
-        container = basis_ax.barh(
-            positions,
-            values,
-            left=left_edges,
-            height=0.68,
-            color=colours[BASE_COLOUR[basis]],
-            edgecolor=tokens["ink"],
-            linewidth=0.5,
-            label=basis,
-            zorder=3,
-        )
-        for bar in container:
-            bar.set_hatch(hatches[BASE_COLOUR[basis]])
-        left_edges = [edge + value for edge, value in zip(left_edges, values, strict=True)]
-
-    basis_ax.set_yticks(positions)
-    basis_ax.set_yticklabels([])
-    basis_ax.set_ylim(-0.7, len(order) - 0.3)
-    basis_ax.set_xlabel("Runnable topics", fontsize=8.5)
-    basis_ax.set_xlim(0, 10)
-    basis_ax.set_xticks([0, 2, 4, 6, 8])
-    basis_ax.grid(axis="x", linewidth=0.6, alpha=0.7)
-    basis_ax.set_axisbelow(True)
-    style.title(basis_ax, "Run basis")
-    basis_ax.legend(
-        loc="lower right",
-        fontsize=8.0,
-        handlelength=1.4,
-        handletextpad=0.5,
-        borderpad=0.3,
-        frameon=False,
-    )
-    for position, _track, total in zip(positions, order, left_edges, strict=True):
-        if total == 0:
-            basis_ax.annotate(
-                "none",
-                xy=(0, position),
-                xytext=(4, 0),
-                textcoords="offset points",
-                ha="left",
+    ax = fig.add_axes((0.39, 0.12, 0.57, 0.68))
+    ys = list(range(len(order)))[::-1]
+    for y, track in zip(ys, order, strict=True):
+        ax.axhline(y, color=tokens["rule"], lw=0.45, zorder=0)
+        for x, depth in enumerate(DEPTHS):
+            n = depth_by_track[track][depth]
+            if n:
+                ax.scatter(
+                    x,
+                    y,
+                    s=30 + 12 * n,
+                    facecolor=style.ladder_steps("light", 3)[x],
+                    edgecolor=tokens["ink"],
+                    linewidth=0.55,
+                    marker=["o", "s", "D"][x],
+                )
+            ax.text(
+                x,
+                y,
+                str(n),
+                ha="center",
                 va="center",
-                fontsize=7.4,
+                fontsize=8.2,
+                color=tokens["panel"] if x == 2 and n else tokens["ink"],
+                fontweight="bold" if n else "normal",
+            )
+        if not sum(base_by_track[track].values()):
+            ax.text(
+                3.55,
+                y,
+                "no runnable topic",
+                ha="center",
+                va="center",
+                fontsize=8.0,
                 color=tokens["muted"],
             )
-            continue
-        basis_ax.annotate(
-            str(int(total)),
-            xy=(total, position),
-            xytext=(4, 0),
-            textcoords="offset points",
-            ha="left",
-            va="center",
-            fontsize=7.4,
-            color=tokens["ink"],
-        )
-
+        else:
+            for x, basis in zip([3.1, 4.0], BASES, strict=True):
+                n = base_by_track[track][basis]
+                ax.text(
+                    x,
+                    y,
+                    str(n),
+                    ha="center",
+                    va="center",
+                    fontweight="bold",
+                    fontsize=9,
+                    color=colours[BASE_COLOUR[basis]],
+                )
+    ax.axvline(2.55, color=tokens["rule"], lw=0.8)
+    ax.set_xticks(
+        [0, 1, 2, 3.1, 4.0], ["Worked", "Executable", "Assessed", "Real data", "Authored"]
+    )
+    ax.xaxis.tick_top()
+    ax.tick_params(length=0, pad=10)
+    ax.set_yticks(ys, style.track_labels(order))
+    ax.tick_params(axis="y", pad=10)
+    ax.set_xlim(-0.5, 4.5)
+    ax.set_ylim(-0.7, len(order) - 0.3)
+    for s in ax.spines.values():
+        s.set_visible(False)
+    ax.text(
+        0.27,
+        1.08,
+        "Topics by observed depth",
+        transform=ax.transAxes,
+        ha="center",
+        fontweight="bold",
+        fontsize=9.2,
+    )
+    ax.text(
+        0.82,
+        1.08,
+        "Runnable basis",
+        transform=ax.transAxes,
+        ha="center",
+        fontweight="bold",
+        fontsize=9.2,
+    )
+    style.footnote(
+        fig,
+        "Numbers give exact counts; empty run-basis rows mean no runnable topic. Real "
+        "data and authored inputs remain distinct.",
+    )
+    dt = {d: sum(depth_by_track[t][d] for t in order) for d in DEPTHS}
+    bt = {b: sum(base_by_track[t][b] for t in order) for b in BASES}
     written = style.save(fig, STEM)
-    depth_totals = {depth: sum(depth_by_track[track][depth] for track in order) for depth in DEPTHS}
-    basis_totals = {basis: sum(base_by_track[track][basis] for track in order) for basis in BASES}
-    runnable = sum(depth_totals[depth] for depth in DEPTHS if depth != "worked")
     style.register_caption(
         FIGURE_NUMBER,
         CAPTION.format(
             topics=len(rows),
-            depths=style.english_list(f"{depth_totals[depth]} {depth}" for depth in DEPTHS),
-            runnable=runnable,
+            depths=style.english_list(f"{dt[d]} {d}" for d in DEPTHS),
+            runnable=sum(dt[d] for d in DEPTHS if d != "worked"),
             bases=(
-                f"{basis_totals['real-data']} rest on real data and "
-                f"{basis_totals['authored']} rest on authored inputs"
+                f"{bt['real-data']} rest on real data and {bt['authored']} rest on authored inputs"
             ),
         ),
     )

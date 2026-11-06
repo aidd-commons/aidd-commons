@@ -5,9 +5,12 @@ description: Trace sequence search, folding, and ligand-complex prediction throu
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="structure-and-pockets/open-structure-stack" />
 <ScrollableRegions />
+
+<TeachingViewLink track="structure-and-pockets" />
 
 ## Learning goals and prerequisites
 
@@ -67,15 +70,13 @@ matches an experimental structure.
 
 ## RoseTTAFold All-Atom
 
-RoseTTAFold All-Atom is an all-atom biomolecular structure-prediction model
-repository. It supplies another folding route for the `biomolecular-complex`
-modality, rather than another sequence-search step. Its record establishes
-inference code, training code, and weights in the repository. The available
-training code permits inspection of released code; it does not establish that
-running it reproduces published results. The BSD-3-Clause licence was read as
-covering repository source code. The record does not establish separate terms
-for weights, the training data or data recipe, a tested run version, or
-experimental correctness of a prediction.
+RoseTTAFold All-Atom supplies a biomolecular structure-prediction route.
+Its record marks inference code, training code and weights available; that
+access does not establish reproduced results. The
+[BSD-3-Clause licence](https://raw.githubusercontent.com/baker-laboratory/RoseTTAFold-All-Atom/HEAD/LICENSE)
+explicitly covers source code and model weights linked for download in the
+README. It does not establish training-data terms, a complete data recipe,
+a tested run version or experimental correctness of a prediction.
 
 ## DynamicBind
 
@@ -119,8 +120,8 @@ A DynamicBind output would be a proposed complex, not a binding observation.
 The chain stops before a claim that the target has that experimental structure
 or that the ligand binds. The `weights` field is unverified for ColabFold and
 DynamicBind, even though DynamicBind lists model-weight links. RoseTTAFold
-All-Atom marks weights available, but its recorded BSD-3-Clause scope covers
-source code. The reader would need to establish relevant asset access and
+All-Atom marks weights available, and its BSD-3-Clause licence explicitly
+covers the README-linked model weights as well as source code. The reader would need to establish relevant asset access and
 terms, template provenance, and actual versions before using this as a
 reproducible workflow. No hit, structure, pose, or assay result was produced
 for this case.
@@ -138,9 +139,9 @@ licence cover?
 DynamicBind's `weights` field is `unverified`. Its model-weight identifiers do
 not change that field, and the MIT licence has `scope` covering repository
 source code. The record establishes no separate weight licence. RoseTTAFold
-All-Atom has `weights` marked `available`, while its BSD-3-Clause licence also
-has source-code scope. Availability of weights does not extend that recorded
-licence to them.
+All-Atom has `weights` marked `available`; its BSD-3-Clause licence
+explicitly includes the model weights linked in its README. This coverage
+comes from the licence text, not from the availability field.
 
 </details>
 
@@ -150,9 +151,9 @@ None of the four resources was run here, and no structure was computed. A
 folding model's coordinate set is not an experimental structure, and a docking
 pose is not a measured affinity. Sequence search, folding, and complex
 prediction do not establish a biological claim about the target or ligand.
-Each resource retains its own licence, and this lesson carries only the
-recorded reading of each source-code licence. Template terms, separate weight
-terms, and a jointly tested versioned chain remain unestablished. Reading an
+Each resource retains its own licence. Template terms, weight terms not
+covered by an explicit grant, and a jointly tested versioned chain still
+require evidence. Reading an
 openness cell does not execute an asset or reproduce a result.
 
 ## Sources

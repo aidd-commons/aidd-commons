@@ -11,6 +11,11 @@ import {
   readLessonProgress,
   serializeAtlasQuery,
   toggleLessonProgress,
+  parseAtlasState,
+  serializeAtlasState,
+  toggleAtlasComparison,
+  sortAtlasResources,
+  paginateAtlasResources,
 } from "../../site/src/lib/atlas-state.js";
 
 const resources = [
@@ -35,6 +40,110 @@ const resources = [
 ];
 
 describe("atlas URL state", () => {
+  it("round-trips a positive safe page number and rejects malformed pagination state", () => {
+    const state = parseAtlasState(
+      new URLSearchParams(
+        "q=protein&view=table&page=3&compare=boltz-1,openfold",
+      ),
+    );
+    expect(state.page).toBe(3);
+    expect(new URLSearchParams(serializeAtlasState(state)).get("page")).toBe(
+      "3",
+    );
+    expect(
+      parseAtlasState(new URLSearchParams(serializeAtlasState(state))),
+    ).toEqual(state);
+    for (const invalid of [
+      "0",
+      "-1",
+      "2.5",
+      "1e3",
+      "Infinity",
+      "NaN",
+      "9007199254740992",
+      "",
+      " 2 ",
+    ]) {
+      expect(
+        parseAtlasState(new URLSearchParams({ page: invalid })).page,
+        invalid,
+      ).toBe(1);
+    }
+    expect(
+      serializeAtlasState(parseAtlasState(new URLSearchParams("page=1"))),
+    ).toBe("");
+  });
+
+  it("bounds a visible page without losing or changing the complete matched population", () => {
+    const records = Array.from(
+      { length: 49 },
+      (_, index) => `resource-${index + 1}`,
+    );
+    expect(paginateAtlasResources(records, 2)).toEqual({
+      page: 2,
+      pages: 3,
+      total: 49,
+      from: 25,
+      to: 48,
+      items: records.slice(24, 48),
+    });
+    expect(paginateAtlasResources(records, 999)).toEqual({
+      page: 3,
+      pages: 3,
+      total: 49,
+      from: 49,
+      to: 49,
+      items: ["resource-49"],
+    });
+    expect(paginateAtlasResources(records, -1).items).toEqual(
+      records.slice(0, 24),
+    );
+    expect(paginateAtlasResources([], 2)).toEqual({
+      page: 1,
+      pages: 1,
+      total: 0,
+      from: 0,
+      to: 0,
+      items: [],
+    });
+    expect(records).toHaveLength(49);
+  });
+  it("retains view, sort and two-to-four distinct comparison IDs, including native repeated form fields", () => {
+    const state = parseAtlasState(
+      new URLSearchParams(
+        "q=protein&view=table&sort=checked&compare=boltz-1&compare=openfold,boltz-1",
+      ),
+    );
+    expect(state.compare).toEqual(["boltz-1", "openfold"]);
+    expect(state.view).toBe("table");
+    expect(state.sort).toBe("checked");
+    expect(
+      parseAtlasState(new URLSearchParams(serializeAtlasState(state))),
+    ).toEqual(state);
+    expect(serializeAtlasState(parseAtlasState(new URLSearchParams()))).toBe(
+      "",
+    );
+  });
+
+  it("rejects malformed selectors and unsafe IDs while preserving valid unknown IDs for a visible diagnostic", () => {
+    const state = parseAtlasState(
+      new URLSearchParams(
+        "view=untrusted&sort=score&compare=../bad,boltz-1,%3Cscript%3E,missing-record,openfold,tool-rdkit,extra",
+      ),
+    );
+    expect(state.view).toBe("list");
+    expect(state.sort).toBe("relevance");
+    expect(state.compare).toEqual([
+      "boltz-1",
+      "missing-record",
+      "openfold",
+      "tool-rdkit",
+    ]);
+    const ids = ["one", "two", "three", "four"];
+    expect(toggleAtlasComparison(ids, "five")).toEqual(ids);
+    expect(toggleAtlasComparison(ids, "two")).toEqual(["one", "three", "four"]);
+    expect(ids).toEqual(["one", "two", "three", "four"]);
+  });
   it("parses and serializes shareable atlas filters", () => {
     const query = parseAtlasQuery(
       new URLSearchParams(
@@ -78,6 +187,55 @@ describe("atlas URL state", () => {
     });
 
     expect(results.map((resource) => resource.id)).toEqual(["freesolv-v0-52"]);
+  });
+
+  it("searches source identifier values even when absent from the resource name and summary", () => {
+    const records = [
+      { ...resources[0], identifiers: [{ value: "10.1234/EXAMPLE" }] },
+      resources[1],
+    ];
+    const query = parseAtlasQuery(new URLSearchParams("q=10.1234%2Fexample"));
+    expect(filterResources(records, query).map(({ id }) => id)).toEqual([
+      "openfold",
+    ]);
+    expect(filterResources(records, { ...query, kind: "dataset" })).toEqual([]);
+  });
+
+  it("searches declared tasks and modalities and gives exact identifiers explicit text-match priority", () => {
+    const records = [
+      {
+        ...resources[0],
+        tasks: ["cofolding"],
+        modalities: ["protein-ligand-complex"],
+        last_verified: "2026-01-01",
+        identifiers: [{ value: "10.1/example" }],
+      },
+      {
+        ...resources[1],
+        summary: "Mentions 10.1/example",
+        last_verified: "2026-10-01",
+      },
+    ];
+    expect(
+      filterResources(
+        records,
+        parseAtlasQuery(new URLSearchParams("q=cofolding")),
+      ).map(({ id }) => id),
+    ).toEqual(["openfold"]);
+    expect(
+      filterResources(
+        records,
+        parseAtlasQuery(new URLSearchParams("q=protein-ligand")),
+      ).map(({ id }) => id),
+    ).toEqual(["openfold"]);
+    const query = parseAtlasQuery(new URLSearchParams("q=10.1/example"));
+    expect(sortAtlasResources(records, query, "relevance")[0].id).toBe(
+      "openfold",
+    );
+    expect(sortAtlasResources(records, query, "checked")[0].id).toBe(
+      "freesolv-v0-52",
+    );
+    expect(records[0].id).toBe("openfold");
   });
 });
 

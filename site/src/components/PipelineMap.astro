@@ -1,43 +1,46 @@
 ---
+import ScientificIcon from "./ScientificIcon.astro";
+import { withSiteBase } from "../lib/site-paths";
+interface Props { chinese?: boolean; }
+const { chinese = Astro.url.pathname.includes("/zh-cn/") } = Astro.props;
 const stages = [
-  {
-    atlas: "disease-mechanism",
-    name: "Disease mechanism",
-    summary: "Establish causal context and evidence boundaries.",
-  },
-  {
-    atlas: "target-discovery",
-    name: "Target discovery",
-    summary: "Prioritize targets from linked biological evidence.",
-  },
-  {
-    atlas: "hit-discovery",
-    name: "Hit discovery",
-    summary: "Screen, score, and compare candidate hypotheses.",
-  },
-  {
-    atlas: "lead-optimization",
-    name: "Lead optimization",
-    summary: "Balance efficacy, safety, and practical constraints.",
-  },
-  {
-    atlas: "candidate-nomination",
-    name: "Candidate nomination",
-    summary: "Make a traceable selection with caveats visible.",
-  },
-];
+  { atlas: "disease-mechanism", icon: "cell", name: "Disease mechanism", zh: "疾病机制", object: "Disease context", objectZh: "疾病语境", summary: "Establish causal context and evidence boundaries.", summaryZh: "明确因果语境和证据边界。" },
+  { atlas: "target-discovery", icon: "protein", name: "Target discovery", zh: "靶点发现", object: "Biological evidence", objectZh: "生物学证据", summary: "Prioritize targets from linked biological evidence.", summaryZh: "连接生物学证据，确定靶点优先级。" },
+  { atlas: "hit-discovery", icon: "molecule", name: "Hit discovery", zh: "命中物发现", object: "Candidate hypotheses", objectZh: "候选假设", summary: "Screen, score, and compare candidate hypotheses.", summaryZh: "筛选、评分并比较候选假设。" },
+  { atlas: "lead-optimization", icon: "assay", name: "Lead optimization", zh: "先导优化", object: "Matched constraints", objectZh: "匹配的约束", summary: "Balance efficacy, safety, and practical constraints.", summaryZh: "平衡效力、安全性与实际约束。" },
+  { atlas: "candidate-nomination", icon: "data", name: "Candidate nomination", zh: "候选提名", object: "Evidence package", objectZh: "证据包", summary: "Make a traceable selection with caveats visible.", summaryZh: "保留限制，做出可追溯的选择。" },
+] as const;
 ---
 
-<div class="pipeline-map" aria-label="Target discovery through candidate nomination pipeline">
-  {stages.map((stage, index) => (
-    <article class="pipeline-stage">
-      <p class="meta-label">Stage {index + 1}</p>
-      <h3>{stage.name}</h3>
-      <p>{stage.summary}</p>
-      <div class="pipeline-stage__links">
-        <span class="planned-action">Learning route planned</span>
-        <a href={`/atlas/?stage=${stage.atlas}`}>Browse atlas resources</a>
-      </div>
-    </article>
-  ))}
-</div>
+<figure class="pipeline-map not-content" aria-label={chinese ? "从疾病机制到候选提名的概念导航" : "Conceptual navigation from disease mechanism to candidate nomination"}>
+  <ol class="pipeline-map__flow">
+    {stages.map((stage, index) => <li class="pipeline-stage">
+      <span class="pipeline-stage__index">{chinese ? "阶段" : "Stage"} {String(index + 1).padStart(2, "0")}</span>
+      <h3>{chinese ? stage.zh : stage.name}</h3>
+      <div class="pipeline-stage__object"><ScientificIcon name={stage.icon} size={90} /></div>
+      <p class="pipeline-stage__object-label">{chinese ? stage.objectZh : stage.object}</p>
+      <p>{chinese ? stage.summaryZh : stage.summary}</p>
+      <div class="pipeline-stage__links"><span class="planned-action">{chinese ? "学习路径计划中" : "Learning route planned"}</span><a href={withSiteBase(`/atlas/?stage=${stage.atlas}`, import.meta.env.BASE_URL)}>{chinese ? "浏览 Atlas 资源" : "Browse atlas resources"}<span aria-hidden="true"> ↗</span></a></div>
+      {index < stages.length - 1 && <span class="pipeline-map__connector" aria-hidden="true">→</span>}
+    </li>)}
+  </ol>
+  <figcaption>{chinese ? "实线箭头表示概念阅读顺序。插图是概念对象，不是实验观测；本图不代表已执行或验证的药物发现流程。" : "Solid arrows indicate conceptual reading order. Illustrations denote concepts, not observations; this is not an executed or validated discovery workflow."}</figcaption>
+</figure>
+
+<style>
+  .pipeline-map { display: block; margin: 1.5rem 0; color: var(--atlas-ink); }
+  .pipeline-map__flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1.5rem; list-style: none; margin: 0; padding: 0; }
+  .pipeline-stage { position: relative; min-width: 0; padding: .8rem 0 0; border: 0; border-top: 1px solid var(--atlas-rule-strong); box-shadow: none; background: transparent; }
+  .pipeline-stage::after { content: none; display: none; }
+  .pipeline-stage__index { color: var(--atlas-teal-deep); font: .75rem var(--atlas-font-mono); }
+  .pipeline-stage h3 { margin: .4rem 0 .7rem; min-height: 2.8em; font-size: .95rem; line-height: 1.4; }
+  .pipeline-stage__object { display: grid; min-height: 100px; justify-items: center; }
+  .pipeline-stage__object-label { font-size: .78rem; font-weight: 650; text-align: center; }
+  .pipeline-stage > p:not(.pipeline-stage__object-label) { color: var(--atlas-muted); font-size: .8rem; line-height: 1.6; }
+  .pipeline-stage__links { display: grid; gap: .5rem; margin-top: .9rem; font-size: .75rem; }
+  .pipeline-stage__links a { display: inline-flex; align-items: center; min-height: 44px; }
+  .planned-action { color: var(--atlas-muted); font-size: .75rem; }
+  .pipeline-map__connector { position: absolute; top: 7.7rem; right: -1.25rem; font-size: 1.25rem; }
+  figcaption { margin-top: 1.1rem; padding-top: .65rem; border-top: 1px dashed var(--atlas-rule); color: var(--atlas-muted); font-size: .75rem; line-height: 1.6; }
+  @media (max-width: 55rem) { .pipeline-map__flow { grid-template-columns: 1fr; gap: 1.3rem; } .pipeline-stage { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: .25rem 1rem; } .pipeline-stage__index, .pipeline-stage h3, .pipeline-stage > p:not(.pipeline-stage__object-label), .pipeline-stage__links { grid-column: 2; margin: 0; } .pipeline-stage h3 { min-height: 0; } .pipeline-stage__object { grid-column: 1; grid-row: 1 / 4; min-height: 0; align-self: center; } .pipeline-stage__object-label { grid-column: 1; grid-row: 4; margin: 0; } .pipeline-map__connector { top: auto; bottom: -1.3rem; left: 45px; right: auto; transform: rotate(90deg); } }
+</style>

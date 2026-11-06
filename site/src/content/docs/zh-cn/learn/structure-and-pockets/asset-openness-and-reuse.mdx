@@ -5,11 +5,14 @@ description: 在计划复用前，分别阅读七项开放性主张及其访问�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 英文原文：[Asset openness and reuse](/learn/structure-and-pockets/asset-openness-and-reuse/)。
 
 <LessonProgress lessonId="structure-and-pockets/asset-openness-and-reuse" />
 <ScrollableRegions />
+
+<TeachingViewLink track="structure-and-pockets" chinese />
 
 ## 学习目标与前置知识
 
@@ -39,7 +42,9 @@ import ScrollableRegions from "../../../../../components/ScrollableRegions.astro
 
 ## 两项推理发布的已解案例
 
-`model-boltz-2` 记录复核于 2026-10-21，标记推理代码和权重为 `available`，并记录 MIT 许可证的范围涵盖源代码与权重。其训练代码、数据配方、训练数据和评测代码仍为 `unverified`。同一范围文字说明已命名的评测集不在其中。因此，即使权重可得，也不能仅凭本记录独立复现报告的评测结果。
+当前 `model-boltz-2` 记录的最后核验日期为 2026-10-23。它保留了于 2026-10-21 重新打开的 README 和许可证证据，以及于 2026-10-23 复核的单独训练数据证据。记录标记推理代码和权重为 `available`，并记录 MIT 许可证的范围涵盖源代码与权重。
+
+记录也把 `data_recipe` 和 `training_data` 标记为 `available`。其 `model-boltz-2-readme` 证据描述结构模型使用的 PDB 与 OpenFold 自蒸馏输入、可下载的预处理训练数据，以及有文档说明的处理流程。注意事项说明，两种亲和力输出采用的训练数据集在很大程度上不同，但未给出数据集名称，因此这些训练数据仍未核实。训练代码和评测代码仍为 `unverified`。许可证范围说明已命名的评测集不在其中。因此，这些已记录的可得性主张并不能确立对所报告评测的独立复现。
 
 `model-alphafold-3-inference` 记录复核于 2026-09-04，标记推理代码为 `available`，权重为 `unverified`。其 Apache-2.0 范围是 `inference-code`。注意事项说明参数根据单独条款提供。两条记录共同支持推理代码可得，但对权重支持不同的陈述，也不能把代码条款赋予权重。请用[审计指南](/zh-cn/labs/asset-openness-audit/)阅读完整证据标识符与注意事项。
 
@@ -50,7 +55,7 @@ import ScrollableRegions from "../../../../../components/ScrollableRegions.astro
 <details data-worked-answer>
 <summary>参考答案</summary>
 
-`tool-rdkit` 把训练代码标记为 `not_applicable`，因为记录所引仓库证据描述的是经典工具，而非已拟合模型。其访问级别为 `open_source`，BSD-3-Clause 的范围指向 RDKit 源代码，但并未把第三方组件纳入此授权。`db-uniprot` 的训练代码仍为 `unverified`，访问级别也为 `unverified`，且记录没有许可证条目。任一行都不足以独自决定拟议用途。对于 RDKit，应检查记录中的许可证文件及相关组件条款。对于 UniProt，应检查现行访问页与条款页。两条记录的最后复核日期均为 2026-10-23，之后的变化需要重新审阅。
+`tool-rdkit` 把训练代码标记为 `not_applicable`，因为记录所引仓库证据描述的是经典工具，而非已拟合模型。其访问级别为 `open_source`，BSD-3-Clause 的范围指向 RDKit 源代码，但并未把第三方组件纳入此授权。`db-uniprot` 的训练代码仍为 `unverified`，访问级别为 `source_available`，其注意事项记录可通过 FTP 目录树和 REST 接口在无需账号的情况下下载。由于已记录的审阅未能确立使用条款，该记录仍没有许可证条目。任一行都不足以独自决定拟议用途。对于 RDKit，应检查记录中的许可证文件及相关组件条款。对于 UniProt，应检查现行访问页与条款页。两条记录均保留 2026-10-23 作为最后核验日期，因此之后的上游变化需要重新审阅。
 
 </details>
 
@@ -60,6 +65,8 @@ import ScrollableRegions from "../../../../../components/ScrollableRegions.astro
 
 ## 来源与复核日期
 
-本课于 2026-10-23 在本地阅读了记录及其证据条目。已解案例对应 [Boltz 仓库](https://github.com/jwohlwend/boltz)，其目录记录把 MIT 指向代码与权重；以及 [AlphaFold 3 推理仓库](https://github.com/google-deepmind/alphafold3)，其记录把 Apache-2.0 指向推理代码。练习对应 [RDKit 仓库](https://github.com/rdkit/rdkit)，其记录把 BSD-3-Clause 指向源代码；以及 [UniProt 网站](https://www.uniprot.org/)，其记录没有已核实的许可证。这些是带各自复核日期的已记录来源主张，并非对网站的全新审计。原创课程文字采用 CC BY 4.0，链接资源保留各自条款。
+本课最初的本地审阅日期为 2026-10-23。2026-10-26，本课文字与四条当前规范目录记录进行了对照，范围包括开放性取值、访问级别、许可证范围、注意事项及已记录的复核日期。此次没有重新打开上游页面，也没有进行新的上游可得性或许可证审阅。
 
-最后复核于 2026-10-23。
+已解案例对应 [Boltz 仓库](https://github.com/jwohlwend/boltz)，其目录记录把 MIT 指向代码与权重；以及 [AlphaFold 3 推理仓库](https://github.com/google-deepmind/alphafold3)，其记录把 Apache-2.0 指向推理代码。练习对应 [RDKit 仓库](https://github.com/rdkit/rdkit)，其记录把 BSD-3-Clause 指向源代码；以及 [UniProt 网站](https://www.uniprot.org/)，其记录没有已核实的许可证。这些是带各自复核日期的已记录来源主张，并非对网站的全新审计。原创课程文字采用 CC BY 4.0，链接资源保留各自条款。
+
+最后一次本地一致性复核于 2026-10-26。来源记录的复核日期保持不变。

@@ -1,19 +1,36 @@
 ---
 import summary from "../../../labs/pool_budget/demo-summary.json";
 import { poolBudget } from "../lib/pool-budget.js";
+import ScientificPlot from "./ScientificPlot.astro";
 const budget = poolBudget(summary.partitions.pool.molecules);
 const curves = [{ label: "MaxMin", ...summary.maxmin }, ...summary.random_runs.map(run => ({label: `Random seed ${run.seed}`, ...run}))];
 ---
 
 <section class="pool-panel" aria-labelledby="pool-demo-title">
+  <p class="panel-kicker">Constructed teaching library · editable budget calculator</p>
   <h2 id="pool-demo-title">Synthetic campaign: count before selecting</h2>
   <p>60 authored graphs, artificial scores, no assay measurements. Initial: 6 molecules;
     acquisition pool: 42; evaluation reserve: 12. The <a href="/labs/pool-budget-campaign/#real-campaign-title">real ChEMBL results</a> are separate.</p>
+  <figure class="library-partition">
+    <figcaption>Authored library membership · molecule counts</figcaption>
+    <div class="library-partition__bar" role="img" aria-label="6 initial molecules, 42 acquisition-pool molecules, and 12 evaluation-reserve molecules">
+      <span style={`flex:${summary.partitions.initial.molecules}`} class="initial" /><span style={`flex:${summary.partitions.pool.molecules}`} class="pool" /><span style={`flex:${summary.partitions.evaluation.molecules}`} class="reserve" />
+    </div>
+    <ul><li><i class="initial" />Initial <strong>{summary.partitions.initial.molecules}</strong></li><li><i class="pool" />Original pool <strong>{summary.partitions.pool.molecules}</strong></li><li><i class="reserve" />Evaluation reserve <strong>{summary.partitions.evaluation.molecules}</strong></li></ul>
+  </figure>
+  <div class="budget-calculator">
+  <p class="calculator-mode">Change the allocation, then compare it with the frozen example.</p>
   <label for="pool-size">Original candidate pool size</label>
   <input id="pool-size" type="number" min="20" max="1000000" step="1" value="42" aria-describedby="budget-help" />
   <p id="budget-help">Four rounds, each 5% of the original pool, rounded down separately.
     This calculator changes the budget only; it does not rerun the curves below.</p>
   <p id="budget-output" role="status" aria-live="polite">{budget.batchSize} per round · {budget.total} labels total · {(100 * budget.fraction).toFixed(2)}% of the original pool</p>
+  <ol class="budget-rounds" aria-label="Four acquisition rounds">{Array.from({length:4},(_,index)=><li><span>Round {index+1}</span><strong data-budget-batch>{budget.batchSize}</strong><span>labels</span></li>)}</ol>
+  </div>
+  <figure class="synthetic-curves">
+    <figcaption><strong>Recovery in the original 42-molecule pool</strong><span>All five random seeds and MaxMin · five artificial top-decile targets</span></figcaption>
+    <ScientificPlot title="Synthetic top-decile recovery: all frozen paths" xLabel="Acquired labels from the original pool" yLabel="Top-decile recovery fraction · denominator 5" xMin={0} xMax={summary.budget.checkpoints.at(-1)} xTicks={summary.budget.checkpoints} yMin={0} yMax={1} yTicks={[0,.2,.4,.6,.8,1]} showTable={false} series={curves.map((curve,index)=>({name:curve.label,color:index===0?"var(--atlas-teal-deep)":"var(--atlas-muted)",marker:index,dashed:index!==0,points:summary.budget.checkpoints.map((count,round)=>({x:count,y:curve.recovery[round]}))}))} />
+  </figure>
   <div class="table-scroll" role="region" aria-label="Synthetic recovery curves" tabindex="0">
     <table>
       <caption>Observed synthetic top-decile recovery (5 targets); original pool = 42</caption>
@@ -37,6 +54,7 @@ const curves = [{ label: "MaxMin", ...summary.maxmin }, ...summary.random_runs.m
         const value = poolBudget(input.valueAsNumber);
         input.setAttribute("aria-invalid", "false");
         output.textContent = `${value.batchSize} per round · ${value.total} labels total · ${(100 * value.fraction).toFixed(2)}% of the original pool`;
+        document.querySelectorAll("[data-budget-batch]").forEach(batch => { batch.textContent = String(value.batchSize); });
       } catch (error) {
         input.setAttribute("aria-invalid", "true");
         output.textContent = error instanceof Error ? error.message : "Invalid pool size.";
@@ -48,11 +66,16 @@ const curves = [{ label: "MaxMin", ...summary.maxmin }, ...summary.random_runs.m
 </script>
 
 <style>
-  .pool-panel { border: 1px solid var(--sl-color-gray-4); border-radius: .6rem; padding: 1rem; margin-block: 2rem; min-width: 0; }
-  label { display: block; font-weight: 600; }
-  input { max-width: 100%; width: 12rem; padding: .5rem; color: var(--sl-color-text); background: var(--sl-color-bg); border: 1px solid var(--sl-color-gray-3); border-radius: .25rem; }
+  .pool-panel { border-block: 1px solid var(--atlas-rule-strong); padding-block: 1.5rem; margin-block: 2rem; min-width: 0;color:var(--atlas-ink); }
+  .pool-panel>h2{margin-top:.35rem}.panel-kicker{font-size:.75rem;color:var(--atlas-teal-deep);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+  .library-partition{margin:1.25rem 0}.library-partition figcaption{font-size:.8rem;font-weight:600;margin-bottom:.6rem}.library-partition__bar{display:flex;height:1rem;border:1px solid var(--atlas-rule-strong)}.library-partition__bar span+span{border-left:2px solid var(--atlas-panel)}.initial{background:var(--atlas-muted)}.pool{background:var(--atlas-teal-deep)}.reserve{background:repeating-linear-gradient(45deg,transparent,transparent 4px,var(--atlas-muted) 4px,var(--atlas-muted) 5px)}.library-partition ul{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;list-style:none;margin:.6rem 0;padding:0;font-size:.78rem}.library-partition li{display:flex;align-items:center;gap:.4rem}.library-partition i{width:.7rem;height:.7rem;display:inline-block;border:1px solid var(--atlas-rule-strong)}
+  .budget-calculator{padding:1rem;margin-block:1.5rem;background:color-mix(in srgb,var(--atlas-surface) 55%,transparent);border-left:3px solid var(--atlas-rule-strong)}.calculator-mode{font-size:.8rem;margin:0 0 .8rem;color:var(--atlas-muted)}label{display:block;font-weight:600;font-size:.85rem}
+  input { max-width: 100%; width: 12rem; min-height:44px;padding: .5rem; color: var(--atlas-ink); background: var(--atlas-bg); border: 1px solid var(--atlas-rule-strong);font:inherit; }
+  #budget-help{font-size:.8rem;color:var(--atlas-muted)}#budget-output{font-size:.85rem;font-weight:600;font-variant-numeric:tabular-nums}.budget-rounds{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.5rem;padding:0;margin:.75rem 0 0}.budget-rounds li{border-top:2px solid var(--atlas-teal-deep);padding:.55rem 0;font-size:.75rem;display:grid;gap:.15rem}.budget-rounds strong{font-size:1.5rem;font-weight:600;font-variant-numeric:tabular-nums}
+  .synthetic-curves{margin:1.5rem 0;min-width:0}.synthetic-curves figcaption{display:grid;gap:.25rem;font-size:.9rem}.synthetic-curves figcaption span{color:var(--atlas-muted);font-size:.78rem}
   .table-scroll { overflow-x: auto; }
-  table { display: table; overflow: visible; width: 100%; font-variant-numeric: tabular-nums; }
-  th, td { padding: .5rem; white-space: nowrap; }
-  caption { text-align: left; white-space: normal; }
+  table { display: table; overflow: visible; width: 100%; font-variant-numeric: tabular-nums;font-size:.8rem; }
+  th, td { padding: .6rem; white-space: nowrap; }
+  caption { text-align: left; white-space: normal;padding-block:.7rem;color:var(--atlas-muted); }input:focus-visible,.table-scroll:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
+  @media(max-width:30rem){.budget-rounds{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>

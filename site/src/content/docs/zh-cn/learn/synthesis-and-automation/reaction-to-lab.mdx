@@ -4,12 +4,15 @@ description: 将反应预测和逆合成计划转化为可检验的实验室假�
 ---
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 英文原文：[Reaction prediction to the lab](/learn/synthesis-and-automation/reaction-to-lab/)。
 
 译文更新：2026-09-08。
 
 <LessonProgress lessonId="synthesis-and-automation/reaction-to-lab" />
+
+<TeachingViewLink track="synthesis-and-automation" chinese />
 
 ## 基础
 
@@ -34,6 +37,21 @@ import LessonProgress from "../../../../../components/LessonProgress.astro";
 [ASKCOS](https://github.com/ASKCOS/askcos) 和
 [RetroSim](https://github.com/connorcoley/retrosim) 提供不同的建模或检索选择。与实验室
 自动化的集成仍是实验系统问题，而不是评分优化练习。
+
+## 有边界的推演与独立任务
+
+阅读[分子表示](/zh-cn/learn/representations/small-molecule-representations/)后，区分图操作与观测反应。构造的[p01 逆合成案例](/zh-cn/labs/retro-disconnection/)记录产物 CC(=O)Nc1ccccc1，以及反应物 CC(=O)O、Nc1ccccc1。恢复这些图意味着匹配记录的断键，没有观察到反应条件、收率或实验室可行性。
+
+规划工具返回这些反应物，并报告软件成功状态。发生了哪种成功？在称路线实验成功之前，还需要什么反馈？
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+软件按声明规则返回了图提议。实验成功需要获得授权的反应记录、材料和条件、可解释测量，以及声明的产物或质量标准。成功返回不是观察收率，检测器读出失败也不一定意味着合成失败。继续阅读[反应映射与路线搜索](/zh-cn/learn/synthesis-and-automation/reaction-mapping-and-route-search/)，学习机制和评估边界。
+
+</details>
+
+本教学任务新增于 2026-10-26；原来源审阅日期保持如下。
 
 ## v0.1 尚未教授的内容
 

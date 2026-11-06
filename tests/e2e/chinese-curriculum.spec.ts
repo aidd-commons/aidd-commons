@@ -74,12 +74,12 @@ test("Chinese entry routes retain Chinese lessons, resources and lab downloads",
     "访问资源",
   );
   await expect(
-    page.locator('[data-lesson-resources] a[href="/atlas/tool-rdkit/"]'),
+    page.locator('[data-lesson-resources] a[href="/zh-cn/atlas/tool-rdkit/"]'),
   ).toBeVisible();
   await page.goto("/zh-cn/labs/");
-  await page
-    .locator('main a[href="/zh-cn/labs/molecule-representation-inspector/"]')
-    .click();
+  const lab = page.locator('[data-lab-id="molecule-representation-inspector"] h3 a');
+  await expect(lab).toHaveAttribute("href", "/zh-cn/labs/molecule-representation-inspector/");
+  await lab.click();
   await expect(
     page.getByRole("heading", { name: "下载教学材料" }),
   ).toBeVisible();
@@ -90,7 +90,7 @@ test("Chinese entry routes retain Chinese lessons, resources and lab downloads",
   ).toBeVisible();
 });
 
-test("language navigation preserves the lesson and untranslated section targets", async ({
+test("language navigation preserves the lesson and matching-language section hubs", async ({
   page,
   isMobile,
 }) => {
@@ -105,15 +105,9 @@ test("language navigation preserves the lesson and untranslated section targets"
     /\/zh-cn\/learn\/representations\/biological-representations\/$/,
   );
   const sidebar = page.locator("#starlight__sidebar");
-  await expect(
-    sidebar.locator('a[href="/zh-cn/learn/foundations/getting-started/"]'),
-  ).toHaveCount(1);
-  await expect(sidebar.locator('a[href="/zh-cn/labs/"]')).toHaveCount(1);
-  for (const section of ["atlas", "audit", "report", "contribute"]) {
-    await expect(sidebar.locator(`a[href="/${section}/"]`)).toHaveCount(1);
-    await expect(sidebar.locator(`a[href="/zh-cn/${section}/"]`)).toHaveCount(
-      0,
-    );
+  for (const section of ["learn", "labs", "atlas", "audit", "report", "contribute"]) {
+    await expect(sidebar.locator(`a[href="/zh-cn/${section}/"]`)).toHaveCount(1);
+    await expect(sidebar.locator(`a[href="/${section}/"]`)).toHaveCount(0);
   }
   if (isMobile)
     await page.getByRole("button", { name: "菜单", exact: true }).click();
@@ -124,12 +118,10 @@ test("language navigation preserves the lesson and untranslated section targets"
     /(?<!zh-cn)\/learn\/representations\/biological-representations\/$/,
   );
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
-  await expect(
-    sidebar.locator('a[href="/learn/foundations/getting-started/"]'),
-  ).toHaveCount(1);
-  await expect(
-    sidebar.locator('a[href="/zh-cn/learn/foundations/getting-started/"]'),
-  ).toHaveCount(0);
+  for (const section of ["learn", "labs", "atlas", "audit", "report", "contribute"]) {
+    await expect(sidebar.locator(`a[href="/${section}/"]`)).toHaveCount(1);
+    await expect(sidebar.locator(`a[href="/zh-cn/${section}/"]`)).toHaveCount(0);
+  }
   await page.goto("/zh-cn/learn/foundations/getting-started/");
   await expect(
     page.locator('[data-lesson-route="core"] [data-next-lesson]'),

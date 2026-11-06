@@ -1,0 +1,30 @@
+---
+import { withSiteBase } from "../lib/site-paths";
+interface Props { chinese?: boolean; }
+const { chinese = false } = Astro.props;
+const action = withSiteBase(chinese ? "/zh-cn/search/" : "/search/", import.meta.env.BASE_URL);
+---
+<form class="workbench-search-entry" role="search" action={action} aria-label={chinese ? "搜索 AIDD Commons" : "Search AIDD Commons"}>
+  <label><span class="search-entry-label">{chinese ? "搜索全站" : "Search everything"}</span><input type="search" name="q" placeholder={chinese ? "资源、课程、实验…" : "Resources, lessons, labs…"} aria-label={chinese ? "搜索资源、课程和实验" : "Search resources, lessons and labs"} /></label>
+  <kbd data-workbench-shortcut aria-hidden="true">⌘K</kbd>
+  <button type="submit" aria-label={chinese ? "搜索全站内容" : "Search all content"}>↗</button>
+</form>
+<script>
+  const shortcut = document.querySelector<HTMLElement>("[data-workbench-shortcut]");
+  if(shortcut) shortcut.textContent = /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘K" : "CtrlK";
+  document.addEventListener("keydown", event => {
+    if((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+      const input = document.querySelector<HTMLInputElement>(".workbench-search-entry input");
+      if(input) { event.preventDefault(); input.focus(); }
+    }
+  });
+</script>
+<style>
+  .workbench-search-entry { display:flex; align-items:center; width:clamp(10rem,18vw,17rem); border:1px solid var(--atlas-rule-strong); border-radius:.25rem; background:var(--atlas-panel); margin:0; }
+  label { flex:1; min-width:0; } .search-entry-label { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+  input { width:100%; min-height:44px; padding:.55rem .7rem; border:0; background:transparent; color:var(--atlas-ink); font:inherit; font-size:.85rem; }
+  button { width:44px; min-height:44px; border:0; background:transparent; color:var(--atlas-teal-deep); font-size:1.3rem; cursor:pointer; }
+  kbd { padding:.2rem; font: .75rem var(--atlas-font-mono); color:var(--atlas-muted); background:var(--atlas-panel); white-space:nowrap; }
+  @media(max-width:72rem) { .workbench-search-entry { width:11rem; } }
+  @media(max-width:48rem) { .workbench-search-entry { width:100%; } kbd { display:none; } }
+</style>

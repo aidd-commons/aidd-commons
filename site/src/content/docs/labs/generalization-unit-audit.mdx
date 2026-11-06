@@ -13,13 +13,25 @@ This laboratory serves `t17-generalization-unit`. Read [the decision-unit lesson
 
 Mode is fresh independent computation over a frozen protocol and a cached ChEMBL 37 snapshot. Use the project Python 3.11 environment and CPU. The snapshot is already cached locally, so these commands need no network or accelerator. The download command copies only validated artifacts into a separate cache. `show` and `check` write nothing. The exporter overwrites only the compact summary after all checks pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/generalization_unit_audit/run_lab.py download
 .venv/bin/python labs/generalization_unit_audit/inspect_generalization_unit_audit.py show
 .venv/bin/python labs/generalization_unit_audit/inspect_generalization_unit_audit.py check
-.venv/bin/python labs/generalization_unit_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/generalization_unit_audit -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/generalization_unit_audit/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/generalization_unit_audit/export_summary.py
+```
+
+</details>
 
 ## Measurement and unit rule
 
@@ -55,6 +67,17 @@ Assay and parent molecule differ most in distinct value count under the declared
 ## Limits of the material
 
 The seeds were deliberately selected to exercise the admission rule. Their unit distribution is not an estimate for ChEMBL as a whole. A scaffold is a structural grouping rule, not a complete measure of analogue relatedness. An assay ID does not reveal all laboratory conditions. The table cannot support time, site or patient generalization. The laboratory does not fit a model, score a prediction or declare one unit correct. A leave-one-unit-out split would, by design, leave every held-out unit without same-unit training observations. The singleton count instead describes leave-one-measurement-out at the value level.
+
+## Independent inspection task
+
+The table has 487 molecule-record memberships but 486 grouped measurements. Explain why that is not an arithmetic defect. Choose assay or document as a hypothetical held-out axis and state the question that changes relative to parent holdout.
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+A grouped measurement can carry more than one source molecule-record identifier, so membership counts need not equal the number of unique measurements. Holding out assay or document changes the context of generalization; it does not follow from a successful parent-held-out result. The grouping rule counts units but does not independently establish biological independence.
+
+</details>
 
 ## Sources and terms
 

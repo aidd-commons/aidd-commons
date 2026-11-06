@@ -13,13 +13,25 @@ This laboratory serves `t10-asset-openness-reproducibility`. It teaches you to r
 
 Mode is fresh independent computation over a frozen protocol and the committed catalogue. Use the project Python 3.11 environment and CPU. The commands need no network, download or accelerator. The `check` and `show` commands write nothing. The exporter overwrites only the committed compact summary after all checks pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/asset_openness_audit/run_lab.py check
 .venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py show
 .venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py check
-.venv/bin/python labs/asset_openness_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/asset_openness_audit -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/asset_openness_audit/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/asset_openness_audit/export_summary.py
+```
+
+</details>
 
 ## Source records and checks
 
@@ -76,6 +88,17 @@ The procedure counts each of the 7 dimension values in the 24 examined records, 
 ## Limits of the material
 
 The audit checks what these catalogue records state and whether their references resolve internally. It does not reopen every linked external page, run a model or determine whether a resource can be used for a particular purpose. An `unverified` value is bounded by the source review and date recorded for that field. It is not evidence of absence. A `not_applicable` value states a different judgement about the resource type and retains its evidence entry. The frozen selection illustrates the distinctions and is not a representative sample of all resources.
+
+## Independent inspection task
+
+Find an examined record with available weights and an unverified training-data field. Trace each state to its own evidence identifier. Would the weight licence establish permission to reuse its training data? Record the unresolved field without changing its state.
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+No. The seven dimensions describe separate assets, and a licence applies to its stated scope. Available weights do not fill an unverified training-data field. A resolving evidence identifier lets the reader find the cited surface; it does not independently verify every upstream claim or widen a licence.
+
+</details>
 
 ## Sources and terms
 

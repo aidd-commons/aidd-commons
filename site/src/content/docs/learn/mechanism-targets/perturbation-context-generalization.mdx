@@ -5,10 +5,13 @@ description: Define a perturbation response by its baseline context, interventio
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="mechanism-targets/perturbation-context-generalization" />
 
 <ScrollableRegions />
+
+<TeachingViewLink track="mechanism-targets" />
 
 ## Learning goals
 
@@ -60,7 +63,7 @@ may be summarized at inference, never its held-out post-perturbation response.
 
 The [PIE within-dataset release](https://huggingface.co/arcinstitute/PIE_replogle_wdataset), checked on 2026-10-25, makes this population target explicit. Perceiver IO combines knowledge embeddings, baseline control means and training response evidence. For each context–perturbation pair it predicts gene-wise DE probability (`p_de`), log2 fold change (`lfc_pred`) and change in processed mean expression (`delta_p_pred`). These are distinct quantities. None is the before-and-after trajectory of an individual cell, and a mean change does not determine a full expression distribution. The [processed-data definition](https://huggingface.co/datasets/arcinstitute/PIE_replogle_nadig_essential) makes control choice, filtering and statistical thresholds part of the target.
 
-Its [canonical splits](https://huggingface.co/datasets/arcinstitute/PIE_splits) distinguish `unseen_ctx`, `unseen_pert` and `unseen_ctx_pert`. The 4 released checkpoint folders name the held-out cell line; they are independent folds, not an ensemble. A held-out-context test can allow its unperturbed baseline without allowing its perturbation responses. The [single-cell model reading](/learn/representations/single-cell-and-virtual-cell-models/) separates the release's code, checkpoint and data terms. No PIE model was run here.
+Its [canonical splits](https://huggingface.co/datasets/arcinstitute/PIE_splits) distinguish `unseen_ctx`, `unseen_pert` and `unseen_ctx_pert`. The 4 released checkpoint folders name the held-out cell line; they represent separate held-out-context folds, not an ensemble. A held-out-context test can allow its unperturbed baseline without allowing its perturbation responses. The [single-cell model reading](/learn/representations/single-cell-and-virtual-cell-models/) separates the release's code, checkpoint and data terms. No PIE model was run here.
 
 ### Constructed holdout exercise
 
@@ -136,47 +139,31 @@ cell lines, MCF7 and PC3, at a fixed dose and timepoint, how well does a
 compound's transcriptional signature in one cell line predict its
 signature in the other?
 
-Computed once on the raw measured expression values with no correction,
-matched compound pairs show a median Spearman rho of 0.79, but so do
-**mismatched** compound pairs (median rho 0.70): both cell lines' raw
-profiles share so much baseline structure that comparing absolute
-expression barely distinguishes a real signature from noise, the same
-failure mode this lesson's condition-mean control warns about in the
-abstract. Subtracting each profile's own plate-matched vehicle-control
-baseline first, exactly the kind of context variable this lesson's input
-contract asks you to record, removes that shared structure: the real,
-compound-matched median rho becomes 0.175 against a mismatched-pair null
-median of 0.034, a difference a two-sided Mann-Whitney U test finds
-significant at p = 7.9 × 10⁻⁸². About one-fifth of the 1,721 real
-compounds show a **negative** cross-cell-line correlation even after
-baseline correction: for these, cell-line context does not merely change
-the size of the transcriptional response, it reverses its direction,
-exactly the Alpha/Beta sign change above, on compounds no one invented.
+On the raw measured expression values, matched compound pairs have median
+Spearman rho 0.79 and mismatched pairs 0.70. Subtracting each profile's
+plate-matched vehicle-control baseline changes those medians to 0.175 and
+0.034. The reported two-sided Mann-Whitney U value is p = 7.9 × 10⁻⁸²;
+its interpretation depends on dependence between the compared profiles.
+About one-fifth of the 1,721 compounds have negative cross-cell-line
+correlation after correction. This is a negative association between
+ranked gene-response patterns, not proof that each gene or the whole
+response reverses sign as in the scalar Alpha/Beta example.
 
-**Independent exercise (on the real lab's own output):** Using only what
-`show` reports, name the two design choices in this real comparison that
-correspond to the constructed table's "Beta held out" and "one shared
-`delta_hat(A)`" cautions, and explain why a raw, uncorrected correlation
-between the two cell lines would have hidden the sign-reversal finding
-entirely.
+**Independent exercise (using the retained lab output):** Explain what
+plate-matched baseline subtraction and the fixed null rotation each test.
+Why is neither equivalent to holding out Beta or fitting a shared
+`delta_hat(A)`? Explain why negative cross-gene correlation is different
+from a scalar sign reversal.
 
 <details data-worked-answer>
 <summary>Worked answer</summary>
 
-The plate-matched vehicle-control subtraction is this comparison's
-equivalent of declaring the baseline context before fitting anything, the
-same discipline "Beta held out" enforces in the constructed table: without
-it, the raw comparison's high mismatched-pair correlation (rho 0.70) shows
-that most of the apparent agreement was baseline structure common to
-every profile, not anything about the specific compound. The single fixed
-null rotation used as a background is this comparison's equivalent of a
-single shared `delta_hat(A)`: it tests whether the real, compound-matched
-correlation is different from an arbitrary, deterministic mismatch, not
-whether every compound behaves identically. A raw, uncorrected
-correlation would have reported rho near 0.79 for real matches and near
-0.70 for shuffled ones, a small, easy-to-miss gap that gives no reason to
-suspect roughly a fifth of real compounds actually reverse sign once the
-shared baseline is removed.
+Plate-matched subtraction defines the response relative to a local baseline.
+The fixed null rotation compares matched compounds with one deterministic
+mismatch. Neither operation fits an additive predictor or creates a
+held-out-context test. The raw medians of 0.79 and 0.70 show why absolute
+expression agreement alone cannot identify compound-specific agreement;
+the corrected comparison asks a different, descriptive question.
 
 </details>
 

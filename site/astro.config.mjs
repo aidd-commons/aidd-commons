@@ -17,6 +17,7 @@ export default defineConfig({
       routeMiddleware: "./src/route-middleware.ts",
       components: {
         Pagination: "./src/components/LessonPagination.astro",
+        Search: "./src/components/DocumentationSearch.astro",
       },
       sidebar: [
         {
@@ -24,13 +25,13 @@ export default defineConfig({
           items: [
             {
               label: "Learn",
-              link: "/learn/foundations/getting-started/",
+              link: "/learn/",
               translations: { "zh-CN": "学习" },
             },
             {
               label: "Atlas",
               link: "/atlas/",
-              translations: { "zh-CN": "图谱（英文）" },
+              translations: { "zh-CN": "图谱" },
             },
             {
               label: "Labs",
@@ -40,17 +41,17 @@ export default defineConfig({
             {
               label: "Audit",
               link: "/audit/",
-              translations: { "zh-CN": "审计（英文）" },
+              translations: { "zh-CN": "审计" },
             },
             {
               label: "Report",
               link: "/report/",
-              translations: { "zh-CN": "报告（英文）" },
+              translations: { "zh-CN": "报告" },
             },
             {
               label: "Contribute",
               link: "/contribute/",
-              translations: { "zh-CN": "参与（英文）" },
+              translations: { "zh-CN": "参与" },
             },
           ],
         },

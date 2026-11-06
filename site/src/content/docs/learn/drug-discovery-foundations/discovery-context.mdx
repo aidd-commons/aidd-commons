@@ -4,8 +4,11 @@ description: Connect medicinal chemistry, structural biology, assays, and experi
 ---
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="drug-discovery-foundations/discovery-context" />
+
+<TeachingViewLink track="drug-discovery-foundations" />
 
 ## Foundations
 
@@ -36,6 +39,21 @@ developability.
 Multimodal target-to-candidate systems may join chemical, structural, and
 mechanistic evidence. Their utility depends on whether the linkages and the
 downstream experimental feedback are available at the same decision point.
+
+## A bounded worked decision and independent task
+
+Begin with [the pipeline](/learn/foundations/getting-started/). This orientation asks what evidence belongs to a discovery decision. Consider a constructed molecule that lowers a reporter signal and also acts in a direct reporter counterscreen. The first observation is compatible with a biological effect, detector interference or both; the second supplies evidence for a measurement alternative. Neither observation by itself identifies a molecular target.
+
+Write the next question without calling the molecule an effective drug. What changes in an orthogonal assay, and what should remain relevant?
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+A bounded question asks whether the response persists when detection changes while the relevant biology is retained. That addresses detection dependence, not clinical efficacy or a fully resolved mechanism. Continue to [assay controls and dose response](/learn/drug-discovery-foundations/assay-controls-dose-response/) for normalization and a numerical example.
+
+</details>
+
+Teaching task added on 2026-10-26; the original source-review date remains below.
 
 ## What v0.1 does not yet teach
 

@@ -139,17 +139,25 @@ describe("figure palette", () => {
   });
 
   it("carries the nine pinned site tokens verbatim in both implementations", async () => {
-    const [mirror, source] = await Promise.all([
+    const [mirror, source, css] = await Promise.all([
       read("site/src/data/atlas-palette.json"),
       read("report/figures/atlas_palette.py"),
+      read("site/src/styles/global.css"),
     ]);
     const parsed = JSON.parse(mirror);
 
     for (const theme of ["light", "dark"] as const) {
+      const selector = theme === "light" ? ":root" : ':root[data-theme="dark"]';
+      const tokenBlock = css
+        .slice(css.indexOf(`${selector} {`))
+        .split("}", 1)[0];
       expect(parsed.themes[theme].tokens).toEqual(PINNED_TOKENS[theme]);
       expect(Object.keys(PINNED_TOKENS[theme])).toHaveLength(9);
-      for (const value of Object.values(PINNED_TOKENS[theme])) {
+      for (const [name, value] of Object.entries(PINNED_TOKENS[theme])) {
         expect(source).toContain(`"${value}"`);
+        expect(tokenBlock).toContain(
+          `--atlas-${name.replaceAll("_", "-")}: ${value};`,
+        );
       }
     }
   });

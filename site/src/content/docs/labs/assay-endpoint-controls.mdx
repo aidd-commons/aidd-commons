@@ -4,6 +4,7 @@ description: Read six archived PubChem BioAssay dose-response assays and see how
 ---
 
 import ScrollableRegions from "../../../components/ScrollableRegions.astro";
+import ScientificTeachingView from "../../../components/ScientificTeachingView.astro";
 
 <ScrollableRegions />
 
@@ -64,6 +65,8 @@ distributions and a fixed set of named examples rather than raw rows. A script
 in the same directory regenerates that summary in place from the cache, so it
 overwrites the frozen artifact and is deliberately not part of the reading
 route.
+
+<ScientificTeachingView track="drug-discovery-foundations" compact />
 
 ## What the data is
 

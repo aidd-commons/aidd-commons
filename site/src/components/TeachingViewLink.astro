@@ -1,0 +1,14 @@
+---
+import { teachingViews, localTeachingText } from "../data/teaching-views";
+interface Props {track:string;chinese?:boolean}
+const {track,chinese=false}=Astro.props;
+const view=teachingViews[track];
+const prefix=chinese?"/zh-cn":"";
+---
+{view&&<aside class="teaching-view-link" aria-label={chinese?"本专题的科学对象视图":"Scientific object view for this track"}><span>{chinese?"边读边检查科学对象":"Inspect the scientific object"}</span><a href={prefix+"/learn/"+view.lesson+"/#scientific-view-"+track}>{localTeachingText(view.question,chinese)} <span aria-hidden="true">↗</span></a></aside>}
+<style>
+  .teaching-view-link { margin:1.1rem 0 1.6rem; padding:.65rem 0 .65rem .85rem; border-left:2px solid var(--sl-color-text-accent); display:grid; gap:.2rem; }
+  .teaching-view-link>span { color:var(--sl-color-gray-2); font-size:.75rem; }
+  .teaching-view-link>a { display:inline-flex; align-items:center; min-height:44px; font-size:.82rem; line-height:1.5; width:fit-content; text-underline-offset:.2em; }
+  .teaching-view-link>a:focus-visible { outline:3px solid var(--sl-color-text-accent); outline-offset:3px; }
+</style>

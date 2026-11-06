@@ -1,5 +1,8 @@
 ---
 import "../styles/global.css";
+import { withoutSiteBase } from "../lib/site-paths";
+import { languageAlternate } from "../lib/site-locale";
+import WorkbenchSearch from "./WorkbenchSearch.astro";
 
 interface Props {
   description: string;
@@ -9,17 +12,19 @@ interface Props {
 
 const { description, lang = "en", title } = Astro.props;
 const chinese = lang === "zh-CN";
+const pathname = withoutSiteBase(Astro.url.pathname, import.meta.env.BASE_URL);
+const alternate = languageAlternate(pathname, "/", chinese);
 const navigation = chinese
   ? [
-      ["学习", "/zh-cn/pathways/"],
-      ["图谱", "/atlas/"],
+      ["学习", "/zh-cn/learn/"],
+      ["图谱", "/zh-cn/atlas/"],
       ["实验室", "/zh-cn/labs/"],
-      ["审计", "/audit/"],
-      ["报告", "/report/"],
-      ["参与", "/contribute/"],
+      ["审计", "/zh-cn/audit/"],
+      ["报告", "/zh-cn/report/"],
+      ["参与", "/zh-cn/contribute/"],
     ]
   : [
-      ["Learn", "/learn/foundations/getting-started/"],
+      ["Learn", "/learn/"],
       ["Atlas", "/atlas/"],
       ["Labs", "/labs/"],
       ["Audit", "/audit/"],
@@ -79,14 +84,15 @@ const themeLabels = {
     <a class="skip-link" href="#main-content">{chinese ? "跳到主要内容" : "Skip to main content"}</a>
     <header class="site-header">
       <div class="site-header__inner">
-        <a class="brand" href="/">AIDD Commons</a>
+        <a class="brand" href={chinese ? "/zh-cn/" : "/"}>AIDD Commons</a>
+        <WorkbenchSearch chinese={chinese} />
         <site-navigation>
-          <button class="nav-toggle" type="button" aria-controls="primary-navigation" aria-expanded="false">
-            {chinese ? "打开导航" : "Open navigation"}
+          <button class="nav-toggle" type="button" aria-label={chinese ? "打开导航" : "Open navigation"} aria-controls="primary-navigation" aria-expanded="false">
+            <span aria-hidden="true">{chinese ? "导航" : "Menu"}</span>
           </button>
           <nav id="primary-navigation" class="primary-nav" aria-label={chinese ? "主要导航" : "Primary navigation"}>
-            {navigation.map(([label, href]) => <a href={href}>{label}</a>)}
-            <a class="language-link" href={chinese ? "/" : "/zh-cn/"}>{chinese ? "English" : "中文"}</a>
+            {navigation.map(([label, href]) => <a href={href} aria-current={pathname === href || (href !== "/" && pathname.startsWith(href)) ? "page" : undefined}>{label}</a>)}
+            <a class="language-link" data-language-link href={alternate}>{chinese ? "English" : "中文"}</a>
           </nav>
           <button
             class="theme-toggle"
@@ -146,18 +152,41 @@ const themeLabels = {
     </main>
     <footer class="site-footer">
       <div class="site-footer__inner">
-        {chinese ? "英语内容为规范版本；现有课程与实验说明提供中文译文，数值面板和下载文件保留原始格式。" : "English is canonical. Existing lessons and lab guides have Chinese translations; numerical panels and downloads retain their original format."}
+        <p>{chinese ? "英语内容为规范版本；课程与实验说明提供中文译文。图谱原始记录、科学图表和下载文件保留原始语言或格式。" : "English is canonical. Lessons and lab guides have Chinese translations. Source records, scientific panels and downloads retain their original language or format."}</p>
+        <a href={chinese ? "/zh-cn/contribute/" : "/contribute/"}>{chinese ? "参与与纠错" : "Contribute a correction"}<span aria-hidden="true">↗</span></a>
       </div>
     </footer>
     <script>
+      // Read the current URL at activation because explorer controls update history in place.
+      document.querySelector<HTMLAnchorElement>("[data-language-link]")?.addEventListener("click", (event) => {
+        const link = event.currentTarget as HTMLAnchorElement;
+        const target = new URL(link.href);
+        target.search = location.search;
+        target.hash = location.hash;
+        link.href = target.href;
+      });
       class SiteNavigation extends HTMLElement {
         connectedCallback() {
           const button = this.querySelector("button");
           if (!button) return;
+          this.dataset.enhanced = "true";
+          const close = () => {
+            this.dataset.open = "false";
+            button.setAttribute("aria-expanded", "false");
+          };
           button.addEventListener("click", () => {
             const open = this.dataset.open === "true";
             this.dataset.open = String(!open);
             button.setAttribute("aria-expanded", String(!open));
+          });
+          this.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && this.dataset.open === "true") {
+              close();
+              button.focus();
+            }
+          });
+          this.addEventListener("focusout", (event) => {
+            if (!this.contains(event.relatedTarget as Node | null)) close();
           });
         }
       }

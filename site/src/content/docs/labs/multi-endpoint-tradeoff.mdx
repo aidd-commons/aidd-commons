@@ -15,13 +15,25 @@ This laboratory asks which measurements actually cover a declared compound cohor
 
 The mode is a fresh independent computation under a frozen protocol. Use the project's Python 3.11 environment. The first command downloads the ChEMBL 37 snapshot into a separate cache and requires network access. The remaining commands read that cache without network access or an accelerator. They do not change the source data. The export command overwrites the small committed summary only after the contract and arithmetic checks pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/multi_endpoint_tradeoff/run_lab.py download
 .venv/bin/python labs/multi_endpoint_tradeoff/inspect_multi_endpoint_tradeoff.py show
 .venv/bin/python labs/multi_endpoint_tradeoff/inspect_multi_endpoint_tradeoff.py check
-.venv/bin/python labs/multi_endpoint_tradeoff/export_summary.py
 .venv/bin/python -m pytest labs/tests/multi_endpoint_tradeoff -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/multi_endpoint_tradeoff/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/multi_endpoint_tradeoff/export_summary.py
+```
+
+</details>
 
 ## Source records and measurement rule
 
@@ -64,6 +76,17 @@ All 10 parents have an empty named family. Toxicity and exposure are empty for a
 ## Limits of the material
 
 The 15 seeds were selected to exercise the admission rule and are not a random sample. The lab does not fit a model, estimate performance, combine families, produce a score or rank compounds. It cannot infer safety, clean interaction behavior or bioavailability from an absent measurement. A response-potency type alone does not establish therapeutic efficacy, and a pooled median across assays does not replace the individual experimental contexts. The local snapshot contains source activity records, while the committed summary contains counts and descriptive statistics rather than activity rows.
+
+## Independent inspection task
+
+Inspect one parent with response-potency measurements but no admitted toxicity or exposure family. Construct a decision memo with a measured field and two unresolved requirements. Would averaging its available potency values fill either gap?
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+No. The protocol maps admitted endpoints to explicit families; an absent toxicity or exposure family remains missing within this source and rule. Averaging potency changes its summary, not its endpoint. This coverage result does not establish that a compound was never tested elsewhere or that it is safe or adequately exposed.
+
+</details>
 
 ## Sources and attribution
 

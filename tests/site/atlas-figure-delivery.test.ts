@@ -84,8 +84,11 @@ it("renders every placed preview as an accessible image with a PDF download", ()
         previewLink,
         `${figure.id}: preview opens its vector PDF`,
       ).toContain(`/figures/${figure.pdf}`);
-      expect(block).toContain(`/figures/${figure.pdf}`);
-      expect(block).toContain("Download PDF");
+      const downloadLink = [...block!.matchAll(/<a\b[^>]*\bdownload(?:="[^"]*")?[^>]*>[\s\S]*?<\/a>/gu)]
+        .map((match) => match[0])
+        .find((link) => link.includes(`href="/figures/${figure.pdf}"`));
+      expect(downloadLink, `${page} ${figure.id}: labelled PDF download`).toBeDefined();
+      expect(downloadLink).toContain(page.replace(/^\//u, "").startsWith("zh-cn/") ? "下载 PDF" : "Download PDF");
       expect(block).not.toContain("<svg");
     }
   }

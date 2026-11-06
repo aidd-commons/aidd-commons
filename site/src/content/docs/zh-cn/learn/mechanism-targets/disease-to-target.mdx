@@ -4,12 +4,15 @@ description: 在不将相关性等同于因果性的前提下，从疾病、因�
 ---
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 英文原文：[From disease mechanism to target](/learn/mechanism-targets/disease-to-target/)。
 
 译文更新：2026-09-08。
 
 <LessonProgress lessonId="mechanism-targets/disease-to-target" />
+
+<TeachingViewLink track="mechanism-targets" chinese />
 
 ## 基础
 
@@ -32,6 +35,21 @@ import LessonProgress from "../../../../../components/LessonProgress.astro";
 
 [BioGPT](https://github.com/microsoft/BioGPT) 等生物医学语言模型可能有助于检索假设，
 但检索质量不能将未支持的文本转化为因果证据。
+
+## 有边界的推演与独立任务
+
+定义靶点主张前，先阅读[生物表示](/zh-cn/learn/representations/biological-representations/)。在一个构造区域中，疾病关联位于基因 T、U 附近。对 T 的扰动改变某细胞情境下的表型，但没有提供从关联变异到 T 的连接。区域关联与扰动因此回答不同问题；把两者名称拼接起来不能建立抑制 T 对患者有益。
+
+写出两种竞争解释及一个判别观察。靶点依赖扰动对照能回答哪个未解决连接，哪个连接仍属遗传证据问题？
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+替代效应基因 U，以及检测或存活影响等解释仍然可能。定义明确的靶点依赖对照可检验该情境中的 T 到表型连接，变异到效应基因连接则需要自身证据。继续阅读[遗传靶点假设](/zh-cn/learn/mechanism-targets/genetics-to-target-evidence/)和[扰动验证](/zh-cn/learn/mechanism-targets/perturbation-to-target-validation/)，学习各自假设与推演案例。
+
+</details>
+
+本教学任务新增于 2026-10-26；原来源审阅日期保持如下。
 
 ## v0.1 尚未教授的内容
 

@@ -5,15 +5,18 @@ description: 判断记录的比较深度在证据充分、有边界、引用失�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="foundations/evidence-claims-and-unknowns" />
 <ScrollableRegions />
 
 英文原文：[Evidence, claims and unresolved fields](/learn/foundations/evidence-claims-and-unknowns/)。
 
+<TeachingViewLink track="foundations" chinese />
+
 ## 学习目标与先修内容
 
-请先阅读[来源与实体识读](/learn/foundations/source-and-entity-literacy/)。你将把深度判断追溯到该主题所声明的证据，在深度未定时保留区间，识别证据失效的主张，并避免把未审阅字段变成否定性发现。[离线审计指南](/labs/claims-evidence-audit/)可复现下面的案例。
+请先阅读[来源与实体识读](/zh-cn/learn/foundations/source-and-entity-literacy/)。你将把深度判断追溯到该主题所声明的证据，在深度未定时保留区间，识别证据失效的主张，并避免把未审阅字段变成否定性发现。[离线审计指南](/zh-cn/labs/claims-evidence-audit/)可复现下面的案例。
 
 比较记录表述的是审阅者在限定来源范围内看到了什么，它本身不是教学效果的测量。当一个对象有详细条目，而另一个没有特定主题条目时，这一区别尤其关键。
 
@@ -73,7 +76,7 @@ SKEMPI 的记录带两条 licence，其 scope 说明授权覆盖上游数据集�
 
 ## 运行审计
 
-模式是依据冻结协议和已提交的本地记录进行全新独立计算。项目 Python 环境和 CPU 即可使用。无需网络、下载或加速器。下列命令不写入文件，会打印所有所选单元及状态计数。[指南](/labs/claims-evidence-audit/)还提供检查与汇总导出命令。
+模式是依据冻结协议和已提交的本地记录进行全新独立计算。项目 Python 环境和 CPU 即可使用。无需网络、下载或加速器。下列命令不写入文件，会打印所有所选单元及状态计数。[指南](/zh-cn/labs/claims-evidence-audit/)还提供检查与汇总导出命令。
 
 ```bash
 .venv/bin/python labs/claims_evidence_audit/inspect_claims_evidence_audit.py show

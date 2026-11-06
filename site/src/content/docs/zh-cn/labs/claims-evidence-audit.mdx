@@ -11,19 +11,31 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 ## 准备与学习目标
 
-本实验对应 `t01-evidence-claim-unknown`。请先阅读[证据、主张与未解决字段](/learn/foundations/evidence-claims-and-unknowns/)和[来源与实体识读](/learn/foundations/source-and-entity-literacy/)。你将区分有证据支持的深度、区间、缺乏支持的深度，以及明确声明的未知字段。你还将比较项目自评与独立阅读，并检查两个最高级主张所附的条件。了解 YAML 会有所帮助，但不需要建模经验。
+本实验对应 `t01-evidence-claim-unknown`。请先阅读[证据、主张与未解决字段](/zh-cn/learn/foundations/evidence-claims-and-unknowns/)和[来源与实体识读](/zh-cn/learn/foundations/source-and-entity-literacy/)。你将区分有证据支持的深度、区间、缺乏支持的深度，以及明确声明的未知字段。你还将比较项目自评与独立阅读，并检查两个最高级主张所附的条件。了解 YAML 会有所帮助，但不需要建模经验。
 
 ## 模式与命令
 
 模式是依据冻结协议和已提交的比较记录进行全新独立计算。使用项目的 Python 3.11.15 环境、PyYAML 6.0.3 和 CPU。命令不需要网络、下载或加速器。请在仓库根目录运行。`check` 和 `show` 不写入文件。导出程序只在检查通过后覆盖精简汇总。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/claims_evidence_audit/run_lab.py check
 .venv/bin/python labs/claims_evidence_audit/inspect_claims_evidence_audit.py show
 .venv/bin/python labs/claims_evidence_audit/inspect_claims_evidence_audit.py check
-.venv/bin/python labs/claims_evidence_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/claims_evidence_audit -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/claims_evidence_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/claims_evidence_audit/export_summary.py
+```
+
+</details>
 
 ## 记录与状态规则
 
@@ -81,6 +93,17 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 ## 材料局限
 
 `unresolved-field` 不表示该对象没有覆盖这个主题。项目自己的深度是其选择陈述的下限，不是教学效果的测量。这些记录是在特定日期对指定来源范围的审阅。本实验不重新打开外部网页，也不测量读者的学习结果。本地证据检查通过，不会使已记录的最高级主张自动成立。
+
+## 独立检查任务
+
+比较有证据的 absent 单元与无证据的 unverified 默认值。分别写出各状态对已审阅来源页面所允许的最强表述，再解释为何两者都不能支持关于某提供方所有版本的主张。
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+有证据的 absent 单元支持按记录规则在所述已审阅材料中未发现相关内容。无证据默认值表示字段未解决。两者都不能建立未审阅页面、版本或活动中的缺失。表述应保留来源页面与审阅日期。
+
+</details>
 
 ## 来源与条款
 

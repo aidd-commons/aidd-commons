@@ -1,0 +1,189 @@
+---
+import LearningProgressPanel from "./LearningProgressPanel.astro";
+import HomeWorkflow from "./HomeWorkflow.astro";
+import { workbenchData } from "../lib/workbench-data";
+import { withSiteBase } from "../lib/site-paths";
+import { siteOverview } from "../lib/site-overview";
+interface Props { chinese?: boolean; }
+const { chinese = false } = Astro.props;
+const local = (path: string) => withSiteBase(`${chinese ? "/zh-cn" : ""}${path}`, import.meta.env.BASE_URL);
+const href = (path: string) => withSiteBase(path, import.meta.env.BASE_URL);
+const tracks = workbenchData.tracks;
+const allLessons = tracks.flatMap((track) => track.lessons);
+const byId = new Map(allLessons.map((lesson) => [lesson.id, lesson]));
+const trackById = new Map(tracks.map((track) => [track.id, track]));
+const title = (lessonId: string) => { const lesson = byId.get(lessonId); return lesson ? chinese ? lesson.titleZh : lesson.title : lessonId; };
+const lessonHref = (lessonId: string) => { const lesson = byId.get(lessonId); return lesson ? href(chinese ? lesson.hrefZh : lesson.href) : "#"; };
+const progressRoutes = workbenchData.routes.map((route) => ({ ...route, title: chinese ? route.titleZh : route.title }));
+const progressLessons = allLessons.map((lesson) => ({ id: lesson.id, title: chinese ? lesson.titleZh : lesson.title, href: href(chinese ? lesson.hrefZh : lesson.href), prerequisiteIds: lesson.prerequisiteIds }));
+---
+
+<section class="learning-hub-hero" aria-labelledby="learn-title">
+  <div><p class="eyebrow">{chinese ? "学习 · 从科学问题到可检查的输出" : "Learn · From scientific question to inspectable output"}</p><h1 id="learn-title">{chinese ? <><span class="learning-hub-title-line">为你的下一个问题，</span><span class="learning-hub-title-line">找到学习路径。</span></> : "Find a learning route for your next question."}</h1></div>
+  <div><p class="learning-hub-intro">{chinese ? "先在下方流程中定位问题，再选择核心路径或专题路径。每一课保留先修条件、练习与来源，轨道中的科学视图帮助你把对象、方法与评价连接起来。" : "Locate your question in the workflow, then choose a core or specialist route. Each lesson keeps its prerequisites, practice and sources. Scientific views within the tracks connect objects, methods and evaluation."}</p><div class="learning-hub-actions"><a href={local("/learn/foundations/first-session/")}>{chinese ? "开始第一次学习" : "Start a first session"}<span aria-hidden="true">→</span></a><a href="#learning-routes">{chinese ? "选择路径" : "Choose a route"}<span aria-hidden="true">↓</span></a><a href="#learning-tracks">{chinese ? "浏览轨道地图" : "Browse the track map"}<span aria-hidden="true">↓</span></a></div><dl class="learning-hub-counts"><div><dt>{chinese ? "学习轨道" : "Tracks"}</dt><dd>{tracks.length}</dd></div><div><dt>{chinese ? "规范教学单元" : "Mapped units"}</dt><dd>{siteOverview.curriculum.unitCount}</dd></div><div><dt>{chinese ? "已声明学习路径" : "Declared routes"}</dt><dd>{workbenchData.routes.length}</dd></div></dl></div>
+</section>
+
+<HomeWorkflow chinese={chinese} />
+
+<div class="learning-hub-workspace">
+  <LearningProgressPanel chinese={chinese} routes={progressRoutes} lessons={progressLessons} compact wide />
+  <p class="learning-hub-boundary">{chinese ? "内容覆盖不表示已观察到学习成效。这里的路径顺序与先修关系来自规范课程，而非能力测评。" : "Content coverage is not observed learning. Route order and prerequisites come from the canonical curriculum, not a proficiency assessment."}</p>
+</div>
+
+<section id="learning-routes" class="learning-routes-section" aria-labelledby="learning-routes-title">
+  <div class="learning-hub-heading"><div><p class="eyebrow">{chinese ? "一条核心路径 · 五条专题路径" : "One core route · five specialist routes"}</p><h2 id="learning-routes-title">{chinese ? "按一个连贯的问题学习" : "Follow a connected question"}</h2></div><a href={local("/learn/foundations/curriculum-map/")}>{chinese ? "完整课程图谱" : "Full curriculum blueprint"}<span aria-hidden="true">↗</span></a></div>
+  <div class="learning-route-grid">{workbenchData.routes.map((route) => <details id={`route-${route.id}`} class="learning-route" data-route-outline={route.id}>
+    <summary><span class="learning-route__kind">{route.kind === "core" ? chinese ? "共同基础" : "Shared foundation" : chinese ? "专题路径" : "Specialist route"}</span><h3>{chinese ? route.titleZh : route.title}</h3><p>{chinese ? route.summaryZh : route.summary}</p><span class="learning-route__footer"><span>{route.lessonIds.length} {chinese ? "节课程" : "lessons"}</span><span>{chinese ? "展开路径" : "Open route"}<span aria-hidden="true">＋</span></span></span></summary>
+    <div class="learning-route__body">{route.prerequisiteIds.length > 0 && <div class="learning-route__prerequisites"><h4>{chinese ? "路径外先修课程" : "Prerequisites outside this route"}</h4><ul>{route.prerequisiteIds.map((id) => <li><a href={lessonHref(id)}>{title(id)}</a></li>)}</ul></div>}<ol>{route.lessonIds.map((id, index) => <li><span class="learning-route__step" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span><a href={lessonHref(id)}>{title(id)}</a></li>)}</ol><a class="learning-route__start" href={`${local("/learn/")}?${new URLSearchParams({ route: route.id })}`}>{chinese ? "在工作区使用这条路径" : "Use this route in the workspace"}<span aria-hidden="true">↑</span></a></div>
+  </details>)}</div>
+</section>
+
+<section id="learning-tracks" class="learning-tracks-section" aria-labelledby="learning-tracks-title">
+  <div class="learning-hub-heading"><div><p class="eyebrow">{chinese ? "由规范课程生成" : "Generated from the canonical curriculum"}</p><h2 id="learning-tracks-title">{chinese ? "18 条轨道，一张可追踪的学习地图" : "Eighteen tracks. A traceable learning map."}</h2></div><a href={local("/labs/")}>{chinese ? "前往实验" : "Go to labs"}<span aria-hidden="true">↗</span></a></div>
+  <p class="learning-tracks-explanation">{chinese ? "每条轨道显示规范顺序和跨轨道先修关系。地图、列表与进度视图使用相同的课程标识符；先修箭头表示学习依赖，不代表药物发现中的因果关系。" : "Each track shows its declared order and prior tracks. Map, list and progress views use the same lesson identifiers. Prerequisite arrows describe learning dependencies, not causal relations in drug discovery."}</p>
+  <learning-track-directory data-view="map" data-chinese={String(chinese)}>
+    <div class="learning-view-controls" role="group" aria-label={chinese ? "轨道显示方式" : "Track display"} hidden><button type="button" data-learning-view="map" aria-pressed="true">{chinese ? "地图" : "Map"}</button><button type="button" data-learning-view="list" aria-pressed="false">{chinese ? "列表" : "List"}</button><button type="button" data-learning-view="progress" aria-pressed="false">{chinese ? "本机进度" : "Device progress"}</button></div>
+    <div class="learning-track-map">{tracks.map((track) => <article id={`track-${track.id}`} class="learning-track-node" data-hub-track={track.id} data-lesson-ids={JSON.stringify(track.lessons.map((lesson) => lesson.id))}>
+      <div class="learning-track-node__identity"><span class="learning-track-node__number">{String(track.order).padStart(2, "0")}</span><span class="learning-track-node__count">{track.lessons.length} {chinese ? "课" : "lessons"}</span><span class="learning-track-node__progress" data-track-progress hidden></span></div>
+      <h3><a href={href(chinese ? track.hrefZh : track.href)}>{chinese ? track.titleZh : track.title}<span aria-hidden="true">↗</span></a></h3><progress class="learning-track-node__bar" data-track-bar value="0" max={track.lessons.length} aria-label={`${chinese ? track.titleZh : track.title}: ${chinese ? "本机自报进度" : "self-reported device progress"}`}></progress><p class="learning-track-node__summary">{chinese ? track.summaryZh : track.summary}</p>
+      <div class="learning-track-node__prerequisites"><span>{chinese ? "先修轨道" : "Prior tracks"}</span>{track.prerequisiteIds.length ? <ul>{track.prerequisiteIds.map((id) => { const prior = trackById.get(id)!; return <li><span aria-hidden="true">↳</span><a href={href(chinese ? prior.hrefZh : prior.href)}>{chinese ? prior.titleZh : prior.title}</a></li>; })}</ul> : <p>{chinese ? "无跨轨道要求" : "No prior track required"}</p>}</div>
+    </article>)}</div>
+    <p class="learning-track-progress-note" hidden>{chinese ? "这里只统计这个浏览器中自行标记完成的课程。先修课程仍可自由阅读；进度不会作为访问门槛。" : "Counts reflect lessons marked complete in this browser. Prerequisites remain freely readable; progress does not restrict access."}</p>
+  </learning-track-directory>
+</section>
+
+<section class="learning-hub-practice" aria-labelledby="learning-practice-title"><div><p class="eyebrow">{chinese ? "从理解到独立练习" : "From explanation to independent practice"}</p><h2 id="learning-practice-title">{chinese ? "先选择执行模式，再运行代码" : "Choose an execution mode before running code"}</h2><p>{chinese ? "阅读已有结果、编辑学生练习和独立复现有不同的输入与输出合同。新的学生输出应写到独立目录，不能覆盖作者结果。" : "Reading retained results, editing a student exercise and running an independent reproduction have different input and output contracts. Write new student outputs to a separate directory, keeping author results intact."}</p></div><ul><li><a href={local("/labs/notebook-guide/")}>{chinese ? "Notebook 执行与恢复指南" : "Notebook execution and recovery"}<span aria-hidden="true">↗</span></a></li><li><a href={local("/learn/machine-learning/student-modelling-sandbox/")}>{chinese ? "构造数据上的拟合与评价练习" : "Fitting and evaluation on constructed data"}<span aria-hidden="true">↗</span></a></li><li><a href={local("/labs/chembl-egfr-representation-baselines/")}>{chinese ? "检查已保存的 EGFR 基线结果" : "Inspect retained EGFR baseline results"}<span aria-hidden="true">↗</span></a></li></ul></section>
+<p class="learning-hub-language">{chinese ? "英文为规范版本。课程译文保留相同的公式、数值、限制与来源；图谱中的英文来源记录和原始数值面板另行标识。" : "English is canonical. Translations retain the same formulas, values, limits and sources. English source records and original numerical panels are identified separately."}</p>
+
+<script>
+  import { readLessonProgress } from "../lib/atlas-state";
+  import { learningProgress } from "../lib/learning-hub";
+  class LearningTrackDirectory extends HTMLElement {
+    private onStorage = () => this.renderProgress();
+    connectedCallback() {
+      this.querySelector<HTMLElement>(".learning-view-controls")?.removeAttribute("hidden");
+      const supported = ["map", "list", "progress"];
+      const requested = new URL(location.href).searchParams.get("view");
+      this.setView(supported.includes(requested ?? "") ? requested! : "map");
+      this.querySelectorAll<HTMLButtonElement>("[data-learning-view]").forEach((button) => button.addEventListener("click", () => {
+        this.setView(button.dataset.learningView ?? "map");
+        const url = new URL(location.href);
+        if (this.dataset.view === "map") url.searchParams.delete("view");
+        else url.searchParams.set("view", this.dataset.view ?? "map");
+        history.replaceState(null, "", url);
+      }));
+      window.addEventListener("storage", this.onStorage);
+      window.addEventListener("pageshow", this.onStorage);
+      this.renderProgress();
+    }
+    disconnectedCallback() { window.removeEventListener("storage", this.onStorage); window.removeEventListener("pageshow", this.onStorage); }
+    private setView(view: string) {
+      this.dataset.view = view;
+      this.querySelectorAll<HTMLButtonElement>("[data-learning-view]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.learningView === view)));
+      const note = this.querySelector<HTMLElement>(".learning-track-progress-note");
+      if (note) note.hidden = view !== "progress";
+    }
+    private renderProgress() {
+      let completed: string[] = [];
+      try { completed = readLessonProgress(localStorage); } catch { /* Optional storage never gates content. */ }
+      this.querySelectorAll<HTMLElement>("[data-hub-track]").forEach((track) => {
+        const ids = JSON.parse(track.dataset.lessonIds ?? "[]") as string[];
+        const count = learningProgress(ids, completed);
+        const bar = track.querySelector<HTMLProgressElement>("[data-track-bar]");
+        if (bar) bar.value = count.completed;
+        const label = track.querySelector<HTMLElement>("[data-track-progress]");
+        if (label) { label.hidden = false; label.textContent = `${count.completed} / ${count.total} ${this.dataset.chinese === "true" ? "已标记" : "marked"}`; }
+      });
+    }
+  }
+  if (!customElements.get("learning-track-directory")) customElements.define("learning-track-directory", LearningTrackDirectory);
+</script>
+
+<style>
+  .learning-hub-hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: end; padding: .5rem 0 1.5rem; }
+  .learning-hub-workspace { margin: 1.25rem 0 0; }
+  .learning-hub-workspace .learning-hub-boundary { max-width: none; margin-top: .6rem; }
+  .learning-hub-hero .eyebrow { font-size: .75rem; margin: 0 0 .7rem; }
+  .learning-hub-hero h1 { max-width: 23ch; font-size: clamp(2rem, 3.1vw, 3rem); letter-spacing: -.045em; line-height: 1.12; margin: 0; font-weight: 650; }
+  .learning-hub-title-line { display: block; }
+  .learning-hub-intro { max-width: 65ch; color: var(--atlas-muted); margin: 0 0 .6rem; font-size: 1rem; line-height: 1.65; }
+  .learning-hub-actions { display: flex; flex-wrap: wrap; gap: .25rem 1.5rem; }
+  .learning-hub-actions a { display: inline-flex; align-items: center; gap: .75rem; min-height: 44px; font-size: .77rem; font-weight: 650; }
+  .learning-hub-counts { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin: .6rem 0 0; padding-top: .65rem; border-top: 1px solid var(--atlas-rule); }
+  .learning-hub-counts > div { display: flex; align-items: baseline; gap: .4rem; }
+  .learning-hub-counts dt { color: var(--atlas-muted); font-size: .75rem; }
+  .learning-hub-counts dd { margin: 0; color: var(--atlas-teal-deep); font: 1rem/1.2 var(--atlas-font-mono); }
+  .learning-hub-boundary { max-width: 75ch; margin: 0; font-size: .75rem; color: var(--atlas-muted); line-height: 1.65; }
+  .learning-routes-section, .learning-tracks-section { margin-top: 1.75rem; scroll-margin-top: 5rem; }
+  .learning-hub-heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+  .learning-hub-heading .eyebrow { font-size: .75rem; margin: 0 0 .4rem; }
+  .learning-hub-heading h2 { margin: 0; font-size: clamp(1.3rem, 2.2vw, 1.85rem); line-height: 1.25; letter-spacing: -.03em; }
+  .learning-hub-heading > a { display: inline-flex; align-items: center; gap: .75rem; min-height: 44px; font-size: .75rem; }
+  .learning-route-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: start; }
+  .learning-route { border: 1px solid var(--atlas-rule-strong); background: var(--atlas-panel); scroll-margin-top: 5rem; }
+  .learning-route summary { display: block; padding: 1rem; cursor: pointer; list-style: none; }
+  .learning-route summary::-webkit-details-marker { display: none; }
+  .learning-route__kind { display: inline-block; padding-bottom: .65rem; color: var(--atlas-teal-deep); font-size: .75rem; font-weight: 650; text-transform: uppercase; letter-spacing: .06em; }
+  .learning-route h3 { margin: 0; font-size: 1.1rem; line-height: 1.35; letter-spacing: -.025em; }
+  .learning-route summary p { max-width: 60ch; margin: .5rem 0 .7rem; color: var(--atlas-muted); font-size: 1rem; line-height: 1.6; }
+  .learning-route__footer { display: flex; align-items: center; justify-content: space-between; gap: .75rem; color: var(--atlas-muted); font-size: .75rem; }
+  .learning-route__footer > span:last-child { display: inline-flex; align-items: center; gap: .75rem; color: var(--atlas-teal-deep); }
+  .learning-route[open] .learning-route__footer > span:last-child > span { transform: rotate(45deg); }
+  .learning-route__body { padding: 0 1.25rem 1rem; }
+  .learning-route__body > ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--atlas-rule); }
+  .learning-route__body > ol > li { display: grid; grid-template-columns: 1.65rem minmax(0, 1fr); gap: .6rem; align-items: center; border-bottom: 1px solid var(--atlas-rule); }
+  .learning-route__body > ol a { display: flex; align-items: center; min-height: 44px; padding: .6rem 0; font-size: .75rem; line-height: 1.5; }
+  .learning-route__step { align-self: start; padding-top: .85rem; font-family: var(--atlas-font-mono); font-size: .75rem; color: var(--atlas-muted); }
+  .learning-route__prerequisites { padding: .8rem; margin-bottom: 1rem; border-left: 2px solid var(--atlas-emphasis); background: var(--atlas-bg); }
+  .learning-route__prerequisites h4 { margin: 0 0 .4rem; font-size: .75rem; }
+  .learning-route__prerequisites ul { margin: 0; padding-left: 1rem; }
+  .learning-route__prerequisites a { display: inline-flex; align-items: center; min-height: 44px; font-size: .75rem; }
+  .learning-route__start { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 44px; margin-top: .5rem; font-weight: 650; font-size: .75rem; }
+  .learning-tracks-explanation { max-width: 95ch; color: var(--atlas-muted); font-size: .77rem; line-height: 1.7; margin: 0 0 1.25rem; }
+  learning-track-directory { display: block; }
+  .learning-view-controls { display: flex; gap: .25rem; margin-bottom: 1rem; }
+  .learning-view-controls button { min-height: 44px; padding: .5rem .9rem; border: 1px solid var(--atlas-rule-strong); background: var(--atlas-panel); color: var(--atlas-ink); font: inherit; font-size: .75rem; cursor: pointer; }
+  .learning-view-controls button[aria-pressed="true"] { background: var(--atlas-teal); border-color: var(--atlas-teal); color: var(--atlas-action-ink); }
+  .learning-track-map { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--atlas-rule); border: 1px solid var(--atlas-rule); }
+  .learning-track-node { display: flex; flex-direction: column; min-width: 0; background: var(--atlas-panel); padding: 1.25rem; scroll-margin-top: 5rem; }
+  .learning-track-node__identity { display: flex; align-items: center; gap: .75rem; margin-bottom: .9rem; }
+  .learning-track-node__number { display: inline-block; color: var(--atlas-teal-deep); border-bottom: 2px solid var(--atlas-teal); padding-bottom: .3rem; font-family: var(--atlas-font-mono); font-size: .8rem; }
+  .learning-track-node__count { color: var(--atlas-muted); font-family: var(--atlas-font-mono); font-size: .75rem; }
+  .learning-track-node__progress { display: none; color: var(--atlas-teal-deep); font-family: var(--atlas-font-mono); font-size: .75rem; }
+  .learning-track-node__bar { display: none; width: 100%; height: .3rem; margin-top: .8rem; border: 0; accent-color: var(--atlas-teal); }
+  .learning-track-node__bar::-webkit-progress-bar { background: var(--atlas-surface); }
+  .learning-track-node__bar::-webkit-progress-value { background: var(--atlas-teal); }
+  .learning-track-node h3 { font-size: 1rem; line-height: 1.4; margin: 0; font-weight: 650; letter-spacing: -.02em; }
+  .learning-track-node h3 a { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; min-height: 44px; color: var(--atlas-ink); text-decoration: none; }
+  .learning-track-node h3 a > span { color: var(--atlas-teal-deep); font-size: .8rem; }
+  .learning-track-node__summary { color: var(--atlas-muted); font-size: 1rem; line-height: 1.6; margin: .6rem 0 1rem; }
+  .learning-track-node__prerequisites { margin-top: auto; border-top: 1px solid var(--atlas-rule); padding-top: .65rem; }
+  .learning-track-node__prerequisites > span { display: block; color: var(--atlas-muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; }
+  .learning-track-node__prerequisites ul { list-style: none; padding: 0; margin: .3rem 0 0; }
+  .learning-track-node__prerequisites li { display: flex; align-items: baseline; gap: .4rem; }
+  .learning-track-node__prerequisites li > span { color: var(--atlas-muted); font-size: .75rem; }
+  .learning-track-node__prerequisites a { display: inline-flex; align-items: center; min-height: 44px; font-size: .75rem; line-height: 1.5; }
+  .learning-track-node__prerequisites p { color: var(--atlas-muted); font-size: .75rem; margin: .5rem 0 0; }
+  [data-view="list"] .learning-track-map { grid-template-columns: 1fr; }
+  [data-view="list"] .learning-track-node { display: grid; grid-template-columns: 6rem minmax(0, 1.2fr) minmax(0, 1fr); gap: .5rem 1.25rem; }
+  [data-view="list"] .learning-track-node__identity { grid-row: 1 / 3; align-self: start; flex-wrap: wrap; }
+  [data-view="list"] .learning-track-node__summary { grid-column: 2; margin: 0; }
+  [data-view="list"] .learning-track-node__prerequisites { grid-column: 3; grid-row: 1 / 3; margin: 0; border-top: 0; padding-top: 0; }
+  [data-view="progress"] .learning-track-node__progress { display: inline-block; margin-left: auto; }
+  [data-view="progress"] .learning-track-node__bar { display: block; }
+  [data-view="progress"] .learning-track-node__summary { display: none; }
+  [data-view="progress"] .learning-track-node__prerequisites { margin-top: 1rem; }
+  .learning-track-progress-note { color: var(--atlas-muted); font-size: .75rem; margin-top: 1rem; line-height: 1.6; }
+  .learning-hub-practice { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 1.75rem; border-top: 1px solid var(--atlas-rule-strong); padding-top: 1.5rem; margin-top: 1.75rem; }
+  .learning-hub-practice .eyebrow { font-size: .75rem; margin: 0 0 .5rem; }
+  .learning-hub-practice h2 { margin: 0; font-size: 1.45rem; line-height: 1.25; letter-spacing: -.03em; }
+  .learning-hub-practice p:not(.eyebrow) { color: var(--atlas-muted); font-size: 1rem; line-height: 1.65; }
+  .learning-hub-practice ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--atlas-rule); }
+  .learning-hub-practice li { border-bottom: 1px solid var(--atlas-rule); }
+  .learning-hub-practice li a { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 58px; padding-block: .65rem; font-size: .8rem; }
+  .learning-hub-language { color: var(--atlas-muted); font-size: .75rem; line-height: 1.7; margin-top: 2rem; }
+  [hidden] { display: none !important; }
+  @media (max-width: 900px) { .learning-hub-hero { gap: 1.5rem; } .learning-track-map { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 680px) { .learning-hub-hero { grid-template-columns: 1fr; padding-top: .25rem; padding-bottom: 1.25rem; gap: .9rem; } .learning-hub-hero h1 { font-size: clamp(1.9rem, 7vw, 2.5rem); } .learning-route-grid, .learning-hub-practice { grid-template-columns: 1fr; } .learning-hub-practice { gap: 1rem; } .learning-hub-heading { align-items: flex-start; } [data-view="list"] .learning-track-node { grid-template-columns: 3.5rem minmax(0, 1fr); } [data-view="list"] .learning-track-node__prerequisites { grid-column: 2; grid-row: auto; margin-top: .5rem; } }
+  @media (max-width: 450px) { .learning-track-map { grid-template-columns: 1fr; } .learning-hub-hero h1 { font-size: 2rem; } .learning-hub-counts { gap: 1.5rem; } .learning-hub-heading { flex-direction: column; gap: .5rem; } .learning-route summary { padding: 1rem; } }
+</style>

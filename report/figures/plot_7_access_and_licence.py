@@ -5,8 +5,9 @@ export, used as a live projection rather than a historical release snapshot.
 Every record carries an access level and a list of licences, each with
 its own scope and evidence.
 
-What the figure shows. The left panel counts records by access level. The right
-panel counts records by licence layer.
+What the figure shows. The upper panel counts records by access level. The lower
+panel counts records by licence layer. Both retain the exact count and the
+share of the same record population.
 
 The licence layers are a grouping this script makes, so they are stated here in
 full and the mapping is enforced rather than assumed: every licence name in the
@@ -56,7 +57,7 @@ LICENCE_LAYERS: list[tuple[str, list[str]]] = [
     ),
     (
         "Permissive software licence",
-        ["MIT", "Apache-2.0", "BSD-3-Clause", "BSD-2-Clause", "ASL", "New BSD"],
+        ["MIT", "Apache-2.0", "BSD-3-Clause", "BSD-2-Clause", "New BSD"],
     ),
     (
         "Creative Commons attribution",
@@ -95,6 +96,9 @@ LICENCE_LAYERS: list[tuple[str, list[str]]] = [
     (
         "Other stated terms",
         [
+            # MACE's ASL checkpoints carry an academic non-commercial licence,
+            # not Apache-2.0 or a permissive software grant.
+            "ASL",
             # A vendor's own open model licence, published as its own terms
             # rather than as a variant of a standard licence.
             "NVIDIA Open Model License",
@@ -177,100 +181,109 @@ def _licence_layer(names: list[str]) -> str:
 
 
 def build() -> dict[str, Path]:
-    """Draw the figure and write its two files plus its caption fragment."""
+    """Expose access and licence counts on separate full-width alignments."""
     style.apply_style("light")
-    tokens = style.tokens("light")
-    colours = style.categorical("light")
+    tokens, colours = style.tokens(), style.categorical()
     resources = style.load_json(style.DATA_DIR / "resources.v1.json")
-
-    access_counts = Counter(record["access_level"]["value"] for record in resources)
+    access_counts = Counter(r["access_level"]["value"] for r in resources)
     layer_counts = Counter()
     for record in resources:
         names = [licence["name"] for licence in record.get("licenses", [])]
         layer_counts[_licence_layer(names) if names else NO_LICENCE] += 1
-
-    fig = style.figure(style.FIGURE_WIDTH, 4.3)
-    axes = style.axes_grid(
+    fig = style.figure(height=6.5)
+    style.heading(
         fig,
-        1,
-        2,
-        left=0.235,
-        right=0.985,
-        bottom=0.135,
-        top=0.90,
-        wspace=0.52,
-        width_ratios=[1.0, 1.15],
+        "Access and stated licence answer different questions",
+        f"{len(resources)} catalogue records · one count per record in each panel",
     )
-    access_ax, licence_ax = axes
-
-    access_values = [access_counts[level] for level in ACCESS_ORDER]
-    access_positions = list(range(len(ACCESS_ORDER)))[::-1]
-    container = access_ax.barh(
-        access_positions,
-        access_values,
-        height=0.62,
-        color=colours["teal"],
-        edgecolor=tokens["ink"],
-        linewidth=0.6,
-        zorder=3,
-    )
-    for bar, level in zip(container, ACCESS_ORDER, strict=True):
-        bar.set_hatch(style.hatch_for_index(ACCESS_ORDER.index(level)))
-    access_ax.set_yticks(access_positions)
-    access_ax.set_yticklabels([level.replace("_", " ") for level in ACCESS_ORDER], fontsize=8.0)
-    access_ax.tick_params(axis="y", length=0)
-    access_ax.set_xlabel("Records", fontsize=8.5)
-    access_ax.set_xlim(0, max(access_values) * 1.16)
-    access_ax.set_xticks([0, 40, 80, 120])
-    access_ax.grid(axis="x", linewidth=0.6, alpha=0.7)
-    access_ax.set_axisbelow(True)
-    style.title(access_ax, "Access level")
-    style.bar_labels(
-        access_ax, container, access_values, orientation="horizontal", pad=4, fontsize=7.8
-    )
-
+    ax1 = fig.add_axes((0.39, 0.53, 0.46, 0.29))
+    ax2 = fig.add_axes((0.39, 0.13, 0.46, 0.29))
     licence_order = [name for name, _ in LICENCE_LAYERS] + [NO_LICENCE]
-    licence_values = [layer_counts[name] for name in licence_order]
-    licence_positions = list(range(len(licence_order)))[::-1]
-    container = licence_ax.barh(
-        licence_positions,
-        licence_values,
-        height=0.62,
-        color=colours["teal"],
-        edgecolor=tokens["ink"],
-        linewidth=0.6,
-        zorder=3,
+    labels = [
+        "Public domain dedication",
+        "Permissive software licence",
+        "CC attribution",
+        "Copyleft",
+        "CC non-commercial",
+        "Other stated terms",
+        "No licence recorded",
+    ]
+    for ax, order, counts, names, title in [
+        (
+            ax1,
+            ACCESS_ORDER,
+            access_counts,
+            [s.replace("_", " ") for s in ACCESS_ORDER],
+            "(a) Access level",
+        ),
+        (ax2, licence_order, layer_counts, labels, "(b) Most restrictive stated licence layer"),
+    ]:
+        ys = list(range(len(order)))[::-1]
+        for y, key in zip(ys, order, strict=True):
+            n = counts[key]
+            unknown = key in ["unverified", NO_LICENCE]
+            colour = colours["slate"] if unknown else colours["teal"]
+            ax.plot([0, n], [y, y], lw=1.6, color=colour, ls=(0, (2, 2)) if unknown else "-")
+            ax.plot(
+                n,
+                y,
+                marker="s" if unknown else "o",
+                ms=6,
+                mfc="none" if unknown else colour,
+                mec=colour,
+                mew=1,
+            )
+            ax.text(
+                1.05,
+                y,
+                str(n),
+                transform=ax.get_yaxis_transform(),
+                ha="right",
+                va="center",
+                fontsize=8.8,
+                fontweight="bold",
+            )
+            ax.text(
+                1.24,
+                y,
+                f"{n / len(resources):.1%}",
+                transform=ax.get_yaxis_transform(),
+                ha="right",
+                va="center",
+                fontsize=8.4,
+                color=tokens["muted"],
+            )
+        ax.set_yticks(ys, names)
+        ax.set_ylim(-0.6, len(order) - 0.4)
+        largest = max(max(access_counts.values()), max(layer_counts.values()))
+        ax.set_xlim(-largest * 0.035, largest * 1.06)
+        ax.set_xlabel("Records")
+        style.clean_axis(ax)
+        style.title(ax, title)
+        ax.text(
+            1.05,
+            1.04,
+            "Count",
+            transform=ax.transAxes,
+            ha="right",
+            fontsize=8,
+            color=tokens["muted"],
+        )
+        ax.text(
+            1.24,
+            1.04,
+            "Share",
+            transform=ax.transAxes,
+            ha="right",
+            fontsize=8,
+            color=tokens["muted"],
+        )
+    style.footnote(
+        fig,
+        "Open square = metadata not verified/read. Stated licence layers do not "
+        "replace scope-specific terms or a legal assessment.",
+        y=0.025,
     )
-    for bar, name in zip(container, licence_order, strict=True):
-        if name == NO_LICENCE:
-            bar.set_facecolor(tokens["panel"])
-            bar.set_hatch("..")
-        else:
-            bar.set_hatch(style.hatch_for_index(licence_order.index(name)))
-    licence_ax.set_yticks(licence_positions)
-    licence_ax.set_yticklabels(
-        [
-            "public domain dedication",
-            "permissive software\nlicence",
-            "Creative Commons\nattribution",
-            "copyleft",
-            "Creative Commons\nnon-commercial",
-            "other stated terms",
-            "no licence recorded",
-        ],
-        fontsize=8.0,
-    )
-    licence_ax.tick_params(axis="y", length=0)
-    licence_ax.set_xlabel("Records", fontsize=8.5)
-    licence_ax.set_xlim(0, max(licence_values) * 1.16)
-    licence_ax.set_xticks([0, 40, 80, 120])
-    licence_ax.grid(axis="x", linewidth=0.6, alpha=0.7)
-    licence_ax.set_axisbelow(True)
-    style.title(licence_ax, "Licence layer")
-    style.bar_labels(
-        licence_ax, container, licence_values, orientation="horizontal", pad=4, fontsize=7.8
-    )
-
     written = style.save(fig, STEM)
     style.register_caption(FIGURE_NUMBER, caption(resources, access_counts, layer_counts))
     return written

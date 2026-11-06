@@ -1,0 +1,194 @@
+---
+export interface PlotPoint { x: number; y: number; label?: string }
+export interface PlotSeries {
+  name: string;
+  points: PlotPoint[];
+  dashed?: boolean;
+  color?: string;
+  marker?: number;
+  connect?: boolean;
+}
+interface Props {
+  title: string;
+  xLabel: string;
+  yLabel: string;
+  series: PlotSeries[];
+  xMin?: number;
+  xMax?: number;
+  yMin?: number;
+  yMax?: number;
+  xTicks?: number[];
+  yTicks?: number[];
+  scatter?: boolean;
+  chinese?: boolean;
+  showTable?: boolean;
+}
+const { title, xLabel, yLabel, series, xMin = 0, xMax = 1, yMin = 0, yMax = 1, xTicks, yTicks, scatter = false, chinese = false, showTable = true } = Astro.props;
+if (![xMin, xMax, yMin, yMax].every(Number.isFinite) || xMax <= xMin || yMax <= yMin) {
+  throw new Error("ScientificPlot requires finite, increasing axis limits: " + title);
+}
+if (series.some(line => line.points.some(point => !Number.isFinite(point.x) || !Number.isFinite(point.y)))) {
+  throw new Error("ScientificPlot cannot display a non-finite source value: " + title);
+}
+const palette = ["var(--atlas-teal)", "var(--atlas-coral)", "var(--atlas-ink)", "var(--atlas-muted)", "var(--atlas-teal-deep)"];
+const px = (x: number) => 100 * (x - xMin) / (xMax - xMin);
+const py = (y: number) => 100 * (y - yMin) / (yMax - yMin);
+const fractions = [0, .25, .5, .75, 1];
+const horizontalTicks = xTicks ?? fractions.map(fraction => xMin + fraction * (xMax - xMin));
+const verticalTicks = yTicks ?? fractions.map(fraction => yMin + fraction * (yMax - yMin));
+if (horizontalTicks.some(value => !Number.isFinite(value) || value < xMin || value > xMax) || verticalTicks.some(value => !Number.isFinite(value) || value < yMin || value > yMax)) {
+  throw new Error("ScientificPlot ticks must lie inside their axis limits: " + title);
+}
+const tick = (value: number) => Number(value.toPrecision(3)).toString();
+const color = (line: PlotSeries, index: number) => line.color ?? palette[index % palette.length];
+const marker = (line: PlotSeries, index: number) => ((line.marker ?? index) % 7 + 7) % 7;
+// The table, initial download and marks share the same source series. Filtering is display-only.
+const hasPointLabels = series.some(line => line.points.some(point => point.label));
+const headers = [chinese ? "序列" : "Series", ...(hasPointLabels ? [chinese ? "点标签" : "Point label"] : []), xLabel, yLabel];
+const rows = series.flatMap((line, index) => line.points.map(point => ({
+  index, cells: [line.name, ...(hasPointLabels ? [point.label ?? ""] : []), String(point.x), String(point.y)],
+})));
+const csvCell = (value: string) => '"' + value.replaceAll('"', '""') + '"';
+const csv = [headers, ...rows.map(row => row.cells)].map(row => row.map(csvCell).join(",")).join("\r\n");
+---
+<div class="science-plot not-content" data-science-plot data-chinese={chinese ? "true" : "false"}>
+  <p class="science-plot__title">{title}</p>
+  <p class="science-plot__quantity">{yLabel}</p>
+  <div class="science-plot__body" role="img" aria-label={title + ". " + yLabel + "; " + xLabel}>
+    {verticalTicks.map(value => <div class="science-plot__grid" style={{ bottom: py(value) + "%" }}><span>{tick(value)}</span></div>)}
+    {horizontalTicks.map(value => <div class="science-plot__vertical" style={{ left: px(value) + "%" }} />)}
+    {series.map((line, index) => (
+      <div class="science-plot__series" style={{ "--series-color": color(line, index) }} data-series={line.name} data-series-index={index}>
+        {!scatter && line.connect !== false && line.points.slice(1).map((point, i) => {
+          const previous = line.points[i];
+          const dx = px(point.x) - px(previous.x);
+          const dy = py(point.y) - py(previous.y);
+          return <i class:list={["science-plot__line", { "is-dashed": line.dashed }]} data-from={previous.x + "," + previous.y} data-to={point.x + "," + point.y} style={{ left: px(previous.x) + "%", bottom: py(previous.y) + "%", width: "hypot(" + dx + "cqw," + dy + "cqh)", transform: "translateY(50%) rotate(atan2(" + (-dy) + "cqh," + dx + "cqw))" }} />;
+        })}
+        {line.points.map(point => (
+          <span class:list={["science-plot__point", "marker-" + marker(line, index)]} data-x={point.x} data-y={point.y} style={{ left: px(point.x) + "%", bottom: py(point.y) + "%" }}>
+            {point.label && <b>{point.label}</b>}
+          </span>
+        ))}
+      </div>
+    ))}
+  </div>
+  <div class="science-plot__x-ticks">{horizontalTicks.map(value => <span style={{ left: px(value) + "%" }}>{tick(value)}</span>)}</div>
+  <p class="science-plot__x-label">{xLabel}</p>
+  <div class="science-plot__readout">
+    <p class="science-plot__help" data-plot-help hidden>{chinese ? "选择图例以显示或隐藏序列。坐标范围保持不变。" : "Select a legend item to show or hide a series. Axis limits stay fixed."}</p>
+    <output data-plot-status role="status" aria-live="polite" aria-atomic="true" hidden></output>
+  </div>
+  <ul class="science-plot__legend" aria-label={chinese ? "序列图例" : "Series legend"}>
+    {series.map((line, index) => <li style={{ "--series-color": color(line, index) }}><button type="button" disabled aria-pressed="true" data-series-toggle={index}><span class:list={["science-plot__key", { "is-dashed": line.dashed, "is-scatter": scatter || line.connect === false }]} aria-hidden="true"><i class={"marker-" + marker(line, index)} /></span><span>{line.name}</span></button></li>)}
+  </ul>
+  <div class="science-plot__actions">
+    <button type="button" data-series-reset hidden>{chinese ? "显示全部序列" : "Show all series"}</button>
+    {showTable && <a data-plot-download href={"data:text/csv;charset=utf-8," + encodeURIComponent("\ufeff" + csv)} download="displayed-plot-data.csv">{chinese ? "下载所示数据 CSV" : "Download displayed data CSV"}</a>}
+  </div>
+  {showTable && <details class="science-plot__table"><summary>{chinese ? "查看所示数据的表格" : "Read displayed data as a table"} <span data-plot-row-count>({rows.length})</span></summary><div class="science-table-scroll" tabindex="0" role="region" aria-label={title + (chinese ? "数据表" : " data table")}><table><caption>{title} · {chinese ? "与图中所示序列一致；保留源值精度" : "Matches the displayed series; source precision retained"}</caption><thead><tr>{headers.map(header => <th scope="col">{header}</th>)}</tr></thead><tbody>{rows.map(row => <tr data-series-row={row.index}>{row.cells.map((cell, index) => index === 0 ? <th scope="row">{cell}</th> : <td>{cell}</td>)}</tr>)}</tbody></table></div></details>}
+</div>
+<script>
+  function initializeScientificPlots() {
+    document.querySelectorAll<HTMLElement>("[data-science-plot]").forEach(root => {
+      if (root.dataset.plotReady) return;
+      root.dataset.plotReady = "true";
+      const chinese = root.dataset.chinese === "true";
+      const toggles = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-series-toggle]"));
+      const status = root.querySelector<HTMLOutputElement>("[data-plot-status]")!;
+      const reset = root.querySelector<HTMLButtonElement>("[data-series-reset]")!;
+      const download = root.querySelector<HTMLAnchorElement>("[data-plot-download]");
+      const csvCell = (value: string) => '"' + value.replaceAll('"', '""') + '"';
+      function update() {
+        const visible = new Set(toggles.filter(button => button.getAttribute("aria-pressed") === "true").map(button => button.dataset.seriesToggle));
+        root.querySelectorAll<HTMLElement>("[data-series-index]").forEach(series => { series.hidden = !visible.has(series.dataset.seriesIndex); });
+        const rows = Array.from(root.querySelectorAll<HTMLTableRowElement>("[data-series-row]"));
+        rows.forEach(row => { row.hidden = !visible.has(row.dataset.seriesRow); });
+        const shownRows = rows.filter(row => !row.hidden);
+        const count = root.querySelector("[data-plot-row-count]");
+        if (count) count.textContent = `(${shownRows.length})`;
+        status.textContent = chinese ? `显示 ${visible.size} / ${toggles.length} 个序列` : `${visible.size} of ${toggles.length} series shown`;
+        reset.disabled = visible.size === toggles.length;
+        if (download) {
+          const headers = Array.from(root.querySelectorAll("thead th"), cell => cell.textContent ?? "");
+          const cells = shownRows.map(row => Array.from(row.cells, cell => cell.textContent ?? ""));
+          const csv = [headers, ...cells].map(row => row.map(csvCell).join(",")).join("\r\n");
+          download.href = "data:text/csv;charset=utf-8," + encodeURIComponent("\ufeff" + csv);
+        }
+      }
+      toggles.forEach(button => {
+        button.disabled = false;
+        button.addEventListener("click", () => {
+          button.setAttribute("aria-pressed", button.getAttribute("aria-pressed") === "true" ? "false" : "true");
+          update();
+        });
+      });
+      reset.hidden = false;
+      status.hidden = false;
+      root.querySelector<HTMLElement>("[data-plot-help]")!.hidden = false;
+      reset.addEventListener("click", () => { toggles.forEach(button => button.setAttribute("aria-pressed", "true")); update(); });
+      update();
+    });
+  }
+  initializeScientificPlots();
+  document.addEventListener("astro:page-load", initializeScientificPlots);
+</script>
+<style>
+  .science-plot { container-type:inline-size; min-width:0; padding:.8rem 0 .3rem; --plot-axis:2.8rem; --plot-edge:1.1rem; }
+  .science-plot__title { font-size:.88rem; font-weight:650; line-height:1.45; margin:0 0 .6rem!important; }
+  .science-plot__quantity { font-size:.75rem; line-height:1.5; color:var(--sl-color-gray-2); margin:0 var(--plot-edge) .7rem var(--plot-axis)!important; }
+  .science-plot__body { position:relative; container-type:size; aspect-ratio:1.9; margin:0 var(--plot-edge) 0 var(--plot-axis); border-left:1px solid var(--sl-color-gray-3); border-bottom:1px solid var(--sl-color-gray-3); isolation:isolate; }
+  .science-plot__grid { position:absolute; inset-inline:0; border-top:1px solid var(--sl-color-gray-5); }
+  .science-plot__grid > span { position:absolute; right:calc(100% + .5rem); top:-.55rem; font:.75rem var(--sl-font-mono,monospace); line-height:1.2; color:var(--sl-color-gray-2); white-space:nowrap; }
+  .science-plot__vertical { position:absolute; inset-block:0; border-left:1px dotted var(--sl-color-gray-6); z-index:-1; }
+  .science-plot__line { position:absolute; display:block; height:1.8px; border:0; background:var(--series-color); transform-origin:left center; }
+  .science-plot__line.is-dashed { background:repeating-linear-gradient(to right,var(--series-color) 0,var(--series-color) 5px,transparent 5px,transparent 8px); }
+  .science-plot__point { position:absolute; width:.52rem; height:.52rem; transform:translate(-50%,50%); }
+  .science-plot__point::before,.science-plot__legend i::before { content:""; display:block; box-sizing:border-box; width:100%; height:100%; background:var(--series-color); border:1px solid var(--sl-color-bg); border-radius:50%; }
+  .marker-1::before { border-radius:0!important; }
+  .marker-2::before { border-radius:0!important; transform:rotate(45deg); }
+  .marker-3::before { background:var(--sl-color-bg)!important; border:2px solid var(--series-color)!important; }
+  .marker-4::before { border:0!important; border-radius:0!important; clip-path:polygon(50% 0,100% 100%,0 100%); }
+  .marker-5::before { border:0!important; border-radius:0!important; clip-path:polygon(35% 0,65% 0,65% 35%,100% 35%,100% 65%,65% 65%,65% 100%,35% 100%,35% 65%,0 65%,0 35%,35% 35%); }
+  .marker-6::before { border-radius:0!important; background:var(--sl-color-bg)!important; border:2px solid var(--series-color)!important; transform:rotate(45deg); }
+  .science-plot__point b { position:absolute; bottom:.85rem; left:.2rem; font:650 .75rem var(--sl-font); line-height:1.3; white-space:nowrap; color:var(--sl-color-text); }
+  .science-plot__x-ticks { position:relative; height:1.35rem; margin:.45rem var(--plot-edge) 0 var(--plot-axis); font:.75rem var(--sl-font-mono,monospace); color:var(--sl-color-gray-2); }
+  .science-plot__x-ticks span { position:absolute; transform:translateX(-50%); white-space:nowrap; }
+  .science-plot__x-label { margin:.1rem var(--plot-edge) .7rem var(--plot-axis)!important; font-size:.78rem; line-height:1.5; text-align:center; }
+  .science-plot__legend { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr)); gap:.4rem 1rem; list-style:none; margin:.8rem 0 0!important; padding:0!important; font-size:.75rem; line-height:1.5; }
+  .science-plot__legend li { display:flex; align-items:center; gap:.6rem; margin:0; min-width:0; overflow-wrap:anywhere; }
+  .science-plot [hidden] { display:none!important; }
+  .science-plot__readout { display:flex; flex-wrap:wrap; justify-content:space-between; gap:.25rem 1rem; font-size:.72rem; color:var(--sl-color-gray-2); }
+  .science-plot__help { margin:.3rem 0!important; line-height:1.5; }
+  .science-plot__readout output { align-self:center; font-variant-numeric:tabular-nums; }
+  .science-plot__legend button { display:flex; align-items:center; gap:.6rem; width:100%; min-height:44px; padding:.35rem .5rem; border:1px solid transparent; background:transparent; color:inherit; text-align:left; font:inherit; line-height:1.4; cursor:pointer; }
+  .science-plot__legend button:disabled { cursor:default; opacity:1; }
+  .science-plot[data-plot-ready] .science-plot__legend button { border-color:var(--sl-color-gray-5); }
+  .science-plot__legend button[aria-pressed="false"] { color:var(--sl-color-gray-2); text-decoration:line-through; border-style:dashed; }
+  .science-plot__legend button[aria-pressed="false"] .science-plot__key { opacity:.4; }
+  .science-plot__legend button:hover:not(:disabled) { background:var(--sl-color-gray-6); }
+  .science-plot__actions { display:flex; flex-wrap:wrap; align-items:center; gap:.35rem 1rem; margin-top:.55rem; font-size:.75rem; }
+  .science-plot__actions button { min-height:44px; padding:.35rem .6rem; border:1px solid var(--sl-color-gray-4); background:transparent; color:var(--sl-color-text); font:inherit; cursor:pointer; }
+  .science-plot__actions button:disabled { opacity:.6; cursor:default; }
+  .science-plot__actions a { display:inline-flex; align-items:center; min-height:44px; text-underline-offset:.2em; }
+  .science-plot button:focus-visible,.science-plot a:focus-visible { outline:3px solid var(--sl-color-text-accent); outline-offset:3px; }
+  .science-plot__key { display:inline-flex; position:relative; flex:0 0 1.9rem; width:1.9rem; height:.7rem; align-items:center; justify-content:center; }
+  .science-plot__key::before { content:""; position:absolute; inset-inline:0; top:50%; border-top:1.8px solid var(--series-color); }
+  .science-plot__key.is-dashed::before { border-top-style:dashed; }
+  .science-plot__key.is-scatter::before { border:0; }
+  .science-plot__legend i { position:relative; display:block; width:.6rem; height:.6rem; }
+  .science-plot__table { margin-top:.85rem; border-top:1px solid var(--sl-color-gray-5); font-size:.8rem; }
+  .science-plot__table summary { cursor:pointer; padding:.6rem 0; min-height:44px; font-weight:600; }
+  .science-plot__table summary:focus-visible,.science-table-scroll:focus-visible { outline:3px solid var(--sl-color-text-accent); outline-offset:3px; }
+  .science-table-scroll { overflow:auto; max-width:100%; max-height:24rem; overscroll-behavior:contain; }
+  .science-table-scroll table { display:table; overflow:visible; width:100%; border-collapse:collapse; font-size:.75rem; }
+  .science-table-scroll caption { text-align:left; padding:.6rem 0; font-weight:600; }
+  .science-table-scroll th,.science-table-scroll td { padding:.55rem .6rem; text-align:left; border-bottom:1px solid var(--sl-color-gray-5); }
+  .science-table-scroll thead th { position:sticky; top:0; z-index:2; background:var(--sl-color-bg); box-shadow:0 1px var(--sl-color-gray-4); }
+  .science-table-scroll tbody th { min-width:8rem; max-width:16rem; }
+  .science-table-scroll tbody tr:nth-child(even) { background:color-mix(in srgb,var(--sl-color-gray-6) 50%,transparent); }
+  .science-table-scroll tbody tr:hover { background:var(--sl-color-gray-6); }
+  .science-table-scroll td { font-variant-numeric:tabular-nums; white-space:nowrap; }
+  @container(max-width:24rem){.science-plot__legend{grid-template-columns:1fr}.science-plot__body{aspect-ratio:1.2}}
+  @media(max-width:35rem){.science-plot{--plot-axis:2.4rem;--plot-edge:.9rem}.science-plot__body{aspect-ratio:1.35}.science-plot__legend{grid-template-columns:1fr}.science-plot__quantity,.science-plot__x-label{font-size:.75rem}}
+</style>

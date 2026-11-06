@@ -11,19 +11,31 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 ## 准备与学习目标
 
-请先阅读[检索、类型化工具与反馈循环](/learn/scientific-agents/retrieval-tools-feedback/)。你将识别实验实际使用的来源，核查保留的拒答，将主张与冻结的计数比较，并找出记录无法自行授权的决定。了解 JSON 和本地 Python 测试即可，无须运行模型推断。
+请先阅读[检索、类型化工具与反馈循环](/zh-cn/learn/scientific-agents/retrieval-tools-feedback/)。你将识别实验实际使用的来源，核查保留的拒答，将主张与冻结的计数比较，并找出记录无法自行授权的决定。了解 JSON 和本地 Python 测试即可，无须运行模型推断。
 
 ## 模式与命令
 
 模式是在冻结协议下，依据仓库中已提交的记录进行全新独立计算。使用 Python 3.11.15 和 CPU。无须网络、下载、模型服务或加速器。请从仓库根目录运行。前三条命令不写文件。所有检查通过后，导出程序才覆盖本实验的精简汇总。测试命令使用临时文件，不重新运行已记录的模型或锁定评估。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/agent_evaluation_taskset/run_lab.py download
 .venv/bin/python labs/agent_evaluation_taskset/inspect_agent_evaluation_taskset.py show
 .venv/bin/python labs/agent_evaluation_taskset/inspect_agent_evaluation_taskset.py check
-.venv/bin/python labs/agent_evaluation_taskset/export_summary.py
 .venv/bin/python -m pytest labs/tests/agent_evaluation_taskset -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/agent_evaluation_taskset/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/agent_evaluation_taskset/export_summary.py
+```
+
+</details>
 
 ## 任务集与判定规则
 
@@ -80,4 +92,4 @@ PaperQA 测试不重新生成模型回答或来源审核。EGFR 检查程序不�
 
 ## 来源与条款
 
-[检索与工具课程](/learn/scientific-agents/retrieval-tools-feedback/)、[主张链指南](/labs/claim-chain-audit/)和[EGFR 协议指南](/labs/chembl-contract-inspection/)提供教学背景。已提交的主张链、PaperQA 和 EGFR 记录于 2026-10-23 在本地读取。原创指南文字采用 CC BY 4.0，实验代码采用 Apache-2.0。引用材料保留各自的条款。
+[检索与工具课程](/zh-cn/learn/scientific-agents/retrieval-tools-feedback/)、[主张链指南](/zh-cn/labs/claim-chain-audit/)和[EGFR 协议指南](/zh-cn/labs/chembl-contract-inspection/)提供教学背景。已提交的主张链、PaperQA 和 EGFR 记录于 2026-10-23 在本地读取。原创指南文字采用 CC BY 4.0，实验代码采用 Apache-2.0。引用材料保留各自的条款。

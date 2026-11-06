@@ -8,11 +8,14 @@
     "node": ">=24.0.0 <25"
   },
   "scripts": {
-    "dev": "pnpm catalog:build && pnpm comparisons:build && pnpm --dir site dev",
-    "build": "pnpm catalog:build && pnpm comparisons:build && pnpm --dir site build",
-    "check": "pnpm catalog:validate && pnpm comparisons:validate && pnpm catalog:build && pnpm comparisons:build && pnpm --dir site check && pnpm --dir site build && pnpm text:check --rendered site/dist && pnpm test:unit",
+    "dev": "pnpm --dir site dev",
+    "build": "pnpm --dir site build",
+    "check": "pnpm catalog:validate && pnpm comparisons:validate && pnpm --dir site check && pnpm --dir site build && pnpm text:check --rendered site/dist && pnpm test:unit",
     "catalog:build": "tsx scripts/catalog/export.ts",
     "catalog:validate": "tsx scripts/catalog/validate.ts",
+    "data:build": "npm run catalog:build && npm run comparisons:build && npm run workbench:build",
+    "workbench:build": "tsx scripts/workbench/export.ts",
+    "workbench:check": "tsx scripts/workbench/export.ts --check",
     "comparisons:build": "tsx scripts/comparisons/export.ts",
     "coverage:build": "tsx scripts/curriculum/coverage.ts",
     "comparisons:validate": "tsx scripts/comparisons/validate.ts",

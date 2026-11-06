@@ -13,13 +13,25 @@ This laboratory serves `t01-source-review-scope`. You will distinguish an eviden
 
 Mode is fresh independent computation over a frozen protocol. The inputs are the committed Atlas catalogue and the independent reading. Use the project Python 3.11 environment and CPU. No network, download or accelerator is needed. The `check` and `show` commands write nothing. The exporter overwrites only the committed compact summary after validation passes.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/source_review_scope_audit/run_lab.py check
 .venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py show
 .venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py check
-.venv/bin/python labs/source_review_scope_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/source_review_scope_audit -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/source_review_scope_audit/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/source_review_scope_audit/export_summary.py
+```
+
+</details>
 
 ## Source records and procedure
 
@@ -57,6 +69,17 @@ The project's comparison record and its independent reading now call this topic 
 ## Limits of the material
 
 The audit cannot say that a linked page says what its entry claims. A missing entry-level date means that the entry does not document when that source was reviewed for the claim. It does not establish that the claim is wrong, that nobody read the page, or that the entry is unreliable. A label and a record caveat can also describe review access differently. This field audit cannot reconcile them without opening the source. The frozen selection illustrates the rule and is not a representative sample of the whole Atlas.
+
+## Independent inspection task
+
+Choose a resolving evidence reference whose entry lacks a dedicated review date or material scope. Write what can be traced and what remains unknown. Can a record-level last_verified date silently supply the missing entry-level date?
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+A resolving reference identifies the registered source surface. It does not identify the exact version or reviewed material when those fields are absent. A record-level date cannot be reassigned to every entry. Keep the date, version and scope unknown at the level where they are missing rather than inventing a complete review receipt.
+
+</details>
 
 ## Sources and terms
 

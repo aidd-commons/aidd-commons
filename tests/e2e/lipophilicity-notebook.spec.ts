@@ -9,7 +9,7 @@ test("notebook-first entry offers exact bilingual downloads and honest Colab upl
   for (const prefix of ["", "/zh-cn"]) {
     await page.goto(`${prefix}/labs/`);
     await page
-      .locator(`a[href="${prefix}/labs/lipophilicity-notebook/"]`)
+      .locator(`lab-explorer a[href="${prefix}/labs/lipophilicity-notebook/"]`)
       .click();
     await expect(page).toHaveURL(
       new RegExp(`${prefix}/labs/lipophilicity-notebook/`),

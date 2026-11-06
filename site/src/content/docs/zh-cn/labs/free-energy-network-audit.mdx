@@ -13,13 +13,25 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 模式为按冻结协议进行全新独立计算。使用项目的 Python 3.11 环境和 CPU。只有首次下载需要网络。通过验证的来源快照进入缓存后，检查与导出可以离线运行。下载命令写入独立缓存，检查命令不写文件，导出命令仅在验证通过后替换小型汇总。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/free_energy_network_audit/run_lab.py download
 .venv/bin/python labs/free_energy_network_audit/inspect_free_energy_network_audit.py show
 .venv/bin/python labs/free_energy_network_audit/inspect_free_energy_network_audit.py check
-.venv/bin/python labs/free_energy_network_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/free_energy_network_audit -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/free_energy_network_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/free_energy_network_audit/export_summary.py
+```
+
+</details>
 
 ## 端点与不确定性规则
 
@@ -62,6 +74,17 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 ## 材料限制
 
 闭合循环只是在既定边选择与不确定性规则下检验内部一致性。它不是对真实值的测量，也不能证明某条边正确、收敛或经过实验验证。未闭合循环揭示这个循环基中的差异，但单凭它不能定位造成差异的边或模拟。本计算不声称得到绝对结合自由能，不比较实验端点，也不按闭合程度给系统排序。尚未观测到读者学习成效。
+
+## 独立检查任务
+
+在保留表中选择一个未通过的循环，把每条带符号结合边追溯到 complex 与 solvent 两条腿。在看到残差后增大容忍阈值，是否修复了原结果？说明边之间的相关性会怎样影响所述平方和不确定性假设。
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+不会。阈值在检查前已经固定，因此该循环按原规则仍然失败。结合差值是 complex 腿减去 solvent 腿。平方和传播依赖声明的独立性；腿、重复或边之间相关可能使该不确定性计算失效。循环偏差提示不一致，不能单独定位原因或建立实验亲和力。
+
+</details>
 
 ## 来源与署名
 

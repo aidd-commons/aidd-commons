@@ -15,13 +15,25 @@ This laboratory serves `t01-evidence-claim-unknown`. Read [Evidence, claims and 
 
 Mode is a fresh independent computation over a frozen protocol and committed comparison records. Use the project Python 3.11.15 environment with PyYAML 6.0.3 and CPU. The commands need no network, download or accelerator. Run them from the repository root. `check` and `show` write nothing. The exporter overwrites only the compact summary after the checks pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/claims_evidence_audit/run_lab.py check
 .venv/bin/python labs/claims_evidence_audit/inspect_claims_evidence_audit.py show
 .venv/bin/python labs/claims_evidence_audit/inspect_claims_evidence_audit.py check
-.venv/bin/python labs/claims_evidence_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/claims_evidence_audit -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/claims_evidence_audit/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/claims_evidence_audit/export_summary.py
+```
+
+</details>
 
 ## Records and state rules
 
@@ -79,6 +91,17 @@ The saved 2026-10-24 computation records both statuses as `not_established`. The
 ## Limits of the material
 
 An `unresolved-field` cell does not say that the provider does not cover the topic. The project's own depth is a floor it chose to state, not a measurement of how well it teaches. These records are dated reviews of selected source surfaces. The laboratory neither reopens external pages nor measures reader learning. A passing local evidence check cannot turn the recorded superlatives into established claims.
+
+## Independent inspection task
+
+Compare an evidenced absent cell with an evidence-free unverified default. Write the strongest sentence each state permits about the reviewed source surface, then explain why neither licenses a claim about every version of a provider.
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+An evidenced absent cell supports absence in the stated reviewed material under the recorded rule. An evidence-free default leaves the field unresolved. Neither establishes absence across unreviewed pages, versions or activities. Keep the source surface and review date in the sentence.
+
+</details>
 
 ## Sources and terms
 

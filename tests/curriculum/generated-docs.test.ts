@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 import { buildCoverage } from "../../scripts/curriculum/coverage.js";
 import {
@@ -213,8 +213,15 @@ async function regenerate(): Promise<{
 }
 
 describe("generated documents", () => {
+  let regenerated: Awaited<ReturnType<typeof regenerate>>;
+
+  // All assertions inspect the same fixed inputs. Generate the artifact once;
+  // a cold filesystem scan is setup work, not a five-second content assertion.
+  beforeAll(async () => {
+    regenerated = await regenerate();
+  }, 30_000);
+
   it("states the measured coverage numbers in the committed document", async () => {
-    const regenerated = await regenerate();
     const committed = await readFile(
       join(repositoryRoot, "docs", "COVERAGE.md"),
       "utf8",
@@ -228,7 +235,6 @@ describe("generated documents", () => {
   });
 
   it("keeps every coverage table identical to the regenerated one", async () => {
-    const regenerated = await regenerate();
     const committed = await readFile(
       join(repositoryRoot, "docs", "COVERAGE.md"),
       "utf8",
@@ -247,7 +253,6 @@ describe("generated documents", () => {
   });
 
   it("states the measured audit numbers in the committed document", async () => {
-    const regenerated = await regenerate();
     const committed = await readFile(
       join(repositoryRoot, "docs", "COMPARISON_AUDIT.md"),
       "utf8",
@@ -261,7 +266,6 @@ describe("generated documents", () => {
   });
 
   it("states this project's executable, real-data and assessed depth", async () => {
-    const regenerated = await regenerate();
     const committed = await readFile(
       join(repositoryRoot, "docs", "COMPARISON_AUDIT.md"),
       "utf8",

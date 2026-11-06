@@ -38,7 +38,7 @@ for (const { id, track, entryId, sourceCount } of lessons) {
       await entry.click();
       await expect(page).toHaveURL(`${prefix}${lesson}`);
 
-      const answers = page.locator("details[data-worked-answer]");
+      const answers = page.locator(".sl-markdown-content > details[data-worked-answer]");
       await expect(answers).toHaveCount(4);
       for (const answer of await answers.all()) {
         expect(await answer.getAttribute("open")).toBeNull();
@@ -70,7 +70,7 @@ for (const { id, track, entryId, sourceCount } of lessons) {
       await page.setViewportSize({ width: 320, height: 850 });
       expect((await page.goto(`${prefix}${lesson}`))?.status()).toBe(200);
       for (const summary of await page
-        .locator("details[data-worked-answer] summary")
+        .locator(".sl-markdown-content > details[data-worked-answer] summary")
         .all())
         await summary.click();
       expect(

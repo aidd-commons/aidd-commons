@@ -1,6 +1,7 @@
 # AIDD Commons platform and publication strategy
 
-Decision date: 25 October 2026. [Public milestones](PUBLIC_ROADMAP.md) record
+Initial decision: 25 October 2026. Publication direction updated 26 October 2026.
+[Public milestones](PUBLIC_ROADMAP.md) record
 dated teaching delivery and scientific boundaries. This document defines the
 product direction and the evidence needed to assess it.
 
@@ -32,6 +33,15 @@ The published historical comparison and its correction window remain intact.
 These outcomes extend the existing teaching standard. They do not replace its
 unit requirements or create a second curriculum authority. All route and lesson
 associations remain in `catalog/curriculum/tracks.yaml`.
+
+The unreleased 26 October development candidate implements a shared workbench
+across Home, Learn, Atlas, Labs, Audit, Report, Search and Contribute. Track hubs
+use the canonical prerequisites and routes. Scientific views expose their
+sources, interpretation boundaries and accessible tables; the Atlas separates
+its compact browsing index from requested resource details and supports scoped
+comparison and export. These are implemented capabilities. Reader comprehension
+and comparative scientific utility still require the observations described
+below.
 
 ## Product priorities
 
@@ -125,13 +135,48 @@ The recommended sequence is a complete scholarly report, an author-approved
 preprint submission, and then a journal submission suited to the actual
 contribution. Do not upload a development log as a research paper.
 
+The active development objective is now a Nature/Cell-family journal with
+Journal Impact Factor above 10. Nature Communications is the provisional
+primary target, conditional on a substantive, validated research-resource
+contribution. The earlier Journal of Cheminformatics educational manuscript
+remains a preserved baseline. The numerical journal floor does not establish
+scientific fit, and language improvements alone do not supply research utility.
+
 | Route | Role in this project | Fit and condition |
 |---|---|---|
 | arXiv | Versioned, citable full technical report | Prepare a refereeable scientific contribution, complete sources and figures; category suitability and moderation remain external decisions. Authors may need endorsement. |
-| Journal of Cheminformatics, Educational Article | Preferred journal preparation target for the current teaching contribution | The article must explain reusable cheminformatics learning content with a fully open, reproducible required path. Required inputs must be accessible without registration. Include the journal's scientific-contribution statement and truthful declarations. |
-| Journal of Cheminformatics, Software | A possible route if the platform software becomes the principal contribution | Requires a significant advance demonstrated against related software. A larger collection alone does not establish this. |
-| Journal of Open Source Education | An alternative for a reusable learning module or educational tool | The short paper accompanies complete open artifacts and describes learning design and actual experience of use. It does not carry the full technical report. |
-| PLOS Computational Biology, Education | A possible focused pedagogical article | Its approximately 2,000-word target and 2,500-word maximum suit a focused teaching argument rather than the complete platform report. |
+| Nature Communications, Article | Provisional primary development target; 2025 JIF 18.1 | Establish a distinctive scientific operation and demonstrate research utility through appropriate real applications and fair comparisons. A resource-style contribution is still original research. |
+| Nature Computational Science, Resource | Conditional framework/resource route; 2025 JIF 20.3 | Match the current type definition and demonstrate useful computational capabilities. Existing framework precedents do not make a teaching catalogue eligible by default. |
+| Nature Methods, Resource | Conditional research-tool collection route; 2025 JIF 28.2 | A collection of tools or dataset must have broad research significance and evidence of the claimed capability. A new core algorithm is not a universal Resource requirement. |
+| Nature Protocols, Protocol | Potential later protocol route; 2025 JIF 18.4 | The described technique must already work and have been used in a published or accepted peer-reviewed primary study. A new integrated workflow is not automatically validated by papers on its components. |
+| Trends in Biotechnology, Resource | Cell Press candidate with unresolved numerical/format gates | The publisher confirms Resource and original research routes. An explicit-year JIF and the detailed fit of this resource to biobased technology remain unverified here. |
+
+The four Nature JIF values above were read from the live
+[official 2025 metrics table](https://www.nature.com/nature-portfolio/about-journals/journal-metrics).
+Journal formats are specified by [Nature Communications](https://www.nature.com/ncomms/submit/content-types),
+[Nature Computational Science](https://www.nature.com/natcomputsci/content),
+[Nature Methods](https://www.nature.com/nmeth/content) and
+[Nature Protocols](https://www.nature.com/nprot/for-authors/preparing-your-submission).
+The [Trends in Biotechnology publisher description](https://shop.elsevier.com/journals/trends-in-biotechnology/0167-7799)
+supports retaining its Resource route rather than assuming all Trends articles
+are reviews. Inaccessible pages and undated index values remain unknowns.
+
+Development should test a concrete benefit of linking source claims, scientific
+evaluation contracts and executable work. Catalogue profiles describe recorded
+states in this release; they do not estimate global openness. Existing scientific
+cases remain frozen teaching evidence. Independent workflow use and any claimed
+learning benefit need evidence appropriate to those specific claims. A controlled
+teaching trial is not being imposed as a universal rule for research resources.
+
+The 26 October scientific-development return is integrated from the user-confirmed
+ChatGPT / GPT-6 Pro run. Current source and independent archive builds pass at
+13/19 pages with29 cited references. Local tools now generate the catalogue
+profile, check three curated dependency paths and compute the proposed point
+endpoint on synthetic fixtures. These tools are unreleased and provide no human
+utility result. The prospective protocol is `research-utility/PROTOCOL.md`.
+The study lead/institution and applicable ethics/privacy determination remain
+pending, as confirmed by the user. Responsible authors own that dependency;
+Codex continues local integration when actual evidence returns.
 
 These are preparation recommendations, not assurances of editorial acceptance.
 Springer Nature's current [preprint policy](https://support.springernature.com/en/support/solutions/articles/6000258807-preprints)
@@ -176,15 +221,23 @@ query; it must not be inferred from another project.
 | Competitive and frontier review | Current source ledger and prioritized teaching deltas | Opened sources, explicit comparison scope and retained competitor strengths | Codex; maintainers accept additions |
 | Content | Integrated bilingual frontier readings and improved learner tasks | Registered routes, verified scientific claims, matched editions and actual user-facing inspection | Codex |
 | Report | Independent native manuscript, checked figures/tables and PDF | Source-linked quantities, verified citations, complete prose and rendered-page QA | Codex; authors accept scientific content |
+| Scientific utility | Matched-interface pilot and independent confirmation | Actual assigned-attempt records, adjudicated references, family/analyst-aware analysis and adverse outcomes | Study lead/institution pending; responsible authors resolve ethics/recruitment |
 | External usability | Colab evidence and a formative reader batch | Actual runtime/session records with failures and assistance preserved | Human runtime operators and volunteer readers; maintainers organize |
 | Community | Reviewable forum setup and maintainer playbook, then an operating exchange | Actual accessible routes, named maintainers and observed useful interactions | Maintainers |
 | Scholarly release | Curated preprint/journal package | Author/declaration completion, exact-artifact checks and actual platform receipts | Responsible authors |
+
+The 26 October local redesign supplies a concrete two-condition English prototype:
+nine tasks, three exposed families, nine source extracts and 53 anchors, with
+provisional keys kept outside the interfaces. Source matching is checked; human
+outcomes, independent reference adjudication, reading burden, a disjoint pilot
+and confirmation are pending. The public v0.3.1 interface is the historical
+release baseline, distinct from the new local tool-centered design.
 
 Earlier valid evidence is reused. Later phases must not be declared complete
 from prepared forms, model reviews or activity plans. Public releases can
 advance while evidence-dependent educational and community work remains open.
 
-## Official publication sources checked on 25 October 2026
+## Official publication sources checked on 25 and 26 October 2026
 
 - [arXiv submission overview](https://info.arxiv.org/help/submit/index.html)
 - [Springer Nature preprint policy](https://support.springernature.com/en/support/solutions/articles/6000258807-preprints)
@@ -192,3 +245,9 @@ advance while evidence-dependent educational and community work remains open.
 - [Journal of Cheminformatics Software](https://link.springer.com/journal/13321/submission-guidelines/software)
 - [JOSE author instructions](https://openjournals.readthedocs.io/en/jose/submitting.html)
 - [PLOS Computational Biology other article types](https://journals.plos.org/ploscompbiol/s/other-article-types)
+- [Nature Portfolio 2025 metrics](https://www.nature.com/nature-portfolio/about-journals/journal-metrics)
+- [Nature Communications content types](https://www.nature.com/ncomms/submit/content-types)
+- [Nature Computational Science content types](https://www.nature.com/natcomputsci/content)
+- [Nature Methods content types](https://www.nature.com/nmeth/content)
+- [Nature Protocols submission preparation](https://www.nature.com/nprot/for-authors/preparing-your-submission)
+- [Trends in Biotechnology publisher description](https://shop.elsevier.com/journals/trends-in-biotechnology/0167-7799)

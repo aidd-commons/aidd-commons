@@ -5,6 +5,7 @@ description: 推导一室浓度曲线，区分总暴露与游离暴露，并判�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import ScientificTeachingView from "../../../../../components/ScientificTeachingView.astro";
 
 英文原文：[From clearance and exposure to PK/PD](/learn/admet-pk/exposure-clearance-pkpd/)。
 
@@ -24,6 +25,8 @@ import ScrollableRegions from "../../../../../components/ScrollableRegions.astro
 两类模型都不会自动补齐“该反应对生物体有益”的证据。FDA 的
 [暴露—反应指南第 IV–V 节](https://www.fda.gov/media/71277/download)
 区分了暴露度量、反应终点及其时间关系。
+
+<ScientificTeachingView track="admet-pk" chinese />
 
 ## 推导一个最小 PK 模型
 
@@ -120,13 +123,12 @@ A 的总 AUC 更大，却没有更大的效应。表格比较的是两组完整�
 | 人肝微粒体 vs 人肝细胞（基质不同，物种固定） | 96 | 0.4864 |
 | 人肝微粒体 vs 大鼠肝细胞（两者都不同） | 359 | 0.3868 |
 
-三对比较中,任何一对都不能强预测另一对:每个 rho 都明显低于 1。两个肝细胞
-检测共用同一单位,那里具名的例子在两个方向上都能相差十倍以上;微粒体检测
-报告的是不同的物理量(按每克蛋白计,不是按每个细胞计),所以它与任一肝细胞
-检测的分歧是一个真实的同方向信号,而不是字面上的倍数关系。无论如何,固定
-基质换物种,或固定物种换基质,都会让数字改变到这种程度——不点名三种体系中
-究竟是哪一种,单一的"这个化合物的清除率"这句话就无法与这些真实记录中的
-任何一条相互核对。
+这些相关系数表明三对检测之间存在部分秩一致性；rho 低于 1 本身不能证明预测很弱，
+也不能证明数值经过校准而一致。两个肝细胞检测共用同一单位，具名例子中同一化合物
+的数值在两个方向上都能相差十倍以上。微粒体检测报告的是不同的物理量
+（按每克蛋白计，而不是按每个细胞计），因此不能把它与肝细胞数值直接解释为倍数关系。
+这些观察性比较涉及不同物种或基质，没有单独识别其因果效应。
+可核对的清除率主张必须注明检测体系和计量基础。
 
 **独立练习(点名检测体系):** 一张幻灯片写道:"化合物 X 的内在清除率为
 18 mL/min/g。"仅使用上面的比较,说出这句话遗留的两个问题,并说明每个问题

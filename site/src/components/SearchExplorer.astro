@@ -1,0 +1,79 @@
+---
+import { withSiteBase } from "../lib/site-paths";
+interface Props { chinese?: boolean; }
+const { chinese = false } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const types = chinese ? ["全部", "资源", "轨道", "路径", "课程", "实验", "案例", "图形", "其他文档"] : ["Everything", "Resources", "Tracks", "Routes", "Lessons", "Labs", "Cases", "Views", "Documents"];
+const values = ["", "resource", "track", "route", "lesson", "lab", "case", "view", "document"];
+---
+<search-explorer data-locale={chinese ? "zh-cn" : "en"} data-base={base} data-index={withSiteBase("/data/search.v1.json", base)}>
+  <form class="search-workspace" role="search" aria-label={chinese ? "跨内容搜索" : "Cross-content search"}>
+    <label class="search-workspace__query"><span>{chinese ? "科学问题、名称或标识符" : "Scientific question, name or identifier"}</span><input name="q" type="search" placeholder="EGFR, Boltz, scaffold, diffusion…" autocomplete="off" /></label>
+    <label><span>{chinese ? "内容类型" : "Content type"}</span><select name="type">{types.map((label,i) => <option value={values[i]}>{label}</option>)}</select></label>
+    <button type="submit">{chinese ? "搜索" : "Search"}</button>
+  </form>
+  <p class="search-guidance">{chinese ? "用名称、标识符或科学术语查找。资源原文保留英文；排序按文字匹配，不代表科学质量。" : "Find material by name, identifier or scientific term. Ranking reflects text matching, not scientific quality."}</p>
+  <p data-search-status role="status">{chinese ? "正在载入搜索索引…" : "Loading the search index…"}</p>
+  <ol class="cross-search-results" data-search-results></ol>
+  <noscript><p>{chinese ? "交互搜索需要 JavaScript。可从下方目录浏览全部内容。" : "Interactive search needs JavaScript. Browse the complete directories below."}</p></noscript>
+  <nav class="search-directories" aria-label={chinese ? "内容目录" : "Content directories"}>
+    <a href={chinese ? "/zh-cn/learn/" : "/learn/"}>{chinese ? "学习目录" : "Learning directory"} <span aria-hidden="true">→</span></a><a href="/atlas/browse/">{chinese ? "全部资源（英文）" : "All resources"} <span aria-hidden="true">→</span></a><a href={chinese ? "/zh-cn/labs/" : "/labs/"}>{chinese ? "实验目录" : "Laboratory directory"} <span aria-hidden="true">→</span></a>
+  </nav>
+</search-explorer>
+<script>
+  import { rankSearchEntries, type SearchEntry } from "../../../scripts/workbench/search";
+  import { withSiteBase } from "../lib/site-paths";
+  class SearchExplorer extends HTMLElement {
+    private entries: SearchEntry[] = [];
+    private events?: AbortController;
+    async connectedCallback() {
+      this.events = new AbortController();
+      const form = this.querySelector<HTMLFormElement>("form")!;
+      const params = new URLSearchParams(location.search);
+      const query = form.elements.namedItem("q") as HTMLInputElement;
+      const type = form.elements.namedItem("type") as HTMLSelectElement;
+      query.value = params.get("q") ?? "";
+      type.value = params.get("type") ?? "";
+      const update = () => {
+        const next = new URLSearchParams();
+        if(query.value.trim()) next.set("q", query.value.trim());
+        if(type.value) next.set("type",type.value);
+        history.replaceState({},"",`${location.pathname}${next.size ? `?${next}` : ""}`);
+        this.render(query.value,type.value);
+      };
+      form.addEventListener("submit", event => { event.preventDefault(); update(); }, {signal:this.events.signal});
+      form.addEventListener("input", update, {signal:this.events.signal});
+      window.addEventListener("popstate", () => {
+        const p=new URLSearchParams(location.search); query.value=p.get("q")??""; type.value=p.get("type")??""; this.render(query.value,type.value);
+      },{signal:this.events.signal});
+      try {
+        const response = await fetch(this.dataset.index!,{signal:this.events.signal});
+        if(!response.ok) throw new Error(`HTTP ${response.status}`);
+        const payload = await response.json();
+        if(payload.version!==1 || !Array.isArray(payload.entries)) throw new Error("Unsupported search index");
+        this.entries = payload.entries;
+        this.render(query.value,type.value);
+      } catch(error) {
+        if(this.events.signal.aborted) return;
+        this.querySelector("[data-search-status]")!.textContent = this.dataset.locale==="zh-cn" ? "搜索索引暂不可用，请使用下方目录。" : "The search index is unavailable. Use the directories below.";
+      }
+    }
+    disconnectedCallback(){ this.events?.abort(); }
+    private render(query:string,type:string) {
+      const chinese=this.dataset.locale==="zh-cn";
+      const results=rankSearchEntries(this.entries,query,{locale:chinese?"zh-cn":"en",types:type?[type as SearchEntry["type"]]:undefined,limit:60});
+      this.querySelector("[data-search-status]")!.textContent=results.length ? (chinese?`显示 ${results.length} 项匹配内容（最多 60 项）。`:`Showing ${results.length} matching items (up to 60).`) : (chinese?"没有匹配内容。请减少条件或尝试标识符。":"No matching material. Broaden the query or try an identifier.");
+      const list=this.querySelector("[data-search-results]")!;
+      list.replaceChildren(...results.map(result=>{
+        const li=document.createElement("li"), meta=document.createElement("p"), heading=document.createElement("h2"), link=document.createElement("a"), summary=document.createElement("p");
+        meta.className="search-result-meta"; meta.textContent=`${result.type}${chinese&&result.language==="en"?" · 英文原文":""}${result.sourceDate?` · ${result.sourceDate}`:""}`;
+        link.href=withSiteBase(result.href,this.dataset.base??"/"); link.textContent=result.title; heading.append(link); summary.textContent=result.summary;
+        li.append(meta,heading,summary); return li;
+      }));
+    }
+  }
+  if(!customElements.get("search-explorer")) customElements.define("search-explorer",SearchExplorer);
+</script>
+<style>
+  search-explorer{display:block;max-width:65rem}.search-workspace{display:grid;grid-template-columns:minmax(0,1fr) 12rem auto;gap:1rem;padding:1.5rem;background:var(--atlas-panel);border:1px solid var(--atlas-rule)}label{display:flex;flex-direction:column;gap:.5rem;font-size:.85rem}input,select,button{font:inherit;color:var(--atlas-ink);background:var(--atlas-bg);border:1px solid var(--atlas-rule-strong);min-height:48px;padding:.65rem}button{align-self:end;background:var(--atlas-teal-deep);color:var(--atlas-action-ink);cursor:pointer}.search-guidance{color:var(--atlas-muted);font-size:.9rem}.cross-search-results{list-style:none;padding:0}.cross-search-results :global(li){padding:1.25rem 0;border-top:1px solid var(--atlas-rule)}.cross-search-results :global(h2){font-size:1.2rem;margin:.35rem 0}.cross-search-results :global(p){margin:.4rem 0}.cross-search-results :global(.search-result-meta){font-size:.75rem;color:var(--atlas-muted)}.search-directories{display:flex;flex-wrap:wrap;gap:1rem}.search-directories a{min-height:44px;display:inline-flex;align-items:center}@media(max-width:40rem){.search-workspace{grid-template-columns:1fr;padding:1rem}}
+</style>

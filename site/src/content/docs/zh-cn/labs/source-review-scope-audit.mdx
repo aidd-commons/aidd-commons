@@ -13,13 +13,25 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 模式是依照冻结协议进行全新独立计算。输入是已提交的 Atlas 目录和独立阅读记录。使用项目的 Python 3.11 环境和 CPU。无需网络、下载或加速器。`check` 与 `show` 不写入文件。导出程序仅在验证通过后覆盖已提交的精简汇总。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/source_review_scope_audit/run_lab.py check
 .venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py show
 .venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py check
-.venv/bin/python labs/source_review_scope_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/source_review_scope_audit -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/source_review_scope_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/source_review_scope_audit/export_summary.py
+```
+
+</details>
 
 ## 来源记录与计算方法
 
@@ -57,6 +69,17 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 ## 材料局限
 
 本审计不能断定链接页面确实说了条目所声称的内容。缺少条目级日期意味着该条目没有记录来源何时为相应主张接受审阅。这不证明主张错误、从未有人读过页面，或条目不可靠。标签和记录的注意事项也可能对页面的可访问情况作不同描述。不打开来源页面的字段审计无法调和这种差异。冻结选集说明规则，不代表整个 Atlas。
+
+## 独立检查任务
+
+选择一个可解析、但所属 evidence entry 缺少独立审阅日期或材料范围的引用，写明可追溯部分和仍未知部分。记录级 last_verified 日期能否暗中补足条目级日期？
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+可解析引用标识已登记来源页面，但在缺少相应字段时，不能确定确切版本或已审阅材料。不能把记录级日期重新赋予每个条目。日期、版本与范围在哪个层级缺失，就应在哪个层级保持未知，不虚构完整审阅凭据。
+
+</details>
 
 ## 来源与条款
 

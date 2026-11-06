@@ -5,19 +5,31 @@ description: 重新计算课程自评注释和独立阅读是否仍保留检验�
 
 ## 准备与学习目标
 
-先阅读[机制与靶点验证课程](/learn/mechanism-targets/perturbation-to-target-validation/)。本实验对应 `t06-mechanism-hypothesis-counterevidence`。你将根据成对的审阅记录给问题划分状态，识别缺失的测量，并找出记录中没有说明如何解决的开放问题。了解 YAML 会有所帮助，但不需要建模经验。
+先阅读[机制与靶点验证课程](/zh-cn/learn/mechanism-targets/perturbation-to-target-validation/)。本实验对应 `t06-mechanism-hypothesis-counterevidence`。你将根据成对的审阅记录给问题划分状态，识别缺失的测量，并找出记录中没有说明如何解决的开放问题。了解 YAML 会有所帮助，但不需要建模经验。
 
 ## 模式与命令
 
 本实验采用固定协议，对仓库中已提交的记录进行全新独立计算。使用项目的 Python 3.11 环境、PyYAML 和 CPU。命令不需要网络、下载或加速器。请在仓库根目录执行。下载命令只核查 3 份本地输入是否存在，不写文件。检查器也不写文件。导出器仅在检查通过后覆盖本实验的精简摘要。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/open_question_audit/run_lab.py download
 .venv/bin/python labs/open_question_audit/inspect_open_question_audit.py show
 .venv/bin/python labs/open_question_audit/inspect_open_question_audit.py check
-.venv/bin/python labs/open_question_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/open_question_audit -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/open_question_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/open_question_audit/export_summary.py
+```
+
+</details>
 
 ## 问题状态
 
@@ -62,6 +74,17 @@ description: 重新计算课程自评注释和独立阅读是否仍保留检验�
 ## 材料边界
 
 本实验测量记录是否仍保留证伪观察或缺失测量，并不证明任何问题已经得到回答。文字提到某项测量，不等于测量已经完成。固定词表可能漏掉另一种表达，也可能匹配到人工阅读时会有不同理解的语句。因此，状态计数只描述这些定期记录在既定规则下的情况，不是对课程路径的排序，也不是读者学习效果的测量。
+
+## 独立检查任务
+
+选择一个 Open 主题并记录其未解决问题。提出一个可区分竞争答案的观察，再说明该观察是否已存在于成对说明中。应区分本地 settled-by-measurement 状态与整个科学问题已被解决的主张。
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+可核对答案应写出主题、记录问题、判别性观察与实际证据状态。提出证伪观察不等于已完成该观察。Settled by measurement 表示本地说明报告了一个有边界的结果，不表示该领域已无不确定性。
+
+</details>
 
 ## 来源与条款
 

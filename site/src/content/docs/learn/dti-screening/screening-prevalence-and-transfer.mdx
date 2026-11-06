@@ -5,6 +5,7 @@ description: Interpret pose, binder, affinity, enrichment, and repurposing claim
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import ScientificTeachingView from "../../../../components/ScientificTeachingView.astro";
 
 <LessonProgress lessonId="dti-screening/screening-prevalence-and-transfer" />
 <ScrollableRegions />
@@ -18,6 +19,8 @@ and affinity](/learn/dti-screening/screening-and-affinity/) and [Regression and
 classification errors](/learn/qsar-properties/regression-classification-errors/)
 first. This is a browser/handworked reasoning lesson, not a runnable screening,
 docking procedure, activity claim, or experimental protocol.
+
+<ScientificTeachingView track="dti-screening" />
 
 ## Four outputs, four different objects
 
@@ -127,18 +130,19 @@ compound is not enough.
 
 ## Move the definitions and watch the benchmark change
 
-Prevalence is one of several choices that decide what a binder dataset is. The
-[binder definition lab](/labs/binder-definition/) holds twelve molecules fixed and
-moves the rest: the positive count more than doubles across a grid of cutoffs,
-four compounds are filed by an assay uncertainty they sit inside, two thirds of
-the enlarged negative class was never measured, and six positives turn out to
-occupy three scaffolds.
+Prevalence is one choice defining a binder dataset. The **constructed**
+[binder definition lab](/labs/binder-definition/) fixes twelve molecules:
+the positive count more than doubles across cutoffs, four compounds fall
+within a declared uncertainty band, two thirds of the enlarged negative
+class lack measurements, and six positives occupy three scaffolds.
+The band marks threshold-sensitive labels; it does not determine the noise
+realization or prove that a label is wrong.
 
 ## Check a real transport claim
 
 The [screening transport lab](/labs/screening-transport/) reads this repository's
 own completed two-assay replay and expresses both contexts in recovered targets,
-the only unit that makes them comparable. It shows that the two assays measure in
+one useful normalization for comparing the declared screening decisions. It shows that the two assays measure in
 steps 4.92 times apart, that the whole five-instance baseline spread is under two
 targets in both, and that the result which sounds most decisive is supported by
 an eighth of a single target.

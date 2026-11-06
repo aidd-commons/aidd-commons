@@ -32,12 +32,24 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 一次得到。`check` 命令重算整个冻结评估集，若已提交的小结与缓存数据产生的结果不再一致，
 就以非零码退出，因此小结与数据之间的漂移是一次失败，而不是一次静默刷新。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 uv run python labs/rosetta_cross_modality/run_lab.py download
 uv run python labs/rosetta_cross_modality/inspect_rosetta_cross_modality.py show
 uv run python labs/rosetta_cross_modality/inspect_rosetta_cross_modality.py check
+```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/rosetta_cross_modality/summary.json`。 它还会写入含逐扰动数值的 `labs/rosetta_cross_modality/results/computed-summary.json`；该文件不是公开汇总。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
 uv run python labs/rosetta_cross_modality/export_summary.py
 ```
+
+</details>
 
 需要 Python 3.11.15 与 NumPy 2.4.6，即已提交小结所记录的版本。只有一次性下载两个已发布
 对象需要联网，缓存位于被 git 忽略的 `.cache/rosetta_cross_modality/`。每次下载都会按冻结

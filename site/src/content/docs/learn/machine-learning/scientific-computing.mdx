@@ -4,8 +4,11 @@ description: Build the mathematical and implementation habits needed to audit AI
 ---
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="machine-learning/scientific-computing" />
+
+<TeachingViewLink track="machine-learning" />
 
 ## Foundations
 
@@ -37,6 +40,21 @@ Foundation models and scientific recipe collections such as
 [BioNeMo Recipes](https://github.com/NVIDIA-BioNeMo/bionemo-recipes) can reduce
 implementation cost, but their transferred assumptions and asset terms must be
 audited task by task.
+
+## A bounded worked decision and independent task
+
+After [records to a modelling table](/learn/data-governance/records-to-model-table/), connect a fitting call to its mathematical input. In the constructed [Ridge derivation](/learn/machine-learning/baseline-training-validation/), training pairs (0,1), (1,3), (2,5) with alpha 2 yield slope 1 and intercept 2. At feature 3 the prediction is 5. A scaler, feature mapping and coefficient vector are all part of the saved inference recipe; a checkpoint name alone does not define it.
+
+A collaborator reloads the coefficients but fits a new scaler on the evaluation batch. Did they evaluate the same mapping? State the artifact needed to make the procedure inspectable.
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+No. Fitting the new scaler changes the input mapping even when coefficients are unchanged. Retain the training-fitted preprocessing state, representation settings, feature order, selected parameters and inference command. This checks computational identity, not whether the scientific endpoint was valid or whether the model generalizes.
+
+</details>
+
+Teaching task added on 2026-10-26; the original source-review date remains below.
 
 ## What v0.1 does not yet teach
 

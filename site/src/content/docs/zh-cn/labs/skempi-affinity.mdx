@@ -13,12 +13,24 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 运行模式是按冻结协议重新独立计算。使用项目的 Python 3.11 环境和 CPU。仅在尚无快照时需要网络。[LiteFold SKEMPI 2.0 镜像](https://huggingface.co/datasets/LiteFold/SKEMPI2)将上游 CSV 规范化为 JSONL。[上游门户](https://life.bsc.es/pid/skempi2/)是权威来源。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/skempi_affinity/run_lab.py download
 .venv/bin/python labs/skempi_affinity/inspect_skempi_affinity.py show
 .venv/bin/python labs/skempi_affinity/inspect_skempi_affinity.py check
+```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/skempi_affinity/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
 .venv/bin/python labs/skempi_affinity/export_summary.py
 ```
+
+</details>
 
 下载缓存会在校验字节长度后复用。导出命令成功后会覆盖已提交的小型摘要，不会替换源测量。
 

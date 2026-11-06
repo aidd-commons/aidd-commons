@@ -1,5 +1,6 @@
 ---
 import summary from "../../../labs/chembl_egfr/locked-summary.json";
+import EvidenceBars from "./EvidenceBars.astro";
 
 const models = [
   { key: "train_mean", label: "Train mean" },
@@ -15,6 +16,7 @@ const download = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.
 ---
 
 <section class="locked-panel" aria-labelledby="chembl-locked-title">
+  <p class="panel-kicker">Saved evaluation · {summary.protocol_id}</p>
   <h2 id="chembl-locked-title">Completed ChEMBL evaluations</h2>
   <p>Both evaluations completed once; reviewed {summary.reviewed_on}.
     Descriptor Ridge alpha={summary.selected_alphas.descriptor_ridge} and Morgan
@@ -22,11 +24,14 @@ const download = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.
   <p><strong>Morgan has the lowest primary MAE, but the highest replication MAE.</strong>
     Descriptor Ridge has the lowest replication MAE. Neither representation is
     uniformly best across these two evaluations.</p>
-  {evaluations.map(({ key, label, assay }) => (
+  <div class="evaluation-pair">
+  {evaluations.map(({ key, label, assay }, index) => (
     <section aria-labelledby={`chembl-${key}-title`}>
+      <p class="panel-letter">({index === 0 ? "a" : "b"}) <span>All {summary.results[key].count} evaluation parents</span></p>
       <h3 id={`chembl-${key}-title`}>{label}: {assay}</h3>
       <p>All {summary.results[key].count} evaluation parents contribute to each metric below;
         no evaluation parents were dropped. MAE and RMSE are in pChEMBL units.</p>
+      <EvidenceBars title="Absolute prediction error" description="Shared scale across assays; no pooled assay score." units="MAE · pChEMBL" maximum={3.5} rows={models.map(({ key: model, label: modelLabel }) => ({ key: model, label: modelLabel, value: summary.results[key].metrics[model].mae }))} />
       <div class="table-scroll" role="region" aria-label={`${label} scores`} tabindex="0">
         <table>
           <caption>{label}: every frozen baseline, no pooled assay score</caption>
@@ -47,6 +52,7 @@ const download = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.
       </div>
     </section>
   ))}
+  </div>
   <p>Train-mean Spearman is undefined because its prediction is constant, not zero.
     Post-run checks recomputed MAE, RMSE and tied-rank Spearman from all saved
     target/prediction rows without refitting. The poor Morgan replication score
@@ -58,10 +64,14 @@ const download = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.
 </section>
 
 <style>
-  .locked-panel { min-width: 0; margin-block: 2rem; padding: 1rem; border: 1px solid var(--sl-color-gray-4); border-radius: .6rem; }
-  .locked-panel section { min-width: 0; margin-block: 1.5rem; }
+  .locked-panel { min-width: 0; margin-block: 2rem; padding-block: 1.5rem; border-block: 1px solid var(--atlas-rule-strong); color:var(--atlas-ink); }
+  .locked-panel>h2{margin-top:.35rem}.panel-kicker{font-size:.75rem;color:var(--atlas-teal-deep);font-weight:700;letter-spacing:.06em;text-transform:uppercase;overflow-wrap:anywhere}
+  .evaluation-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem;margin-block:1.5rem}.locked-panel section { min-width: 0; padding-top:1rem;border-top:1px solid var(--atlas-rule); }
+  .locked-panel section>p{font-size:.8rem;color:var(--atlas-muted)}.locked-panel h3{font-size:1rem;margin-top:.4rem}.panel-letter{display:flex;justify-content:space-between;gap:.7rem;font-weight:700;color:var(--atlas-ink)!important}.panel-letter span{font-weight:400;color:var(--atlas-muted)}
+  .locked-panel>ul{font-size:.82rem}.locked-panel>p:last-child{font-size:.8rem}
   .table-scroll { max-width: 100%; overflow-x: auto; }
-  table { display: table; overflow: visible; width: 100%; font-variant-numeric: tabular-nums; }
-  th, td { padding: .5rem; white-space: nowrap; }
-  caption { text-align: left; white-space: normal; }
+  table { display: table; overflow: visible; width: 100%; font-variant-numeric: tabular-nums;font-size:.78rem; }
+  th, td { padding: .55rem; white-space: nowrap; }.table-scroll:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
+  caption { text-align: left; white-space: normal;padding-block:.9rem .5rem;color:var(--atlas-muted); }
+  @media(max-width:65rem){.evaluation-pair{grid-template-columns:minmax(0,1fr)}}
 </style>

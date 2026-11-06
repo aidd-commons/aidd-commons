@@ -5,9 +5,12 @@ description: Separate a pose's geometric accuracy from its internal physical val
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="dti-screening/docking-and-pose-validity" />
 <ScrollableRegions />
+
+<TeachingViewLink track="dti-screening" />
 
 ## Learning goals and prerequisites
 
@@ -25,14 +28,12 @@ the cited benchmark.
 
 ## Two questions a pose score can answer, and why they diverge
 
-**Geometric accuracy** asks how close a predicted pose is to a known reference
-structure, typically an RMSD in Angstroms between predicted and co-crystallized
-ligand atoms. It requires a ground-truth structure and says nothing about the
-pose on its own. **Physical validity** asks whether the pose is internally
-sane: bond lengths and angles inside empirically normal ranges, a ring
-conformation that matches a known-good template, consistent stereochemistry,
-and no severe clash with the protein. It needs no reference structure at all,
-because it is a property of the single generated pose.
+**Geometric accuracy** asks how close a predicted pose is to a known ligand
+reference, typically an RMSD in Angstroms. **Physical validity** checks such
+properties as bond geometry, stereochemistry and clashes with the protein.
+These validity checks do not require a reference ligand pose, but a
+protein–ligand clash check does require receptor coordinates. Passing them
+does not establish binding or recovery of the experimental pose.
 
 A pose-generation model trained to imitate co-crystal geometry can score well
 on the first question while failing the second: RMSD, computed only from atom
@@ -111,26 +112,20 @@ set built to reduce training overlap. (a) Name the two axes the 68% headline
 conflates. (b) How many percentage points does adding the validity requirement
 alone cost, holding the test set fixed at Set 1? (c) Is the further drop from
 19% to 6% evidence about the same problem as (b), or a different one? (d)
-Name one screening decision for which the 68% number alone would be
-sufficient, and one for which it would not.
+Name the narrow question answered by the 68% number, and a screening
+decision it cannot establish.
 
 <details data-worked-answer>
 <summary>Worked answer</summary>
 
-(a) Geometric accuracy to a reference structure, and internal physical
-validity; the 68% figure measures only the first. (b) 68% − 19% = 49
-percentage points, on the same test set, attributable to poses that were
-geometrically close but not independently physically sane. (c) A different
-one: it is the generalization gap between an easier, possibly memorized test
-set and a newer one built to reduce that overlap, not a restatement of the
-validity gap already counted in (b). (d) The 68% RMSD-only number could
-suffice for a purely comparative ranking task that does not depend on any
-single pose being physically deployable, for example prioritizing which
-candidates get a downstream binding assay. It would not suffice for a
-decision that consumes the geometry itself, for example proposing a specific
-analogue or a synthesis route from the predicted contacts, since a headline
-that never required physical validity or newer-target performance says
-nothing about either.
+(a) Geometric accuracy to a reference structure and physical validity;
+the 68% figure measures only the first. (b) 68% − 19% = 49 percentage points
+fail at least one added validity check on the same set. (c) The 19% to 6%
+difference concerns performance across different test sets; it does not by
+itself isolate memorization as the cause. (d) The 68% answers how often a
+reference pose was recovered within the stated RMSD threshold on Set 1.
+It alone does not evaluate binder ranking, establish which compounds should
+receive a binding assay, or validate an individual pose for analogue design.
 
 </details>
 

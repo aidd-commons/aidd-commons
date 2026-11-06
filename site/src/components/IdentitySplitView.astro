@@ -1,0 +1,56 @@
+---
+interface Props {chinese?:boolean; context?:"lineage"|"evaluation"}
+const {chinese=false,context="lineage"}=Astro.props;
+const records=[{id:"r1",parent:"A",assay:"E",value:"100 nM",state:"exact"},{id:"r2",parent:"A",assay:"E",value:"1000 nM",state:"exact"},{id:"r3",parent:"B",assay:"E",value:"0.2 µM",state:"exact"},{id:"r4",parent:"C",assay:"E",value:"> 10 µM",state:"censored"},{id:"r5",parent:"D",assay:"F",value:"10 nM",state:"different-assay"},{id:"r1-copy",parent:"A",assay:"E",value:"100 nM",state:"duplicate"}];
+---
+<div class="identity-view" data-identity-view>
+  <p class="identity-view__mode">{chinese?"构造示例 · 没有真实 assay 测量":"Constructed example · no real assay measurements"}</p>
+  <div class="identity-view__lineage" aria-label={chinese?"记录到目标值的构造谱系":"Constructed record-to-target lineage"}>
+    <div><span>(a) {chinese?"来源记录":"Source records"}</span><ul class="identity-view__records"><li><b>r1</b><code>100 nM → 7</code></li><li><b>r2</b><code>1000 nM → 6</code></li><li class="is-duplicate"><s>r1-copy</s><em>{chinese?"去重":"duplicate removed"}</em></li></ul></div>
+    <span class="identity-view__arrow" aria-hidden="true">→</span>
+    <div><span>(b) {chinese?"身份与去重":"Identity + deduplication"}</span><div class="identity-view__parent"><b>A</b><strong>parent A · assay E</strong></div></div>
+    <span class="identity-view__arrow" aria-hidden="true">→</span>
+    <div><span>(c) {chinese?"先变换，再聚合":"Transform, then aggregate"}</span><div class="identity-view__target" aria-hidden="true"><i>6</i><b>6.5</b><i>7</i></div><strong>pIC50 = median(7, 6) = 6.5</strong></div>
+  </div>
+  <label class="identity-view__selector" hidden>{chinese?"比较成员归属":"Compare membership"}<select data-identity-select><option value="group">{chinese?"按 parent 分组":"Group by parent"}</option><option value="row">{chinese?"按行划分，故意错误的对照":"Row split, deliberately defective control"}</option></select></label>
+  <div class="identity-view__split" data-identity-state="group">
+    <div class="identity-view__partition"><h4>{chinese?"训练":"Training"}</h4><span class="identity-view__token">A · r1</span><span class="identity-view__token">A · r2</span></div>
+    <div class="identity-view__partition"><h4>{chinese?"评估":"Evaluation"}</h4><span class="identity-view__token identity-view__token--b">B · r3</span></div>
+    <p>{chinese?"A 的记录放在同一集合。该示意检查 parent 成员归属，不证明独立性，也不是完整 scaffold 划分。":"A's records stay together. This diagram checks parent membership; it does not establish independence or represent a complete scaffold split."}</p>
+  </div>
+  <div class="identity-view__split" data-identity-state="row" hidden>
+    <div class="identity-view__partition"><h4>{chinese?"训练":"Training"}</h4><span class="identity-view__token">A · r1</span></div>
+    <div class="identity-view__partition"><h4>{chinese?"评估":"Evaluation"}</h4><span class="identity-view__token">A · r2</span><span class="identity-view__token identity-view__token--b">B · r3</span></div>
+    <p class="identity-view__leak">{chinese?"故意错误的对照：A 跨越了集合。按相同行数统计不能发现身份泄漏。":"Deliberately defective control: A crosses the boundary. Counting rows alone misses shared identity."}</p>
+  </div>
+  <p class="identity-view__exclusions">{chinese?"保留精确测量，区分被删失值、不同 assay、重复记录与未解析结构。它们不是同一种缺失。":"Keep exact measurements distinct from censoring, a different assay, duplicates and unresolved structures. These are different evidence states."}</p>
+  <noscript><style>.identity-view [data-identity-state][hidden]{display:grid!important}</style><p>{chinese?"按行划分的错误对照会把 A · r1 放入训练、A · r2 放入评估，使 parent A 跨越边界。":"The defective row-split control puts A · r1 in training and A · r2 in evaluation, carrying parent A across the boundary."}</p></noscript>
+  <details><summary>{chinese?"读取原始构造记录":"Read the original constructed records"}</summary><div class="identity-view__scroll" tabindex="0" role="region" aria-label={chinese?"构造记录表":"Constructed record table"}><table><caption>{chinese?"精确值回归只接收正确 assay 中已解析的精确测量。另有 r6，结构未解析，50 nM，不进入表中的任何已解析 parent。":"Exact-value regression admits resolved exact measurements in the correct assay. A separate r6 has unresolved structure and 50 nM; it enters none of the resolved parents in this table."}</caption><thead><tr><th scope="col">{chinese?"记录":"Record"}</th><th scope="col">Parent</th><th scope="col">Assay</th><th scope="col">IC50</th><th scope="col">{chinese?"状态":"State"}</th></tr></thead><tbody>{records.map(record=><tr><th scope="row">{record.id}</th><td>{record.parent}</td><td>{record.assay}</td><td>{record.value}</td><td>{record.state}</td></tr>)}</tbody></table></div></details>
+  {context==="evaluation"&&<p class="identity-view__frozen">{chinese?"真实冻结 ChEMBL scaffold 分区：训练 634 / 验证 136 / 评估 132 个 parent。实际计数保留完整组，而不是强行匹配目标比例。":"Real frozen ChEMBL scaffold partitions: training 634 / validation 136 / evaluation 132 parents. Realized counts preserve whole groups rather than forcing target percentages."}</p>}
+</div>
+<script>
+  function initializeIdentityViews(){
+    document.querySelectorAll<HTMLElement>("[data-identity-view]").forEach(root=>{
+      if(root.dataset.initialized)return;root.dataset.initialized="true";
+      const selector=root.querySelector<HTMLElement>(".identity-view__selector");
+      if(selector)selector.hidden=false;
+      root.querySelector<HTMLSelectElement>("[data-identity-select]")?.addEventListener("change",event=>{
+        const selected=(event.currentTarget as HTMLSelectElement).value;
+        root.querySelectorAll<HTMLElement>("[data-identity-state]").forEach(panel=>panel.hidden=panel.dataset.identityState!==selected);
+      });
+    });
+  }
+  initializeIdentityViews();document.addEventListener("astro:page-load",initializeIdentityViews);
+</script>
+<style>
+  .identity-view__selector[hidden]{display:none}
+  .identity-view__scroll{max-height:24rem;overscroll-behavior:contain}
+  .identity-view__scroll thead th{position:sticky;top:0;z-index:2;background:var(--atlas-bg);box-shadow:0 1px var(--atlas-rule)}
+  .identity-view__scroll tbody tr:nth-child(even){background:color-mix(in srgb,var(--atlas-rule) 24%,transparent)}
+  .identity-view{min-width:0;color:var(--atlas-ink);font-size:.82rem}.identity-view__mode{font-size:.75rem;color:var(--atlas-teal-deep);font-weight:650;margin:.4rem 0}.identity-view__lineage{display:flex;align-items:center;gap:.65rem;padding:.75rem 0 .9rem;border-block:1px solid var(--atlas-rule)}.identity-view__lineage>div{flex:1;min-width:0;align-self:stretch}.identity-view__lineage>div>span{display:block;font-size:.75rem;color:var(--atlas-muted);margin-bottom:.75rem}.identity-view__lineage strong{font:600 .78rem var(--sl-font-mono,monospace);overflow-wrap:anywhere}.identity-view__arrow{font-size:1.3rem;color:var(--atlas-muted)}
+  .identity-view__records{list-style:none;margin:0!important;padding:0!important;display:grid;gap:.35rem}.identity-view__records li{display:flex;gap:.5rem;align-items:center;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--atlas-rule);font-size:.75rem}.identity-view__records code{font-size:.75rem;background:none;white-space:nowrap;padding:0}.identity-view__records .is-duplicate{border-bottom-style:dashed;color:var(--atlas-muted)}.identity-view__records em{font-size:.75rem;font-style:normal}.identity-view__parent{display:flex;flex-direction:column;align-items:center;gap:.7rem;padding:.6rem 0}.identity-view__parent>b{display:grid;place-items:center;width:3.5rem;height:3.5rem;border:2px solid var(--atlas-teal-deep);border-radius:50%;font:600 1.5rem var(--sl-font-mono,monospace);background:color-mix(in srgb,var(--atlas-teal) 8%,transparent)}
+  .identity-view__target{display:flex;justify-content:space-between;align-items:center;position:relative;margin:1rem .3rem 1.15rem;border-top:1px solid var(--atlas-rule-strong)}.identity-view__target i,.identity-view__target b{font:600 .8rem var(--sl-font-mono,monospace);position:relative;padding-top:.6rem}.identity-view__target i::before,.identity-view__target b::before{content:'';position:absolute;left:50%;top:-.3rem;width:.55rem;height:.55rem;transform:translateX(-50%);background:var(--atlas-muted);border-radius:50%}.identity-view__target b{color:var(--atlas-teal-deep)}.identity-view__target b::before{border-radius:0;background:var(--atlas-teal-deep);width:.7rem;height:.7rem;top:-.35rem}
+  .identity-view__selector{display:flex;align-items:center;flex-wrap:wrap;gap:.7rem;font-weight:600;margin:1.1rem 0}.identity-view select{min-height:44px;max-width:100%;padding:.5rem .65rem;background:var(--atlas-bg);color:var(--atlas-ink);border:1px solid var(--atlas-rule-strong);font:inherit}.identity-view__split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}.identity-view__split[hidden]{display:none}.identity-view__partition{min-width:0;border-top:3px solid var(--atlas-teal-deep);padding:.8rem 0}.identity-view__partition:nth-child(2){border-top-style:double;border-top-color:var(--atlas-muted)}.identity-view__partition h4{font-size:.78rem;font-weight:600;margin:0 0 .7rem}.identity-view__token{display:inline-block;margin:.25rem .35rem 0 0;padding:.45rem .6rem;border:1px solid var(--atlas-teal-deep);font:.78rem var(--sl-font-mono,monospace);background:color-mix(in srgb,var(--atlas-teal) 10%,transparent)}.identity-view__token--b{border-style:dashed;border-color:var(--atlas-muted);background:transparent}.identity-view__split>p{grid-column:1/-1;margin:.2rem 0 .75rem;font-size:.78rem;color:var(--atlas-muted);line-height:1.6}.identity-view__leak{padding:.65rem .8rem;border-left:3px dashed var(--atlas-emphasis);background:color-mix(in srgb,var(--atlas-emphasis) 7%,transparent)}
+  .identity-view__exclusions{font-size:.78rem;color:var(--atlas-muted);line-height:1.6}.identity-view details summary{cursor:pointer;min-height:44px;padding:.7rem 0;font-weight:600}.identity-view__scroll{max-width:100%;overflow:auto}.identity-view table{display:table;width:100%;font-size:.75rem;font-variant-numeric:tabular-nums}.identity-view caption{text-align:left;padding:.6rem 0;color:var(--atlas-muted)}.identity-view th,.identity-view td{padding:.55rem;white-space:nowrap}.identity-view__frozen{border-left:3px solid var(--atlas-teal-deep);padding-left:.8rem;font-size:.78rem}.identity-view select:focus-visible,.identity-view summary:focus-visible,.identity-view__scroll:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
+  @media(max-width:39rem){.identity-view__lineage{align-items:stretch;flex-direction:column}.identity-view__lineage>div{width:100%}.identity-view__arrow{transform:rotate(90deg);align-self:center;line-height:1}.identity-view__records{max-width:22rem}.identity-view__parent{flex-direction:row}.identity-view__target{max-width:20rem}}
+</style>

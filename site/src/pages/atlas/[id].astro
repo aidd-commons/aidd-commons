@@ -1,10 +1,13 @@
 ---
+import { localizedPath } from "../../lib/site-locale.js";
 import { readFile } from "node:fs/promises";
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import ClaimEvidence from "../../components/ClaimEvidence.astro";
 import OpennessMatrix from "../../components/OpennessMatrix.astro";
 import ResourceLearningLinks from "../../components/ResourceLearningLinks.astro";
 import type { Resource } from "../../data/resource.js";
+import resourceData from "../../../public/data/resources.v1.json" with { type: "json" };
+import { localizedAtlasLabel } from "../../lib/atlas-presentation.js";
 
 export async function getStaticPaths() {
   const resources = JSON.parse(
@@ -16,17 +19,22 @@ export async function getStaticPaths() {
 
   return resources.map((resource) => ({
     params: { id: resource.id },
-    props: { resource },
+    props: { resource, chinese: false as boolean },
   }));
 }
 
-interface Props {
-  resource: Resource;
-}
-
-const { resource } = Astro.props;
+const { resource, chinese = false } = Astro.props;
+const t = (en: string, zh: string) => chinese ? zh : en;
+const local = (path: string) => localizedPath(path, chinese);
+const atlasLabel = (value: string) => localizedAtlasLabel(value, chinese);
+const resources = resourceData as Resource[];
+const names = new Map(resources.map((record) => [record.id, record.name]));
+const sameScope = resources.filter((record) => record.id !== resource.id &&
+  record.kind === resource.kind && record.stages.some((stage) => resource.stages.includes(stage)));
+const comparisonOptions = (sameScope.length ? sameScope : resources.filter((record) => record.id !== resource.id && record.kind === resource.kind))
+  .sort((left, right) => left.name.localeCompare(right.name, "en"));
 const resourceLinks = [
-  { url: resource.canonical_url, label: "Primary resource page" },
+  { url: resource.canonical_url, label: t("Primary resource page","资源主页") },
   ...resource.identifiers.flatMap((identifier) => identifier.url
     ? [{ url: identifier.url, label: `${identifier.scheme}: ${identifier.value}` }]
     : []),
@@ -36,75 +44,200 @@ const resourceLinks = [
 
 <StarlightPage frontmatter={{ title: resource.name, description: resource.summary }}>
   <article class="resource-detail">
-    <ResourceLearningLinks resourceId={resource.id} />
-    <section class="detail-panel" aria-labelledby="resource-links-title">
-      <h2 id="resource-links-title">Resource links</h2>
-      <ul>
-        {resourceLinks.map((link) => <li><a href={link.url}>{link.label}</a></li>)}
-      </ul>
-      <p>Links are entry points, not a claim of open access or permission to use every asset. Check the access, licence and openness notes below.</p>
+    {chinese && <p class="notice" data-source-language="en">此页界面为中文。资源摘要、范围说明、标识符和来源证据保留规范英语原文；未声称原始记录已翻译。</p>}
+<nav class="resource-record-nav" aria-label={t("Resource record sections","资源记录章节")}>
+      <a href={local("/atlas/")} data-atlas-return>{t("← Back to Atlas","← 返回图谱")}</a>
+      <a href="#claim-context-title">{t("Claims","主张")}</a>
+      <a href="#evidence-title">{t("Evidence","证据")}</a>
+      <a href="#reuse-title">{t("Reuse limits","复用限制")}</a>
+      <a href="#reading-title">{t("Next reading","继续阅读")}</a>
+      <a href="#resource-compare-title">{t("Compare","比较")}</a>
+    </nav>
+<script is:inline>
+  (() => {
+    const back = document.querySelector("[data-atlas-return]");
+    if (back) {
+      const target = new URL(back.href);
+      target.search = location.search;
+      back.href = target.href;
+    }
+  })();
+</script>
+<section class="resource-purpose" aria-labelledby="purpose-title">
+      <p class="meta-label">{atlasLabel(resource.kind)} · {t("scientific purpose", "科学用途")}</p>
+      <h2 id="purpose-title">{t("Scientific purpose","科学用途")}</h2>
+      <p class="resource-purpose__summary" lang="en">{resource.summary}</p>
+      <ClaimEvidence evidence={resource.evidence} support="summary" emptyMessage={t("Unknown — no summary evidence is recorded.","未知：未记录摘要证据。")} />
+      <p><a class="resource-primary-link" href={resource.canonical_url}>{t("Open the primary resource page →","打开资源主页 →")}</a></p>
+      <ClaimEvidence evidence={resource.evidence} support="name" emptyMessage={t("Unknown — no name evidence is recorded.","未知：未记录名称证据。")} />
     </section>
-    <section class="detail-panel" aria-labelledby="identity-title">
-      <h2 id="identity-title">Identity and summary</h2>
-      <p>
-        <a href={resource.canonical_url}>Canonical resource page</a><br />
-        <ClaimEvidence
-          evidence={resource.evidence}
-          support="name"
-          emptyMessage="Unknown — no name evidence is recorded."
-        />
-      </p>
-      <p>
-        {resource.summary}<br />
-        <ClaimEvidence
-          evidence={resource.evidence}
-          support="summary"
-          emptyMessage="Unknown — no summary evidence is recorded."
-        />
-      </p>
-      <p>
-        <strong>Kind:</strong> {resource.kind}<br />
-        <ClaimEvidence
-          evidence={resource.evidence}
-          support="kind"
-          emptyMessage="Unknown — no kind evidence is recorded."
-        />
-      </p>
+<section class="resource-comparison-entry" aria-labelledby="resource-compare-title">
+      <h2 id="resource-compare-title">{t("Compare reuse and evidence","比较复用条件与证据")}</h2>
+      <p>{t("Inspect this record beside another resource. Every asset state, licence scope, source and review date stays separate.","将此记录与另一项资源并列检查。各资产状态、许可范围、来源与核查日期仍分别列出。")}</p>
+      {comparisonOptions.length > 0 && <form action={local("/atlas/#compare")} method="get">
+        <input type="hidden" name="compare" value={resource.id} />
+        <label>{t("Another", "另一项")} {atlasLabel(resource.kind)} {t("record", "记录")}
+          <select name="compare" required>
+            <option value="">{t("Choose a resource","选择资源")}</option>
+            {comparisonOptions.map((record) => <option value={record.id}>{record.name}</option>)}
+          </select>
+        </label>
+        <button type="submit">{t("Compare resource evidence","比较资源证据")}</button>
+      </form>}
+      <p class="resource-comparison-note">{t("Choices share a catalogue kind", "候选项具有相同的目录类型")}{sameScope.length ? t(" and at least one declared pipeline stage", "，并共享至少一个声明的流程阶段") : ""}{t(". This is a navigation association, not evidence of scientific equivalence.", "。这是导航关联，不构成科学等价性的证据。")} <a href={local(`/atlas/?compare=${resource.id}#compare`)}>{t("Choose from the full Atlas or compare up to 4 records →","从完整图谱中选择，最多比较 4 条记录 →")}</a></p>
     </section>
-
-    <section class="detail-panel" aria-labelledby="claim-context-title">
-      <h2 id="claim-context-title">Claim context</h2>
+<section class="detail-panel" aria-labelledby="claim-context-title">
+      <h2 id="claim-context-title">{t("Claim context","主张背景")}</h2>
       <dl class="detail-list">
-        <div><dt>Kind</dt><dd>{resource.kind}</dd></div>
+        <div><dt>{t("Kind","类型")}</dt><dd>{resource.kind}<ClaimEvidence evidence={resource.evidence} support="kind" emptyMessage={t("Unknown — no kind evidence is recorded.","未知：未记录类型证据。")} /></dd></div>
         <div>
-          <dt>Lifecycle</dt>
+          <dt>{t("Lifecycle","生命周期")}</dt>
           <dd>
             {resource.status.value}<br />
             <ClaimEvidence
               evidence={resource.evidence}
               ids={resource.status.evidence}
-              emptyMessage="Unknown — no direct lifecycle evidence is recorded."
+              emptyMessage={t("Unknown — no direct lifecycle evidence is recorded.","未知：未记录直接生命周期证据。")}
             />
           </dd>
         </div>
         <div>
-          <dt>Access</dt>
+          <dt>{t("Access","访问")}</dt>
           <dd>
             {resource.access_level.value}<br />
             <ClaimEvidence
               evidence={resource.evidence}
               ids={resource.access_level.evidence}
-              emptyMessage="Unknown — no direct access evidence is recorded."
+              emptyMessage={t("Unknown — no direct access evidence is recorded.","未知：未记录直接访问证据。")}
             />
           </dd>
         </div>
-        <div><dt>Last verified</dt><dd>Last verified: {resource.last_verified}</dd></div>
+        <div><dt>{t("Last verified","最近核查")}</dt><dd>{t("Last verified: ", "最近核查：")}{resource.last_verified}</dd></div>
       </dl>
     </section>
-
-    {resource.identifiers.length > 0 && (
-      <section aria-labelledby="identifiers-title">
-        <h2 id="identifiers-title">Identifiers</h2>
+{(resource.stages.length > 0 || resource.modalities.length > 0 || resource.tasks.length > 0) && (<div class="resource-scope-grid">
+{resource.stages.length > 0 && (<section aria-labelledby="stages-title">
+        <h2 id="stages-title">{t("Pipeline stages","流程阶段")}</h2>
+        <ul>{resource.stages.map((stage) => <li>{stage}</li>)}</ul>
+        <ClaimEvidence
+          evidence={resource.evidence}
+          support="stages"
+          emptyMessage={t("Unknown — no stage evidence is recorded.","未知：未记录阶段证据。")}
+        />
+      </section>)}
+{resource.modalities.length > 0 && (<section aria-labelledby="modalities-title">
+        <h2 id="modalities-title">{t("Modalities","模态")}</h2>
+        <ul>{resource.modalities.map((modality) => <li>{modality}</li>)}</ul>
+        <ClaimEvidence
+          evidence={resource.evidence}
+          support="modalities"
+          emptyMessage={t("Unknown — no modality evidence is recorded.","未知：未记录模态证据。")}
+        />
+      </section>)}
+{resource.tasks.length > 0 && (<section aria-labelledby="tasks-title">
+        <h2 id="tasks-title">{t("Tasks","任务")}</h2>
+        <ul>{resource.tasks.map((task) => <li>{task}</li>)}</ul>
+        <ClaimEvidence
+          evidence={resource.evidence}
+          support="tasks"
+          emptyMessage={t("Unknown — no task evidence is recorded.","未知：未记录任务证据。")}
+        />
+      </section>)}
+</div>)}
+<section aria-labelledby="evidence-title">
+      <h2 id="evidence-title">{t("Evidence","证据")}</h2>
+      <ul>
+        {resource.evidence.map((evidence) => (
+          <li>
+            <a href={evidence.url}>{evidence.label}</a>
+            {evidence.supports.length > 0 && t(` — supports ${evidence.supports.join(", ")}.`, ` — 支持 ${evidence.supports.join(", ")}。`)}
+          </li>
+        ))}
+      </ul>
+    </section>
+<section class="resource-reuse" aria-labelledby="reuse-title">
+      <h2 id="reuse-title">{t("Reuse limits","复用限制")}</h2>
+      <p>{t("Access to a page, permission to reuse an asset, and availability of that asset are separate claims. Each of the seven dimensions below keeps its own state and evidence; unknown does not mean unavailable.","能否访问页面、是否获准复用资产及该资产是否可用是不同主张。下方七个维度分别保留状态与证据；未知不等于不可用。")}</p>
+<section aria-labelledby="caveats-title">
+      <h2 id="caveats-title">{t("Caveats","注意事项")}</h2>
+      {resource.caveats.length > 0 ? (
+        <ul>
+          {resource.caveats.map((caveat) => (
+            <li>
+              {caveat}<br />
+              <ClaimEvidence
+                evidence={resource.evidence}
+                support="caveats"
+                emptyMessage={t("Unknown — no caveat evidence is recorded.","未知：未记录注意事项证据。")}
+              />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>{t("No caveats recorded.","未记录注意事项。")}</p>
+      )}
+    </section>
+<section aria-labelledby="licences-title">
+      <h2 id="licences-title">{t("Licences","许可")}</h2>
+      {resource.licenses.length > 0 ? (
+        <ul>
+          {resource.licenses.map((license) => (
+            <li>
+              {license.name} ({license.scope})<br />
+              <ClaimEvidence
+                evidence={resource.evidence}
+                ids={license.evidence}
+                emptyMessage={t("Unknown — no direct licence evidence is recorded.","未知：未记录直接许可证据。")}
+              />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>{t("No licence claim is currently verified.","目前没有已核实的许可声明。")}</p>
+      )}
+    </section>
+<section aria-labelledby="openness-title">
+      <h2 id="openness-title">{t("Openness matrix","开放性矩阵")}</h2>
+      <OpennessMatrix resource={resource} />
+    </section>
+<section aria-labelledby="acknowledgements-title">
+      <h2 id="acknowledgements-title">{t("Acknowledgements","致谢")}</h2>
+      {resource.acknowledgements.length > 0 ? (
+        <ul>
+          {resource.acknowledgements.map((acknowledgement) => (
+            <li>
+              {acknowledgement}<br />
+              <ClaimEvidence
+                evidence={resource.evidence}
+                support="acknowledgements"
+                emptyMessage={t("Unknown — no acknowledgement evidence is recorded.","未知：未记录致谢证据。")}
+              />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>{t("No acknowledgements recorded.","未记录致谢。")}</p>
+      )}
+    </section>
+</section>
+<section class="resource-reading" aria-labelledby="reading-title">
+      <h2 id="reading-title">{t("Relevant next reading","相关后续阅读")}</h2>
+      <ResourceLearningLinks resourceId={resource.id} />
+{resource.relations.length > 0 && (<section aria-labelledby="relations-title">
+        <h2 id="relations-title">{t("Relations","关联")}</h2>
+        <ul>
+          {resource.relations.map((relation) => (
+            <li>{atlasLabel(relation.type)}: <a href={local(`/atlas/${relation.target}/`)}>{names.get(relation.target) ?? relation.target}</a> · <a href={local(`/atlas/?compare=${resource.id},${relation.target}#compare`)}>{t("Compare these records","比较这些记录")}</a></li>
+          ))}
+        </ul>
+        <ClaimEvidence
+          evidence={resource.evidence}
+          support="relations"
+          emptyMessage={t("Unknown — no relation evidence is recorded.","未知：未记录关联证据。")}
+        />
+      </section>)}
+{resource.identifiers.length > 0 && (<section aria-labelledby="identifiers-title">
+        <h2 id="identifiers-title">{t("Identifiers","标识符")}</h2>
         <ul>
           {resource.identifiers.map((identifier) => (
             <li>
@@ -115,138 +248,53 @@ const resourceLinks = [
         <ClaimEvidence
           evidence={resource.evidence}
           support="identifiers"
-          emptyMessage="Unknown — no identifier evidence is recorded."
+          emptyMessage={t("Unknown — no identifier evidence is recorded.","未知：未记录标识符证据。")}
         />
-      </section>
-    )}
-
-    {resource.stages.length > 0 && (
-      <section aria-labelledby="stages-title">
-        <h2 id="stages-title">Pipeline stages</h2>
-        <ul>{resource.stages.map((stage) => <li>{stage}</li>)}</ul>
-        <ClaimEvidence
-          evidence={resource.evidence}
-          support="stages"
-          emptyMessage="Unknown — no stage evidence is recorded."
-        />
-      </section>
-    )}
-
-    {resource.modalities.length > 0 && (
-      <section aria-labelledby="modalities-title">
-        <h2 id="modalities-title">Modalities</h2>
-        <ul>{resource.modalities.map((modality) => <li>{modality}</li>)}</ul>
-        <ClaimEvidence
-          evidence={resource.evidence}
-          support="modalities"
-          emptyMessage="Unknown — no modality evidence is recorded."
-        />
-      </section>
-    )}
-
-    {resource.tasks.length > 0 && (
-      <section aria-labelledby="tasks-title">
-        <h2 id="tasks-title">Tasks</h2>
-        <ul>{resource.tasks.map((task) => <li>{task}</li>)}</ul>
-        <ClaimEvidence
-          evidence={resource.evidence}
-          support="tasks"
-          emptyMessage="Unknown — no task evidence is recorded."
-        />
-      </section>
-    )}
-
-    {resource.relations.length > 0 && (
-      <section aria-labelledby="relations-title">
-        <h2 id="relations-title">Relations</h2>
-        <ul>
-          {resource.relations.map((relation) => (
-            <li>{relation.type}: <a href={`/atlas/${relation.target}/`}>{relation.target}</a></li>
-          ))}
-        </ul>
-        <ClaimEvidence
-          evidence={resource.evidence}
-          support="relations"
-          emptyMessage="Unknown — no relation evidence is recorded."
-        />
-      </section>
-    )}
-
-    <section aria-labelledby="evidence-title">
-      <h2 id="evidence-title">Evidence</h2>
+      </section>)}
+<section class="detail-panel" aria-labelledby="resource-links-title">
+      <h2 id="resource-links-title">{t("Resource links","资源链接")}</h2>
       <ul>
-        {resource.evidence.map((evidence) => (
-          <li>
-            <a href={evidence.url}>{evidence.label}</a>
-            {evidence.supports.length > 0 && ` — supports ${evidence.supports.join(", ")}.`}
-          </li>
-        ))}
+        {resourceLinks.map((link) => <li><a href={link.url}>{link.label}</a></li>)}
       </ul>
+      <p>{t("Links are entry points, not a claim of open access or permission to use every asset. Check the access, licence and openness notes below.","链接是访问入口，不表示开放访问或获准使用所有资产。请检查访问、许可与开放性说明。")}</p>
     </section>
-
-    <section aria-labelledby="caveats-title">
-      <h2 id="caveats-title">Caveats</h2>
-      {resource.caveats.length > 0 ? (
-        <ul>
-          {resource.caveats.map((caveat) => (
-            <li>
-              {caveat}<br />
-              <ClaimEvidence
-                evidence={resource.evidence}
-                support="caveats"
-                emptyMessage="Unknown — no caveat evidence is recorded."
-              />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No caveats recorded.</p>
-      )}
-    </section>
-
-    <section aria-labelledby="licences-title">
-      <h2 id="licences-title">Licences</h2>
-      {resource.licenses.length > 0 ? (
-        <ul>
-          {resource.licenses.map((license) => (
-            <li>
-              {license.name} ({license.scope})<br />
-              <ClaimEvidence
-                evidence={resource.evidence}
-                ids={license.evidence}
-                emptyMessage="Unknown — no direct licence evidence is recorded."
-              />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No licence claim is currently verified.</p>
-      )}
-    </section>
-
-    <section aria-labelledby="acknowledgements-title">
-      <h2 id="acknowledgements-title">Acknowledgements</h2>
-      {resource.acknowledgements.length > 0 ? (
-        <ul>
-          {resource.acknowledgements.map((acknowledgement) => (
-            <li>
-              {acknowledgement}<br />
-              <ClaimEvidence
-                evidence={resource.evidence}
-                support="acknowledgements"
-                emptyMessage="Unknown — no acknowledgement evidence is recorded."
-              />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No acknowledgements recorded.</p>
-      )}
-    </section>
-
-    <section aria-labelledby="openness-title">
-      <h2 id="openness-title">Openness matrix</h2>
-      <OpennessMatrix resource={resource} />
-    </section>
+</section>
   </article>
 </StarlightPage>
+
+<style>
+  .resource-detail { gap: 1.8rem; min-width: 0; }
+  .resource-record-nav { display: flex; flex-wrap: wrap; gap: .1rem 1.15rem; padding-block: .4rem; border-bottom: 1px solid var(--atlas-rule); font-size: .83rem; }
+  .resource-record-nav a, .resource-primary-link { display: inline-flex; min-height: 44px; align-items: center; }
+  .resource-purpose .meta-label { margin: 0; }
+  .resource-purpose h2 { margin-top: .3rem; }
+  .resource-purpose__summary { max-width: 76ch; font-size: 1.1rem; line-height: 1.65; }
+  .resource-detail :global(.detail-panel) { padding: 0; border: 0; background: transparent; box-shadow: none; }
+  .resource-detail :global(section) { min-width: 0; scroll-margin-top: 5rem; }
+  .resource-detail :global(h2) { font-size: 1.35rem; margin-top: .5rem; }
+  .resource-detail :global(p), .resource-detail :global(li), .resource-detail :global(dd) { overflow-wrap: anywhere; }
+  .resource-detail :global(.claim-evidence) { display: block; margin-top: .3rem; font-size: .8rem; line-height: 1.6; }
+  .resource-detail :global(.openness-matrix .claim-evidence) { color: var(--atlas-ink); }
+  .resource-detail :global(.detail-list) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  .resource-detail :global(.detail-list > div) { margin: 0; border-top: 1px solid var(--atlas-rule); padding-top: .65rem; }
+  .resource-detail :global(.detail-list dd) { margin: .25rem 0 0; }
+  .resource-detail :global(.detail-list dt) { color: var(--atlas-muted); font-size: .8rem; }
+  .resource-scope-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; padding-block: .75rem; border-block: 1px solid var(--atlas-rule); }
+  .resource-scope-grid > section { margin: 0; }
+  .resource-scope-grid :global(h2) { font-size: 1rem; }
+  .resource-scope-grid :global(ul) { padding-left: 1.1rem; font-size: .9rem; }
+  .resource-reuse, .resource-reading { padding-top: 1rem; border-top: 1px solid var(--atlas-rule); }
+  .resource-reuse > section, .resource-reading > section { margin-top: 1.5rem; }
+  .resource-reuse > section > h2, .resource-reading > section > h2 { font-size: 1.05rem; }
+  .resource-comparison-entry { padding: 1rem; border: 1px solid var(--atlas-rule); border-radius: .4rem; background: var(--atlas-surface); }
+  .resource-comparison-entry form { display: flex; align-items: end; gap: .75rem; flex-wrap: wrap; }
+  .resource-comparison-entry label { display: grid; gap: .35rem; font-size: .85rem; min-width: 0; max-width: 100%; }
+  .resource-comparison-entry select, .resource-comparison-entry button { min-height: 44px; padding: .4rem .65rem; border: 1px solid var(--atlas-rule); border-radius: .25rem; color: var(--atlas-ink); background: var(--atlas-bg); font: inherit; max-width: 100%; }
+  .resource-comparison-entry select { min-width: 0; width: 100%; }
+  .resource-comparison-entry button { cursor: pointer; }
+  .resource-comparison-note { font-size: .8rem; color: var(--atlas-muted); }
+  @media (max-width: 620px) {
+    .resource-scope-grid { grid-template-columns: 1fr; }
+    .resource-detail :global(.detail-list) { grid-template-columns: 1fr; }
+  }
+</style>

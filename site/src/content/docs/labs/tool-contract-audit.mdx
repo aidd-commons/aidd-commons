@@ -4,6 +4,7 @@ description: Check the project's committed laboratory returns against a six-part
 ---
 
 import ScrollableRegions from "../../../components/ScrollableRegions.astro";
+import ScientificTeachingView from "../../../components/ScientificTeachingView.astro";
 
 <ScrollableRegions />
 
@@ -13,13 +14,25 @@ Read [Retrieval, tools and feedback](/learn/scientific-agents/retrieval-tools-fe
 
 The mode is fresh independent computation over a frozen protocol and committed local return records. Use the project Python 3.11 environment and CPU. No network, download or accelerator is needed. The `download` command verifies the local material and writes nothing. The inspection commands write nothing. The exporter overwrites only the compact summary after its checks pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/tool_contract_audit/run_lab.py download
 .venv/bin/python labs/tool_contract_audit/inspect_tool_contract_audit.py show
 .venv/bin/python labs/tool_contract_audit/inspect_tool_contract_audit.py check
-.venv/bin/python labs/tool_contract_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/tool_contract_audit -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/tool_contract_audit/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/tool_contract_audit/export_summary.py
+```
+
+</details>
 
 ## Return-record contract
 
@@ -33,6 +46,8 @@ Each counted unit is one laboratory return record. The audit covers every labora
 | Side effects | Require `side_effects.allowed_writes` as a list of repository-relative paths. An empty list declares no allowed writes and makes that claim checkable against a separate trace. |
 | Error states | `outcome_status` is `complete`, `no_result` or `halt`. `no_result` licenses no usable result. `halt` also requires stopping. The source laboratories have no uniform top-level error field, so missing status is not read as success. |
 | Scientific meaning | Require nonempty `scientific_meaning.licenses` and `scientific_meaning.does_not_license`. The audit separately counts existing explicit limit fields without treating them as a complete meaning statement. |
+
+<ScientificTeachingView track="scientific-agents" compact />
 
 ## Field completeness
 

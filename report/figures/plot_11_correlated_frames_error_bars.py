@@ -9,12 +9,12 @@ numbers are parsed out of that page rather than transcribed into this script,
 so the figure cannot drift away from the page it cites, and the parser raises
 if a number it expects is not on the page.
 
-What the figure shows. The left panel puts the naive standard error next to
-the block-averaged standard error for each of the two molecules. The middle
+What the figure shows. The upper-left panel pairs the naive standard error
+with the block-averaged standard error for each molecule. The upper-right
 panel shows the ratio between them, which is the number the page reports and
 the one a reader needs: treating the frames as independent understates the
 uncertainty of the estimate by a factor of 3.30 for ethanol and 6.26 for
-malonaldehyde. The right panel shows that the corrected estimate still carries
+malonaldehyde. The lower panel shows that the corrected estimate still carries
 a choice inside it, because the block count changes the answer.
 
 What it does not show. There is exactly one ab initio trajectory per molecule
@@ -38,6 +38,7 @@ if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 import figure_style as style  # noqa: E402  (the module sits next to this script)
+from matplotlib.ticker import FuncFormatter  # noqa: E402
 
 FIGURE_NUMBER = 11
 STEM = "plot_11_correlated_frames_error_bars"
@@ -45,8 +46,10 @@ PAGE = Path("site/src/content/docs/labs/rmd17-dynamics-observable.mdx")
 SYSTEMS = ["Ethanol", "Malonaldehyde"]
 
 CAPTION = (
-    "The uncertainty of a trajectory observable, from the rMD17 lab page. {values}. The middle "
-    "panel is the ratio between the two estimates, which is the number the page reports. The right "
+    "The uncertainty of a trajectory observable, from the rMD17 lab page. {values}. "
+    "The upper-right "
+    "panel is the ratio between the two estimates, which is the number the page "
+    "reports. The lower panel "
     "is ethanol's block-averaged standard error against the block count, because a corrected "
     "estimate still carries a choice inside it. There is one trajectory per molecule and one level "
     "of theory, so nothing here speaks to replicate dependence or force-field sensitivity."
@@ -114,167 +117,122 @@ def read_observable_page() -> dict:
 
 
 def build() -> dict[str, Path]:
-    """Draw the figure and write its two files plus its caption fragment."""
+    """Read uncertainty magnitude, understatement and block-choice sensitivity separately."""
     style.apply_style("light")
-    tokens = style.tokens("light")
-    colours = style.categorical("light")
-    hatches = style.atlas_palette.HATCH
-
+    tokens, colours = style.tokens(), style.categorical()
     page = read_observable_page()
-
-    fig = style.figure(style.FIGURE_WIDTH, 3.6)
-    axes = style.axes_grid(
+    fig = style.figure(height=5.5)
+    style.heading(
         fig,
-        1,
-        3,
-        left=0.115,
-        right=0.985,
-        bottom=0.185,
-        top=0.855,
-        wspace=0.40,
-        width_ratios=[1.2, 0.8, 1.05],
+        "Correlated frames change the uncertainty estimate",
+        "rMD17 radius of gyration · one trajectory per molecule · 100-block estimate retained",
     )
-    sem_ax, ratio_ax, sweep_ax = axes
-
-    positions = [0.0, 1.0]
-    naive = [page["sem"][system]["naive_sem"] for system in SYSTEMS]
-    block = [page["sem"][system]["block_sem"] for system in SYSTEMS]
-    width = 0.34
-    naive_container = sem_ax.bar(
-        [position - width / 2 for position in positions],
-        naive,
-        width=width,
-        color=colours["slate"],
-        edgecolor=tokens["ink"],
-        linewidth=0.6,
-        label="Naive standard error",
-        zorder=3,
-    )
-    block_container = sem_ax.bar(
-        [position + width / 2 for position in positions],
-        block,
-        width=width,
-        color=colours["teal"],
-        edgecolor=tokens["ink"],
-        linewidth=0.6,
-        label="Block standard error, 100 blocks",
-        zorder=3,
-    )
-    for bar in naive_container:
-        bar.set_hatch(hatches["slate"])
-    for bar in block_container:
-        bar.set_hatch(hatches["teal"])
-    style.bar_labels(sem_ax, naive_container, naive, fmt="{:.6f}", pad=2, fontsize=6.2)
-    style.bar_labels(sem_ax, block_container, block, fmt="{:.6f}", pad=2, fontsize=6.2)
-    sem_ax.set_xticks(positions)
-    sem_ax.set_xticklabels(SYSTEMS, fontsize=8.2)
-    sem_ax.set_ylabel("Standard error of the mean (Å)", fontsize=8.5)
-    sem_ax.set_ylim(0, max(block) * 1.28)
-    sem_ax.grid(axis="y", linewidth=0.6, alpha=0.7)
-    sem_ax.set_axisbelow(True)
-    style.title(sem_ax, "Two estimates of the same error")
-    sem_ax.legend(
-        loc="upper left",
-        fontsize=7.4,
-        handlelength=1.2,
-        handleheight=1.0,
-        borderpad=0.3,
-        frameon=False,
-    )
-
-    ratios = [page["sem"][system]["ratio"] for system in SYSTEMS]
-    container = ratio_ax.bar(
-        positions,
-        ratios,
-        width=0.6,
-        color=colours["teal"],
-        edgecolor=tokens["ink"],
-        linewidth=0.6,
-        zorder=3,
-    )
-    for bar in container:
-        bar.set_hatch(hatches["teal"])
-    ratio_ax.axhline(1.0, color=tokens["ink"], linewidth=1.0, linestyle="--", zorder=4)
-    ratio_ax.annotate(
-        "the naive estimate",
-        xy=(1.42, 1.0),
-        xytext=(0, 4),
-        textcoords="offset points",
-        ha="right",
-        fontsize=7.0,
-        color=tokens["muted"],
-    )
-    style.bar_labels(ratio_ax, container, ratios, fmt="{:.2f}", pad=2, fontsize=7.6)
-    ratio_ax.set_xticks(positions)
-    ratio_ax.set_xticklabels(SYSTEMS, fontsize=8.2)
-    ratio_ax.set_ylabel("Block error over naive error", fontsize=8.5)
-    ratio_ax.set_ylim(0, max(ratios) * 1.22)
-    ratio_ax.grid(axis="y", linewidth=0.6, alpha=0.7)
-    ratio_ax.set_axisbelow(True)
-    style.title(ratio_ax, "Understatement")
-
-    sweep = sorted(page["sweep"], key=lambda entry: entry["blocks"])
-    blocks = [entry["blocks"] for entry in sweep]
-    values = [entry["sem"] for entry in sweep]
-    naive_level = page["sem"]["Ethanol"]["naive_sem"]
-    sweep_ax.axhline(
-        naive_level,
-        color=colours["slate"],
-        linewidth=1.2,
-        linestyle="--",
-        zorder=2,
-    )
-    sweep_ax.annotate(
-        "the naive estimate",
-        xy=(blocks[-1], naive_level),
-        xytext=(-2, 5),
-        textcoords="offset points",
-        ha="right",
-        fontsize=7.0,
-        color=tokens["muted"],
-    )
-    sweep_ax.plot(
-        blocks,
-        values,
-        color=colours["teal"],
-        marker="o",
-        markersize=6.0,
-        markerfacecolor=colours["teal"],
-        markeredgecolor=tokens["ink"],
-        markeredgewidth=0.5,
-        linewidth=1.8,
-        zorder=3,
-    )
-    for block_count, value in zip(blocks, values, strict=True):
-        sweep_ax.annotate(
-            f"{value:.6f}",
-            xy=(block_count, value),
-            xytext=(0, 8),
+    sem_ax = fig.add_axes((0.21, 0.59, 0.37, 0.20))
+    ratio_ax = fig.add_axes((0.74, 0.59, 0.21, 0.20))
+    sweep_ax = fig.add_axes((0.21, 0.18, 0.74, 0.24))
+    for y, system in zip([1, 0], SYSTEMS, strict=True):
+        values = page["sem"][system]
+        a, b = values["naive_sem"], values["block_sem"]
+        sem_ax.plot([a, b], [y, y], color=tokens["rule"], lw=2)
+        sem_ax.plot(a, y, "s", ms=6, mfc="none", mec=colours["slate"], mew=1)
+        sem_ax.plot(b, y, "o", ms=6, mfc=colours["teal"], mec=tokens["ink"], mew=0.5)
+        for value, dy in [(a, -13), (b, 11)]:
+            sem_ax.annotate(
+                f"{value:.6f}",
+                (value, y),
+                xytext=(0, dy),
+                textcoords="offset points",
+                ha="center",
+                va="center",
+                fontsize=8,
+            )
+        ratio = values["ratio"]
+        ratio_ax.plot([1, ratio], [y, y], color=colours["teal"], lw=1.6)
+        ratio_ax.plot(ratio, y, "D", ms=6, mfc=colours["teal"], mec=tokens["ink"], mew=0.5)
+        ratio_ax.annotate(
+            f"{ratio:.2f}×",
+            (ratio, y),
+            xytext=(0, 10),
             textcoords="offset points",
             ha="center",
-            fontsize=6.6,
-            color=tokens["ink"],
+            fontsize=8.5,
+            fontweight="bold",
         )
-    sweep_ax.set_xscale("log")
-    sweep_ax.set_xticks(blocks)
-    sweep_ax.set_xticklabels([str(block) for block in blocks], fontsize=8.2)
-    sweep_ax.set_yscale("log")
-    sweep_ax.set_ylim(0.00007, 0.00037)
-    sweep_ax.set_yticks([0.00008, 0.0001, 0.0002, 0.0003])
-    sweep_ax.set_yticklabels(["0.00008", "0.0001", "0.0002", "0.0003"], fontsize=7.6)
-    sweep_ax.set_xlabel("Blocks used", fontsize=8.5)
-    sweep_ax.set_ylabel("Block standard error (Å)", fontsize=8.5)
-    sweep_ax.grid(axis="y", linewidth=0.6, alpha=0.7)
-    sweep_ax.set_axisbelow(True)
-    style.title(sweep_ax, "Ethanol, by block count")
-
-    written = style.save(fig, STEM)
-    values_text = style.english_list(
-        f"{system} has a naive standard error of {page['sem'][system]['naive_sem']:.6f} Å "
-        f"against a block-averaged standard error of {page['sem'][system]['block_sem']:.6f} Å "
-        f"at 100 blocks"
-        for system in SYSTEMS
+    sem_ax.set_yticks([1, 0], SYSTEMS)
+    sem_ax.set_ylim(-0.7, 1.7)
+    sem_ax.set_xlim(0, max(page["sem"][s]["block_sem"] for s in SYSTEMS) * 1.18)
+    sem_ax.xaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value * 1000:g}"))
+    sem_ax.set_xlabel(r"Standard error ($10^{-3}$ Å)")
+    style.clean_axis(sem_ax)
+    style.title(sem_ax, "(a) Naive versus block SEM")
+    ratio_ax.axvline(1, color=tokens["muted"], ls="--", lw=0.8)
+    ratio_ax.set_yticks([])
+    ratio_ax.set_ylim(-0.7, 1.7)
+    ratio_ax.set_xlim(0.5, 7.6)
+    ratio_ax.set_xticks([1, 3, 5, 7])
+    ratio_ax.set_xlabel("Block / naive")
+    style.clean_axis(ratio_ax)
+    style.title(ratio_ax, "(b) Understatement")
+    sweep = sorted(page["sweep"], key=lambda r: r["blocks"])
+    xs = [r["blocks"] for r in sweep]
+    ys = [r["sem"] for r in sweep]
+    sweep_ax.plot(
+        xs, ys, color=colours["teal"], marker="o", ms=6, lw=1.7, mec=tokens["ink"], mew=0.5
     )
+    naive = page["sem"]["Ethanol"]["naive_sem"]
+    sweep_ax.axhline(naive, color=colours["slate"], ls="--", lw=1)
+    for x, y in zip(xs, ys, strict=True):
+        sweep_ax.annotate(
+            f"{y:.6f}",
+            (x, y),
+            xytext=(0, 10),
+            textcoords="offset points",
+            ha="center",
+            fontsize=8.3,
+        )
+    sweep_ax.text(
+        0.99,
+        0.03,
+        "Dashed: naive SEM",
+        transform=sweep_ax.transAxes,
+        ha="right",
+        fontsize=8.2,
+        color=tokens["muted"],
+    )
+    sweep_ax.set_xscale("log")
+    sweep_ax.set_xticks(xs, [str(x) for x in xs])
+    sweep_ax.set_ylim(0, max(ys) * 1.3)
+    sweep_ax.yaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value * 10000:g}"))
+    sweep_ax.set_xlabel("Blocks used · log scale")
+    sweep_ax.set_ylabel(r"Block SEM ($10^{-4}$ Å)")
+    style.clean_axis(sweep_ax, axis="y")
+    style.title(sweep_ax, "(c) Ethanol remains sensitive to block count")
+    from matplotlib.lines import Line2D
+
+    fig.legend(
+        [
+            Line2D([], [], marker="s", mfc="none", mec=colours["slate"], ls="none"),
+            Line2D([], [], marker="o", mfc=colours["teal"], mec=tokens["ink"], ls="none"),
+        ],
+        ["Naive SEM", "Block-averaged SEM"],
+        ncol=2,
+        loc="lower center",
+        bbox_to_anchor=(0.58, 0.07),
+        fontsize=8.5,
+    )
+    style.footnote(
+        fig,
+        "No independent-run or force-field sensitivity is measured. Block count is an "
+        "analysis choice; no new trajectory is simulated.",
+        y=0.022,
+    )
+    values_text = style.english_list(
+        f"{s} has a naive standard error of {page['sem'][s]['naive_sem']:.6f} Å "
+        f"against a block-averaged standard error of {page['sem'][s]['block_sem']:.6f} "
+        f"Å at 100 blocks"
+        for s in SYSTEMS
+    )
+    written = style.save(fig, STEM)
     style.register_caption(FIGURE_NUMBER, CAPTION.format(values=values_text))
     return written
 

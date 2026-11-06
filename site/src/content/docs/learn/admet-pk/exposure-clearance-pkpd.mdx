@@ -5,6 +5,7 @@ description: Derive a one-compartment concentration curve, distinguish total fro
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import ScientificTeachingView from "../../../../components/ScientificTeachingView.astro";
 
 <LessonProgress lessonId="admet-pk/exposure-clearance-pkpd" />
 <ScrollableRegions />
@@ -25,6 +26,8 @@ specified exposure to a specified response; neither model supplies missing
 evidence that the response benefits the organism. The FDA's
 [exposure-response guidance, sections IV–V](https://www.fda.gov/media/71277/download)
 distinguishes exposure measures, response endpoints and their timing.
+
+<ScientificTeachingView track="admet-pk" />
 
 ## Derive a minimal PK model
 
@@ -142,17 +145,15 @@ Computed on 2026-09-12:
 | Human liver microsomes vs. human hepatocytes (matrix differs, species fixed) | 96 | 0.4864 |
 | Human liver microsomes vs. rat hepatocytes (both differ) | 359 | 0.3868 |
 
-None of the three pairs is a strong predictor of another: every rho sits well
-short of 1. The two hepatocyte assays share one unit, and named examples
-there diverge by more than tenfold in either direction for the same real
-compound; the microsome assay reports a different physical quantity (per
-gram of protein, not per cell), so its divergence from either hepatocyte
-assay is a real same-direction signal rather than a literal fold-change.
-Either way, swapping species while holding the matrix fixed, or swapping
-matrix while holding species fixed, changes the number enough that a single
-"this compound's clearance" claim, without naming which of the three
-systems produced it, cannot be checked against any one of these real
-records.
+The correlations show partial rank agreement between the three assay pairs;
+a rho below 1 does not by itself establish weak prediction or calibrated
+agreement. The two hepatocyte assays share one unit, and named examples
+differ by more than tenfold in either direction for the same compound.
+The microsome assay reports a different physical quantity (per gram of
+protein, not per cell), so its values cannot be read as literal fold-changes
+against the hepatocyte values. These observational comparisons involve
+different species or matrices and do not isolate their causal effects.
+A checkable clearance claim must name the assay system and measurement basis.
 
 **Independent exercise (naming the assay system):** A slide states "Compound
 X has intrinsic clearance 18 mL/min/g." Using only the comparison above,

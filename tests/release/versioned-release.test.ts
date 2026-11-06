@@ -55,5 +55,24 @@ it("ships consistent release metadata, the report addendum, and the historical c
   expect(archive.version).toBe("0.1.0");
   expect(archive["date-released"]).toBe("2026-09-04");
   await read("report/aidd-commons-v0.2-addendum.md");
+  await read("report/metadata-v0.2.yaml");
+  await read("report/aidd-commons-living-report-v0.2.md");
+  expect(
+    (
+      await read("site/public/reports/aidd-commons-living-report-v0.2.html")
+    ).replace(/\s+/g, " "),
+  ).toContain("Learning through linked scientific views");
+  await read("scripts/report/build-v02-pdf.py");
+  const reports = JSON.parse(await read("site/src/data/publications.json"));
+  const current = reports.versions.find(
+    (version: { id: string }) => version.id === "v0.2",
+  );
+  expect(current.pdfHref).toBe("/reports/aidd-commons-living-report-v0.2.pdf");
+  const pdfPath = `site/public${current.pdfHref}`;
+  const shippedPDF = await readFile(join(destination, pdfPath));
+  expect(shippedPDF.subarray(0, 5).toString()).toBe("%PDF-");
+  expect(shippedPDF.equals(await readFile(join(repositoryRoot, pdfPath)))).toBe(
+    true,
+  );
   await read("CHANGELOG.md");
 }, 30_000);

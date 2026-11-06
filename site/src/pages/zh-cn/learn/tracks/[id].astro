@@ -1,0 +1,13 @@
+---
+import TrackHub from "../../../../components/TrackHub.astro";
+import SiteShell from "../../../../components/SiteShell.astro";
+import { workbenchData, type WorkbenchTrack } from "../../../../lib/workbench-data";
+export function getStaticPaths() {
+  return workbenchData.tracks.map((track) => ({ params: { id: track.id }, props: { track } }));
+}
+interface Props { track: WorkbenchTrack; }
+const { track } = Astro.props;
+---
+<SiteShell lang="zh-CN" title={track.titleZh} description={track.summaryZh}>
+  <TrackHub track={track} chinese />
+</SiteShell>

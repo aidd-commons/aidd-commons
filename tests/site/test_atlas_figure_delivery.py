@@ -3,8 +3,12 @@
 from __future__ import annotations
 
 import importlib.util
+import json
+import shutil
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
+import zipfile
 from pathlib import Path
 from unittest.mock import patch
 
@@ -25,6 +29,124 @@ import matplotlib.pyplot as plt  # noqa: E402
 
 
 class AtlasFigureDeliveryTests(unittest.TestCase):
+    def composed_source(self, directory):
+        root = Path(directory) / "src"
+        (root / "pages").mkdir(parents=True)
+        (root / "components").mkdir()
+        page = root / "pages/labs.astro"
+        page.write_text(
+            '---\nimport Group from "../components/Group.astro";\n---\n<Group />\n',
+            encoding="utf-8",
+        )
+        (root / "components/Group.astro").write_text(
+            '---\nimport Nested from "./Nested.astro";\n---\n<Nested />\n', encoding="utf-8"
+        )
+        nested = root / "components/Nested.astro"
+        nested.write_text(
+            '---\nimport Figure from "./AtlasFigure.astro";\n---\n'
+            '<details><Figure id="fixture" /></details>\n',
+            encoding="utf-8",
+        )
+        (root / "components/AtlasFigure.astro").write_text("<figure />\n", encoding="utf-8")
+        return root, page, nested
+
+    def test_active_generator_selection_matches_five_figure_nine_placement_manifest(self):
+        manifest = checker.json.loads(checker.MANIFEST_PATH.read_text(encoding="utf-8"))
+        expected = [(row["id"], row["stem"], row["pages"]) for row in renderer.placement_rows()]
+        actual = [
+            (row["id"], row["source_stem"].replace("_", "-"), row["pages"])
+            for row in manifest["figures"]
+        ]
+        self.assertEqual(actual, expected)
+        self.assertEqual(len(actual), 5)
+        self.assertEqual(sum(len(row[2]) for row in actual), 9)
+        for home in ("/", "/zh-cn/"):
+            self.assertEqual(
+                [row[0] for row in actual if home in row[2]],
+                ["representation-flips"],
+            )
+
+    def test_static_nested_component_and_renderer_alias_are_real_placements(self):
+        with tempfile.TemporaryDirectory(prefix="aidd-composed-figure-") as directory:
+            root, page, _ = self.composed_source(directory)
+            manifest = [{"id": "fixture", "pages": ["/labs/"]}]
+            self.assertEqual(checker.check_placements(manifest, {"/labs/": page}, root), [])
+
+    def test_missing_and_unregistered_nested_placements_are_both_refused(self):
+        with tempfile.TemporaryDirectory(prefix="aidd-composed-defect-") as directory:
+            root, page, nested = self.composed_source(directory)
+            nested.write_text(
+                '---\nimport Figure from "./AtlasFigure.astro";\n---\n'
+                '<Figure id="unknown-fixture" />\n',
+                encoding="utf-8",
+            )
+            issues = checker.check_placements(
+                [{"id": "fixture", "pages": ["/labs/"]}], {"/labs/": page}, root
+            )
+            self.assertEqual(
+                issues,
+                [
+                    "fixture: /labs/ does not place the figure",
+                    "/labs/: places unknown-fixture without a matching manifest placement",
+                ],
+            )
+
+    def test_id_text_and_unused_imports_cannot_substitute_for_component_placement(self):
+        with tempfile.TemporaryDirectory(prefix="aidd-unrendered-figure-") as directory:
+            root, page, _ = self.composed_source(directory)
+            page.write_text(
+                '---\nimport Group from "../components/Group.astro";\n'
+                "const example = '<Group />';\n---\n"
+                '<div id="fixture"></div>\n<!-- <Group /> -->\n'
+                '<script>const example = "<Group />";</script>\n'
+                '{"<Group />"}\n{/* <Group /> */}\n',
+                encoding="utf-8",
+            )
+            self.assertEqual(
+                checker.check_placements(
+                    [{"id": "fixture", "pages": ["/labs/"]}], {"/labs/": page}, root
+                ),
+                ["fixture: /labs/ does not place the figure"],
+            )
+
+    def test_dynamic_figure_id_is_refused(self):
+        with tempfile.TemporaryDirectory(prefix="aidd-dynamic-figure-") as directory:
+            root, page, nested = self.composed_source(directory)
+            nested.write_text(
+                '---\nimport Figure from "./AtlasFigure.astro";\n---\n<Figure id={value} />\n',
+                encoding="utf-8",
+            )
+            _, issues = checker.page_figure_ids(page, root)
+            self.assertIn("AtlasFigure requires one literal figure id", issues)
+
+    def test_component_cycles_and_source_root_escapes_are_refused(self):
+        with tempfile.TemporaryDirectory(prefix="aidd-unsafe-component-") as directory:
+            root, page, nested = self.composed_source(directory)
+            nested.write_text(
+                '---\nimport Group from "./Group.astro";\n---\n<Group />\n', encoding="utf-8"
+            )
+            _, issues = checker.page_figure_ids(page, root)
+            self.assertTrue(any("component import cycle" in issue for issue in issues))
+            page.write_text(
+                '---\nimport Outside from "../../outside.astro";\n---\n<Outside />\n',
+                encoding="utf-8",
+            )
+            (Path(directory) / "outside.astro").write_text(
+                '<div id="fixture" />\n', encoding="utf-8"
+            )
+            _, issues = checker.page_figure_ids(page, root)
+            self.assertTrue(any("component path escapes" in issue for issue in issues))
+
+    def test_missing_rendered_component_is_refused(self):
+        with tempfile.TemporaryDirectory(prefix="aidd-missing-component-") as directory:
+            root, page, _ = self.composed_source(directory)
+            page.write_text(
+                '---\nimport Missing from "../components/Missing.astro";\n---\n<Missing />\n',
+                encoding="utf-8",
+            )
+            _, issues = checker.page_figure_ids(page, root)
+            self.assertTrue(any("not a regular source file" in issue for issue in issues))
+
     def test_the_native_schematic_entry_point_writes_pdf_and_png_only(self):
         import schematic_style
 
@@ -80,6 +202,104 @@ class AtlasFigureDeliveryTests(unittest.TestCase):
             path.write_text('{"figures": []}', encoding="utf-8")
             with patch.object(checker, "MANIFEST_PATH", path):
                 self.assertEqual(checker.check_manifest(), ["the manifest registers no figure"])
+
+    def test_native_library_valid_and_known_delivery_defects(self):
+        manifest = json.loads(checker.MANIFEST_PATH.read_text(encoding="utf-8"))
+        row = next(item for item in manifest["library"] if item["kind"] == "schematic")
+        key = "S" + str(int(row["source_stem"].split("-")[1]))
+        captions = {key: row["caption"]}
+        with tempfile.TemporaryDirectory(prefix="aidd-native-library-") as directory:
+            source = Path(directory) / "source"
+            delivery = Path(directory) / "delivery"
+            source.mkdir()
+            delivery.mkdir()
+            for field, suffix in (("file", ".png"), ("pdf", ".pdf"), ("pptx", ".pptx")):
+                native = checker.REPORT_OUT / (row["source_stem"] + suffix)
+                shutil.copy2(native, source / native.name)
+                shutil.copy2(native, delivery / row[field])
+
+            def check(items):
+                return checker.check_library(items, delivery, source, {}, captions)
+
+            self.assertEqual(check([row]), [])
+            self.assertEqual(check([]), ["the figure library is empty"])
+            self.assertTrue(any("exactly once" in issue for issue in check([row, row])))
+            (delivery / row["pdf"]).write_bytes(b"%PDF-1.4\nretained stale copy\n%%EOF\n")
+            self.assertIn(
+                f"{row['id']}: delivered .pdf differs from its native source", check([row])
+            )
+            shutil.copy2(source / (row["source_stem"] + ".pdf"), delivery / row["pdf"])
+            for root in (source, delivery):
+                (root / row["pptx"]).write_bytes(
+                    b"a PNG cannot stand in for an editable presentation"
+                )
+            self.assertIn(
+                f"{row['id']}: editable PPTX is not a readable presentation", check([row])
+            )
+
+    def test_native_master_valid_and_known_source_defects(self):
+        import schematic_style
+
+        stem = "schematic-01-artifacts"
+        contracts = schematic_style._native_source_contracts()
+        with tempfile.TemporaryDirectory(prefix="aidd-native-source-") as directory:
+            root = Path(directory)
+            figures = root / "report/figures"
+            output = figures / "out"
+            output.mkdir(parents=True)
+            assets = root / "site/src/assets/editorial"
+            assets.mkdir(parents=True)
+            for suffix in (".pdf", ".png", ".pptx"):
+                shutil.copy2(checker.REPORT_OUT / (stem + suffix), output / (stem + suffix))
+            for asset in set(contracts[stem]["native_contract"]["images"].values()):
+                shutil.copy2(ROOT / "site/src/assets/editorial" / (asset + ".png"), assets)
+            native = output / (stem + ".pptx")
+            original = native.read_bytes()
+            with zipfile.ZipFile(native) as package:
+                parts = {name: package.read(name) for name in package.namelist()}
+
+            def write_parts(changed):
+                with zipfile.ZipFile(native, "w") as package:
+                    for name, data in changed.items():
+                        package.writestr(name, data)
+
+            with (
+                patch.object(schematic_style, "_HERE", figures),
+                patch.object(schematic_style, "_native_source_contracts", return_value=contracts),
+            ):
+                self.assertEqual(
+                    set(schematic_style.validate_native_master(stem)), {"pdf", "png", "pptx"}
+                )
+                fixture = json.loads(
+                    (ROOT / "tests/report/fixtures/native-label-mismatch.json").read_text()
+                )
+                ns = {
+                    "p": "http://schemas.openxmlformats.org/presentationml/2006/main",
+                    "a": "http://schemas.openxmlformats.org/drawingml/2006/main",
+                }
+                slide = ET.fromstring(parts["ppt/slides/slide1.xml"])
+                shape = next(
+                    shape
+                    for shape in slide.findall(".//p:sp", ns)
+                    if shape.find("p:nvSpPr/p:cNvPr", ns).get("name") == fixture["shape_name"]
+                )
+                shape.find(".//a:t", ns).text = fixture["replacement"]
+                write_parts({**parts, "ppt/slides/slide1.xml": ET.tostring(slide)})
+                with self.assertRaisesRegex(RuntimeError, fixture["expected_diagnostic"]):
+                    schematic_style.validate_native_master(stem)
+                fixture = json.loads(
+                    (ROOT / "tests/report/fixtures/native-illustration-mismatch.json").read_text()
+                )
+                image = next(
+                    name
+                    for name in parts
+                    if name.startswith("ppt/media/") and name.endswith(".png")
+                )
+                write_parts({**parts, image: fixture["replacement"].encode()})
+                with self.assertRaisesRegex(RuntimeError, fixture["expected_diagnostic"]):
+                    schematic_style.validate_native_master(stem)
+                native.write_bytes(original)
+                schematic_style.validate_native_master(stem)
 
 
 if __name__ == "__main__":

@@ -5,9 +5,12 @@ description: Read seven real licence scopes from this project's own records and 
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="data-governance/reading-a-licence-scope" />
 <ScrollableRegions />
+
+<TeachingViewLink track="data-governance" />
 
 ## Learning goals and prerequisites
 
@@ -65,13 +68,13 @@ licence is still a licence, and it can impose duties that are not
 restrictions. It also reserves the right to change the format of the
 machine-readable data, which is a change a reader's pipeline has to survive.
 
-**ToxCast.** The agency's own statement is that its computational toxicology
-data are open data, free of all copyright restrictions, and fully and freely
-available for both non-commercial and commercial use. Nothing is withheld
-because there is nothing to withhold: these are works of the United States
-government. A record that leaves the licence field empty for such a resource
-has failed to say something true, and a record that writes "public domain"
-where the source says "open data" has said something the source did not.
+**ToxCast.** The agency states that its computational toxicology data are
+open data, free of copyright restrictions, and available for non-commercial
+and commercial use. Record that affirmative statement for the identified
+data. It does not automatically settle every right in linked third-party
+materials or every asset on the site. An empty licence field would omit the
+stated terms; replacing the source's wording with an unexplained label would
+also lose scope.
 
 **SAbDab2.** The machine-learning release states its own terms, on the
 release, so the record can point at the exact artefact and version. That is the
@@ -143,8 +146,8 @@ the data?
 so the asset you hold is not covered; it permits whatever the authors can
 license and withholds the parts carrying upstream restrictions, and it
 leaves the pinned version's terms unresolved. The second covers the data as
-such, permits commercial and non-commercial use, withholds nothing because
-the work is not copyrightable, and leaves nothing unresolved on its face. The
+such, permits commercial and non-commercial use, states no copyright restriction on those data; rights in other assets or
+third-party material still require their own source statements. The
 third covers the code, permits reuse and redistribution of that code,
 withholds the third-party weights and the data, and leaves unresolved what
 "other-open" consists of, because no licence name and no rights text are

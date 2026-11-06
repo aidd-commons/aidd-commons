@@ -5,11 +5,14 @@ description: 读两个 2026 年的路线规划系统——两者都把规划变�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 英文原文：[Retrieval and reinforcement learning for route planning](/learn/synthesis-and-automation/retrieval-and-reinforcement-learning-for-route-planning/)。
 
 <LessonProgress lessonId="synthesis-and-automation/retrieval-and-reinforcement-learning-for-route-planning" />
 <ScrollableRegions />
+
+<TeachingViewLink track="synthesis-and-automation" chinese />
 
 ## 学习目标与前置知识
 
@@ -118,9 +121,8 @@ gemini-2.5-flash，并且主模型与重排模型各自需要凭据。复现该�
 (a) 预算惩罚为 0.02 × (45 − 20) = 0.5，触顶后为 0.3。深度惩罚为
 0.02 × (35 − 20) = 0.3，正好在上限。工具惩罚为 2 × 0.05 = 0.10。奖励为
 clip(−1, 1, 1.0 − 0.3 − 0.3 − 0.10) = 0.30。(b) 两项惩罚都为零，因为二十次调用与
-深度二十恰好是阈值，且没有失败工具调用，所以奖励为 clip(−1, 1, 1.0) = 1.0。你原本
-以为会起作用的很可能是最早起作用的那一项，即调用惩罚，而它在二十次调用时根本没起
-作用。(c) 未完成路线无论消耗多少预算都是 -1.0，所以 200 次调用与深度 60 都不改变它：
+深度二十恰好是阈值，且没有失败工具调用，所以奖励为 clip(−1, 1, 1.0) = 1.0。两项惩罚在各自阈值处都不生效。调用次数与路线深度是不同的量，阈值相同不能
+确定搜索中哪一项先触发。(c) 未完成路线无论消耗多少预算都是 -1.0，所以 200 次调用与深度 60 都不改变它：
 奖励为 -1.0。这是关于发布常数最锋利的一点：预算惩罚施加在已完成的路线上，因此昂贵
 的失败与廉价的失败在奖励里无法区分，而"搜索预算效率"这个说法描述的是成功路线上的
 行为。(d) 150 个目标中 48.0% 是 72 个，46.0% 是 69 个，14.7% 是 22 个。完整系统比

@@ -1,0 +1,5 @@
+---
+import WorkbenchSearch from "./WorkbenchSearch.astro";
+const chinese = Astro.url.pathname.includes("/zh-cn/");
+---
+<WorkbenchSearch chinese={chinese} />

@@ -4,8 +4,11 @@ description: Bound language-model and tool-using workflows by their evidence, ac
 ---
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="scientific-agents/agents-and-tools" />
+
+<TeachingViewLink track="scientific-agents" />
 
 ## Foundations
 
@@ -36,6 +39,21 @@ Scientific language models such as
 such as [BioNeMo](https://github.com/NVIDIA-BioNeMo/bionemo-recipes) create questions
 about provenance, tool authority, action scope, and reproducibility. These
 questions must be evaluated in the workflow that uses them.
+
+## A bounded worked decision and independent task
+
+After [evidence and unknowns](/learn/foundations/evidence-claims-and-unknowns/), trace a workflow from evidence to its return. The constructed [typed-tool case](/learn/scientific-agents/retrieval-tools-feedback/) returns status qc_failed and control_pass false. A competent fixed script can retain that failure and stop; an adaptive plan reaching the same branch does not demonstrate a measured advantage.
+
+Write the supported workflow conclusion and one unsupported biological sentence. Which record would be needed before treating the tool call as a completed wet experiment?
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+The supported conclusion is that the tool returned a failed-control state. A positive biological effect is unsupported because no valid readout is supplied. An authorized experimental record with the relevant controls would be needed for a wet-experiment claim; schema validity or a textual promise cannot provide it. Retain failure, source scope and the pending reviewer or evidence requirement.
+
+</details>
+
+Teaching task added on 2026-10-26; the original source-review date remains below.
 
 ## What v0.1 does not yet teach
 

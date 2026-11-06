@@ -17,13 +17,25 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 本模式是在冻结协议下进行全新独立计算。使用项目的 Python 3.11 环境。第一个命令把 ChEMBL 37 快照下载到单独缓存，需要联网。其余命令离线读取缓存，不需要加速器，也不更改源数据。导出命令仅在协议和算术检查全部通过后覆盖已提交的小型摘要。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/multi_endpoint_tradeoff/run_lab.py download
 .venv/bin/python labs/multi_endpoint_tradeoff/inspect_multi_endpoint_tradeoff.py show
 .venv/bin/python labs/multi_endpoint_tradeoff/inspect_multi_endpoint_tradeoff.py check
-.venv/bin/python labs/multi_endpoint_tradeoff/export_summary.py
 .venv/bin/python -m pytest labs/tests/multi_endpoint_tradeoff -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/multi_endpoint_tradeoff/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/multi_endpoint_tradeoff/export_summary.py
+```
+
+</details>
 
 ## 来源记录与测量规则
 
@@ -66,6 +78,17 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 ## 材料的边界
 
 这 15 个种子是为覆盖准入规则而选，并非随机样本。本实验不拟合模型、不估计性能、不合并家族、不产生分数，也不排列化合物。不能从测量缺失推断安全、无相互作用风险或具有生物利用度。反应效力类型本身不确立治疗疗效，而跨测定的汇总中位数不能代替各自的实验语境。本地快照含来源活性记录，已提交摘要仅含计数和描述统计，不含活性行。
+
+## 独立检查任务
+
+检查一个有响应效力测量、却没有纳入毒性或暴露家族的 parent，写一份包含已测字段与两个未解决要求的决策备忘录。对已有效力取均值能否填补任一缺口？
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+不能。协议把纳入终点映射到明确家族；在该来源与规则内，缺失的毒性或暴露家族仍然缺失。对效力取均值改变的是汇总方式，而不是终点。这个覆盖结果不说明化合物从未在别处被测试，也不证明其安全或暴露充分。
+
+</details>
 
 ## 来源与署名
 

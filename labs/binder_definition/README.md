@@ -12,23 +12,23 @@ python labs/binder_definition/inspect_definition.py check
 
 ## The dataset stores no classes
 
-Twelve measured compounds carry a value, twelve decoys carry none, and **nothing
+Twelve constructed compounds carry a hypothetical value, twelve decoys carry none, and **nothing
 carries a class label**. A class is produced by a choice, and storing one would
 hide the choice. A test asserts the file contains no label field.
 
 ## What each choice does
 
-**The cutoff.** Across the declared grid the same unchanged measurements yield
-9, 8, 6, 4 and 4 positives. Nothing was measured again.
+**The cutoff.** Across the declared grid the same unchanged constructed values yield
+9, 8, 6, 4 and 4 positives. No measurement was performed.
 
 **The assay uncertainty.** At the primary cutoff of 6.0 with a declared
 uncertainty of 0.3, four of the twelve compounds sit within that distance of the
-cutoff, on both sides. Their class is a property of one reading rather than of
-the compound.
+cutoff, on both sides. This flags sensitivity to the supplied value and cutoff. It does not specify
+a probability of crossing the cutoff or demonstrate measurement noise.
 
 **The negative class.** Measured inactives and decoys are different things.
 Reported together, prevalence falls from 0.500 to 0.250 and **67% of the negative
-class carries no measurement at all.** Precision of a random selector equals
+class carries no measurement at all.** Expected precision of a random selector equals
 prevalence, so the number any reported precision must beat was moved by a
 decision about untested molecules.
 
@@ -36,8 +36,8 @@ decision about untested molecules.
 scaffolds, with three scaffolds carrying more than one molecule. One compound is
 acyclic and has **no scaffold at all**, so the unit is undefined rather than
 coarse, and the lab reports that instead of assigning one. At the primary cutoff
-the six positives sit on three scaffolds, which is the number a test set can
-spend.
+the six positives sit on three scaffold groups. These counts describe
+grouping, not an established number of statistically independent replicates.
 
 ## What it does not do
 

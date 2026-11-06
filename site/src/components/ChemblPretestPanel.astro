@@ -1,5 +1,6 @@
 ---
 import developmentSummary from "../../../labs/chembl_egfr/development-summary.json";
+import ScientificPlot from "./ScientificPlot.astro";
 
 type Metric = {
   mae: number;
@@ -22,9 +23,7 @@ type DevelopmentSummary = {
     replication: string;
   };
   selection: {
-    grid_scores: {
-      descriptor_ridge: Array<{ alpha: number }>;
-    };
+    grid_scores: Record<"descriptor_ridge" | "morgan_ridge", Array<{ alpha: number; metrics: Metric }>>;
     metrics: {
       descriptor_ridge: Metric;
       morgan_ridge: Metric;
@@ -55,9 +54,6 @@ const metricLabels = [
   { key: "descriptor_ridge", label: "Descriptor Ridge" },
   { key: "morgan_ridge", label: "Morgan Ridge" },
 ] as const;
-const largestMae = Math.max(
-  ...metricLabels.map(({ key }) => summary.selection.metrics[key].mae),
-);
 const formatMetric = (value: number | null) =>
   value === null ? "undefined" : value.toFixed(3);
 const validationMetrics = metricLabels.map(({ key, label }) => {
@@ -67,7 +63,6 @@ const validationMetrics = metricLabels.map(({ key, label }) => {
     mae: formatMetric(metric.mae),
     rmse: formatMetric(metric.rmse),
     spearman: formatMetric(metric.spearman),
-    width: `${((metric.mae / largestMae) * 100).toFixed(2)}%`,
   };
 });
 
@@ -86,6 +81,7 @@ const descriptorGridUpperEdge = Math.max(
   ...summary.selection.grid_scores.descriptor_ridge.map(({ alpha }) => alpha),
 );
 const descriptorAtUpperEdge = descriptorAlpha === descriptorGridUpperEdge;
+const gridModels = [{key:"descriptor_ridge",label:"Descriptor Ridge"},{key:"morgan_ridge",label:"Morgan Ridge"}] as const;
 ---
 
 <section class="chembl-panel" aria-labelledby="chembl-panel-title">
@@ -140,12 +136,11 @@ const descriptorAtUpperEdge = descriptorAlpha === descriptorGridUpperEdge;
         role="img"
         aria-label={`${split.train} training molecules, ${split.validation} validation molecules, and ${split.test} locked test molecules`}
       >
-        <span class="chembl-panel__train" style={`flex: ${split.train}`}>{split.train} train</span>
-        <span class="chembl-panel__validation" style={`flex: ${split.validation}`}>
-          {split.validation} validation
-        </span>
-        <span class="chembl-panel__test" style={`flex: ${split.test}`}>{split.test} locked</span>
+        <span class="chembl-panel__train" style={`flex: ${split.train}`} />
+        <span class="chembl-panel__validation" style={`flex: ${split.validation}`} />
+        <span class="chembl-panel__test" style={`flex: ${split.test}`} />
       </div>
+      <ul class="chembl-panel__split-key"><li><i class="chembl-panel__train" />Training <strong>{split.train}</strong></li><li><i class="chembl-panel__validation" />Validation <strong>{split.validation}</strong></li><li><i class="chembl-panel__test" />Evaluation <strong>{split.test}</strong></li></ul>
       <p class="chembl-panel__note">
         Realised counts differ slightly from 70/15/15 targets because scaffold
         groups are never broken.
@@ -157,26 +152,15 @@ const descriptorAtUpperEdge = descriptorAlpha === descriptorGridUpperEdge;
         <p>03 / Validation only</p>
         <h3 id="metrics-title">Selection evidence, not test performance</h3>
       </div>
-      <p class="chembl-panel__axis-note">MAE in pChEMBL units · shorter is lower</p>
-      <ul>
-        {validationMetrics.map((metric) => (
-          <li>
-            <div class="chembl-panel__metric-label">
-              <strong>{metric.label}</strong>
-              <span>MAE {metric.mae}</span>
-            </div>
-            <div class="chembl-panel__track" aria-hidden="true">
-              <span style={`width: ${metric.width}`}></span>
-            </div>
-            <p>RMSE {metric.rmse} · Spearman {metric.spearman}</p>
-          </li>
-        ))}
-      </ul>
+      <p class="chembl-panel__axis-note">All seven frozen alpha values for each representation. Only validation errors select a setting.</p>
+      <ScientificPlot title="ChEMBL development: full frozen validation grid" xLabel="log10(alpha) · −3 to 3 means 0.001 to 1000" yLabel="Validation MAE · pChEMBL · lower is better" xMin={-3} xMax={3} xTicks={[-3,-2,-1,0,1,2,3]} yMin={0} yMax={1.5} yTicks={[0,.5,1,1.5]} showTable={false} series={gridModels.map(({key,label},index)=>({name:label,color:index===0?"var(--atlas-teal-deep)":"var(--atlas-emphasis)",marker:index+1,dashed:index===1,points:summary.selection.grid_scores[key].map(entry=>({x:Math.log10(entry.alpha),y:entry.metrics.mae}))}))} />
+      <div class="chembl-panel__table-wrap" role="region" aria-label="Selected validation metrics" tabindex="0"><table><caption>Selected-setting validation errors; Spearman is undefined for the constant control.</caption><thead><tr><th scope="col">Model</th><th scope="col">MAE</th><th scope="col">RMSE</th><th scope="col">Spearman</th></tr></thead><tbody>{validationMetrics.map(metric=><tr><th scope="row">{metric.label}</th><td>{metric.mae}</td><td>{metric.rmse}</td><td>{metric.spearman}</td></tr>)}</tbody></table></div>
       <div class="chembl-panel__selection">
-        <p><span>Descriptor Ridge</span><strong>alpha {descriptorAlpha}</strong></p>
+        <p><span>Descriptor Ridge</span><strong>alpha {descriptorAlpha}</strong><small>Validation MAE {formatMetric(summary.selection.metrics.descriptor_ridge.mae)}</small></p>
         <p>
           <span>Morgan Ridge</span>
           <strong>alpha {summary.selection.selected_alphas.morgan_ridge}</strong>
+          <small>Validation MAE {formatMetric(summary.selection.metrics.morgan_ridge.mae)}</small>
         </p>
       </div>
       {descriptorAtUpperEdge && (
@@ -185,6 +169,7 @@ const descriptorAtUpperEdge = descriptorAlpha === descriptorGridUpperEdge;
           frozen; this is reported as a limitation.
         </p>
       )}
+      <details><summary>Exact validation grid and source</summary><div class="chembl-panel__table-wrap" role="region" aria-label="Every frozen alpha validation score" tabindex="0"><table><caption>All frozen settings, no omitted alpha values; errors in pChEMBL units.</caption><thead><tr><th scope="col">Model</th><th scope="col">Alpha</th><th scope="col">MAE</th><th scope="col">RMSE</th><th scope="col">Spearman</th></tr></thead><tbody>{gridModels.flatMap(({key,label})=>summary.selection.grid_scores[key].map(entry=><tr><th scope="row">{label}</th><td>{entry.alpha}</td><td>{entry.metrics.mae.toFixed(6)}</td><td>{entry.metrics.rmse.toFixed(6)}</td><td>{entry.metrics.spearman===null?"undefined":entry.metrics.spearman.toFixed(6)}</td></tr>))}</tbody></table></div><p class="chembl-panel__note">Source: reviewed ChEMBL development summary. The historical snapshot stays separate from completed evaluation scores.</p></details>
     </section>
 
     <section class="chembl-panel__locks" aria-labelledby="locks-title">
@@ -209,327 +194,21 @@ const descriptorAtUpperEdge = descriptorAlpha === descriptorGridUpperEdge;
       </p>
     </section>
   </div>
+  <p class="chembl-panel__source">Source: reviewed development summary · {developmentSummary.protocol_version} · reviewed {developmentSummary.reviewed_on}. Counts, alpha grid and historical states are preserved.</p>
 </section>
 
 <style>
-  .chembl-panel {
-    margin-block: 2rem 3rem;
-    overflow: hidden;
-    border: 1px solid var(--atlas-rule);
-    background:
-      radial-gradient(
-        circle at 100% 0,
-        color-mix(in srgb, var(--atlas-coral) 15%, transparent),
-        transparent 27rem
-      ),
-      var(--atlas-panel);
-    box-shadow: var(--atlas-shadow);
-  }
-
-  .chembl-panel__header {
-    display: grid;
-    gap: 1.5rem;
-    padding: clamp(1.25rem, 4vw, 2.25rem);
-    border-bottom: 1px solid var(--atlas-rule);
-  }
-
-  .chembl-panel__header > div {
-    max-width: 46rem;
-  }
-
-  .chembl-panel__eyebrow,
-  .chembl-panel__section-heading > p {
-    margin: 0 0 0.4rem;
-    color: var(--atlas-teal-deep);
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .chembl-panel h2 {
-    margin: 0;
-    color: var(--atlas-ink);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(1.6rem, 4vw, 2.55rem);
-    font-weight: 500;
-    letter-spacing: -0.03em;
-    line-height: 1.05;
-  }
-
-  .chembl-panel__header p:last-child,
-  .chembl-panel__note {
-    color: var(--atlas-muted);
-  }
-
-  .chembl-panel__status {
-    display: flex;
-    flex: 0 0 auto;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 0.45rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .chembl-panel__pill {
-    display: inline-flex;
-    min-height: 2rem;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.35rem 0.6rem;
-    border: 1px solid var(--atlas-rule);
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--atlas-bg) 72%, transparent);
-    color: var(--atlas-ink);
-    font-size: 0.72rem;
-    font-weight: 750;
-    white-space: nowrap;
-  }
-
-  .chembl-panel__pill span {
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    background: var(--atlas-muted);
-  }
-
-  .chembl-panel__pill--passed span {
-    background: var(--atlas-teal);
-  }
-
-  .chembl-panel__pill--locked span {
-    background: var(--atlas-coral);
-  }
-
-  .chembl-panel__body {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .chembl-panel__body > section {
-    min-width: 0;
-    padding: clamp(1rem, 3vw, 1.5rem);
-    border-bottom: 1px solid var(--atlas-rule);
-  }
-
-  .chembl-panel__body > section:last-child {
-    border-bottom: 0;
-  }
-
-  .chembl-panel__section-heading h3 {
-    margin: 0;
-    color: var(--atlas-ink);
-    font-size: 1.05rem;
-  }
-
-  .chembl-panel__funnel ol {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0;
-    margin: 1.15rem 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .chembl-panel__funnel li {
-    min-width: 0;
-    padding: 0.7rem;
-    border-block: 1px solid var(--atlas-rule);
-    border-right: 1px solid var(--atlas-rule);
-  }
-
-  .chembl-panel__funnel li:first-child {
-    border-left: 1px solid var(--atlas-rule);
-  }
-
-  .chembl-panel__funnel strong,
-  .chembl-panel__funnel li > span:last-child {
-    display: block;
-  }
-
-  .chembl-panel__funnel strong {
-    margin-top: 0.35rem;
-    color: var(--atlas-ink);
-    font-size: clamp(1.15rem, 3vw, 1.65rem);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .chembl-panel__funnel li > span:last-child {
-    color: var(--atlas-muted);
-    font-size: 0.7rem;
-    line-height: 1.3;
-  }
-
-  .chembl-panel__step {
-    color: var(--atlas-teal-deep);
-    font-size: 0.64rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-  }
-
-  .chembl-panel__split-bar {
-    display: flex;
-    min-height: 4.5rem;
-    margin: 1.15rem 0;
-    overflow: hidden;
-    border: 1px solid var(--atlas-rule);
-    font-size: 0.7rem;
-    font-weight: 800;
-  }
-
-  .chembl-panel__split-bar span {
-    display: flex;
-    min-width: 0;
-    align-items: center;
-    justify-content: center;
-    padding: 0.45rem;
-    text-align: center;
-  }
-
-  .chembl-panel__train {
-    background: var(--atlas-teal);
-    color: var(--atlas-action-ink);
-  }
-
-  .chembl-panel__validation {
-    background: color-mix(in srgb, var(--atlas-teal) 28%, var(--atlas-panel));
-    color: var(--atlas-ink);
-  }
-
-  .chembl-panel__test {
-    background: color-mix(in srgb, var(--atlas-coral) 24%, var(--atlas-panel));
-    color: var(--atlas-ink);
-  }
-
-  .chembl-panel__axis-note {
-    margin: 0.9rem 0 0;
-    color: var(--atlas-muted);
-    font-size: 0.72rem;
-  }
-
-  .chembl-panel__metrics ul {
-    display: grid;
-    gap: 0.85rem;
-    margin: 0.9rem 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .chembl-panel__metric-label {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    color: var(--atlas-ink);
-    font-size: 0.78rem;
-  }
-
-  .chembl-panel__metric-label span,
-  .chembl-panel__metrics li > p {
-    color: var(--atlas-muted);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .chembl-panel__track {
-    display: block;
-    height: 0.55rem;
-    margin-top: 0.25rem;
-    background: color-mix(in srgb, var(--atlas-rule) 52%, transparent);
-  }
-
-  .chembl-panel__track span {
-    display: block;
-    height: 100%;
-    background: var(--atlas-teal);
-  }
-
-  .chembl-panel__metrics li > p {
-    margin: 0.2rem 0 0;
-    font-size: 0.68rem;
-  }
-
-  .chembl-panel__selection {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.6rem;
-  }
-
-  .chembl-panel__selection p,
-  .chembl-panel__locks dl div {
-    margin: 0;
-    padding: 0.7rem;
-    border-left: 3px solid var(--atlas-teal);
-    background: color-mix(in srgb, var(--atlas-bg) 70%, transparent);
-  }
-
-  .chembl-panel__selection span,
-  .chembl-panel__selection strong {
-    display: block;
-  }
-
-  .chembl-panel__selection span,
-  .chembl-panel__locks dt {
-    color: var(--atlas-muted);
-    font-size: 0.68rem;
-  }
-
-  .chembl-panel__selection strong {
-    margin-top: 0.15rem;
-    font-size: 0.88rem;
-  }
-
-  .chembl-panel__warning {
-    margin: 0.8rem 0 0;
-    padding: 0.65rem;
-    border: 1px solid color-mix(in srgb, var(--atlas-coral) 58%, var(--atlas-rule));
-    color: var(--atlas-muted);
-    font-size: 0.75rem;
-  }
-
-  .chembl-panel__locks dl {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.6rem;
-    margin: 1.15rem 0;
-  }
-
-  .chembl-panel__locks dl div {
-    border-left-color: var(--atlas-coral);
-  }
-
-  .chembl-panel__locks dd {
-    margin: 0.25rem 0 0;
-  }
-
-  .chembl-panel__locks code {
-    color: var(--atlas-ink);
-    font-weight: 800;
-  }
-
-  .chembl-panel__note {
-    margin-bottom: 0;
-    font-size: 0.78rem;
-  }
-
-  @media (max-width: 34rem) {
-    .chembl-panel__funnel ol,
-    .chembl-panel__selection,
-    .chembl-panel__locks dl {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .chembl-panel__funnel li:nth-child(3) {
-      border-left: 1px solid var(--atlas-rule);
-    }
-
-    .chembl-panel__split-bar {
-      display: grid;
-      height: auto;
-    }
-
-    .chembl-panel__split-bar span {
-      min-height: 2.4rem;
-    }
-  }
+  .chembl-panel{margin-block:2rem 3rem;border-block:1px solid var(--atlas-rule-strong);color:var(--atlas-ink);background:var(--atlas-panel);min-width:0}
+  .chembl-panel__header{display:grid;grid-template-columns:minmax(0,1fr) minmax(10rem,.5fr);gap:1.5rem;align-items:start;padding-block:1.5rem;border-bottom:1px solid var(--atlas-rule)}
+  .chembl-panel__header>div{max-width:46rem}.chembl-panel__eyebrow,.chembl-panel__section-heading>p{font-size:.75rem;color:var(--atlas-teal-deep);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin:0 0 .45rem}
+  .chembl-panel h2{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:600;line-height:1.15;margin:0}.chembl-panel__header>div>p:last-child{color:var(--atlas-muted);font-size:.9rem}.chembl-panel h3{font-size:1rem;line-height:1.4;margin:0}
+  .chembl-panel__status{list-style:none;margin:0;padding:0;display:grid;gap:.65rem}.chembl-panel__pill{font-size:.78rem;line-height:1.5;padding:.45rem 0 .45rem .7rem;border-left:2px solid var(--atlas-teal-deep);overflow-wrap:anywhere}.chembl-panel__pill--locked{border-left-style:dashed;border-left-color:var(--atlas-emphasis)}
+  .chembl-panel__body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 1.5rem}.chembl-panel__body>section{min-width:0;padding-block:1.2rem;border-bottom:1px solid var(--atlas-rule)}.chembl-panel__metrics{grid-column:1/-1}.chembl-panel__locks{grid-column:1/-1}.chembl-panel__section-heading{margin-bottom:1rem}
+  .chembl-panel__funnel ol{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin:1rem 0;padding:0;list-style:none}.chembl-panel__funnel li{min-width:0;padding:.5rem 0;border-top:2px solid var(--atlas-rule-strong)}.chembl-panel__step{font-size:.75rem;color:var(--atlas-muted)}.chembl-panel__funnel strong{display:block;font-size:1.65rem;line-height:1.2;margin:.4rem 0;font-weight:600;font-variant-numeric:tabular-nums}.chembl-panel__funnel li>span:last-child{display:block;font-size:.75rem;color:var(--atlas-muted);line-height:1.4}
+  .chembl-panel__split-bar{display:flex;height:1.15rem;margin:1.5rem 0 .75rem;border:1px solid var(--atlas-rule-strong)}.chembl-panel__split-bar span+span{border-left:2px solid var(--atlas-panel)}.chembl-panel__train{background:var(--atlas-teal-deep)}.chembl-panel__validation{background:color-mix(in srgb,var(--atlas-teal) 35%,var(--atlas-panel))}.chembl-panel__test{background:repeating-linear-gradient(45deg,transparent,transparent 4px,var(--atlas-muted) 4px,var(--atlas-muted) 5px)}.chembl-panel__split-key{list-style:none;display:flex;flex-wrap:wrap;gap:.6rem 1.2rem;margin:0;padding:0;font-size:.78rem}.chembl-panel__split-key li{display:flex;align-items:center;gap:.4rem}.chembl-panel__split-key i{width:.65rem;height:.65rem;border:1px solid var(--atlas-rule-strong)}
+  .chembl-panel__axis-note,.chembl-panel__note,.chembl-panel__source{font-size:.78rem;color:var(--atlas-muted);line-height:1.6}.chembl-panel__source{padding-block:.8rem;overflow-wrap:anywhere}.chembl-panel__selection{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-top:1rem}.chembl-panel__selection p{margin:0;padding:.6rem 0;border-top:2px solid var(--atlas-teal-deep);display:flex;justify-content:space-between;gap:.7rem;flex-wrap:wrap;font-size:.82rem}.chembl-panel__selection p:last-child{border-top-color:var(--atlas-emphasis)}.chembl-panel__selection strong{font-variant-numeric:tabular-nums}.chembl-panel__selection small{display:block;flex-basis:100%;font-size:.75rem;color:var(--atlas-muted)}
+  .chembl-panel__warning{border-left:3px solid var(--atlas-emphasis);padding:.65rem .85rem;font-size:.8rem;background:color-mix(in srgb,var(--atlas-emphasis) 7%,transparent)}.chembl-panel__table-wrap{max-width:100%;overflow-x:auto}.chembl-panel table{display:table;width:100%;font-size:.78rem;font-variant-numeric:tabular-nums}.chembl-panel th,.chembl-panel td{padding:.55rem;white-space:nowrap;text-align:left}.chembl-panel caption{text-align:left;color:var(--atlas-muted);padding-block:.7rem}.chembl-panel summary{cursor:pointer;min-height:44px;padding-block:.7rem;font-size:.8rem;font-weight:600}
+  .chembl-panel__locks dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin:1rem 0}.chembl-panel__locks dl>div{border-top:1px dashed var(--atlas-emphasis);padding-top:.7rem}.chembl-panel__locks dt{font-size:.78rem;color:var(--atlas-muted)}.chembl-panel__locks dd{margin:.3rem 0 0;font-size:.9rem}.chembl-panel__table-wrap:focus-visible,.chembl-panel summary:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
+  @media(max-width:48rem){.chembl-panel__header,.chembl-panel__body{grid-template-columns:minmax(0,1fr)}.chembl-panel__metrics,.chembl-panel__locks{grid-column:auto}.chembl-panel__status{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:30rem){.chembl-panel__funnel ol{grid-template-columns:repeat(2,minmax(0,1fr))}.chembl-panel__selection,.chembl-panel__locks dl,.chembl-panel__status{grid-template-columns:minmax(0,1fr)}}
 </style>

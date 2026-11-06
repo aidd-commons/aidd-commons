@@ -28,9 +28,9 @@ const sources = sourceIds.map((id) => {
 {sources.length > 0 && (
   <details class="lesson-resources" data-lesson-resources>
     <summary>{chinese ? "本课与路径资源" : "Lesson and pathway resources"} ({sources.length})</summary>
-    <p>{chinese ? "本课及核心阅读路径登记的资源。Atlas 条目（英文）汇集来源、论文和文档链接，并列明访问与许可限制。" : "Registered reading for this lesson and its core-source path. Atlas entries collect source, paper and documentation links alongside access and licence notes."}</p>
+    <p>{chinese ? "本课及核心阅读路径登记的资源。图谱使用中文界面，资源正文和来源证据保留英语原文，并列明访问与许可限制。" : "Registered reading for this lesson and its core-source path. Atlas entries collect source, paper and documentation links alongside access and licence notes."}</p>
     <ul>
-      {sources.map((resource) => <li><a href={`/atlas/${resource.id}/`}>{resource.name}</a> · <a href={resource.canonical_url}>{chinese ? "访问资源" : "Visit resource"}</a></li>)}
+      {sources.map((resource) => <li><a href={`${chinese ? "/zh-cn" : ""}/atlas/${resource.id}/`}>{resource.name}</a> · <a href={resource.canonical_url}>{chinese ? "访问资源" : "Visit resource"}</a></li>)}
     </ul>
   </details>
 )}

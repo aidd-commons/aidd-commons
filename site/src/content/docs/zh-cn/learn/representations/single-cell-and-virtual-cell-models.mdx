@@ -5,10 +5,13 @@ description: 通过任务约定、表示、开放维度、许可范围，以及�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="representations/single-cell-and-virtual-cell-models" />
 
 <ScrollableRegions />
+
+<TeachingViewLink track="representations" chinese />
 
 ## 学习目标与前置知识
 
@@ -105,7 +108,7 @@ CellFM 的训练代码也依据 README 标为可用，推断代码、权重、�
 
 [零样本评估仓库](https://github.com/microsoft/zero-shot-scfoundation)是一个基准而不是模型，并以匹配协议评估其表示任务终点。其 [README](https://raw.githubusercontent.com/microsoft/zero-shot-scfoundation/main/README.md)指明两项任务，即细胞类型聚类与批次整合，以及两个基线，即 scVI 与高变基因启发式方法，并用已发布的笔记本与已发布的数据归档来评估 scGPT 与 Geneformer。[预印本记录](https://doi.org/10.1101/2023.10.16.561085)报告零样本场景下可靠性有限，没有指明基线、数据集、分割或指标，因此已发布的笔记本是唯一能看到基线实现的地方。
 
-推断代码与评估代码标为可用，训练代码、权重和架构为不适用，这对一项不训练任何东西的研究是恰当的分类。数据配方是未核实，README 没有指明 [Figshare归档](https://doi.org/10.6084/m9.figshare.24747228)内部的各个数据集，因此从所打开的页面无法核实评估集的组成。[MIT许可文件](https://raw.githubusercontent.com/microsoft/zero-shot-scfoundation/main/LICENSE)覆盖本仓库的笔记本，写着 "Copyright (c) Microsoft Corporation." 且没有年份，而它加载的权重来自 scGPT 与 Geneformer 仓库，其条款适用。这些笔记本按同一协议评估他人的检查点，但记录仍不携带任何指标数值。
+推断代码与评估代码标为可用，训练代码、权重和架构为不适用，这是对基准记录而非新发布模型的描述，不能据此断定其中没有拟合过任何评估基线。数据配方是未核实，README 没有指明 [Figshare归档](https://doi.org/10.6084/m9.figshare.24747228)内部的各个数据集，因此从所打开的页面无法核实评估集的组成。[MIT许可文件](https://raw.githubusercontent.com/microsoft/zero-shot-scfoundation/main/LICENSE)覆盖本仓库的笔记本，写着 "Copyright (c) Microsoft Corporation." 且没有年份，而它加载的权重来自 scGPT 与 Geneformer 仓库，其条款适用。这些笔记本按同一协议评估他人的检查点，但记录仍不携带任何指标数值。
 
 ## 按维度记录开放状态
 
@@ -131,7 +134,7 @@ CellFM 的训练代码也依据 README 标为可用，推断代码、权重、�
 
 另两条相关的序列模型记录把这条边界显得更清楚。[tGPT](https://github.com/deeplearningplus/tGPT) 是自回归 GPT 模型，把细胞内部的基因表达排序作为生成式预训练任务，并为单细胞与 bulk 组织分析产生细胞层面特征。其 README 和[论文摘要](https://doi.org/10.1101/2022.01.31.478596)给出 22.3 million 个单细胞转录组的规模，却没有指明来源语料，因此训练数据仍为未核实。预训练 tokenizer 与检查点从一张未声明许可的[模型卡](https://huggingface.co/lixiangchun/transcriptome-gpt-1024-8-16-64)载入。仓库的 GPL 3.0 条款来自其 [LICENSE 文件](https://raw.githubusercontent.com/deeplearningplus/tGPT/main/LICENSE)，而非 README 的许可章节或权重模型卡。本课已经提到的 [Geneformer](https://github.com/jkobject/geneformer)则有另一种资产边界。检查时其仓库没有显示许可，LICENSE 路径在 2026-10-21 返回 HTTP 404，而 Apache 2.0 出现在所链接的[模型卡](https://huggingface.co/ctheodoris/Geneformer)上，尚未显示该条款覆盖仓库源码。
 
-5 条模型记录把训练语料留为未核实，即 scGPT、scFoundation、UCE、CPA 和 PertFormer。CellFM 指明了一个归档，却没有列出其中的来源图谱。GEARS 指明 Norman 等人 2019 是某个所链接模型的训练集，却没有给出版本或分割。Tahoe-x1 指明预训练语料，但部分语料需要申请访问，而且过滤改变了进入第 2 阶段的细胞群体。零样本研究不训练任何东西，因此该维度不适用。特征图谱检查 scGPT 与 Geneformer 的表示，但应用仓库不包含提取出的特征或逐层结果，也无法补齐 scGPT 缺失的语料组成信息。
+5 条模型记录把训练语料留为未核实，即 scGPT、scFoundation、UCE、CPA 和 PertFormer。CellFM 指明了一个归档，却没有列出其中的来源图谱。GEARS 指明 Norman 等人 2019 是某个所链接模型的训练集，却没有给出版本或分割。Tahoe-x1 指明预训练语料，但部分语料需要申请访问，而且过滤改变了进入第 2 阶段的细胞群体。基准记录将该维度记为不适用，这不表示每种被评估方法都无需训练。特征图谱检查 scGPT 与 Geneformer 的表示，但应用仓库不包含提取出的特征或逐层结果，也无法补齐 scGPT 缺失的语料组成信息。
 
 这些记录里的规模数字很容易被读成覆盖保证，而它们不是。scGPT 摘要报告超过 33 million 个细胞。scFoundation 的 README 给出超过 50 million 个人类单细胞转录组。CellFM 模型卡报告 19,914 个样本，包含 102,304,686 个人类细胞，README 给出的预训练规模约为 100 million 个人类细胞。UCE 论文报告的图谱含 36 million 个细胞与超过 1,000 个具名细胞类型。PertFormer 摘要给出九种数据类型、55 billion 个碱基对的 bulk 数据，以及来自一百万个细胞的 1.5 billion 对配对多组学观测。对这些记录而言，每个数字都界定了某个量，却不是能对照具名预训练语料核查的细胞类型清单。Tahoe-x1 指明了语料，但其约 266 million 份表达谱的概述数字，与 6 行合计约 269 million 的数字仍未调和，访问申请和过滤也限制了读者能核查多少细胞类型覆盖信息。
 

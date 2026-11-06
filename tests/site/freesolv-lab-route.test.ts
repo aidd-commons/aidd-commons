@@ -35,16 +35,17 @@ describe("FreeSolv completed lab route", () => {
 
   it("links the Labs index to the completed Starlight route instead of a preparation claim", async () => {
     const index = await readFile(
-      join(repositoryRoot, "site", "src", "pages", "labs", "index.astro"),
+      join(repositoryRoot, "site", "dist", "labs", "index.html"),
       "utf8",
     );
 
     expect(index).toContain(`href="${labRoute}"`);
-    expect(index).toContain("Completed frozen protocol");
+    const row = index.match(
+      /<li data-lab-id="freesolv-honest-baselines"[^>]*>[\s\S]*?<\/li>/u,
+    )?.[0];
+    expect(row).toContain("Read saved results");
     expect(index).not.toContain("Frozen protocol in preparation");
-    expect(index).toContain(
-      'class="button-secondary" href="/labs/freesolv-honest-baselines/"',
-    );
+    expect(row).toContain(`href="${labRoute}"`);
   });
 
   it("builds the lab route with exactly one title heading", async () => {

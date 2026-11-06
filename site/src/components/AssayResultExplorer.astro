@@ -1,0 +1,85 @@
+---
+import summary from "../../../labs/chembl_egfr/locked-summary.json";
+import EvidenceBars from "./EvidenceBars.astro";
+interface Props { chinese?: boolean; }
+const { chinese = false } = Astro.props;
+const rows = Object.entries(summary.results).flatMap(([assay, result]) => Object.entries(result.metrics).map(([model, metric]) => ({ assay, model, count: result.count, mae: metric.mae, rmse: metric.rmse })));
+const labels: Record<string, string> = { train_mean: "Train mean", descriptor_ridge: "Descriptor Ridge", morgan_ridge: "Morgan Ridge" };
+const names: Record<string, string> = { primary_test: chinese ? "主评估 · CHEMBL5736995" : "Primary · CHEMBL5736995", assay_replication: chinese ? "复现 · CHEMBL3705421" : "Replication · CHEMBL3705421" };
+const maximum = Math.ceil(Math.max(...rows.map(row => row.mae)) * 2) / 2;
+---
+
+<assay-result-explorer data-rows={JSON.stringify(rows)} data-chinese={chinese}>
+  <header class="result-story-heading">
+    <p class="eyebrow">{chinese ? "已观测案例 · 阅读已有结果" : "Observed case · reading saved results"}</p>
+    <h2>{chinese ? "表示的排序会随 assay 改变" : "Representation rank changes with the assay"}</h2>
+    <p>{chinese ? "同样的三条冻结基线，在两个不同 assay 的评估中得到不同排序。切换误差指标，检查结果的范围与单位。" : "The same three frozen baselines rank differently in two assay evaluations. Switch the error measure and inspect its population and units."}</p>
+  </header>
+  <div class="result-explorer-controls">
+    <label>{chinese ? "误差指标" : "Error measure"}<select name="metric" aria-label={chinese ? "误差指标" : "Error measure"}><option value="mae">MAE</option><option value="rmse">RMSE</option></select></label>
+    <p>{chinese ? "共享零起点刻度 · 全部 evaluation parents" : "Shared zero-origin scale · all evaluation parents"} · <span data-axis-max>{maximum} pChEMBL</span></p>
+  </div>
+  <div class="result-comparison">
+    {Object.entries(summary.results).map(([assay, result], index) => (
+      <section aria-label={names[assay]}>
+        <p class="result-panel-label"><span>({index === 0 ? "a" : "b"})</span> {chinese ? "评估总体" : "Evaluation population"} <strong>n = {result.count}</strong></p>
+        <EvidenceBars title={names[assay]} description={chinese ? "所有三条冻结基线；未排除 parent。" : "Every frozen baseline; no parents excluded."} rows={Object.entries(result.metrics).map(([model, metric]) => ({ key: model, label: labels[model], value: metric.mae }))} maximum={maximum} units="MAE · pChEMBL" assay={assay} chinese={chinese} />
+      </section>
+    ))}
+  </div>
+  <p class="result-conclusion">{chinese ? "Morgan Ridge 的主评估 MAE 最低，复现 MAE 最高。该观察不解释转移失败的原因，也不证明哪种表示在所有 assay 中最好。" : "Morgan Ridge has the lowest primary MAE and the highest replication MAE. This observation does not identify the cause of transfer failure or establish a universally best representation."}</p>
+  <p class="result-boundary">{chinese ? "T15 在此次评估前接触了 T05 共享标签。因此，这不是完全未接触的独立确认；冻结分区、alpha 网格和已选设置均未重新调节。" : "T15 accessed labels shared with T05 before this evaluation. This is not an entirely untouched independent confirmation; the frozen split, alpha grid and selected settings were not retuned."}</p>
+  <noscript><p>{chinese ? "图中显示 MAE。下表同时保留 MAE 和 RMSE，无需 JavaScript。" : "The plot shows MAE. Both MAE and RMSE remain available in the table without JavaScript."}</p></noscript>
+  <details>
+    <summary>{chinese ? "精确数值、总体与来源" : "Exact values, populations and source"}</summary>
+    <div class="result-table" tabindex="0" role="region" aria-label={chinese ? "全部冻结误差" : "All frozen errors"}>
+      <table><caption>{chinese ? "所有评估 parents，无排除。MAE 与 RMSE 的单位均为 pChEMBL。" : "All evaluation parents, no exclusions. MAE and RMSE are in pChEMBL units."}</caption><thead><tr><th scope="col">Assay</th><th scope="col">Model</th><th scope="col">n</th><th scope="col">MAE</th><th scope="col">RMSE</th></tr></thead><tbody>{rows.map(row => <tr><th scope="row">{names[row.assay]}</th><td>{labels[row.model]}</td><td>{row.count}</td><td>{row.mae.toFixed(6)}</td><td>{row.rmse.toFixed(6)}</td></tr>)}</tbody></table>
+    </div>
+    <p class="result-source">{chinese ? "来源" : "Source"}: <a href={chinese ? "/zh-cn/labs/chembl-egfr-representation-baselines/" : "/labs/chembl-egfr-representation-baselines/"}>ChEMBL EGFR · {summary.protocol_id}</a> · {chinese ? "检查日期" : "reviewed"} {summary.reviewed_on}. <a href={`data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(summary, null, 2))}`} download="chembl-locked-summary.json">JSON</a></p>
+  </details>
+</assay-result-explorer>
+
+<script>
+  class AssayResultExplorer extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.ready) return;
+      this.dataset.ready = "true";
+      const rows = JSON.parse(this.dataset.rows ?? "[]") as { assay: string; model: string; mae: number; rmse: number }[];
+      this.querySelector<HTMLSelectElement>("select")?.addEventListener("change", event => {
+        const metric = (event.currentTarget as HTMLSelectElement).value as "mae" | "rmse";
+        const maximum = Math.ceil(Math.max(...rows.map(row => row[metric])) * 2) / 2;
+        for (const row of rows) {
+          const selector = `[data-assay="${row.assay}"][data-model="${row.model}"]`;
+          const bar = this.querySelector<HTMLElement>(`[data-bar]${selector}`)!;
+          bar.style.width = `${row[metric] / maximum * 100}%`;
+          bar.dataset.value = String(row[metric]);
+          const score = this.querySelector<HTMLOutputElement>(`output${selector}`)!;
+          score.textContent = row[metric].toFixed(3);
+          score.title = String(row[metric]);
+        }
+        this.querySelectorAll<HTMLElement>("[data-axis-tick]").forEach(tick => {
+          tick.textContent = Number((maximum * Number(tick.dataset.axisTick) / 4).toPrecision(3)).toString();
+        });
+        this.querySelector("[data-axis-max]")!.textContent = `${maximum} pChEMBL`;
+        this.querySelectorAll(".evidence-bars__unit").forEach(unit => {
+          unit.textContent = `${metric.toUpperCase()} · pChEMBL · ${this.dataset.chinese === "true" ? "越低越好" : "lower is better"}`;
+        });
+        this.querySelectorAll('[role="img"]').forEach(plot => plot.setAttribute("aria-label", this.dataset.chinese === "true" ? `三条基线的 ${metric.toUpperCase()}，单位 pChEMBL；精确数值见下表` : `${metric.toUpperCase()} for three baselines in pChEMBL units; exact values in the table below`));
+      });
+    }
+  }
+  if (!customElements.get("assay-result-explorer")) customElements.define("assay-result-explorer", AssayResultExplorer);
+</script>
+
+<style>
+  assay-result-explorer{display:block;min-width:0;padding-block:1.5rem;margin-block:2rem;border-block:1px solid var(--atlas-rule-strong);color:var(--atlas-ink)}
+  .result-story-heading h2{font-size:clamp(1.4rem,3vw,2rem);max-width:38rem;margin:.5rem 0}.result-story-heading>p:last-child{max-width:58rem;color:var(--atlas-muted)}
+  .result-explorer-controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem;margin:1.4rem 0;font-size:.8rem}.result-explorer-controls p{margin:0;color:var(--atlas-muted)}
+  label{display:flex;align-items:center;gap:.75rem;font-weight:600}select{min-height:44px;max-width:100%;padding:.5rem 1rem;background:var(--atlas-bg);color:var(--atlas-ink);border:1px solid var(--atlas-rule-strong);font:inherit}
+  .result-comparison{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem}.result-comparison>section{min-width:0;padding-block:1rem;border-top:1px solid var(--atlas-rule)}
+  .result-panel-label{display:flex;flex-wrap:wrap;gap:.5rem;margin:0 0 .7rem;font-size:.75rem;color:var(--atlas-muted)}.result-panel-label span{font-weight:750;color:var(--atlas-ink)}.result-panel-label strong{margin-left:auto;color:var(--atlas-ink);font-variant-numeric:tabular-nums}
+  .result-conclusion{border-left:3px solid var(--atlas-emphasis);padding:.6rem 0 .6rem 1rem;margin-block:1.4rem .75rem;max-width:58rem;font-size:.9rem}.result-boundary{font-size:.78rem;color:var(--atlas-muted);max-width:60rem}
+  .result-table{overflow-x:auto;max-width:100%}table{display:table;width:100%;font-size:.8rem;font-variant-numeric:tabular-nums}th,td{padding:.6rem;text-align:left}caption{text-align:left;padding:.6rem 0}summary{min-height:44px;padding-block:.7rem;cursor:pointer;font-weight:600}.result-source{font-size:.78rem;overflow-wrap:anywhere}
+  select:focus-visible,summary:focus-visible,.result-table:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
+  @media(max-width:55rem){.result-comparison{grid-template-columns:minmax(0,1fr);gap:.5rem}}
+</style>

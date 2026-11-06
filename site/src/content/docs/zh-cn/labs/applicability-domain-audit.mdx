@@ -15,13 +15,25 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 模式是依照冻结协议和本地 FreeSolv 发行文件进行全新独立计算。使用项目的 Python 3.11 环境和 CPU。无需网络、下载或加速器。`check` 与 `show` 不写入文件。导出程序仅在审计通过后覆盖已提交的聚合摘要。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/applicability_domain_audit/run_lab.py check
 .venv/bin/python labs/applicability_domain_audit/inspect_applicability_domain_audit.py show
 .venv/bin/python labs/applicability_domain_audit/inspect_applicability_domain_audit.py check
-.venv/bin/python labs/applicability_domain_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/applicability_domain_audit -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/applicability_domain_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/applicability_domain_audit/export_summary.py
+```
+
+</details>
 
 ## 来源与测量
 
@@ -76,6 +88,17 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 ## 材料局限
 
 这次运行中，较大距离半区的误差中位数较高。该对比不能确定可用阈值，也不能估计某个新分子的误差。不同结构的这五个性质可以几乎相同。本审计不拟合更好的模型，也不把选定距离转为化学机制主张。骨架划分在一种操作性骨架定义下检验留出分组。随机划分可能让相关骨架出现在两侧，因此支持的是另一种泛化主张。
+
+## 独立检查任务
+
+选择一个被声明距离规则标记的保留分子。该标记是否允许从主要结果中删除它的误差？分别为完整保留总体和被标记子组各写一句话，并在解释标记前注明表示方法和距离参考集。
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+不允许。适用域标记是在固定表示和训练参考集下的诊断，不是按结果排除样本的理由。应保留完整声明总体，再用单独分母描述被标记子组。较短指纹距离既不证明预测可靠，也不提供实验不确定性区间。
+
+</details>
 
 ## 来源与条款
 

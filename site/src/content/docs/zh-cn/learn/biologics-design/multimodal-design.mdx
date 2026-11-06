@@ -4,12 +4,15 @@ description: 将设计出的序列和结构与生物学功能的证据分开。
 ---
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 英文原文：[Biologics and multimodal design](/learn/biologics-design/multimodal-design/)。
 
 译文更新：2026-09-08。
 
 <LessonProgress lessonId="biologics-design/multimodal-design" />
+
+<TeachingViewLink track="biologics-design" chinese />
 
 ## 基础
 
@@ -34,6 +37,21 @@ import LessonProgress from "../../../../../components/LessonProgress.astro";
 [LigandMPNN](https://github.com/dauparas/LigandMPNN) 和
 [Chroma](https://github.com/generatebio/chroma) 扩展了设计输入，但并未消除复合物、
 抗原状态或下游功能中的不确定性。合适的模型取决于决策和可用的测定反馈。
+
+## 有边界的推演与独立任务
+
+先阅读[生物表示](/zh-cn/learn/representations/biological-representations/)与[构造身份课程](/zh-cn/learn/biologics-design/construct-identity-and-objectives/)。后者读取 etanercept、adalimumab 标签：分别是二聚 receptor–Fc 融合蛋白和 IgG1 单克隆抗体。两种标签均注明 CHO 表达，但共同宿主不会使识别组分相同。这是来源记录解释，不是新的实验比较。
+
+某目录行将两种对象都写为由人免疫细胞制造的人抗体。哪些字段需要修复？预测结构能否补完它们的功能证据？
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+应分离产品身份、组分与组装描述，以及来源记载宿主。人源序列不指定表达系统；含 Fc 的融合蛋白不因此就是抗体识别构造。预测结构不能替代与构造匹配的结合和功能观察。链接推演课程保留这些目标的区别。
+
+</details>
+
+本教学任务新增于 2026-10-26；原来源审阅日期保持如下。
 
 ## v0.1 尚未教授的内容
 

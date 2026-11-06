@@ -1,44 +1,54 @@
 ---
+import { parse } from "yaml";
 import { learningTracks } from "../data/tracks.js";
-
-interface Props {
-  chinese?: boolean;
-}
-
+import type { Curriculum } from "../../../scripts/curriculum/curriculum.js";
+import curriculumSource from "../../../catalog/curriculum/tracks.yaml?raw";
+import ScientificIcon from "./ScientificIcon.astro";
+interface Props { chinese?: boolean; }
 const { chinese = false } = Astro.props;
+const curriculum = parse(curriculumSource) as Curriculum;
 const entries = [
-  {
-    id: "core",
-    label: chinese ? "核心路径" : "Core route",
-    route: chinese
-      ? "/zh-cn/learn/foundations/curriculum-map/#core-route"
-      : "/learn/foundations/curriculum-map/#core-route",
-  },
-  {
-    id: "specialist",
-    label: chinese ? "专题路径" : "Specialist routes",
-    route: chinese
-      ? "/zh-cn/learn/foundations/curriculum-map/#specialist-routes"
-      : "/learn/foundations/curriculum-map/#specialist-routes",
-  },
+  { id: "core", label: chinese ? "核心路径" : "Core route", route: `${chinese ? "/zh-cn" : ""}/learn/foundations/curriculum-map/#core-route` },
+  { id: "specialist", label: chinese ? "专题路径" : "Specialist routes", route: `${chinese ? "/zh-cn" : ""}/learn/foundations/curriculum-map/#specialist-routes` },
+];
+const iconByTrack = ["data", "assay", "model", "data", "molecule", "cell", "molecule", "assay", "protein", "protein", "simulation", "molecule", "protein", "robot", "robot", "model", "data", "data"] as const;
+const groups = [
+  { key: "Foundations", title: chinese ? "建立共同基础" : "Build common foundations", detail: chinese ? "对象、证据与计算语言" : "Objects, evidence and computation" },
+  { key: "Research", title: chinese ? "进入科学问题" : "Enter the scientific question", detail: chinese ? "从机制到分子与结构设计" : "From mechanism to molecular and structural design" },
+  { key: "Engineering", title: chinese ? "形成可检查的决策" : "Make an inspectable decision", detail: chinese ? "实验、评价与证据整合" : "Experiment, evaluation and evidence integration" },
 ];
 ---
 
-<div class="action-row" aria-label={chinese ? "学习入口" : "Learning entry routes"}>
-  {entries.map((entry) => <a class="button-secondary" href={entry.route}>{entry.label}</a>)}
-</div>
+<nav class="learning-path-map not-content" aria-label={chinese ? "学习入口和轨道图" : "Learning entry and track map"}>
+  <div class="learning-path-map__entries">{entries.map((entry) => <a href={entry.route}>{entry.label}<span aria-hidden="true"> →</span></a>)}</div>
+  {groups.map((group, groupIndex) => <section class="learning-path-map__group" aria-labelledby={`learning-entry-${group.key}`}>
+    <header><span>{String(groupIndex + 1).padStart(2, "0")}</span><div><h3 id={`learning-entry-${group.key}`}>{group.title}</h3><p>{group.detail}</p></div></header>
+    <ol>{curriculum.tracks.filter((track) => learningTracks.find((entry) => entry.id === track.id)?.entry === group.key).map((track) => {
+      const introduction = track.lessons.find((lesson) => lesson.type === "intro") ?? track.lessons[0];
+      return <li data-track-summary data-entry={group.key}>
+        <span class="learning-path-map__number">{String(track.order).padStart(2, "0")}</span>
+        <ScientificIcon name={iconByTrack[track.order - 1]} size={48} />
+        <div><a href={chinese ? `/zh-cn/pathways/${track.id}/` : `/learn/${track.id}/${introduction.id}/`}>{chinese ? track.title_zh : track.title}<span aria-hidden="true"> ↗</span></a><p>{chinese ? track.summary_zh : track.summary}</p></div>
+      </li>;
+    })}</ol>
+  </section>)}
+  <p class="learning-path-map__note">{chinese ? "编号沿用课程源的轨道顺序，分组是学习入口，不表示先修依赖或已测得的学习成果。" : "Numbers retain curriculum track order. Groups are entry categories, not prerequisite dependencies or measured learning outcomes."}</p>
+</nav>
 
-<div class="track-grid" style="margin-top: 1rem">
-  {learningTracks.map((track, index) => (
-    <article class="track-card" data-track-summary data-entry={track.entry}>
-      <div>
-        <p class="meta-label">{index + 1} · {chinese ? (track.entry === "Foundations" ? "基础" : track.entry === "Research" ? "研究" : "工程") : track.entry}</p>
-        <h3>{chinese ? track.zhTitle : track.title}</h3>
-        <p>{chinese ? track.zhSummary : track.summary}</p>
-      </div>
-      <a href={chinese ? `/zh-cn/pathways/${track.id}/` : `/learn/${track.id}/${track.lesson}/`}>
-        {chinese ? "阅读中文路径摘要" : "Open introduction"}
-      </a>
-    </article>
-  ))}
-</div>
+<style>
+  .learning-path-map { margin-block: 1rem; color: var(--atlas-ink); }
+  .learning-path-map__entries { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; padding-bottom: .8rem; border-bottom: 1px solid var(--atlas-rule-strong); }
+  .learning-path-map__entries a { display: inline-flex; align-items: center; gap: 1rem; min-height: 44px; font-size: .9rem; font-weight: 650; }
+  .learning-path-map__group { margin-top: 1.5rem; }
+  .learning-path-map__group header { display: flex; gap: .8rem; align-items: baseline; margin-bottom: .6rem; }
+  .learning-path-map__group header > span { color: var(--atlas-teal-deep); font: .78rem var(--atlas-font-mono); }
+  .learning-path-map h3 { margin: 0; font-size: 1.15rem; }
+  .learning-path-map header p { margin: .25rem 0; color: var(--atlas-muted); font-size: .82rem; }
+  .learning-path-map ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1.5rem; margin: 0; padding: 0; list-style: none; }
+  .learning-path-map li { display: grid; grid-template-columns: 1.5rem 48px minmax(0, 1fr); align-items: start; gap: .65rem; padding: .9rem 0; min-width: 0; border-top: 1px solid var(--atlas-rule); }
+  .learning-path-map__number { color: var(--atlas-muted); font: .75rem var(--atlas-font-mono); padding-top: .3rem; }
+  .learning-path-map li a { display: block; font-size: .88rem; font-weight: 650; line-height: 1.5; }
+  .learning-path-map li p { margin: .3rem 0 0; font-size: .78rem; line-height: 1.6; color: var(--atlas-muted); }
+  .learning-path-map__note { margin: 1rem 0 0; padding-top: .8rem; border-top: 1px dashed var(--atlas-rule); font-size: .75rem; color: var(--atlas-muted); }
+  @media (max-width: 42rem) { .learning-path-map ol { grid-template-columns: 1fr; } .learning-path-map li { gap: .5rem; } }
+</style>

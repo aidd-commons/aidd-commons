@@ -5,6 +5,7 @@ import source from "../../../catalog/curriculum/tracks.yaml?raw";
 
 interface Props { resourceId: string; }
 const { resourceId } = Astro.props;
+const chinese = Astro.url.pathname.includes("/zh-cn/");
 const curriculum = parse(source) as Curriculum;
 const lessons = curriculum.tracks.flatMap((track) => track.lessons
   .filter((lesson) => lesson.type !== "core-source-path" && lesson.source_ids.includes(resourceId))
@@ -12,8 +13,8 @@ const lessons = curriculum.tracks.flatMap((track) => track.lessons
 ---
 
 {lessons.length > 0 && <section data-resource-learning aria-labelledby="learning-use-title">
-  <h2 id="learning-use-title">Learn with this resource · 相关课程</h2>
-  <p>Registered chapter reading, not a claim that this resource has been executed or validated here.</p>
+  <h2 id="learning-use-title">{chinese ? "使用此资源的相关课程" : "Learn with this resource · 相关课程"}</h2>
+  <p>{chinese ? "目录中登记的章节阅读链接，不表示该资源已在此处执行或验证。" : "Registered chapter reading, not a claim that this resource has been executed or validated here."}</p>
   <ul>{lessons.map((lesson) => <li>
     <a href={`/learn/${lesson.path}/`}>{lesson.title}</a>
     {" · "}<a href={`/zh-cn/learn/${lesson.path}/`}>{lesson.title_zh ?? "中文课程"}</a>

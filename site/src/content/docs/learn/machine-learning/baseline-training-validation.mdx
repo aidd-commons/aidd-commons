@@ -4,6 +4,7 @@ description: Derive a small Ridge fit and trace training, preprocessing and vali
 ---
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
+import ScientificTeachingView from "../../../../components/ScientificTeachingView.astro";
 
 <LessonProgress lessonId="machine-learning/baseline-training-validation" />
 
@@ -20,6 +21,8 @@ output. Training chooses predictor parameters to reduce an objective on observed
 training examples. Inference evaluates the resulting mapping on a new input; it
 does not ordinarily update the parameters. Validation compares candidate choices
 without being another training loss term unless the protocol explicitly says so.
+
+<ScientificTeachingView track="machine-learning" />
 
 ## Derive the smallest useful model
 

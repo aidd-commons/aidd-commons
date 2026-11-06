@@ -1,0 +1,56 @@
+version: 1
+cases:
+  - id: egfr-assay-transfer
+    title: When the assay changes, the representation ranking changes
+    titleZh: 测定改变时，表示方法的排名也改变
+    summary:
+      Compare the same three frozen EGFR baselines within the primary assay
+      and on a separate assay. Keep the failed Morgan transfer visible.
+    summaryZh: 比较同样三个冻结 EGFR 基线在主测定与另一测定上的表现，并保留 Morgan 迁移失败的证据。
+    labSlug: chembl-egfr-representation-baselines
+    trackIds:
+      - qsar-properties
+      - representations
+      - evaluation-and-reproducibility
+    lessonIds:
+      - qsar-properties/property-prediction
+      - evaluation-and-reproducibility/assay-shift-diagnosis
+    entity: ChEMBL parent molecule
+    entityZh: ChEMBL 母体分子
+    population: Primary scaffold-held-out parents and separate assay parents; never pooled
+    populationZh: 主测定骨架留出母体与另一测定母体分别报告，不合并
+    unit: pChEMBL
+    comparison: Train mean, Descriptor Ridge and Morgan Ridge under the frozen
+      representation protocol
+    comparisonZh: 在冻结的表示协议下比较 Train mean、Descriptor Ridge 和 Morgan Ridge
+    interpretation:
+      Morgan has the lowest primary MAE and the highest replication
+      MAE; neither representation is uniformly best.
+    interpretationZh: Morgan 的主测定 MAE 最低、复现测定 MAE 最高；两种表示均未在两项测定中一致占优。
+    protocol:
+      id: chembl37-egfr-representation-v1
+      path: labs/chembl_egfr/protocol.json
+      label: Frozen EGFR endpoint, representation and split
+    result:
+      id: egfr-locked-summary
+      path: labs/chembl_egfr/locked-summary.json
+      label: Retained primary and assay-replication results
+      datePointer: /reviewed_on
+      dataPointer: /results
+    viewIds:
+      - egfr-assay-mae
+views:
+  - id: egfr-assay-mae
+    caseId: egfr-assay-transfer
+    adapter: egfr-mae
+    question: Does the representation ranking survive a change of assay?
+    questionZh: 表示方法的排名能否跨测定保持？
+    quantity: mean absolute error
+    unit: kcal/mol
+    encoding: Grouped comparison by assay and model; a lower MAE is better
+    interaction: Select an assay; preserve all three baselines in the table and export
+    caption:
+      Frozen primary and replication MAE are separate populations. Morgan's
+      adverse replication result remains visible.
+    captionZh: 冻结的主测定与复现测定 MAE 属于不同总体；保留 Morgan 的不利复现结果。
+    tableAnchor: completed-evaluation-and-remaining-boundaries

@@ -11,19 +11,31 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 ## 准备与学习目标
 
-先阅读[目标产品概况课程](/learn/drug-discovery-foundations/product-profile-and-series/)和[多终点整合实验](/labs/multi-endpoint-integration/)。本任务要求先声明一个教学用产品概况，再将其应用于已纳入的测量，计数与硬性门槛相矛盾的结果，并分别保留未达到的偏好及未测量的要求。计数单位是 ChEMBL 母体分子，每个母体计一次。
+先阅读[目标产品概况课程](/zh-cn/learn/drug-discovery-foundations/product-profile-and-series/)和[多终点整合实验](/zh-cn/labs/multi-endpoint-integration/)。本任务要求先声明一个教学用产品概况，再将其应用于已纳入的测量，计数与硬性门槛相矛盾的结果，并分别保留未达到的偏好及未测量的要求。计数单位是 ChEMBL 母体分子，每个母体计一次。
 
 ## 全新独立计算
 
 此模式在冻结协议下进行全新独立计算。教学用要求和阈值先于缓存测量的读取而声明。这些阈值是教学决策，并非从本队列拟合或挑选得出。使用项目的 Python 3.11 环境。来源实验室的快照缓存完毕后，所有命令均不需要网络或加速器。第一条命令只验证现有快照，不写入文件。只有审计通过后，导出命令才写入小型已提交摘要。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/target_product_profile/run_lab.py download
 .venv/bin/python labs/target_product_profile/inspect_target_product_profile.py show
 .venv/bin/python labs/target_product_profile/inspect_target_product_profile.py check
-.venv/bin/python labs/target_product_profile/export_summary.py
 .venv/bin/python -m pytest labs/tests/target_product_profile -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/target_product_profile/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/target_product_profile/export_summary.py
+```
+
+</details>
 
 `show` 命令逐一列出连接后的母体，注明通过或未通过的门槛、未达到的偏好以及未测量的要求。`check` 命令通过已验证的读取器重新计算结果。如果一个未通过门槛的母体被报告为满足产品概况，或任何其他不变量不成立，命令就以非零状态退出。
 

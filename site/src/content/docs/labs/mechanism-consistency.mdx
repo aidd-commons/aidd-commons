@@ -13,13 +13,25 @@ Read [From perturbation to target validation](/learn/mechanism-targets/perturbat
 
 Mode is fresh independent computation under a frozen protocol. Use the project Python 3.11 environment and CPU. The source is the owning laboratory's cached snapshot. The first command verifies that cache without fetching or copying data. If the cache is absent, obtain it through the owning laboratory before running this task. Once cached, no network or accelerator is needed. Inspection leaves the committed summary unchanged. Export overwrites only that small summary after checks pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/mechanism_consistency/run_lab.py download
 .venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py show
 .venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py check
-.venv/bin/python labs/mechanism_consistency/export_summary.py
 .venv/bin/python -m pytest labs/tests/mechanism_consistency -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/mechanism_consistency/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/mechanism_consistency/export_summary.py
+```
+
+</details>
 
 ## Competing explanations and discriminator
 

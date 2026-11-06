@@ -5,19 +5,21 @@ import type {
 } from "../data/comparison.js";
 
 interface Props {
+  chinese?: boolean;
   providers: ComparisonProvider[];
   summaries: CoverageSummary[];
   totalTopics: number;
 }
 
-const { providers, summaries, totalTopics } = Astro.props;
+const { providers, summaries, totalTopics, chinese = false } = Astro.props;
+const t = (en: string, zh: string) => chinese ? zh : en;
 const selfId = "aidd-commons";
 const thresholdLabels = {
-  explained: "Explained",
-  worked: "Worked example",
-  executable: "Executable",
-  "executable-on-real-data": "Executable on real data",
-  assessed: "Assessed",
+  explained: t("Explained","有解释"),
+  worked: t("Worked example","完整示例"),
+  executable: t("Executable","可执行"),
+  "executable-on-real-data": t("Executable on real data","真实数据可执行"),
+  assessed: t("Assessed","有评估"),
 } as const;
 const externalIds = providers
   .filter(({ id }) => id !== selfId)
@@ -50,68 +52,83 @@ const thresholdRows = Object.keys(thresholdLabels).map((threshold) => {
   };
 });
 const explained = thresholdRows.find(({ threshold }) => threshold === "explained")!;
+const axisTicks = [...new Set([0,Math.round(totalTopics/4),Math.round(totalTopics/2),Math.round(3*totalTopics/4),totalTopics])];
 ---
 
 <section class="coverage-bounds" aria-labelledby="coverage-bounds-title">
   <div class="section-heading-row">
     <div>
-      <p class="eyebrow">Interval audit</p>
-      <h2 id="coverage-bounds-title">Coverage bounds, not a leaderboard</h2>
+      <p class="eyebrow">{t("Interval audit","区间审计")}</p>
+      <h2 id="coverage-bounds-title">{t("Coverage bounds, not a leaderboard","覆盖范围的上下界")}</h2>
     </div>
-    <p class="audit-status"><span aria-hidden="true">●</span> Claim status: not established</p>
+    <p class="audit-status"><span aria-hidden="true">●</span> {t("Claim status: not established", "主张状态：尚未确立")}</p>
   </div>
 
+  <figure class="bounds-figure">
+    <figcaption><strong>{t("Evidence bounds across five teaching depths","五个教学深度的证据上下界")}</strong><span>{t("Each row uses the same ", "每行均使用相同的 ")}{totalTopics}{t("-topic taxonomy. External reference marks are separate maxima, not one provider interval.", " 主题分类。外部参考标记分别取最大值，不表示某一个提供方的区间。")}</span></figcaption>
+    <ul class="bounds-figure__key"><li><i class="self-lower" />{t("AIDD confirmed lower","AIDD 已确认下界")}</li><li><i class="self-upper" />{t("AIDD possible upper","AIDD 可能上界")}</li><li><i class="external-lower" />{t("Maximum external lower","外部最大下界")}</li><li><i class="external-upper" />{t("Maximum external upper","外部最大上界")}</li></ul>
+    <div class="bounds-figure__rows" role="img" aria-label={t("AIDD Commons lower-to-upper topic intervals and separate external maxima for all five depth thresholds; exact values in the table below","AIDD Commons 在五个深度阈值处的主题上下界区间，以及各自的外部最大值；准确数值见下表")}>
+      {thresholdRows.map(row=><div class="bounds-figure__row"><strong>{row.label}</strong><div class="bounds-figure__track">{axisTicks.map(value=><b class="bounds-figure__grid" style={`left:${value/totalTopics*100}%`} />)}<span class="bounds-figure__interval" style={`left:${row.self.lower/totalTopics*100}%;width:${(row.self.upper-row.self.lower)/totalTopics*100}%`} /><i class="self-lower" style={`left:${row.self.lower/totalTopics*100}%`} /><i class="self-upper" style={`left:${row.self.upper/totalTopics*100}%`} /><i class="external-lower" style={`left:${row.externalLower/totalTopics*100}%`} /><i class="external-upper" style={`left:${row.externalUpper/totalTopics*100}%`} /></div><output>{row.self.lower}–{row.self.upper}</output></div>)}
+      <div class="bounds-figure__axis"><span /><div>{axisTicks.map(value=><span style={`left:${value/totalTopics*100}%`}>{value}</span>)}</div><span /></div>
+    </div>
+    <p class="bounds-figure__axis-label">{t("Number of topics qualifying at each depth", "各深度符合条件的主题数")} · {totalTopics} {t("topics total", "个主题总计")}</p>
+  </figure>
+
   <p class="section-intro">
-    Unknown cells widen an interval. They do not count as present in the lower
-    bound or absent in the upper bound, so a sparse review cannot manufacture a
-    comparison win.
+    {t("Unknown cells widen an interval. They do not count as present in the lower bound or absent in the upper bound, so a sparse review cannot manufacture a comparison win.", "未知单元格使区间变宽。计算下界时不算作存在，计算上界时不算作缺失，因此稀疏评阅不能制造比较优势。")}
   </p>
   <p class="section-intro">
-    "Executable on real data" counts a runnable topic only when measured or
-    computed records, or a genuine simulation, docking or structure-prediction
-    run, carry it. A checker over hand-authored teaching inputs is executable but
-    not on real data.
+    {t('"Executable on real data" counts a runnable topic only when measured or computed records, or a genuine simulation, docking or structure-prediction run, carry it. A checker over hand-authored teaching inputs is executable but not on real data.', "真实数据可执行要求使用测量或计算记录，或实际的模拟、对接、结构预测运行。针对手工教学输入的检查器虽然可执行，但不属于真实数据执行。")}
   </p>
 
-  <div class="bounds-overview" aria-label="AIDD Commons explained coverage interval">
+  <div class="bounds-overview" aria-label={t("AIDD Commons explained coverage interval","AIDD Commons 有解释覆盖区间")}>
     <article class="bound-card bound-card--lower">
-      <p class="meta-label">Lower bound</p>
+      <p class="meta-label">{t("Lower bound","下界")}</p>
       <p class="bound-card__value">{explained.self.lower}<span> / {totalTopics}</span></p>
-      <p>Topics directly confirmed at explained depth or deeper.</p>
+      <p>{t("Topics directly confirmed at explained depth or deeper.","直接确认达到解释深度或更深的主题。")}</p>
     </article>
     <article class="bound-card bound-card--upper">
-      <p class="meta-label">Upper bound</p>
+      <p class="meta-label">{t("Upper bound","上界")}</p>
       <p class="bound-card__value">{explained.self.upper}<span> / {totalTopics}</span></p>
-      <p>Confirmed topics plus unresolved cells that could still qualify.</p>
+      <p>{t("Confirmed topics plus unresolved cells that could still qualify.","已确认主题，加上仍可能达到要求的未解决单元格。")}</p>
     </article>
   </div>
 
   <div
     class="bounds-table-wrap"
     role="region"
-    aria-label="Coverage bounds by depth threshold"
+    aria-label={t("Coverage bounds by depth threshold","各深度阈值的覆盖上下界")}
     tabindex="0"
   >
     <table class="bounds-table">
-      <caption>Provider-level topic counts at each depth threshold</caption>
+      <caption>{t("Provider-level topic counts at each depth threshold","各深度阈值下的提供方主题计数")}</caption>
       <thead>
         <tr>
-          <th scope="col">Depth threshold</th>
-          <th scope="col">AIDD Commons interval</th>
-          <th scope="col">Strongest external lower</th>
-          <th scope="col">Strongest external upper</th>
+          <th scope="col">{t("Depth threshold","深度阈值")}</th>
+          <th scope="col">{t("AIDD Commons interval","AIDD Commons 区间")}</th>
+          <th scope="col">{t("Strongest external lower","外部最大下界")}</th>
+          <th scope="col">{t("Strongest external upper","外部最大上界")}</th>
         </tr>
       </thead>
       <tbody>
         {thresholdRows.map((row) => (
           <tr>
             <th scope="row">{row.label}</th>
-            <td>{row.self.lower}–{row.self.upper} of {row.self.total_topics}</td>
-            <td>{row.externalLower} of {row.self.total_topics}</td>
-            <td>{row.externalUpper} of {row.self.total_topics}</td>
+            <td>{row.self.lower}–{row.self.upper}{t(" of ", " / ")}{row.self.total_topics}</td>
+            <td>{row.externalLower}{t(" of ", " / ")}{row.self.total_topics}</td>
+            <td>{row.externalUpper}{t(" of ", " / ")}{row.self.total_topics}</td>
           </tr>
         ))}
       </tbody>
     </table>
   </div>
 </section>
+
+<style>
+  .coverage-bounds{min-width:0}.bounds-overview{gap:1.5rem;margin-block:1.25rem}.bound-card{border:0;border-top:2px solid var(--atlas-teal-deep);padding:.8rem 0;background:transparent;box-shadow:none}.bound-card--upper{border-top:3px double var(--atlas-muted)}.bound-card p{font-size:.8rem;line-height:1.6}.bound-card .bound-card__value{font-size:2rem;line-height:1.2;margin:.3rem 0}.bound-card__value span{font-size:.5em}.bound-card .meta-label{font-size:.75rem}.bounds-overview .bound-card p:last-child{color:var(--atlas-muted)}
+  .bounds-figure{margin:1.5rem 0;min-width:0;padding-block:1.1rem;border-block:1px solid var(--atlas-rule)}.bounds-figure figcaption{display:grid;gap:.35rem;font-size:.95rem}.bounds-figure figcaption>span{font-size:.8rem;line-height:1.6;color:var(--atlas-muted)}.bounds-figure__key{list-style:none;display:flex;gap:.6rem 1.25rem;flex-wrap:wrap;margin:1rem 0!important;padding:0!important;font-size:.75rem}.bounds-figure__key li{display:flex;align-items:center;gap:.5rem;margin:0}.bounds-figure__key i{position:relative!important;left:auto!important;top:auto!important;transform:none!important;display:inline-block;flex-shrink:0}
+  .self-lower{width:.5rem;height:.5rem;border-radius:50%;background:var(--atlas-teal-deep)}.self-upper{width:.8rem;height:.8rem;border-radius:50%;border:2px solid var(--atlas-teal-deep);background:transparent}.external-lower{width:.7rem;height:.7rem;background:var(--atlas-muted);clip-path:polygon(50% 0,100% 100%,0 100%)}.external-upper{width:.6rem;height:.6rem;border:1px solid var(--atlas-muted);background:var(--atlas-panel);transform:translate(-50%,-50%) rotate(45deg)!important}
+  .bounds-figure__row{display:grid;grid-template-columns:11rem minmax(0,1fr) 4rem;gap:.75rem;align-items:center;border-top:1px solid var(--atlas-rule);font-size:.8rem;min-height:5rem}.bounds-figure__row>strong{font-size:.8rem;font-weight:600}.bounds-figure__track{position:relative;min-height:4rem;border-left:1px solid var(--atlas-rule)}.bounds-figure__grid{position:absolute;top:0;bottom:0;width:0;border-left:1px solid var(--atlas-rule)}.bounds-figure__key .external-upper{transform:rotate(45deg)!important}.bounds-figure__interval{position:absolute;top:1rem;height:.35rem;transform:translateY(-50%);background:color-mix(in srgb,var(--atlas-teal) 25%,transparent);border-block:1px solid var(--atlas-teal-deep)}.bounds-figure__track>i{position:absolute;transform:translate(-50%,-50%);top:1rem}.bounds-figure__track>.external-lower{top:2.25rem}.bounds-figure__track>.external-upper{top:3.35rem}.bounds-figure__row output{font-size:.8rem;text-align:right;font-variant-numeric:tabular-nums}
+  .bounds-figure__axis{display:grid;grid-template-columns:11rem minmax(0,1fr) 4rem;gap:.75rem;font-size:.75rem;color:var(--atlas-muted);height:1.8rem}.bounds-figure__axis>div{position:relative;border-top:1px solid var(--atlas-rule-strong)}.bounds-figure__axis>div>span{position:absolute;top:.35rem;transform:translateX(-50%);font-variant-numeric:tabular-nums}.bounds-figure__axis>div>span:first-child{transform:none}.bounds-figure__axis>div>span:last-child{transform:translateX(-100%)}.bounds-figure__axis-label{font-size:.75rem;text-align:center;color:var(--atlas-muted);margin:.6rem 0 0}.bounds-table-wrap{border:0;border-top:1px solid var(--atlas-rule)}.bounds-table{font-size:.8rem}.bounds-table-wrap:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
+  @media(max-width:42rem){.bounds-figure__row{grid-template-columns:minmax(0,1fr) 3.5rem;gap:.4rem .75rem;padding-block:.65rem}.bounds-figure__row>strong{grid-column:1/-1}.bounds-figure__axis{grid-template-columns:minmax(0,1fr) 3.5rem}.bounds-figure__axis>span:first-child{display:none}.bounds-figure__key{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));font-size:.75rem}.bounds-overview{grid-template-columns:minmax(0,1fr)}}
+</style>

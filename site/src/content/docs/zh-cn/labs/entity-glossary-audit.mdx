@@ -17,13 +17,25 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 模式是基于冻结的 ChEMBL 37 快照进行全新独立计算。使用项目的 Python 3.11 环境和 CPU。经过验证的快照已缓存在本仓库。下载命令会验证并复制它到本实验的缓存。快照就位后，任务不需要网络或加速器。检查器不写入文件。导出器仅在检查通过后替换已提交的精简汇总。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/entity_glossary_audit/run_lab.py download
 .venv/bin/python labs/entity_glossary_audit/inspect_entity_glossary_audit.py show
 .venv/bin/python labs/entity_glossary_audit/inspect_entity_glossary_audit.py check
-.venv/bin/python labs/entity_glossary_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/entity_glossary_audit -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/entity_glossary_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/entity_glossary_audit/export_summary.py
+```
+
+</details>
 
 ## 表格能命名的实体
 
@@ -58,6 +70,17 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 ## 材料局限
 
 本审核不合并两个标识符，不预测化合物作用，不把靶点认作疾病，也不把文献当作测量真实无误的证明。它描述有目的挑选的教学队列，而不是总体样本。缓存的发行版和准入规则限定所有计数。界值测量和被排除的活性行都不进入上表。
+
+## 独立检查任务
+
+总体解析为 10 个 parent，但纳入行表只注明 9 个。解释这一差别，不虚构缺失实体。再选择一个 molecule-record identifier，说明为何它的 assay、target、document identifier 不能替代它进行连接。
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+一个已解析 parent 没有纳入的精确值行，因此不向这个按行统计贡献 parent identifier。各字段命名不同对象：被测试分子形式、测量系统、靶点与文献。其计数不能相加为独立分子，也不能作为可互换连接键。
+
+</details>
 
 ## 来源与条款
 

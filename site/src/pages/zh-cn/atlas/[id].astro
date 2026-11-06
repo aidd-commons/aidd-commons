@@ -1,0 +1,9 @@
+---
+import Page from "../../atlas/[id].astro";
+import type { Resource } from "../../../data/resource.js";
+import resources from "../../../../public/data/resources.v1.json";
+export function getStaticPaths() {
+  return (resources as Resource[]).map((resource) => ({ params: { id: resource.id }, props: { resource } }));
+}
+---
+<Page resource={Astro.props.resource} chinese />

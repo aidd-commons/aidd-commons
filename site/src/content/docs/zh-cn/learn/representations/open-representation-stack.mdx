@@ -5,15 +5,18 @@ description: 从输入与学习目标追踪分子和蛋白质资源的可用资�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="representations/open-representation-stack" />
 <ScrollableRegions />
 
+<TeachingViewLink track="representations" chinese />
+
 ## 学习目标与前置知识
 
-学完[生物学表征](/learn/representations/biological-representations/)、
-[神经表征](/learn/machine-learning/neural-representations/)和
-[核酸与肽模型](/learn/biologics-design/nucleic-acid-and-peptide-models/)后，
+学完[生物学表征](/zh-cn/learn/representations/biological-representations/)、
+[神经表征](/zh-cn/learn/machine-learning/neural-representations/)和
+[核酸与肽模型](/zh-cn/learn/biologics-design/nucleic-acid-and-peptide-models/)后，
 沿着来源材料、学习目标、编码器到下游主张的路径追踪一种表征。辨别目录确立了哪些资产
 和使用许可，并区分实测扰动表达谱与学得的细胞状态嵌入。这是一节带书面练习的阅读课。
 [英文原版](/learn/representations/open-representation-stack/)是规范版本。
@@ -23,7 +26,7 @@ import ScrollableRegions from "../../../../../components/ScrollableRegions.astro
 比较表征前，需确定输入实体、来源集合及其版本、预训练任务、编码器、下游目标和评估
 分割。在相同下游任务及分割下，简单描述符或实测表达谱可作为参照。这些记录没有提供
 跨下列资源的配对比较。资产可获取本身既不确立嵌入的生物学含义，也不证明预测优势。
-[分割泄漏审计](/labs/split-leakage-audit/)展示了训练和测试分割间共享实体为何会改变
+[分割泄漏审计](/zh-cn/labs/split-leakage-audit/)展示了训练和测试分割间共享实体为何会改变
 评估问题。该实验使用 ChEMBL 活性记录，不使用本课讨论的数据集。
 
 ## 表征的各个步骤
@@ -73,7 +76,7 @@ LINCS L1000 public perturbation profiles 是来自公开 Phase I 和 Phase II GE
 共同决定表达谱的含义。对于 GSE70138，记录区分了直接测量标志基因的 Level 2 文件
 和也包含推断基因的更大规模发布文件。较旧的 Level 2 文件所用列标签不能连接到当前
 化合物、剂量和时间元数据，而核查过的 2017-03-06 发布文件具有可连接的标识符。
-[L1000 实验](/labs/l1000-perturbation-context/)已按照自身固定方案读取该系列。
+[L1000 实验](/zh-cn/labs/l1000-perturbation-context/)已按照自身固定方案读取该系列。
 记录没有为此数据集确立模型代码、权重或训练代码。NCBI 的一般政策涉及其网站上的
 分子数据，但记录没有找到这些归档文件的系列专属许可条款。已停用的 CLUE 服务不能
 代替明确指定的 GEO 发布版本。

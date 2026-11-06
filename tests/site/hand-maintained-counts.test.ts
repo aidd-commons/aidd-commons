@@ -4,6 +4,7 @@ import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
+import { siteOverview } from "../../site/src/lib/site-overview.js";
 
 const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
 const contentRoot = join(repositoryRoot, "site/src/content/docs");
@@ -130,12 +131,6 @@ const labClaims: Claim[] = [
     subject: "chineseLabGuides",
     pattern: /links the (\d+) translated lab guides/,
   },
-  {
-    file: "site/src/pages/zh-cn/index.astro",
-    label: "lab guides",
-    subject: "chineseLabGuides",
-    pattern: /现有课程正文和 (\d+) 个实验说明的译文/,
-  },
 ];
 
 async function collectDrift(
@@ -238,6 +233,31 @@ describe("hand-maintained counts in reader-facing prose", () => {
   it("states the number of lab guides that exist", async () => {
     const counts = await measurePages();
     expect(await collectDrift(labClaims, counts)).toEqual([]);
+  });
+
+  it("derives the shared Chinese home count from the delivered bilingual lab guides", async () => {
+    const counts = await measurePages();
+    expect(siteOverview.labs.guideCount).toBe(counts.chineseLabGuides);
+    expect(siteOverview.labs.guideCount).toBe(counts.englishLabGuides);
+    expect(siteOverview.labs.guides.map(({ slug }) => slug)).not.toContain(
+      "notebook-guide",
+    );
+    const [component, chineseHome, englishHome] = await Promise.all([
+      readFile(
+        join(repositoryRoot, "site/src/components/HomeLanding.astro"),
+        "utf8",
+      ),
+      readFile(
+        join(repositoryRoot, "site/src/pages/zh-cn/index.astro"),
+        "utf8",
+      ),
+      readFile(join(repositoryRoot, "site/src/pages/index.astro"), "utf8"),
+    ]);
+    expect(component).toMatch(
+      /现有课程正文和 \$\{siteOverview\.labs\.guideCount\} 个实验说明的译文/u,
+    );
+    expect(chineseHome).toMatch(/<HomeLanding\s+chinese\s*\/>/u);
+    expect(englishHome).toMatch(/<HomeLanding\s*\/>/u);
   });
 
   // Both local agent guides are intentionally absent from the public source.

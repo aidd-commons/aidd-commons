@@ -5,11 +5,14 @@ description: 将测量读作受测分子记录、其母体、检测、靶点与�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="foundations/entity-kinds-and-identifiers" />
 <ScrollableRegions />
 
 英文原文：[Entity kinds and identifiers](/learn/foundations/entity-kinds-and-identifiers/)。
+
+<TeachingViewLink track="foundations" chinese />
 
 ## 学习目标与预备知识
 
@@ -75,9 +78,21 @@ ChEMBL 可能给盐型分配独立的分子记录，并将该记录映射到一�
 .venv/bin/python labs/entity_glossary_audit/run_lab.py download
 .venv/bin/python labs/entity_glossary_audit/inspect_entity_glossary_audit.py show
 .venv/bin/python labs/entity_glossary_audit/inspect_entity_glossary_audit.py check
-.venv/bin/python labs/entity_glossary_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/entity_glossary_audit -q
 ```
+
+<details>
+<summary>仅维护者：重新生成摘要</summary>
+
+上面的读者路线读取并检查保留结果。此导出器写入固定路径
+`labs/entity_glossary_audit/summary.json`，不提供另设输出目录的选项。
+只有在自己的检出副本中有意更新保留摘要时才运行。
+
+```bash
+.venv/bin/python labs/entity_glossary_audit/export_summary.py
+```
+
+</details>
 
 ## 来源与署名
 

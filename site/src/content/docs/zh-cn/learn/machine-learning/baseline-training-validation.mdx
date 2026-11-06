@@ -4,6 +4,7 @@ description: 手算小型 Ridge 拟合，并区分训练、预处理和验证的
 ---
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
+import ScientificTeachingView from "../../../../../components/ScientificTeachingView.astro";
 
 英文原文：[How a baseline learns, predicts and gets selected](/learn/machine-learning/baseline-training-validation/)。
 
@@ -14,6 +15,8 @@ import LessonProgress from "../../../../../components/LessonProgress.astro";
 先阅读[从记录到建模表](/zh-cn/learn/data-governance/records-to-model-table/)。本课将特征、目标函数和预测连接起来。你将推导一条拟合直线，区分拟合参数与选择的设置，并追踪每一步允许使用的数据。本例是构造的算术示例，不是分子测定或研究结果。
 
 表示把对象映射成数字，预测器把这些数字映射成输出。训练在已观测的训练样本上选择预测器参数，以降低目标函数。推理在新输入上计算已有映射的输出，通常不更新参数。验证比较候选设置；除非协议明确规定，否则它不是额外的训练损失项。
+
+<ScientificTeachingView track="machine-learning" chinese />
 
 ## 推导最小的有用模型
 

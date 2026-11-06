@@ -1,0 +1,188 @@
+---
+import type { DiscoverableLab } from "../lib/lab-discovery.js";
+import { labInputLabels, labModeLabels } from "../lib/lab-discovery.js";
+import AtlasFigure from "./AtlasFigure.astro";
+
+interface Props { labs: DiscoverableLab[]; chinese?: boolean; }
+const { labs, chinese = false } = Astro.props;
+const language = chinese ? "zh" : "en";
+const starters = [
+  { title: "Molecular representations", titleZh: "分子表示", input: "Authored structures · RDKit", inputZh: "编写的结构例子 · RDKit", href: "labs/molecule-representation-inspector/" },
+  { title: "Synthetic modelling", titleZh: "合成数据建模", input: "Invented table · Python standard library", inputZh: "虚构数据表 · Python 标准库", href: "learn/machine-learning/student-modelling-sandbox/" },
+  { title: "Measured logD", titleZh: "实测 logD", input: "Public CSV · pinned scientific Python", inputZh: "公开 CSV · 固定版本科学计算环境", href: "labs/lipophilicity-notebook/" },
+  { title: "Cited answers, offline", titleZh: "离线检查带引用的回答", input: "Saved answers + source excerpts · Python", inputZh: "已保存回答与来源片段 · Python", href: "learn/scientific-agents/agent-resource-guide/" },
+];
+---
+
+<section class="lab-start" aria-labelledby="notebook-route-title">
+  <div class="lab-start__heading">
+    <h2 id="notebook-route-title">{chinese ? "从可修改 notebook 开始" : "Start with an editable notebook"}</h2>
+    <a href={chinese ? "/zh-cn/labs/notebook-guide/" : "/labs/notebook-guide/"}>{chinese ? "执行与保存指南 →" : "Execution and saving guide →"}</a>
+  </div>
+  <p class="lab-boundary">{chinese ? "四项默认练习无需 GPU 或 API 密钥。PaperQA 默认读取已保存回答；新的推理另行开启。Colab 链接可打开 notebook，尚未验证云端执行。" : "The four default exercises need no GPU or API key. PaperQA reads saved answers by default; fresh inference is separate. Colab links open notebooks; hosted execution remains unverified."}</p>
+  <ol class="lab-start__list">
+    {starters.map((starter, index) => <li>
+      <span class="meta-label">{String(index + 1).padStart(2, "0")}</span>
+      <h3><a href={`/${chinese ? "zh-cn/" : ""}${starter.href}`}>{chinese ? starter.titleZh : starter.title}</a></h3>
+      <p>{chinese ? starter.inputZh : starter.input}</p>
+    </li>)}
+  </ol>
+</section>
+
+<lab-explorer data-labs={JSON.stringify(labs)} data-chinese={chinese}>
+  <h2 id="browse-labs-title">{chinese ? "按模式与输入查找" : "Browse by mode and input"}</h2>
+  <form class="lab-controls" role="search" aria-label={chinese ? "筛选实验指南" : "Filter laboratory guides"}>
+    <label class="lab-search"><span>{chinese ? "搜索" : "Search"}</span><input type="search" name="q" placeholder={chinese ? "科学问题、来源或实验名称" : "Scientific question, source, or lab name"} autocomplete="off" /></label>
+    <label for="lab-mode"><span id="lab-mode-label">{chinese ? "执行模式" : "Execution mode"}</span><select id="lab-mode" name="mode" aria-labelledby="lab-mode-label">
+      <option value="">{chinese ? "全部模式" : "All modes"}</option>
+      {Object.entries(labModeLabels).map(([value, labels]) => <option value={value}>{labels[language]}</option>)}
+    </select></label>
+    <label for="lab-input"><span id="lab-input-label">{chinese ? "输入" : "Input"}</span><select id="lab-input" name="input" aria-labelledby="lab-input-label">
+      <option value="">{chinese ? "全部输入" : "All inputs"}</option>
+      {Object.entries(labInputLabels).map(([value, labels]) => <option value={value}>{labels[language]}</option>)}
+    </select></label>
+    <button type="reset">{chinese ? "清空筛选" : "Clear filters"}</button>
+  </form>
+  <p class="lab-boundary">{chinese ? "筛选标签说明默认入口模式与主要输入；限定说明保留其他模式或混合输入。本地重新计算仍使用指南声明的数据与协议。具体命令、环境、联网请求和输出边界以指南为准。" : "Filters describe the default entry mode and primary input; scope notes retain alternatives and mixed inputs. A fresh local computation still uses the guide's declared data and protocol. Follow each guide's commands, environment, network and output boundaries."}</p>
+  <div class="lab-result-bar">
+    <p data-lab-count aria-live="polite" aria-atomic="true">{chinese ? `${labs.length} / ${labs.length} 项实验指南` : `${labs.length} of ${labs.length} laboratory guides`}</p>
+    <p data-lab-selection>{chinese ? "全部模式 · 全部输入" : "All modes · All inputs"}</p>
+  </div>
+  <p data-lab-empty hidden>{chinese ? "没有匹配的指南。请修改搜索词或清空筛选。" : "No matching guides. Change the search or clear the filters."}</p>
+  <noscript><p>{chinese ? "交互筛选需要 JavaScript。下方仍列出所有指南。" : "Interactive filtering needs JavaScript. All guides remain listed below."}</p></noscript>
+  <ul class="lab-list" data-lab-results>
+    {labs.map((lab) => <li data-lab-id={lab.slug}>
+      <article class="lab-row">
+        <div>
+          <h3><a href={chinese ? lab.hrefZh : lab.href}>{chinese ? lab.titleZh : lab.title}</a></h3>
+          <p>{chinese ? lab.descriptionZh : lab.description}</p>
+          {lab.qualifier && <p class="lab-row__qualifier">{lab.qualifier[language]}</p>}
+        </div>
+        <dl>
+          <div><dt>{chinese ? "入口模式" : "Entry mode"}</dt><dd>{labModeLabels[lab.mode][language]}</dd></div>
+          <div><dt>{chinese ? "主要输入" : "Primary input"}</dt><dd>{labInputLabels[lab.input][language]}</dd></div>
+        </dl>
+      </article>
+    </li>)}
+  </ul>
+</lab-explorer>
+
+<details id="frozen-reading" class="lab-reading">
+  <summary>{chinese ? "阅读冻结评估：协议边界与迁移失败" : "Reading frozen evaluations: protocol boundaries and transfer failure"}</summary>
+  <p>{chinese ? "协议在查看留出结果之前冻结。已完成结果与后来的练习分开；一个评估上胜出的基线，在另一个评估上可能失败。以下图示保留已记录的结果和限制。" : "The protocol is frozen before held-out results are seen. Completed results stay separate from later exercises; a baseline that wins one evaluation can fail another. These figures retain the recorded results and limits."}</p>
+  <AtlasFigure id="frozen-lifecycle" />
+  <AtlasFigure id="representation-flips" />
+</details>
+
+<script>
+  import { emptyLabQuery, filterLabs, labInputLabels, labModeLabels, parseLabQuery, serializeLabQuery } from "../lib/lab-discovery";
+  import type { DiscoverableLab, LabInput, LabMode, LabQuery } from "../lib/lab-discovery";
+
+  class LabExplorer extends HTMLElement {
+    private labs: DiscoverableLab[] = [];
+    private items = new Map<string, HTMLLIElement>();
+    private events?: AbortController;
+    private form?: HTMLFormElement;
+
+    connectedCallback() {
+      this.labs = JSON.parse(this.dataset.labs ?? "[]") as DiscoverableLab[];
+      this.form = this.querySelector("form") ?? undefined;
+      if (!this.form) return;
+      this.querySelectorAll<HTMLLIElement>("[data-lab-id]").forEach((item) => this.items.set(item.dataset.labId!, item));
+      this.events = new AbortController();
+      const { signal } = this.events;
+      this.form.addEventListener("input", (event) => {
+        if (event.target instanceof HTMLInputElement) this.applyForm();
+      }, { signal });
+      this.form.addEventListener("change", () => this.applyForm(), { signal });
+      this.form.addEventListener("submit", (event) => { event.preventDefault(); this.applyForm(); }, { signal });
+      this.form.addEventListener("reset", (event) => {
+        event.preventDefault();
+        this.update({ ...emptyLabQuery });
+      }, { signal });
+      window.addEventListener("popstate", () => this.update(parseLabQuery(new URLSearchParams(location.search)), false), { signal });
+      this.update(parseLabQuery(new URLSearchParams(location.search)), false);
+    }
+
+    disconnectedCallback() { this.events?.abort(); }
+
+    private applyForm() {
+      const data = new FormData(this.form);
+      this.update({ q: String(data.get("q") ?? "").trim(), mode: String(data.get("mode") ?? ""), input: String(data.get("input") ?? "") }, true, false);
+    }
+
+    private update(query: LabQuery, writeUrl = true, syncForm = true) {
+      if (writeUrl) history.replaceState({}, "", `${location.pathname}${serializeLabQuery(query)}${location.hash}`);
+      if (syncForm && this.form) for (const [key, value] of Object.entries(query)) {
+        const field = this.form.elements.namedItem(key);
+        if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) {
+          if (field instanceof HTMLSelectElement && value && ![...field.options].some((option) => option.value === value)) field.add(new Option(`${value} (shared URL)`, value));
+          field.value = value;
+        }
+      }
+      const results = filterLabs(this.labs, query);
+      const list = this.querySelector<HTMLElement>("[data-lab-results]");
+      const count = this.querySelector<HTMLElement>("[data-lab-count]");
+      const empty = this.querySelector<HTMLElement>("[data-lab-empty]");
+      const selection = this.querySelector<HTMLElement>("[data-lab-selection]");
+      const chinese = this.dataset.chinese === "true";
+      const language = chinese ? "zh" : "en";
+      if (!list || !count || !empty || !selection) return;
+      list.replaceChildren(...results.flatMap((lab) => this.items.get(lab.slug) ?? []));
+      list.hidden = results.length === 0;
+      empty.hidden = results.length !== 0;
+      count.textContent = chinese ? `${results.length} / ${this.labs.length} 项实验指南` : `${results.length} of ${this.labs.length} laboratory guides`;
+      const mode = labModeLabels[query.mode as LabMode]?.[language] ?? (query.mode || (chinese ? "全部模式" : "All modes"));
+      const input = labInputLabels[query.input as LabInput]?.[language] ?? (query.input || (chinese ? "全部输入" : "All inputs"));
+      selection.textContent = [query.q ? `“${query.q}”` : "", mode, input].filter(Boolean).join(" · ");
+      document.querySelectorAll<HTMLAnchorElement>("[data-lab-language]").forEach((link) => {
+        link.search = serializeLabQuery(query);
+      });
+      const clear = this.form?.querySelector<HTMLButtonElement>('[type="reset"]');
+      if (clear) clear.disabled = !query.q && !query.mode && !query.input;
+    }
+  }
+  if (!customElements.get("lab-explorer")) customElements.define("lab-explorer", LabExplorer);
+</script>
+
+<style>
+  lab-explorer { display: block; }
+  .lab-start { margin-block: 1.4rem 2rem; }
+  .lab-start__heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .3rem 1rem; }
+  .lab-start h2, lab-explorer > h2 { margin: 0; font-size: 1.4rem; }
+  .lab-start__heading > a { display: inline-flex; align-items: center; min-height: 44px; font-size: .85rem; }
+  .lab-start__list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; list-style: none; margin: .9rem 0 0; padding: 0; }
+  .lab-start__list li { min-width: 0; border-top: 2px solid var(--atlas-teal); padding-top: .6rem; }
+  .lab-start__list h3 { margin: .1rem 0; font-size: .98rem; line-height: 1.4; }
+  .lab-start__list h3 a { display: inline-flex; align-items: center; min-height: 44px; }
+  .lab-start__list p { margin: 0; color: var(--atlas-muted); font-size: .8rem; line-height: 1.5; }
+  .lab-reading { margin-top: 2rem; padding-block: 1rem; border-block: 1px solid var(--atlas-rule); }
+  .lab-reading summary { padding-block: .35rem; min-height: 44px; color: var(--atlas-teal-deep); cursor: pointer; }
+  .lab-reading > p { max-width: 80ch; font-size: .9rem; }
+  .lab-controls { display: grid; grid-template-columns: minmax(12rem, 2fr) repeat(2, minmax(0, 1fr)) auto; align-items: end; gap: .8rem; padding-block: 1rem; border-block: 1px solid var(--atlas-rule); }
+  .lab-controls label { display: grid; gap: .35rem; min-width: 0; font-size: .8rem; font-weight: 650; color: var(--atlas-muted); }
+  .lab-controls input, .lab-controls select, .lab-controls button { width: 100%; min-width: 0; min-height: 44px; padding: .5rem .65rem; border: 1px solid var(--atlas-rule-strong); border-radius: var(--atlas-radius, .2rem); background: var(--atlas-panel); color: var(--atlas-ink); font: inherit; }
+  .lab-controls button { color: var(--atlas-teal-deep); cursor: pointer; font-size: .85rem; }
+  .lab-controls button:disabled { opacity: .65; cursor: default; }
+  .lab-boundary { max-width: 95ch; margin-block: .7rem; font-size: .82rem; color: var(--atlas-muted); }
+  .lab-result-bar { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0 1rem; border-bottom: 1px solid var(--atlas-rule); font-size: .82rem; }
+  .lab-result-bar p { margin-block: .7rem; }
+  [data-lab-selection] { color: var(--atlas-muted); overflow-wrap: anywhere; }
+  .lab-list { margin: 0; padding: 0; list-style: none; }
+  .lab-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(12rem, 25%); gap: 1.5rem; padding-block: 1.1rem; border-bottom: 1px solid var(--atlas-rule); }
+  .lab-row h3 { margin: 0; font-size: 1.08rem; line-height: 1.4; }
+  .lab-row h3 a { display: inline-flex; align-items: center; min-height: 44px; }
+  .lab-row p { max-width: 80ch; margin: .1rem 0; font-size: .91rem; line-height: 1.6; }
+  .lab-row .lab-row__qualifier { margin-top: .45rem; font-size: .82rem; color: var(--atlas-muted); }
+  .lab-row dl { display: grid; gap: .6rem; align-content: start; margin: .25rem 0 0; padding-left: 1.1rem; border-left: 1px solid var(--atlas-rule); font-size: .8rem; }
+  .lab-row dt { color: var(--atlas-muted); font-size: .72rem; }
+  .lab-row dd { margin: .1rem 0 0; }
+  [hidden] { display: none !important; }
+  @media (max-width: 760px) {
+    .lab-start__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .lab-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+    .lab-search, .lab-controls button { grid-column: 1 / -1; }
+    .lab-row { grid-template-columns: 1fr; gap: .7rem; }
+    .lab-row dl { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: .6rem 0 0; border-left: 0; border-top: 1px solid var(--atlas-rule); }
+  }
+</style>

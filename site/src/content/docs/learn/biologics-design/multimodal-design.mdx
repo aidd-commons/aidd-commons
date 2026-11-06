@@ -4,8 +4,11 @@ description: Separate designed sequences and structures from evidence of biologi
 ---
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="biologics-design/multimodal-design" />
+
+<TeachingViewLink track="biologics-design" />
 
 ## Foundations
 
@@ -36,6 +39,21 @@ and record failures rather than retaining only successful designs.
 [Chroma](https://github.com/generatebio/chroma) broaden design inputs, but do
 not erase uncertainty in complexes, antigen state, or downstream function.
 The appropriate model depends on the decision and available assay feedback.
+
+## A bounded worked decision and independent task
+
+Read [biological representations](/learn/representations/biological-representations/) and the [construct-identity lesson](/learn/biologics-design/construct-identity-and-objectives/). The latter reads the labels for etanercept and adalimumab: a dimeric receptor–Fc fusion and an IgG1 monoclonal antibody. Both labels name CHO expression, but the same host does not make their recognition components identical. This is a source-record interpretation, not a new experimental comparison.
+
+A catalogue row calls both objects a human antibody made by human immune cells. Which fields must be repaired, and would a predicted structure complete their functional evidence?
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+Separate the product identities, component/assembly descriptions and source-reported host. Human-derived sequence does not identify the expression system; an Fc-containing fusion is not thereby an antibody recognition construct. A predicted structure cannot replace construct-matched binding and functional observations. The linked worked lesson keeps those objectives separate.
+
+</details>
+
+Teaching task added on 2026-10-26; the original source-review date remains below.
 
 ## What v0.1 does not yet teach
 

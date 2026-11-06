@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -122,6 +122,42 @@ describe("public release hygiene", () => {
       await writeFile(join(root, path), `${JSON.stringify(payload)}\n`);
       return root;
     }
+
+    it("accepts the declared label-free molecule encodings while rejecting locked outputs and other paths", async () => {
+      const path = "site/src/data/teaching/molecules.json";
+      const payload = JSON.parse(
+        await readFile(join(repositoryRoot, path), "utf8"),
+      );
+      expect(payload.scope).toContain("Label-free");
+      expect(payload.rdkit_version).toBeTruthy();
+      expect(payload.molecules.length).toBeGreaterThan(0);
+      expect(
+        payload.molecules.every(
+          (molecule: { canonical_smiles?: string }) =>
+            typeof molecule.canonical_smiles === "string",
+        ),
+      ).toBe(true);
+      await expect(scan(await treeWith(path, payload))).resolves.toEqual([]);
+      const contaminated = {
+        ...payload,
+        predictions: [1.0],
+        member_ids: ["held-out-parent"],
+      };
+      const findings = await scan(await treeWith(path, contaminated));
+      expect(findings.map(({ detail }) => detail)).toEqual(
+        expect.arrayContaining([
+          "pipeline state key: predictions",
+          "pipeline state key: member_ids",
+        ]),
+      );
+      expect(
+        (
+          await scan(
+            await treeWith("site/src/data/unreviewed-molecules.json", payload),
+          )
+        ).map(({ detail }) => detail),
+      ).toContain("pipeline state key: canonical_smiles");
+    });
 
     it("accepts a smiles key only in a reviewed authored dataset", async () => {
       const exempt = await treeWith("labs/sar_attribution/dataset.json", {

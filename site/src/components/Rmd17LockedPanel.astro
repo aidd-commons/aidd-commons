@@ -1,5 +1,6 @@
 ---
 import summary from "../../../labs/rmd17_system_state/locked-summary.json";
+import EvidenceBars from "./EvidenceBars.astro";
 
 const models = [{ key: "train_mean", label: "Train mean" }, { key: "ridge", label: "Ridge" }] as const;
 const format = (value: number) => value.toFixed(6);
@@ -7,6 +8,7 @@ const download = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.
 ---
 
 <section class="locked-panel" aria-labelledby="rmd17-locked-title">
+  <p class="panel-kicker">Saved evaluation · {summary.protocol_id}</p>
   <h2 id="rmd17-locked-title">Completed rMD17 evaluations</h2>
   <p>Benzene and uracil completed together; reviewed {summary.reviewed_on}.
     Shared alpha={summary.selected_alpha} was fixed by development validation.
@@ -16,6 +18,14 @@ const download = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.
   <p><strong>Ridge has lower MAE and RMSE than the training-mean control in both systems.</strong>
     These are within-system evaluations with separately fitted models, not
     transfer of one learned molecular model to a new system.</p>
+  <div class="system-plots">
+    {Object.entries(summary.results).map(([system, scores], index) => (
+      <section aria-label={`${system} frozen evaluation error`}>
+        <p class="panel-letter">({index === 0 ? "a" : "b"}) <span>{summary.partitions_per_system.evaluation} correlated evaluation frames</span></p>
+        <EvidenceBars title={system} description="A separate model is fitted within this molecular system." units="MAE · kcal/mol" maximum={4} rows={models.map(({ key, label }) => ({ key, label, value: scores[key].mae }))} />
+      </section>
+    ))}
+  </div>
   <div class="table-scroll" role="region" aria-label="Completed rMD17 system scores" tabindex="0">
     <table>
       <caption>All {summary.partitions_per_system.evaluation} evaluation frames per system; errors and target ranges in kcal/mol</caption>
@@ -44,9 +54,14 @@ const download = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.
 </section>
 
 <style>
-  .locked-panel { min-width: 0; margin-block: 2rem; padding: 1rem; border: 1px solid var(--sl-color-gray-4); border-radius: .6rem; }
+  .locked-panel { min-width: 0; margin-block: 2rem; padding-block: 1.5rem; border-block: 1px solid var(--atlas-rule-strong);color:var(--atlas-ink); }
+  .locked-panel>h2{margin-top:.35rem}.panel-kicker{font-size:.75rem;color:var(--atlas-teal-deep);font-weight:700;letter-spacing:.06em;text-transform:uppercase;overflow-wrap:anywhere}
+  .system-plots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem;margin-block:1.5rem}.system-plots>section{min-width:0;border-top:1px solid var(--atlas-rule);padding-top:1rem}
+  .panel-letter{display:flex;justify-content:space-between;gap:.7rem;font-weight:700;font-size:.75rem}.panel-letter span{font-weight:400;color:var(--atlas-muted)}
+  .locked-panel>ul,.locked-panel>p:last-child{font-size:.82rem}
   .table-scroll { max-width: 100%; overflow-x: auto; }
-  table { display: table; overflow: visible; width: 100%; font-variant-numeric: tabular-nums; }
-  th, td { padding: .5rem; white-space: nowrap; }
-  caption { text-align: left; white-space: normal; }
+  table { display: table; overflow: visible; width: 100%; font-variant-numeric: tabular-nums;font-size:.8rem; }
+  th, td { padding: .6rem; white-space: nowrap; }
+  caption { text-align: left; white-space: normal;padding-block:.75rem;color:var(--atlas-muted); }.table-scroll:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
+  @media(max-width:58rem){.system-plots{grid-template-columns:minmax(0,1fr)}}
 </style>

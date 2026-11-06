@@ -4,12 +4,15 @@ description: 用其证据、行动和审查点约束语言模型及工具使用�
 ---
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 英文原文：[Scientific agents and tools](/learn/scientific-agents/agents-and-tools/)。
 
 译文更新：2026-09-09。
 
 <LessonProgress lessonId="scientific-agents/agents-and-tools" />
+
+<TeachingViewLink track="scientific-agents" chinese />
 
 ## 基础
 
@@ -33,6 +36,21 @@ import LessonProgress from "../../../../../components/LessonProgress.astro";
 [BioGPT](https://github.com/microsoft/BioGPT) 等科学语言模型，以及
 [BioNeMo](https://github.com/NVIDIA-BioNeMo/bionemo-recipes) 等领域配方集合，提出了关于
 溯源、工具权限、行动范围和可复现性的问题。这些问题必须在使用它们的工作流中得到评估。
+
+## 有边界的推演与独立任务
+
+阅读[证据与未知字段](/zh-cn/learn/foundations/evidence-claims-and-unknowns/)后，从证据追溯到工作流返回。构造的[带类型工具案例](/zh-cn/learn/scientific-agents/retrieval-tools-feedback/)返回 status qc_failed 与 control_pass false。合格固定脚本可以保留该失败并停止；自适应计划到达同一分支，不构成已测得的优势。
+
+分别写出一个有支持的工作流结论与一个没有支持的生物学句子。在将工具调用视为已完成的湿实验之前，需要哪种记录？
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+有支持的结论是工具返回了对照失败状态。由于没有有效读出，正向生物效应没有支持。湿实验主张需要已获授权、带相关对照的实验记录；schema 合法性或文字承诺不能提供它。应保留失败、来源范围与等待中的审阅者或证据要求。
+
+</details>
+
+本教学任务新增于 2026-10-26；原来源审阅日期保持如下。
 
 ## v0.1 尚未教授的内容
 

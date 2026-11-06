@@ -5,6 +5,7 @@ description: Compare rule, retrieval and template disconnections on one construc
 
 import ScrollableRegions from "../../../components/ScrollableRegions.astro";
 import LabDownloads from "../../../components/LabDownloads.astro";
+import ScientificTeachingView from "../../../components/ScientificTeachingView.astro";
 
 <ScrollableRegions />
 
@@ -35,6 +36,8 @@ offline labs.
 That last line is the point of listing it. A comparison that quietly drops a
 family implies four were compared when three were, and the boundary should be
 printed rather than inferred.
+
+<ScientificTeachingView track="synthesis-and-automation" compact />
 
 ## 2. All three are perfect inside the precedent set
 
@@ -106,38 +109,30 @@ Name what the comparison does not establish, and say which single number you
 would ask for first.
 
 <details data-worked-answer>
-<summary>Worked answer — three gaps, and the number to ask for</summary>
+<summary>Worked answer: identify the evaluated task before interpreting the gap</summary>
 
-**"Route recovery" is not correctness.** It measures agreement with one recorded
-route. A chemist proposing a different and better disconnection scores zero, and
-a model proposing many disconnections that happen to include the record scores
-one. Top-1 controls for the second of those, which is why it is the right thing
-to report, but it still leaves the first: the target is a single literature
-precedent, not a set of acceptable answers.
+First identify what the reported recovery measures. A top-1 prediction selects
+one proposed answer, but the answer could be a single reaction, a reactant set or
+a complete route. Agreement with one recorded answer does not establish that
+other proposals are chemically wrong, or that the recorded proposal is suitable
+for production. The benchmark name alone does not resolve the task definition.
 
-**The two numbers may not be measuring the same difficulty.** Template methods
-inherit the coverage of the dataset the templates came from, and here that is the
-same dataset the model trained on. If the test split shares transformation
-classes with training, both methods are being asked an easier question than
-production planning poses, and the five-point gap is between two scores on that
-easier question.
+For the 92% and 87% comparison, check that both methods use the same test
+examples, preprocessing, accessible reaction information and success rule.
+Inspect the template source and nearest-neighbour retrieval baseline instead of
+assuming either method only memorizes the training set. A strong retrieval result
+would be a relevant comparator, not a measurement of how much another model
+memorized.
 
-**Nothing here touches production.** Production planning needs available
-reagents, compatible conditions, acceptable selectivity, and a route that survives
-scale. A recovery percentage is silent on all of them, and the claim in the last
-sentence is a different kind of claim from the evidence in the first.
+A useful next score is recovery on a prespecified holdout with the relevant
+transformation groups absent from training, with its sample count and uncertainty.
+It tests a different generalization question, but cannot on its own establish
+helpfulness for every new target or production process.
 
-**And the retrieval baseline is missing.** If a nearest-neighbour lookup over the
-training set scores anywhere near 87%, most of what both methods achieved is
-memorisation, and the comparison between them is measuring something small on top
-of something large.
-
-**The number to ask for first: the score on products whose transformation class
-does not appear in training.** It separates the three causes that a single
-percentage collapses, it exposes how much of the headline is retrieval, and it is
-the only one of these numbers that speaks to whether the method would help on a
-target nobody has made before. If that number is not available, the honest reading
-of 92% is that it describes the dataset.
+Production planning also requires evidence about materials, conditions,
+selectivity, scale and route execution. The original recovery percentages do not
+measure those outcomes. Until the task and matched comparison are known, the
+claim remains a reported benchmark score rather than production readiness.
 
 </details>
 

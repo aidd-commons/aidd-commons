@@ -13,12 +13,24 @@ This lab addresses `t13-sequence-structure-function-objective`. Its question is 
 
 Mode is fresh independent computation under a frozen protocol. Use the project Python 3.11 environment and CPU. Network access is needed only when the snapshot is absent. The source is the public [LiteFold SKEMPI 2.0 mirror](https://huggingface.co/datasets/LiteFold/SKEMPI2), which normalizes the upstream CSV into JSONL. The [upstream portal](https://life.bsc.es/pid/skempi2/) is the canonical source.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/skempi_affinity/run_lab.py download
 .venv/bin/python labs/skempi_affinity/inspect_skempi_affinity.py show
 .venv/bin/python labs/skempi_affinity/inspect_skempi_affinity.py check
+```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/skempi_affinity/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
 .venv/bin/python labs/skempi_affinity/export_summary.py
 ```
+
+</details>
 
 The download cache is reused after byte-length validation. The export overwrites the committed small summary after a successful run. It does not replace source measurements.
 

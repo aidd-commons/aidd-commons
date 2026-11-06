@@ -2,6 +2,7 @@
 title: 按记录划分在哪些路径泄漏
 description: 在冻结的 ChEMBL 37 队列中检查分子、骨架、测定、靶点和受测形式的跨划分重叠。
 ---
+import ScientificTeachingView from "../../../../components/ScientificTeachingView.astro";
 
 英文原文：[Where a row split leaks](/labs/split-leakage-audit/)。
 
@@ -19,13 +20,27 @@ RDKit 2025.09.6，无需加速器。
 并在本实验的缓存中放置副本。首次冷启动可能访问 ChEMBL API。快照缓存后，计数与检查
 无需网络。命令不会拟合模型。汇总导出器只有在检查通过后才会覆盖派生汇总。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/split_leakage_audit/run_lab.py download
 .venv/bin/python labs/split_leakage_audit/inspect_split_leakage_audit.py show
 .venv/bin/python labs/split_leakage_audit/inspect_split_leakage_audit.py check
-.venv/bin/python labs/split_leakage_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/split_leakage_audit -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/split_leakage_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/split_leakage_audit/export_summary.py
+```
+
+</details>
+
+<ScientificTeachingView track="evaluation-and-reproducibility" chinese compact />
 
 ## 测量单位与划分
 
@@ -87,3 +102,13 @@ RDKit 2025.09.6，无需加速器。
 [RDKit 源码许可](https://github.com/rdkit/rdkit/blob/master/license.txt)
 于 2026-09-09 记录为 BSD 3-Clause。原创课程文字采用 CC BY 4.0，原创实验代码采用
 Apache-2.0。实验已提交汇总只含计数，不含活性记录。最后复核于 2026-10-23。
+## 独立检查任务
+
+比较 98 个按行保留的测量与 353 个按 parent 保留的测量。为何前者即使行不重叠，也可能没有任何 parent 未见测量？在不按分数择优的前提下，分别说明两种划分回答的泛化问题。
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+在按行划分中，同一 parent 可通过不同 measurement key 同时进入训练与测试。行不重叠不意味着 parent 不重叠。按 parent 分组保留该身份，也改变总体与实际计数。没有一种划分普遍正确；它必须匹配预先声明的部署问题，本审计不比较预测表现。
+
+</details>

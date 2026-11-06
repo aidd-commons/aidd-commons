@@ -5,11 +5,14 @@ description: 读本项目自己记录里七条真实的许可证范围，并看�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 英文原文：[Reading a licence scope, not a licence name](/learn/data-governance/reading-a-licence-scope/)。
 
 <LessonProgress lessonId="data-governance/reading-a-licence-scope" />
 <ScrollableRegions />
+
+<TeachingViewLink track="data-governance" chinese />
 
 ## 学习目标与前置知识
 
@@ -49,10 +52,10 @@ import ScrollableRegions from "../../../../../components/ScrollableRegions.astro
 声明该产品不反映最新数据。自制的许可证仍然是许可证，而且它可以施加的不是限制而是
 义务。它还保留改变机器可读数据格式的权利，而读者的流程必须能承受这种改变。
 
-**ToxCast。** 该机构自己的声明是：其计算毒理数据是开放数据，不受任何版权限制，
-非商业与商业使用都可完全自由地获取。没有什么被扣留，因为没有可扣留的东西：这些是
-美国政府作品。对这样的资源，记录若把许可证字段留空，就是漏掉了一句真话；而记录若在
-来源说的是"开放数据"的地方写上"公有领域"，那就是说了来源没说的事。
+**ToxCast。** 该机构声明其计算毒理数据为不受版权限制的开放数据，可供非商业与
+商业使用。应为已指明的数据记录这项肯定性声明；它并不自动解决所链接第三方材料
+的全部权利，或该网站所有资产的条款。许可证字段留空会漏掉已声明的条款，
+而用没有说明范围的标签替代来源原话，同样会丢失适用范围。
 
 **SAbDab2。** 机器学习发布版自己声明了条款，条款就在那份发布上，因此记录可以指向确切的
 产物与版本。这是这里最干净的一例，而它值得注意的条件是：一份声明自己许可证的存缴、
@@ -98,8 +101,7 @@ Attribution 4.0 覆盖那份机器学习发布版，而发布版自己声明了�
 
 (a) 第一条覆盖的是仓库当前分支而不是你锁定的版本，所以你手上的资产没有被覆盖；
 它许可作者能许可的部分，扣留带上游限制的部分，并把你所锁定版本的条款留作未决。第二条
-覆盖数据本身，许可商业与非商业使用，因为是政府作品所以没有什么可扣留，其表面上没有
-未决项。第三条覆盖代码，许可复用与再分发该代码，扣留第三方权重与数据，并且把
+覆盖数据本身，许可商业与非商业使用，声明这些数据没有版权限制；其他资产或第三方材料的权利仍需各自的来源声明。第三条覆盖代码，许可复用与再分发该代码，扣留第三方权重与数据，并且把
 "other-open 到底由什么构成"留作未决，因为既没有许可证名称也没有权利声明。第四条覆盖
 门户当前数据，许可内部与非营利用途，扣留商用（包括用该数据训练出的模型的销售或产品
 使用），并把是否会另签协议、条款如何留作未决。

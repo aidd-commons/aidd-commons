@@ -15,13 +15,25 @@ Read [Retrieval, typed tools, and feedback loops](/learn/scientific-agents/retri
 
 Mode is a fresh independent computation under a frozen protocol over the repository's committed records. Use Python 3.11.15 on a CPU. No network, download, model server or accelerator is needed. Run from the repository root. The first three commands write nothing. Export overwrites only this laboratory's compact summary after its checks pass. The test command uses temporary files and does not rerun the recorded model or locked evaluation.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/agent_evaluation_taskset/run_lab.py download
 .venv/bin/python labs/agent_evaluation_taskset/inspect_agent_evaluation_taskset.py show
 .venv/bin/python labs/agent_evaluation_taskset/inspect_agent_evaluation_taskset.py check
-.venv/bin/python labs/agent_evaluation_taskset/export_summary.py
 .venv/bin/python -m pytest labs/tests/agent_evaluation_taskset -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/agent_evaluation_taskset/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/agent_evaluation_taskset/export_summary.py
+```
+
+</details>
 
 ## Task set and decision rules
 

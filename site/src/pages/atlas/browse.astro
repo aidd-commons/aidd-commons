@@ -1,0 +1,24 @@
+---
+import { localizedPath } from "../../lib/site-locale.js";
+import SiteShell from "../../components/SiteShell.astro";
+import AtlasResourceCard from "../../components/AtlasResourceCard.astro";
+import { catalogResources } from "../../lib/site-overview.js";
+import { buildAtlasIndex, emptyAtlasQuery } from "../../lib/atlas-presentation.js";
+import { sortAtlasResources } from "../../lib/atlas-state.js";
+import "../../styles/atlas-explorer.css";
+const resources = sortAtlasResources(buildAtlasIndex(catalogResources), emptyAtlasQuery, "name");
+const chinese = Astro.props.chinese ?? false;
+const t = (english: string, chineseText: string) => chinese ? chineseText : english;
+const local = (path: string) => localizedPath(path, chinese);
+---
+<SiteShell lang={chinese ? "zh-CN" : "en"} title={t("Browse every Atlas record","浏览全部图谱记录")} description={t("All catalogue records, readable without JavaScript, with direct evidence and resource links.","无需 JavaScript 即可浏览全部目录记录，并直接访问证据与资源链接。")}>
+  <section class="page-header">
+    <p class="eyebrow">{t("Complete catalogue · canonical English","完整目录 · 英语原始记录")}</p>
+    <h1 class="page-heading">{t("Browse every Atlas record","浏览全部图谱记录")}</h1>
+    <p class="page-intro">{resources.length}{t(" records in alphabetical order. Each record links to its seven asset states, source evidence and scope notes.", " 条记录，按字母顺序排列。每条记录链接到七个资产状态、来源证据与范围说明。资源正文保留英语原文。")}</p>
+    <p><a href={local("/atlas/")}>{t("← Interactive search and comparison","← 交互检索与比较")}</a> · <a href={local("/data/resources.v1.json")} download>{t("Catalogue JSON","目录 JSON")}</a> · <a href={local("/data/resources.v1.csv")} download>{t("Catalogue CSV","目录 CSV")}</a> · <a href={local("/data/openness.v1.json")} download>{t("Asset states JSON","资产状态 JSON")}</a></p>
+  </section>
+  <ul class="atlas-results" aria-label={t("Complete resource catalogue","完整资源目录")}>
+    {resources.map((resource) => <AtlasResourceCard resource={resource} chinese={chinese} />)}
+  </ul>
+</SiteShell>

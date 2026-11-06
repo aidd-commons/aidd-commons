@@ -28,20 +28,50 @@ describe("CI workflow contracts", () => {
     expect(packageManifest.scripts?.["comparisons:build"]).toBe(
       "tsx scripts/comparisons/export.ts",
     );
-    expect(checkScript).toContain("pnpm catalog:build");
+    expect(checkScript).not.toMatch(
+      /catalog:build|comparisons:build|workbench:build/u,
+    );
     expect(checkScript.indexOf("pnpm comparisons:validate")).toBeGreaterThan(
       -1,
     );
-    expect(checkScript.indexOf("pnpm comparisons:build")).toBeGreaterThan(
-      checkScript.indexOf("pnpm comparisons:validate"),
-    );
     expect(checkScript.indexOf("pnpm --dir site build")).toBeGreaterThan(-1);
     expect(checkScript.indexOf("pnpm --dir site build")).toBeGreaterThan(
-      checkScript.indexOf("pnpm comparisons:build"),
+      checkScript.indexOf("pnpm comparisons:validate"),
     );
     expect(checkScript.indexOf("pnpm test:unit")).toBeGreaterThan(
       checkScript.indexOf("pnpm --dir site build"),
     );
+  });
+
+  it("prepares generated workbench/search projections explicitly before checkout consumers", async () => {
+    const workflow = parse(
+      await readFile(`${repositoryRoot}/.github/workflows/ci.yml`, "utf8"),
+    ) as Workflow;
+    for (const name of [
+      "catalog",
+      "web",
+      "links-and-citations",
+      "browser-and-accessibility",
+      "release-hygiene",
+    ]) {
+      const steps = workflow.jobs[name].steps;
+      const generation = steps.findIndex((step) =>
+        step.run?.includes("pnpm workbench:build"),
+      );
+      const consumer = steps.findIndex((step) =>
+        /(?:vitest run tests\/(?:catalog|workbench)|pnpm --dir site (?:check|build)|scripts\/release\/build.ts)/u.test(
+          step.run ?? "",
+        ),
+      );
+      expect(
+        generation,
+        `${name}: explicit workbench preparation`,
+      ).toBeGreaterThan(-1);
+      expect(
+        consumer,
+        `${name}: generation must precede its consumer`,
+      ).toBeGreaterThanOrEqual(generation);
+    }
   });
 
   it("stages pull-request checks without secrets and installs pnpm explicitly", async () => {

@@ -29,6 +29,7 @@ Run:
 ```bash
 pnpm catalog:validate
 pnpm catalog:build
+pnpm workbench:build
 ```
 
 ## Lessons and language editions
@@ -36,6 +37,8 @@ pnpm catalog:build
 Canonical scientific content is written in English. Chinese content includes onboarding, pathway summaries, and translations of the current lessons and lab guides; it must preserve the same numerical values, caveats, evidence scope, and uncertainty. Translation is semantic work: do not strengthen claims, remove conditions, or convert `unverified` into a positive or negative assertion. Numerical panels and downloads retain their original format.
 
 Each substantive chapter should state its prerequisites, learning outcomes, data contract, strongest relevant cheap baseline, evaluation traps, openness constraints, and last review date. Use [the editorial guide](docs/EDITORIAL_GUIDE.md) and the curriculum chapter template.
+
+After changing curriculum routes, document metadata or declared case mappings, run `pnpm workbench:build`. `pnpm workbench:check` verifies that the generated navigation and bilingual search index match their canonical inputs. Ordinary site builds check freshness without rewriting projections.
 
 ## Labs and experiment reports
 

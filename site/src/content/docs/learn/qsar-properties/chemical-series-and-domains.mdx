@@ -5,9 +5,12 @@ description: Connect chemical standardization and matched molecular changes to s
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="qsar-properties/chemical-series-and-domains" />
 <ScrollableRegions />
+
+<TeachingViewLink track="qsar-properties" />
 
 ## Predict a defined property for a defined chemical object
 
@@ -146,8 +149,9 @@ The [SAR attribution lab](/labs/sar-attribution/) fits a model to data whose
 generating rule is stated in the file, so the cause is known rather than
 inferred. A confounder correlated with that cause takes the larger share of atom
 credit on seven of eight actives, and the matched pair that breaks the
-correlation is ranked backwards. It is the check that real activity data never
-allows.
+correlation is ranked backwards. The generating rule gives this constructed case a direct reference.
+Real activity data require independent interventions and controls for a
+causal check; attribution alone is insufficient.
 
 ## Independent exercises
 

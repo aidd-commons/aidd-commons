@@ -1,0 +1,261 @@
+---
+import manifest from "../data/atlas-figures.json";
+import { teachingViews } from "../data/teaching-views";
+import { withSiteBase } from "../lib/site-paths";
+
+interface Props { chinese?: boolean; }
+const { chinese = false } = Astro.props;
+const t = (en: string, zh: string) => chinese ? zh : en;
+const asset = (file: string) => withSiteBase(`/figures/${file}`, import.meta.env.BASE_URL);
+const views = Object.entries(teachingViews);
+const groups = [
+  { kind: "schematic", id: "schematics", title: t("Concepts and methods", "概念与方法图"), description: t("Separate illustrations, native text and connectors form editable diagrams. These graphics explain teaching relationships; they are not biological observations.", "独立插画、原生文字与连接线组成可编辑图。图形说明教学关系，不是生物学观测。") },
+  { kind: "plot", id: "plots", title: t("Data and retained results", "数据与保留结果"), description: t("Each plot retains its source dates, comparison population and interpretation limits. A visual revision is not a new experiment or a new review of every source.", "每张图保留其来源日期、比较对象与解释边界。视觉更新不等于重新运行实验或重新审核全部来源。") },
+];
+const orderedFigures = groups.flatMap(group => manifest.library.filter(entry => entry.kind === group.kind));
+const figureLabel = (id: string) => `${t("Figure", "图")} ${String(orderedFigures.findIndex(entry => entry.id === id) + 1).padStart(2, "0")}`;
+---
+<section class="figure-library" data-figure-library data-chinese={chinese} data-figure-total={manifest.library.length} data-view-total={views.length}>
+  <header class="figure-library__header">
+    <p class="eyebrow">{t("Scientific figure reading desk", "科学图件阅读台")}</p>
+    <h1 class="page-heading">{t("Explore the figure library", "探索科学图件库")}</h1>
+    <p class="page-intro">{t(`${manifest.library.length} source-bound figures and ${views.length} interactive teaching views. Enlarge a figure, download its PDF or PNG, or edit a native PPTX diagram.`, `${manifest.library.length} 张保留来源的图件与 ${views.length} 个交互式教学视图。放大阅读、下载 PDF 或 PNG，或编辑原生 PPTX 方法图。原始英文标签与数值保持一致。`)}</p>
+  </header>
+  <nav class="figure-library__nav" aria-label={t("Figure groups", "图件分组")}>
+    {groups.map(group => <a href={`#${group.id}`}>{group.title}<span aria-hidden="true">↓</span></a>)}
+    <a href="#teaching-views">{t("Interactive teaching views", "交互式教学视图")}<span aria-hidden="true">↓</span></a>
+    <a href={withSiteBase(chinese ? "/zh-cn/report/" : "/report/", import.meta.env.BASE_URL)}>{t("Return to the report", "返回报告")}<span aria-hidden="true">↗</span></a>
+  </nav>
+  <details class="figure-library__boundary">
+    <summary>{t("Source dates and interpretation limits", "来源日期与解释边界")}</summary>
+    <p>{t("Visual revision dates describe each drawing; source dates describe the underlying evidence. Website concept illustrations were generated with an image tool and are not scientific evidence. Manuscript figures use separate native or source-derived artwork. Versioned report downloads retain their historical form.", "图件视觉更新日期描述各张图的绘制版本；来源日期描述底层证据。网站概念插画由图像工具生成，不能作为科学证据；论文图使用独立的原生或来源派生素材。历史版本报告下载保持原貌。")}</p>
+  </details>
+  <form class="figure-library__controls" role="search" aria-label={t("Search the figure library", "搜索图件库")} data-library-controls hidden>
+    <label class="figure-library__search">{t("Search figures and teaching views", "搜索图件与教学视图")}
+      <input type="search" name="q" data-library-search placeholder={t("Title, caption, source or teaching question", "标题、图注、来源或教学问题")} aria-describedby="figure-search-hint" />
+    </label>
+    <label>{t("Type", "类型")}
+      <select name="type" data-library-type>
+        <option value="all">{t("All types", "所有类型")}</option>
+        <option value="schematic">{t("Concepts and methods", "概念与方法图")}</option>
+        <option value="plot">{t("Data and retained results", "数据与保留结果")}</option>
+        <option value="interactive">{t("Interactive teaching views", "交互式教学视图")}</option>
+      </select>
+    </label>
+    <button type="button" data-library-reset>{t("Clear filters", "清除筛选")}</button>
+    <p id="figure-search-hint">{t("Search the available English and Chinese text. Captions and source dates retain their original wording.", "可搜索已有中英文内容；图注与来源日期保留原文。")}</p>
+  </form>
+  <p class="figure-library__count" role="status" aria-live="polite" aria-atomic="true" data-library-count>{t(`${manifest.library.length} figures · ${views.length} teaching views`, `${manifest.library.length} 张图件 · ${views.length} 个教学视图`)}</p>
+  <div class="figure-library__empty" data-library-empty hidden>
+    <h2>{t("No matching figures or teaching views", "没有匹配的图件或教学视图")}</h2>
+    <p>{t("Try a shorter search or choose another type.", "请尝试更短的关键词或选择其他类型。")}</p>
+    <button type="button" data-library-reset>{t("Show all", "显示全部")}</button>
+  </div>
+  {groups.map(group => <section id={group.id} class="figure-library__group" data-library-group aria-labelledby={`${group.id}-title`}>
+    <header><h2 id={`${group.id}-title`}>{group.title}</h2><p>{group.description}</p></header>
+    <div class="figure-library__grid">{manifest.library.filter(entry => entry.kind === group.kind).map(entry => <figure id={entry.id} data-library-figure={entry.id} data-library-item data-kind={entry.kind} data-search={[figureLabel(entry.id), entry.title, entry.caption, entry.source_note, group.title, group.kind === "schematic" ? "concepts methods 概念 方法图" : "data retained results 数据 保留结果"].join(" ")}>
+      <div class="figure-library__figure-heading"><span>{figureLabel(entry.id)}</span><h3>{entry.title}</h3></div>
+      <a class="figure-library__preview" href={asset(entry.pdf)} data-library-preview aria-label={`${t("Open PDF", "打开 PDF")}: ${entry.title}`}>
+        <img src={asset(entry.file)} width={entry.width} height={entry.height} alt={entry.alt} loading="lazy" decoding="async" />
+        <span class="figure-library__enlarge" data-library-enlarge hidden aria-hidden="true">{t("Enlarge figure", "放大图件")} ↗</span>
+      </a>
+      <figcaption>
+        <p data-figure-caption>{entry.caption}</p>
+        <p class="figure-library__dates" data-figure-dates>{t("Visual revision", "图件视觉更新")}: <time datetime={entry.visual_revision_date}>{entry.visual_revision_date}</time>{entry.source_dates.length > 0 && <span> · {t("Source dates", "来源日期")}: {entry.source_dates.map((date, index) => <>{index > 0 && ", "}<time datetime={date}>{date}</time></>)}</span>}</p>
+        <p class="figure-library__source" data-figure-source>{entry.source_note}</p>
+        <div class="figure-library__downloads" data-figure-downloads>
+          <a href={asset(entry.pdf)} download>{t("Vector PDF", "矢量 PDF")}<span aria-hidden="true">↓</span></a>
+          {"pptx" in entry && entry.pptx && <a href={asset(entry.pptx)} download>{t("Editable PPTX", "可编辑 PPTX")}<span aria-hidden="true">↓</span></a>}
+          <a href={asset(entry.file)} download>PNG<span aria-hidden="true">↓</span></a>
+        </div>
+      </figcaption>
+    </figure>)}</div>
+  </section>)}
+  <section id="teaching-views" class="figure-library__group" data-library-group aria-labelledby="teaching-views-title">
+    <header><h2 id="teaching-views-title">{t("Interactive teaching views", "交互式教学视图")}</h2><p>{t("Open a teaching question in its existing lesson. Each view states its source and evidence boundary.", "在已有课程中打开教学问题。每个视图均说明其来源与证据边界。")}</p></header>
+    <ol class="figure-library__teaching">{views.map(([track, view], index) => <li data-library-item data-kind="interactive" data-search={[view.question.en, view.question.zh, view.state.en, view.state.zh, view.mechanism.en, view.mechanism.zh, "interactive teaching view 交互式 教学 视图"].join(" ")}>
+      <span class="figure-library__view-number">{t("View", "视图")} {String(index + 1).padStart(2, "0")}</span>
+      <div><a href={withSiteBase(`/${chinese ? "zh-cn/" : ""}learn/${view.lesson}/#scientific-view-${track}`, import.meta.env.BASE_URL)}>{chinese ? view.question.zh : view.question.en}<span aria-hidden="true"> ↗</span></a><p>{chinese ? view.state.zh : view.state.en}</p></div>
+    </li>)}</ol>
+  </section>
+  <dialog class="figure-library__dialog" id="figure-library-zoom" aria-labelledby="figure-zoom-title" aria-describedby="figure-zoom-caption" data-library-dialog>
+    <div class="figure-library__dialog-heading"><h2 id="figure-zoom-title" data-zoom-title></h2><button type="button" data-zoom-close autofocus>{t("Close figure", "关闭图件")}</button></div>
+    <div class="figure-library__zoom-toolbar"><button type="button" data-zoom-size aria-pressed="false">{t("Actual size", "实际尺寸")}</button><span>{t("Use actual size to inspect details; scroll within the image.", "切换实际尺寸检查细节，可在图像区域内滚动。")}</span></div>
+    <div class="figure-library__zoom-viewport" tabindex="0" role="region" aria-label={t("Enlarged figure", "放大的图件")}><img data-zoom-image alt="" /></div>
+    <div class="figure-library__zoom-copy"><p id="figure-zoom-caption" data-zoom-caption></p><p class="figure-library__dates" data-zoom-dates></p><p class="figure-library__source" data-zoom-source></p></div>
+    <div class="figure-library__downloads" data-zoom-downloads></div>
+  </dialog>
+</section>
+<script>
+  function initializeFigureLibrary() {
+    document.querySelectorAll<HTMLElement>("[data-figure-library]").forEach(library => {
+      if (library.dataset.ready) return;
+      library.dataset.ready = "true";
+      const chinese = library.dataset.chinese === "true";
+      const t = (en: string, zh: string) => chinese ? zh : en;
+      const controls = library.querySelector<HTMLFormElement>("[data-library-controls]")!;
+      const search = library.querySelector<HTMLInputElement>("[data-library-search]")!;
+      const type = library.querySelector<HTMLSelectElement>("[data-library-type]")!;
+      const count = library.querySelector<HTMLElement>("[data-library-count]")!;
+      const empty = library.querySelector<HTMLElement>("[data-library-empty]")!;
+      const items = [...library.querySelectorAll<HTMLElement>("[data-library-item]")];
+      const groups = [...library.querySelectorAll<HTMLElement>("[data-library-group]")];
+      const resets = [...library.querySelectorAll<HTMLButtonElement>("[data-library-reset]")];
+      const normalize = (value: string) => value.normalize("NFKC").toLocaleLowerCase();
+      const searchable = new Map(items.map(item => [item, normalize(item.dataset.search ?? "")]));
+      let typing = false;
+
+      function render() {
+        const words = normalize(search.value).trim().split(/\s+/u).filter(Boolean);
+        let figures = 0;
+        let views = 0;
+        for (const item of items) {
+          item.hidden = (type.value !== "all" && type.value !== item.dataset.kind) || !words.every(word => searchable.get(item)!.includes(word));
+          if (!item.hidden) item.dataset.kind === "interactive" ? views++ : figures++;
+        }
+        for (const group of groups) group.hidden = !group.querySelector("[data-library-item]:not([hidden])");
+        count.textContent = t(`${figures} of ${library.dataset.figureTotal} figures · ${views} of ${library.dataset.viewTotal} teaching views`, `${library.dataset.figureTotal} 张图件中显示 ${figures} 张 · ${library.dataset.viewTotal} 个教学视图中显示 ${views} 个`);
+        empty.hidden = figures + views > 0;
+        resets.forEach(button => button.disabled = !search.value && type.value === "all");
+      }
+      function writeURL(mode: "push" | "replace") {
+        const url = new URL(window.location.href);
+        const query = search.value.trim();
+        if (query) url.searchParams.set("q", query); else url.searchParams.delete("q");
+        if (type.value !== "all") url.searchParams.set("type", type.value); else url.searchParams.delete("type");
+        if (url.href !== window.location.href) window.history[mode === "push" ? "pushState" : "replaceState"]({}, "", url);
+      }
+      function readURL() {
+        const params = new URL(window.location.href).searchParams;
+        search.value = params.get("q") ?? "";
+        const selected = params.get("type");
+        type.value = ["schematic", "plot", "interactive"].includes(selected ?? "") ? selected! : "all";
+        typing = false;
+        render();
+      }
+      controls.hidden = false;
+      search.addEventListener("input", () => { render(); writeURL(typing ? "replace" : "push"); typing = true; });
+      search.addEventListener("blur", () => typing = false);
+      controls.addEventListener("submit", event => { event.preventDefault(); typing = false; });
+      type.addEventListener("change", () => { typing = false; render(); writeURL("push"); });
+      resets.forEach(button => button.addEventListener("click", () => {
+        search.value = ""; type.value = "all"; typing = false; render(); writeURL("push"); search.focus();
+      }));
+      window.addEventListener("popstate", readURL);
+      readURL();
+      writeURL("replace");
+
+      const dialog = library.querySelector<HTMLDialogElement>("[data-library-dialog]")!;
+      if (typeof dialog.showModal !== "function") return;
+      const image = dialog.querySelector<HTMLImageElement>("[data-zoom-image]")!;
+      const size = dialog.querySelector<HTMLButtonElement>("[data-zoom-size]")!;
+      const close = dialog.querySelector<HTMLButtonElement>("[data-zoom-close]")!;
+      let opener: HTMLAnchorElement | null = null;
+      library.querySelectorAll<HTMLAnchorElement>("[data-library-preview]").forEach(preview => {
+        const figure = preview.closest<HTMLElement>("[data-library-figure]")!;
+        const title = figure.querySelector("h3")!.textContent!;
+        preview.setAttribute("aria-label", `${t("Enlarge figure", "放大图件")}: ${title}`);
+        preview.setAttribute("aria-haspopup", "dialog");
+        preview.setAttribute("aria-controls", dialog.id);
+        preview.querySelector<HTMLElement>("[data-library-enlarge]")!.hidden = false;
+        preview.addEventListener("click", event => {
+          if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+          event.preventDefault();
+          opener = preview;
+          const original = preview.querySelector("img")!;
+          image.src = original.src; image.alt = original.alt;
+          image.width = Number(original.getAttribute("width")); image.height = Number(original.getAttribute("height"));
+          dialog.querySelector("[data-zoom-title]")!.textContent = `${figure.querySelector(".figure-library__figure-heading > span")!.textContent} · ${title}`;
+          dialog.querySelector("[data-zoom-caption]")!.textContent = figure.querySelector("[data-figure-caption]")!.textContent;
+          dialog.querySelector("[data-zoom-dates]")!.replaceChildren(...[...figure.querySelector("[data-figure-dates]")!.childNodes].map(node => node.cloneNode(true)));
+          dialog.querySelector("[data-zoom-source]")!.textContent = figure.querySelector("[data-figure-source]")!.textContent;
+          dialog.querySelector("[data-zoom-downloads]")!.replaceChildren(...[...figure.querySelectorAll("[data-figure-downloads] a")].map(link => link.cloneNode(true)));
+          dialog.dataset.actualSize = "false";
+          size.setAttribute("aria-pressed", "false"); size.textContent = t("Actual size", "实际尺寸");
+          dialog.showModal(); close.focus();
+          const viewport = dialog.querySelector<HTMLElement>(".figure-library__zoom-viewport")!;
+          viewport.scrollTo(0, 0);
+        });
+      });
+      size.addEventListener("click", () => {
+        const actual = dialog.dataset.actualSize !== "true";
+        dialog.dataset.actualSize = String(actual);
+        size.setAttribute("aria-pressed", String(actual));
+        size.textContent = actual ? t("Fit to window", "适应窗口") : t("Actual size", "实际尺寸");
+      });
+      dialog.addEventListener("keydown", event => {
+        if (event.key !== "Tab") return;
+        const targets = [...dialog.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], [tabindex="0"]')];
+        const boundary = event.shiftKey ? targets[0] : targets.at(-1);
+        if (document.activeElement === boundary) {
+          event.preventDefault();
+          (event.shiftKey ? targets.at(-1) : targets[0])?.focus();
+        }
+      });
+      close.addEventListener("click", () => dialog.close());
+      dialog.addEventListener("close", () => { opener?.focus(); image.removeAttribute("src"); });
+    });
+  }
+  initializeFigureLibrary();
+  document.addEventListener("astro:page-load", initializeFigureLibrary);
+</script>
+<style>
+  .figure-library { max-width: 80rem; margin-inline: auto; }
+  .figure-library [hidden] { display: none !important; }
+  .figure-library__header { display: grid; gap: .6rem; }
+  .figure-library__header .eyebrow { margin: 0; }
+  .figure-library__header .page-heading { max-width: none; font-size: clamp(1.85rem, 3vw, 2.5rem); }
+  .figure-library__header .page-intro { max-width: 85ch; font-size: 1rem; line-height: 1.6; }
+  .figure-library__nav { display: flex; flex-wrap: wrap; gap: .1rem 1.5rem; margin-block: .8rem; border-block: 1px solid var(--atlas-rule); }
+  .figure-library__nav a, .figure-library__downloads a { display: inline-flex; align-items: center; justify-content: space-between; min-height: 44px; gap: 1rem; font-size: .8rem; }
+  .figure-library__boundary { color: var(--atlas-muted); font-size: .8rem; line-height: 1.6; }
+  .figure-library__boundary summary { width: fit-content; min-height: 44px; align-content: center; cursor: pointer; }
+  .figure-library__boundary p { max-width: 100ch; margin-block: 0 .8rem; }
+  .figure-library__controls { display: flex; align-items: end; flex-wrap: wrap; gap: .65rem; margin-top: .6rem; padding: .8rem; background: var(--atlas-surface); border: 1px solid var(--atlas-rule); }
+  .figure-library__controls label { display: grid; gap: .35rem; font-size: .8rem; font-weight: 650; }
+  .figure-library__search { flex: 1 1 20rem; }
+  .figure-library input, .figure-library select, .figure-library button { min-height: 44px; font: inherit; color: var(--atlas-ink); border: 1px solid var(--atlas-rule-strong); border-radius: .25rem; background: var(--atlas-panel); padding: .55rem .7rem; }
+  .figure-library input { width: 100%; min-width: 0; }
+  .figure-library select { max-width: 100%; }
+  .figure-library button { cursor: pointer; font-size: .8rem; }
+  .figure-library button:disabled { opacity: .55; cursor: default; }
+  .figure-library__controls > p { flex-basis: 100%; margin: 0; color: var(--atlas-muted); font-size: .75rem; }
+  .figure-library :is(a, button, input, select, summary, [tabindex]):focus-visible { outline: 3px solid var(--atlas-teal-deep); outline-offset: 3px; }
+  .figure-library__count { margin-block: .8rem 0; font-size: .85rem; color: var(--atlas-muted); }
+  .figure-library__empty { padding-block: 1.5rem; }
+  .figure-library__empty h2 { font-size: 1.3rem; }
+  .figure-library__group { margin-top: 1.5rem; scroll-margin-top: 2rem; }
+  .figure-library__group > header { max-width: 85ch; margin-bottom: 1rem; }
+  .figure-library__group h2 { margin: 0 0 .4rem; font-size: 1.6rem; }
+  .figure-library__group > header > p { margin: 0; color: var(--atlas-muted); font-size: .85rem; line-height: 1.6; }
+  .figure-library__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.8rem 2rem; }
+  .figure-library figure { min-width: 0; margin: 0; padding-top: .7rem; border-top: 2px solid var(--atlas-rule-strong); scroll-margin-top: 2rem; }
+  .figure-library__figure-heading { display: flex; align-items: baseline; gap: .8rem; min-height: 3rem; }
+  .figure-library__figure-heading > span, .figure-library__view-number { font: .7rem var(--atlas-font-mono); color: var(--atlas-muted); white-space: nowrap; }
+  .figure-library h3 { margin: .5rem 0 1rem; font-size: 1.05rem; line-height: 1.4; }
+  .figure-library__preview { position: relative; display: grid; place-items: center; background: #fff; border: 1px solid var(--atlas-rule); }
+  .figure-library__preview img { display: block; width: 100%; height: auto; }
+  .figure-library__enlarge { position: absolute; right: .4rem; bottom: .4rem; padding: .3rem .5rem; color: #fff; background: #153d40; font-size: .75rem; }
+  .figure-library figcaption { font-size: .78rem; line-height: 1.7; }
+  .figure-library figcaption > p { margin: .8rem 0; }
+  .figure-library__dates, .figure-library__source { color: var(--atlas-muted); font-size: .72rem; }
+  .figure-library__downloads { display: flex; flex-wrap: wrap; gap: .2rem 1.2rem; border-top: 1px solid var(--atlas-rule); }
+  .figure-library__teaching { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 2rem; list-style: none; margin: 0; padding: 0; }
+  .figure-library__teaching li { display: flex; gap: .8rem; align-items: baseline; min-width: 0; padding-block: .9rem; border-top: 1px solid var(--atlas-rule); }
+  .figure-library__teaching a { font-size: .9rem; font-weight: 650; }
+  .figure-library__teaching p { margin: .4rem 0 0; font-size: .75rem; color: var(--atlas-muted); }
+  .figure-library__dialog { width: min(90rem, calc(100vw - 2rem)); max-width: none; max-height: calc(100dvh - 2rem); box-sizing: border-box; padding: 1rem; color: var(--atlas-ink); background: var(--atlas-panel); border: 1px solid var(--atlas-rule-strong); }
+  .figure-library__dialog::backdrop { background: rgb(0 0 0 / .72); }
+  .figure-library__dialog-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .figure-library__dialog-heading h2 { margin: 0; font-size: 1.2rem; }
+  .figure-library__dialog-heading button { flex-shrink: 0; }
+  .figure-library__zoom-toolbar { display: flex; gap: .7rem; align-items: center; margin-block: .7rem; font-size: .75rem; color: var(--atlas-muted); }
+  .figure-library__zoom-toolbar button { flex-shrink: 0; }
+  .figure-library__zoom-viewport { overflow: auto; max-height: 62dvh; background: #fff; border: 1px solid var(--atlas-rule); }
+  .figure-library__zoom-viewport img { display: block; width: 100%; height: auto; max-width: none; }
+  .figure-library__dialog[data-actual-size="true"] .figure-library__zoom-viewport img { width: auto; }
+  .figure-library__zoom-copy { font-size: .8rem; line-height: 1.6; }
+  @media(max-width: 54rem) { .figure-library__grid, .figure-library__teaching { grid-template-columns: 1fr; } }
+  @media(max-width: 32rem) { .figure-library__nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .1rem .75rem; } .figure-library__nav a { gap: .4rem; } .figure-library__controls .figure-library__search { flex-basis: 100%; } .figure-library__controls > label:not(.figure-library__search) { flex: 1; min-width: 0; } .figure-library__dialog { padding: .65rem; } .figure-library__dialog-heading { align-items: start; gap: .5rem; } .figure-library__dialog-heading h2 { font-size: 1rem; } }
+  @media(max-width: 25rem) { .figure-library__figure-heading { display: block; } }
+</style>

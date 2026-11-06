@@ -11,6 +11,8 @@ const curriculum = parse(
 ) as { units: Array<{ id: string; lesson_id?: string }> };
 
 const map = "/learn/foundations/curriculum-map/";
+// Exercise the lesson-authored disclosure, not an answer nested in its teaching view.
+const lessonAnswerSelector = ".sl-markdown-content > details[data-worked-answer]";
 const modellingLine = [
   "data-governance/records-to-model-table",
   "machine-learning/baseline-training-validation",
@@ -46,7 +48,8 @@ for (const prefix of ["", "/zh-cn"]) {
         "data-lesson-id",
         lessonId,
       );
-      const answer = page.locator("details[data-worked-answer]").first();
+      const answer = page.locator(lessonAnswerSelector).first();
+      await expect(answer).toBeVisible();
       await expect(answer).not.toHaveAttribute("open", "");
       await answer.locator("summary").focus();
       await page.keyboard.press("Enter");
@@ -77,7 +80,8 @@ for (const prefix of ["", "/zh-cn"]) {
         "data-lesson-id",
         lessonId,
       );
-      const answer = page.locator("details[data-worked-answer]").first();
+      const answer = page.locator(lessonAnswerSelector).first();
+      await expect(answer).toBeVisible();
       await expect(answer).not.toHaveAttribute("open", "");
       await answer.locator("summary").focus();
       await page.keyboard.press("Enter");
@@ -140,7 +144,8 @@ for (const prefix of ["", "/zh-cn"]) {
   }) => {
     for (const id of [...modellingLine, ...mechanismLessons]) {
       expect((await page.goto(`${prefix}/learn/${id}/`))?.status()).toBe(200);
-      const answer = page.locator("details[data-worked-answer]").first();
+      const answer = page.locator(lessonAnswerSelector).first();
+      await expect(answer).toBeVisible();
       await expect(answer).not.toHaveAttribute("open", "");
       await answer.locator("summary").focus();
       await page.keyboard.press("Enter");
@@ -223,6 +228,9 @@ for (const prefix of ["", "/zh-cn"]) {
     page,
   }) => {
     await page.goto(prefix ? `${prefix}/` : "/");
+    // Home now introduces learning through the hub; follow its real curriculum route.
+    await page.locator(`main a[href="${prefix}/learn/"]`).first().click();
+    await expect(page).toHaveURL(`${prefix}/learn/`);
     const mapLink = page.locator(`main a[href^="${prefix}${map}"]`).first();
     await expect(mapLink).toBeVisible();
     await mapLink.click();

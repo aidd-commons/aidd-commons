@@ -1,6 +1,7 @@
 ---
 import developmentSummary from "../../../labs/rmd17_system_state/development-summary.json";
 import { validateRmd17DevelopmentSummary } from "../lib/rmd17-development-summary.js";
+import ScientificPlot from "./ScientificPlot.astro";
 
 const summary = validateRmd17DevelopmentSummary(developmentSummary);
 const developmentSystemIds = Object.keys(summary.development_evaluation);
@@ -167,10 +168,14 @@ const claimRows = [
                 <strong>{feature.channel_count}</strong> pair channels · <strong>{feature.feature_dimension}</strong> features
               </p>
               <code>{feature.element_pair_channels.join(" · ")}</code>
+              <div class="rmd17-panel__channel-layout" role="img" aria-label={`${systemId}: ${feature.channel_count} channels, each with ${ordinaryBinCount} ordinary bins and ${overflowBinCount} overflow bin; layout only, no bin heights shown`}>
+                {feature.element_pair_channels.map(channel => <div><span>{channel}</span><i style={`--bin-count:${summary.features.bins_per_channel}`}><b /></i></div>)}
+              </div>
             </li>
           ))
         }
       </ul>
+      <p class="rmd17-panel__note">Each lane is a channel layout, not observed histogram heights. Fine divisions denote {ordinaryBinCount} ordinary bins; the outlined terminal bin retains overflow. The channel count changes with the system's element composition.</p>
     </section>
 
     <section aria-labelledby="rmd17-selection-title">
@@ -186,6 +191,9 @@ const claimRows = [
           scalers, and feature dimensions remain system-specific.
         </p>
       </div>
+      <ScientificPlot title="rMD17: complete frozen validation grid" xLabel="log10(alpha) · −3 to 3 means 0.001 to 1000" yLabel="Validation MAE · kcal/mol · lower is better" xMin={-3} xMax={3} xTicks={[-3,-2,-1,0,1,2,3]} yMin={2.5} yMax={3.2} yTicks={[2.5,2.7,2.9,3.1,3.2]} showTable={false} series={[{name:"Median validation MAE",color:"var(--atlas-teal-deep)",marker:0,points:summary.selection.validation_grid.map(entry=>({x:Math.log10(entry.alpha),y:entry.median_validation_mae,label:entry.alpha===summary.selection.selected_alpha?"selected":undefined}))},...developmentSystemIds.map((systemId,index)=>({name:systemId,color:"var(--atlas-muted)",marker:index+1,dashed:true,points:summary.selection.validation_grid.map(entry=>({x:Math.log10(entry.alpha),y:entry.per_system_validation_mae[systemId]}))}))]} />
+      <p class="rmd17-panel__note">The point-and-line axis spans 2.5–3.2 kcal/mol. All frozen alpha values and both development systems are shown; the median combines system-level validation scalars.</p>
+      <details class="rmd17-panel__grid-table"><summary>Exact frozen validation grid</summary><div class="rmd17-panel__table-wrap" role="region" aria-label="Every rMD17 validation alpha and system score" tabindex="0"><table><caption>MAE in kcal/mol; no settings or systems omitted.</caption><thead><tr><th scope="col">Alpha</th>{developmentSystemIds.map(system=><th scope="col">{system}</th>)}<th scope="col">Median</th></tr></thead><tbody>{summary.selection.validation_grid.map(entry=><tr><th scope="row">{entry.alpha}</th>{developmentSystemIds.map(system=><td>{entry.per_system_validation_mae[system].toFixed(6)}</td>)}<td>{entry.median_validation_mae.toFixed(6)}</td></tr>)}</tbody></table></div></details>
       <div
         class="rmd17-panel__table-wrap"
         role="region"
@@ -193,7 +201,7 @@ const claimRows = [
         tabindex="0"
       >
         <table>
-          <caption>Within-system development evaluation; lower error is better.</caption>
+          <caption>Within-system development evaluation; errors and target ranges in kcal/mol. Lower error is better.</caption>
           <thead>
             <tr>
               <th scope="col">System</th>
@@ -323,410 +331,21 @@ const claimRows = [
       </p>
     </section>
   </div>
+  <p class="rmd17-panel__source">Source: {developmentSummary.protocol_id} · reviewed {developmentSummary.reviewed_on} · <a href={`https://doi.org/${developmentSummary.source.doi}`}>rMD17 version {developmentSummary.source.version}</a>, {developmentSummary.source.licence}. This panel preserves the development snapshot.</p>
 </section>
 
 <style>
-  .rmd17-panel {
-    margin-block: 2rem 3rem;
-    overflow: hidden;
-    border: 1px solid var(--atlas-rule);
-    background:
-      radial-gradient(
-        circle at 100% 0,
-        color-mix(in srgb, var(--atlas-teal) 15%, transparent),
-        transparent 28rem
-      ),
-      var(--atlas-panel);
-    box-shadow: var(--atlas-shadow);
-  }
-
-  .rmd17-panel__header,
-  .rmd17-panel__body > section {
-    min-width: 0;
-    padding: clamp(1.1rem, 3vw, 1.75rem);
-  }
-
-  .rmd17-panel__header {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 1.25rem;
-    align-items: start;
-    border-bottom: 1px solid var(--atlas-rule);
-  }
-
-  .rmd17-panel__header > div {
-    max-width: 48rem;
-  }
-
-  .rmd17-panel__eyebrow,
-  .rmd17-panel__section-heading > p {
-    margin: 0 0 0.35rem;
-    color: var(--atlas-teal-deep);
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .rmd17-panel h2,
-  .rmd17-panel h3,
-  .rmd17-panel h4,
-  .rmd17-panel p {
-    overflow-wrap: anywhere;
-  }
-
-  .rmd17-panel h2 {
-    margin: 0;
-    color: var(--atlas-ink);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(1.65rem, 4vw, 2.5rem);
-    font-weight: 500;
-    letter-spacing: -0.03em;
-    line-height: 1.05;
-  }
-
-  .rmd17-panel__header p:last-child,
-  .rmd17-panel__note,
-  .rmd17-panel__system-grid p,
-  .rmd17-panel__selection-callout p {
-    color: var(--atlas-muted);
-  }
-
-  .rmd17-panel__status,
-  .rmd17-panel__system-grid,
-  .rmd17-panel__feature-grid,
-  .rmd17-panel__diagnostics,
-  .rmd17-panel__aggregate-grid,
-  .rmd17-panel__lock-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .rmd17-panel__status {
-    display: grid;
-    gap: 0.5rem;
-  }
-
-  .rmd17-panel__status-item {
-    display: inline-flex;
-    min-height: 2.25rem;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.45rem 0.65rem;
-    border: 1px solid var(--atlas-rule);
-    background: color-mix(in srgb, var(--atlas-bg) 72%, transparent);
-    color: var(--atlas-ink);
-    font-size: 0.78rem;
-    font-weight: 750;
-  }
-
-  .rmd17-panel__status-item--observed span {
-    color: var(--atlas-teal-deep);
-  }
-
-  .rmd17-panel__status-item--boundary span {
-    color: var(--atlas-coral);
-  }
-
-  .rmd17-panel__body > section {
-    border-bottom: 1px solid var(--atlas-rule);
-  }
-
-  .rmd17-panel__body > section:last-child {
-    border-bottom: 0;
-  }
-
-  .rmd17-panel__section-heading h3 {
-    margin: 0;
-    color: var(--atlas-ink);
-    font-size: clamp(1.05rem, 2vw, 1.3rem);
-  }
-
-  .rmd17-panel__system-grid,
-  .rmd17-panel__feature-grid,
-  .rmd17-panel__diagnostics,
-  .rmd17-panel__aggregate-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-    gap: 0.75rem;
-    margin-top: 1rem;
-  }
-
-  .rmd17-panel__system-grid li,
-  .rmd17-panel__feature-grid li,
-  .rmd17-panel__diagnostics li,
-  .rmd17-panel__aggregate-grid li {
-    min-width: 0;
-    padding: 0.9rem;
-    border: 1px solid var(--atlas-rule);
-    background: color-mix(in srgb, var(--atlas-bg) 46%, transparent);
-  }
-
-  .rmd17-panel__system-grid strong,
-  .rmd17-panel__system-grid span,
-  .rmd17-panel__feature-grid h4,
-  .rmd17-panel__diagnostics h4,
-  .rmd17-panel__aggregate-grid span,
-  .rmd17-panel__aggregate-grid strong {
-    display: block;
-  }
-
-  .rmd17-panel__system-grid strong,
-  .rmd17-panel__feature-grid h4,
-  .rmd17-panel__diagnostics h4,
-  .rmd17-panel__aggregate-grid strong {
-    color: var(--atlas-ink);
-    font-size: 1rem;
-  }
-
-  .rmd17-panel__system-grid span {
-    margin-top: 0.25rem;
-    color: var(--atlas-teal-deep);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.76rem;
-  }
-
-  .rmd17-panel__aggregate-grid span {
-    color: var(--atlas-teal-deep);
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  .rmd17-panel__aggregate-grid strong {
-    margin-top: 0.45rem;
-  }
-
-  .rmd17-panel__system-grid p,
-  .rmd17-panel__feature-grid p,
-  .rmd17-panel__diagnostics p,
-  .rmd17-panel__aggregate-grid p {
-    margin: 0.55rem 0 0;
-    font-size: 0.86rem;
-  }
-
-  .rmd17-panel__timeline,
-  .rmd17-panel__construction {
-    display: flex;
-    gap: 0.65rem;
-    margin: 1rem 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .rmd17-panel__timeline {
-    overflow: hidden;
-    border: 1px solid var(--atlas-rule);
-  }
-
-  .rmd17-panel__timeline li {
-    display: grid;
-    min-width: 0;
-    gap: 0.2rem;
-    padding: 0.75rem;
-    border-right: 1px solid var(--atlas-rule);
-    background: color-mix(in srgb, var(--atlas-teal) 15%, var(--atlas-panel));
-  }
-
-  .rmd17-panel__timeline li:nth-child(2) {
-    background: color-mix(in srgb, var(--atlas-teal) 30%, var(--atlas-panel));
-  }
-
-  .rmd17-panel__timeline li:last-child {
-    border-right: 0;
-    background: color-mix(in srgb, var(--atlas-coral) 18%, var(--atlas-panel));
-  }
-
-  .rmd17-panel__timeline span:first-child,
-  .rmd17-panel__construction span {
-    color: var(--atlas-muted);
-    font-size: 0.68rem;
-    font-weight: 750;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  .rmd17-panel__timeline span:first-child {
-    color: var(--atlas-ink);
-  }
-
-  .rmd17-panel__timeline strong {
-    color: var(--atlas-ink);
-    font-size: clamp(1.15rem, 3vw, 1.55rem);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .rmd17-panel__timeline span:last-child {
-    font-size: 0.78rem;
-  }
-
-  .rmd17-panel__construction {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .rmd17-panel__construction li {
-    display: grid;
-    gap: 0.35rem;
-    min-width: 0;
-    padding: 0.85rem;
-    border: 1px solid var(--atlas-rule);
-  }
-
-  .rmd17-panel__construction strong {
-    color: var(--atlas-ink);
-    font-size: 0.9rem;
-  }
-
-  .rmd17-panel__feature-grid code {
-    display: block;
-    margin-top: 0.65rem;
-    color: var(--atlas-muted);
-    font-size: 0.7rem;
-    line-height: 1.5;
-    overflow-wrap: anywhere;
-  }
-
-  .rmd17-panel__selection-callout {
-    display: grid;
-    grid-template-columns: auto auto minmax(0, 1fr);
-    gap: 0.8rem;
-    align-items: center;
-    margin: 1rem 0;
-    padding: 0.9rem;
-    border-left: 4px solid var(--atlas-teal);
-    background: color-mix(in srgb, var(--atlas-teal) 8%, transparent);
-  }
-
-  .rmd17-panel__selection-callout span {
-    color: var(--atlas-teal-deep);
-    font-size: 0.73rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .rmd17-panel__selection-callout strong {
-    color: var(--atlas-ink);
-    font-size: 1.15rem;
-    white-space: nowrap;
-  }
-
-  .rmd17-panel__selection-callout p {
-    margin: 0;
-    font-size: 0.85rem;
-  }
-
-  .rmd17-panel__table-wrap {
-    max-width: 100%;
-    overflow-x: auto;
-    border: 1px solid var(--atlas-rule);
-  }
-
-  .rmd17-panel table {
-    width: 100%;
-    min-width: 36rem;
-    border-collapse: collapse;
-    font-size: 0.82rem;
-  }
-
-  .rmd17-panel caption {
-    padding: 0.75rem;
-    color: var(--atlas-muted);
-    text-align: left;
-  }
-
-  .rmd17-panel th,
-  .rmd17-panel td {
-    padding: 0.65rem;
-    border-top: 1px solid var(--atlas-rule);
-    text-align: left;
-    vertical-align: top;
-  }
-
-  .rmd17-panel thead th {
-    color: var(--atlas-teal-deep);
-    font-size: 0.7rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-
-  .rmd17-panel td {
-    font-variant-numeric: tabular-nums;
-  }
-
-  .rmd17-panel__diagnostics dl {
-    display: grid;
-    gap: 0.65rem;
-    margin: 0.8rem 0 0;
-  }
-
-  .rmd17-panel__diagnostics dt {
-    color: var(--atlas-teal-deep);
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  .rmd17-panel__diagnostics dd {
-    margin: 0.2rem 0 0;
-    font-size: 0.8rem;
-    line-height: 1.45;
-  }
-
-  .rmd17-panel__lock-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-    gap: 0.7rem;
-    margin-top: 1rem;
-  }
-
-  .rmd17-panel__lock-list li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    padding: 0.7rem;
-    border: 1px solid var(--atlas-rule);
-  }
-
-  .rmd17-panel__lock-list code {
-    color: var(--atlas-ink);
-    font-weight: 800;
-  }
-
-  @media (max-width: 42rem) {
-    .rmd17-panel__header,
-    .rmd17-panel__selection-callout {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .rmd17-panel__timeline,
-    .rmd17-panel__construction {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .rmd17-panel__timeline li {
-      border-right: 0;
-      border-bottom: 1px solid var(--atlas-rule);
-    }
-
-    .rmd17-panel__timeline li:last-child {
-      border-bottom: 0;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .rmd17-panel,
-    .rmd17-panel * {
-      scroll-behavior: auto !important;
-      transition-duration: 0.01ms !important;
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-    }
-  }
+  .rmd17-panel{min-width:0;margin-block:2rem 3rem;padding-block:1.5rem;border-block:1px solid var(--atlas-rule-strong);background:var(--atlas-panel);color:var(--atlas-ink)}
+  .rmd17-panel__header{display:grid;grid-template-columns:minmax(0,1fr) minmax(10rem,.6fr);gap:1.5rem;border-bottom:1px solid var(--atlas-rule);padding-bottom:1.3rem}.rmd17-panel__eyebrow,.rmd17-panel__section-heading>p{font-size:.75rem;color:var(--atlas-teal-deep);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin:0 0 .45rem}.rmd17-panel h2{margin:0;font-size:clamp(1.6rem,3vw,2.2rem);line-height:1.15;font-weight:600}.rmd17-panel__header>div>p:last-child{font-size:.9rem;color:var(--atlas-muted)}.rmd17-panel h3{font-size:1rem;line-height:1.4;margin:0}.rmd17-panel h4{font-size:.9rem;margin:.2rem 0}
+  .rmd17-panel__status,.rmd17-panel__system-grid,.rmd17-panel__feature-grid,.rmd17-panel__aggregate-grid,.rmd17-panel__diagnostics,.rmd17-panel__lock-list{list-style:none;padding:0;margin:0}.rmd17-panel__status{display:grid;gap:.65rem}.rmd17-panel__status-item{font-size:.78rem;line-height:1.5;border-left:2px solid var(--atlas-teal-deep);padding:.45rem 0 .45rem .7rem}.rmd17-panel__status-item--boundary{border-left:2px dashed var(--atlas-emphasis)}.rmd17-panel__status-item>span{display:none}
+  .rmd17-panel__body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 1.5rem}.rmd17-panel__body>section{min-width:0;padding-block:1.3rem;border-bottom:1px solid var(--atlas-rule)}.rmd17-panel__body>section:nth-child(n+3){grid-column:1/-1}.rmd17-panel__section-heading{margin-bottom:1rem}
+  .rmd17-panel__system-grid,.rmd17-panel__feature-grid,.rmd17-panel__aggregate-grid,.rmd17-panel__diagnostics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-top:1rem}.rmd17-panel__system-grid li,.rmd17-panel__feature-grid li,.rmd17-panel__aggregate-grid li,.rmd17-panel__diagnostics li{min-width:0;border-top:2px solid var(--atlas-rule-strong);padding-top:.75rem}.rmd17-panel__system-grid strong,.rmd17-panel__system-grid span,.rmd17-panel__aggregate-grid span,.rmd17-panel__aggregate-grid strong{display:block}.rmd17-panel__system-grid strong{font-size:.95rem}.rmd17-panel__system-grid span{font-family:var(--sl-font-mono,monospace);font-size:.75rem;overflow-wrap:anywhere;color:var(--atlas-teal-deep);margin:.3rem 0}.rmd17-panel__system-grid p,.rmd17-panel__feature-grid p,.rmd17-panel__aggregate-grid p{font-size:.78rem;line-height:1.6;margin:.4rem 0;color:var(--atlas-muted)}.rmd17-panel__aggregate-grid span{font-size:.75rem;color:var(--atlas-muted)}.rmd17-panel__aggregate-grid strong{font-size:1rem;margin-top:.3rem;font-weight:600;font-variant-numeric:tabular-nums}
+  .rmd17-panel__timeline{display:flex;gap:2px;list-style:none;padding:0;margin:1.2rem 0}.rmd17-panel__timeline li{min-width:0;padding-top:.65rem;border-top:12px solid var(--atlas-teal-deep);display:grid;gap:.2rem}.rmd17-panel__timeline li:nth-child(2){border-top-color:color-mix(in srgb,var(--atlas-teal) 40%,var(--atlas-panel))}.rmd17-panel__timeline li:nth-child(3){border-top-color:var(--atlas-muted);border-top-style:double}.rmd17-panel__timeline span{font-size:.75rem;color:var(--atlas-muted);overflow-wrap:anywhere}.rmd17-panel__timeline strong{font-size:1.4rem;line-height:1.3;font-weight:600;font-variant-numeric:tabular-nums}
+  .rmd17-panel__construction{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;list-style:none;padding:0;margin:1rem 0}.rmd17-panel__construction li{min-width:0;border-top:2px solid var(--atlas-teal-deep);padding:.65rem 0;display:grid;gap:.4rem}.rmd17-panel__construction span{font-size:.75rem;color:var(--atlas-muted)}.rmd17-panel__construction strong{font-size:.85rem;font-weight:600;line-height:1.5;overflow-wrap:anywhere}.rmd17-panel__feature-grid code{font-size:.75rem;line-height:1.6;display:block;overflow-wrap:anywhere;color:var(--atlas-muted)}
+  .rmd17-panel__channel-layout{display:grid;gap:.45rem;margin-top:1rem}.rmd17-panel__channel-layout>div{display:grid;grid-template-columns:4rem minmax(0,1fr);gap:.5rem;align-items:center}.rmd17-panel__channel-layout span{font-size:.75rem;font-family:var(--sl-font-mono,monospace)}.rmd17-panel__channel-layout i{height:.7rem;position:relative;border:1px solid var(--atlas-rule-strong);background:repeating-linear-gradient(to right,transparent 0,transparent calc(100% / var(--bin-count) - 1px),var(--atlas-rule) calc(100% / var(--bin-count) - 1px),var(--atlas-rule) calc(100% / var(--bin-count)))}.rmd17-panel__channel-layout b{display:block;position:absolute;width:calc(100% / var(--bin-count));min-width:0;height:100%;right:0;background:var(--atlas-panel);border-left:2px solid var(--atlas-emphasis)}
+  .rmd17-panel__selection-callout{display:grid;grid-template-columns:auto auto minmax(0,1fr);align-items:center;gap:.8rem;margin-block:1rem;padding:.75rem 0;border-block:1px solid var(--atlas-rule)}.rmd17-panel__selection-callout span{font-size:.75rem;color:var(--atlas-muted)}.rmd17-panel__selection-callout strong{font-size:1.2rem;font-weight:600;font-variant-numeric:tabular-nums}.rmd17-panel__selection-callout p{font-size:.8rem;margin:0;color:var(--atlas-muted)}
+  .rmd17-panel__table-wrap{max-width:100%;overflow-x:auto}.rmd17-panel table{display:table;width:100%;font-size:.78rem;font-variant-numeric:tabular-nums}.rmd17-panel th,.rmd17-panel td{padding:.6rem;text-align:left;vertical-align:top;min-width:5rem}.rmd17-panel caption{font-size:.78rem;text-align:left;color:var(--atlas-muted);padding-block:.8rem}.rmd17-panel__note,.rmd17-panel__source{font-size:.78rem;color:var(--atlas-muted);line-height:1.6}.rmd17-panel__source{overflow-wrap:anywhere;margin-bottom:0}.rmd17-panel summary{min-height:44px;cursor:pointer;padding-block:.65rem;font-size:.8rem;font-weight:600}.rmd17-panel__grid-table{margin-bottom:.75rem}
+  .rmd17-panel__diagnostics p{font-size:.8rem}.rmd17-panel__diagnostics dl{display:grid;gap:.65rem;margin-top:.7rem}.rmd17-panel__diagnostics dt{font-size:.75rem;color:var(--atlas-muted)}.rmd17-panel__diagnostics dd{font-size:.8rem;margin:.25rem 0 0;font-variant-numeric:tabular-nums;line-height:1.6}.rmd17-panel__lock-list{display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:1rem}.rmd17-panel__lock-list li{font-size:.8rem;display:flex;gap:.75rem;border-top:1px dashed var(--atlas-emphasis);padding-top:.5rem}.rmd17-panel__table-wrap:focus-visible,.rmd17-panel summary:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
+  @media(max-width:48rem){.rmd17-panel__header,.rmd17-panel__body{grid-template-columns:minmax(0,1fr)}.rmd17-panel__body>section:nth-child(n+3){grid-column:auto}.rmd17-panel__status{grid-template-columns:repeat(2,minmax(0,1fr))}.rmd17-panel__selection-callout{grid-template-columns:auto auto}.rmd17-panel__selection-callout p{grid-column:1/-1}}
+  @media(max-width:30rem){.rmd17-panel__construction,.rmd17-panel__feature-grid,.rmd17-panel__diagnostics,.rmd17-panel__status{grid-template-columns:minmax(0,1fr)}.rmd17-panel__system-grid{gap:.75rem}.rmd17-panel__channel-layout>div{grid-template-columns:4rem minmax(0,1fr)}}
 </style>

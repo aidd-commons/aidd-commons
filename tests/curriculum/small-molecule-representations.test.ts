@@ -152,7 +152,7 @@ describe("small-molecule representations depth lesson", () => {
         ),
         "utf8",
       ),
-      readFile(join(repositoryRoot, "site/src/pages/labs/index.astro"), "utf8"),
+      readFile(join(repositoryRoot, "site/dist/labs/index.html"), "utf8"),
     ]);
 
     expect(lab).toContain(
@@ -165,7 +165,7 @@ describe("small-molecule representations depth lesson", () => {
     expect(labIndex).toContain(
       'href="/labs/molecule-representation-inspector/"',
     );
-    expect(labIndex).toContain("Executable representation lab");
+    expect(labIndex).toContain("Label-free molecule representation inspector");
   });
 
   it("promotes the delivered T05 surfaces in the dated self-audit", async () => {

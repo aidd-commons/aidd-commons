@@ -21,10 +21,10 @@ measured, and nothing is a design proposal.
 python labs/sar_attribution/inspect_attribution.py show
 ```
 
-Model explanations are routinely read as statements about which atoms cause
-activity. On real data that reading cannot be checked, because the cause is
-exactly what you were trying to learn. **Here it can**, because the labels come
-from a rule stated in the dataset.
+A model explanation alone cannot establish which atoms cause activity. This
+constructed example makes the proposed interpretation directly checkable because
+the labels come from a rule stated in the dataset. Real biological claims need
+independent evidence that can separate competing explanations.
 
 ## 1. The dataset stores a rule, not labels
 
@@ -104,9 +104,9 @@ correlation, and that is an experiment rather than a re-reading of the same fit.
 carried the larger share of credit, and that was visible only because the
 generating rule was known.
 
-**On real data this check is unavailable.** You cannot compare the explanation to
-the cause, because the cause is what you are trying to find. The analogue is the
-only route left, and it costs an experiment.
+On real data, the generating rule is usually unknown. A controlled analogue
+comparison is one way to challenge the proposed explanation; it is not the only
+possible source of independent mechanistic evidence.
 
 ## Independent exercise
 
@@ -118,38 +118,34 @@ Say what the heat map does and does not support, and design the cheapest
 experiment that would distinguish the two possibilities.
 
 <details data-worked-answer>
-<summary>Worked answer — what the colour means, and the pair to make</summary>
+<summary>Worked answer: test the attribution and the chemical hypothesis separately</summary>
 
-**The heat map supports one claim: the model's prediction depends on those
-atoms.** That is a fact about the fitted function, and it is checkable by
-perturbing the input. It is not a fact about chemistry.
+The heat map assigns importance under a particular attribution method and model.
+First check what that method computes and whether controlled input changes
+produce the predicted response. It does not establish that the sulfonamide causes
+biological activity.
 
-**The competing explanation is a confound, and it is usually the likelier one.**
-If the sulfonamide entered the series early and every subsequent analogue kept it,
-then every active in the training data carries it and the model cannot separate
-its contribution from whatever else those molecules share. The lab above is that
-situation made visible: the confounder took the larger share of credit while
-causing nothing.
+Confounding is one competing explanation. If the training series always keeps
+the sulfonamide together with other features, those data may not distinguish
+their effects. The constructed lab illustrates that possibility; it does not
+establish that confounding is more likely for the colleague's compound.
 
-**"Keep it fixed and optimise elsewhere" is the decision the confound damages
-most.** It removes the only compounds that could have distinguished the two
-explanations, and it does so before the question is asked. After that round, the
-correlation is stronger and the heat map looks more convincing, having gained no
-new evidence.
+Holding the group fixed can prevent the next round from testing its necessity.
+A useful proposal therefore compares an analogue that removes or replaces the
+sulfonamide with an appropriate retained-group control, changing other features
+as little as feasible. Choose the pair and measurements with the assay, chemical
+feasibility and possible exposure changes in view. A matched pair is a bounded
+test, not automatically the cheapest informative experiment.
 
-**The cheapest experiment is a matched pair.** Make one analogue that removes or
-replaces the sulfonamide while holding the rest of the molecule as fixed as
-synthesis allows, and one that keeps the sulfonamide but changes a region the
-model treats as unimportant. If activity survives removal, the attribution was
-reading a confound. If it collapses, the hypothesis survives this test — which is
-not the same as being confirmed, and the next series will re-confound it unless
-the pair is repeated.
+Activity retained after removal would challenge a necessity claim under those
+conditions. Activity lost after removal would be consistent with a role for the
+group, but could also reflect another changed property. Neither outcome alone
+identifies a causal mechanism.
 
-**And check what the model says about the pair before making it.** In the lab
-above the model gave two molecules of opposite true activity scores 0.0300 apart
-and in the wrong order. A model that cannot separate the pair on paper is telling
-you the pair is worth making, and that its own attribution should not be used to
-skip it.
+Record the model's predictions before obtaining new evidence. In the constructed
+lab, two molecules with opposite authored activity have scores only 0.0300 apart
+and in the wrong order. That is a reason to question this model's discrimination
+on the pair, not proof that the same pair will be decisive in a real experiment.
 
 </details>
 

@@ -33,8 +33,10 @@ jobs:
             pnpm install --no-frozen-lockfile
           fi
       - run: pnpm catalog:validate
-      - run: pnpm exec vitest run tests/catalog
       - run: pnpm catalog:build
+      - run: pnpm workbench:build
+      - run: pnpm exec vitest run tests/catalog
+      - run: pnpm exec vitest run tests/workbench
       - run: pnpm comparisons:validate
       - run: pnpm exec vitest run tests/comparisons
       - run: pnpm comparisons:build
@@ -72,6 +74,7 @@ jobs:
       - run: pnpm catalog:build
       - run: pnpm comparisons:validate
       - run: pnpm comparisons:build
+      - run: pnpm workbench:build
       - run: pnpm exec tsc --noEmit
       - run: pnpm --dir site check
       - run: pnpm --dir site build
@@ -109,6 +112,7 @@ jobs:
           fi
       - run: pnpm catalog:build
       - run: pnpm comparisons:build
+      - run: pnpm workbench:build
       - run: pnpm --dir site build
       - run: pnpm links:internal
       - run: pnpm citations:check
@@ -169,6 +173,7 @@ jobs:
           fi
       - run: pnpm catalog:build
       - run: pnpm comparisons:build
+      - run: pnpm workbench:build
       - run: pnpm --dir site build
       - run: pnpm exec playwright install --with-deps chrome
       - run: pnpm test:e2e
@@ -210,10 +215,11 @@ jobs:
           pnpm catalog:build
           pnpm comparisons:validate
           pnpm comparisons:build
+          pnpm workbench:build
           pnpm exec tsx scripts/release/build.ts --source . --destination "$release_root/public-release" --inventory "$release_root/inventory.txt"
           pnpm exec tsx scripts/release/hygiene.ts "$release_root/public-release" --report artifacts/release-hygiene.json
           test -s "$release_root/inventory.txt"
-          for data_file in resources.v1.json resources.v1.csv openness.v1.json comparison.v1.json comparison.v1.csv; do
+          for data_file in resources.v1.json resources.v1.csv openness.v1.json comparison.v1.json comparison.v1.csv workbench.v1.json search.v1.json; do
             test -s "$release_root/public-release/site/public/data/$data_file"
           done
       - name: Test the export against its own code

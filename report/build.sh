@@ -33,7 +33,8 @@ fi
 # The document carries each figure's caption in the alt text, and that caption is
 # generated from the same committed artefacts as the artwork. The copy is refreshed
 # here, so the document cannot state a number the figures do not.
-"$python_bin" "$project_root/scripts/report/sync-figure-captions.py"
+"$python_bin" "$project_root/scripts/report/sync-figure-captions.py" \
+  --report "$report_dir/aidd-commons-living-report-v0.1.md"
 
 # Pandoc resolves a relative resource path against the working directory, so the build
 # runs from the report directory and the path to the figures stays relative to it. The

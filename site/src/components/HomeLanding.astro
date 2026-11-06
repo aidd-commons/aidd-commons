@@ -1,0 +1,175 @@
+---
+import AtlasFigure from "./AtlasFigure.astro";
+import HomeWorkflow from "./HomeWorkflow.astro";
+import LearningProgressPanel from "./LearningProgressPanel.astro";
+import ScientificIcon from "./ScientificIcon.astro";
+import { catalogResources, siteOverview } from "../lib/site-overview";
+import { withSiteBase } from "../lib/site-paths";
+import { workbenchData } from "../lib/workbench-data";
+
+interface Props { chinese?: boolean; }
+const { chinese = false } = Astro.props;
+const local = (path: string) => withSiteBase(`${chinese ? "/zh-cn" : ""}${path}`, import.meta.env.BASE_URL);
+const link = (path: string) => withSiteBase(path, import.meta.env.BASE_URL);
+const core = workbenchData.routes.find((route) => route.kind === "core")!;
+const progressRoutes = [{ ...core, title: chinese ? core.titleZh : core.title }];
+const progressLessons = workbenchData.tracks.flatMap((track) => track.lessons.map((lesson) => ({ id: lesson.id, title: chinese ? lesson.titleZh : lesson.title, href: link(chinese ? lesson.hrefZh : lesson.href), prerequisiteIds: lesson.prerequisiteIds })));
+const egfrCase = workbenchData.cases.find((entry) => entry.id === "egfr-assay-transfer");
+const backgrounds = chinese ? [
+  { label: "从生物与化学进入", title: "把实验问题变成模型任务", description: "从测定、分子与目标端点开始，再读表示与基线。", track: "drug-discovery-foundations", detail: "测定 → 表示 → 预测" },
+  { label: "从 AI 与计算进入", title: "先认识模型之外的生物对象", description: "区分记录、化学 parent、测定和靶点，理解数据如何形成。", track: "data-governance", detail: "对象 → 数据 → 评价" },
+  { label: "从研究与工程进入", title: "为一个真实比较建立证据链", description: "限定任务与复用条件，检查资源、协议和已有结果。", track: "evaluation-and-reproducibility", detail: "问题 → 比较 → 来源" },
+] : [
+  { label: "From biology & chemistry", title: "Turn an experimental question into a model task", description: "Begin with the assay, molecule and endpoint, then read representations and baselines.", track: "drug-discovery-foundations", detail: "Assay → representation → prediction" },
+  { label: "From AI & computation", title: "Meet the biological objects behind the model", description: "Separate records, chemical parents, assays and targets. See how a model table is made.", track: "data-governance", detail: "Object → data → evaluation" },
+  { label: "From research & engineering", title: "Build an evidence trail for a real comparison", description: "Bound the task and reuse conditions. Inspect resources, protocols and existing results.", track: "evaluation-and-reproducibility", detail: "Question → comparison → source" },
+];
+const selectedResources = ["model-boltz-2", "db-chembl-37", "tool-rdkit"].map((id) => catalogResources.find((record) => record.id === id)!);
+const backgroundObjects = [["protein", "molecule"], ["data", "model"], ["simulation", "robot"]] as const;
+---
+
+<section class="aidd-home-hero" aria-labelledby="home-title" data-home-workbench>
+  <div class="aidd-home-hero__copy">
+    <p class="eyebrow">{chinese ? "AI 药物发现 · 开放学习与研究工作台" : "AI drug discovery · An open learning & research workbench"}</p>
+    <h1 id="home-title">{chinese ? "从靶点到候选，循着证据前进。" : "Follow the evidence from target to candidate."}</h1>
+  </div>
+  <div class="aidd-home-hero__entry">
+    <p class="aidd-home-hero__purpose">{chinese ? "把一个发现问题连接到课程、资源、代码与证据。先检查已有结果，再开始自己的练习。" : "Connect a discovery question to its lessons, resources, code and evidence. Inspect a retained result, then begin your own exercise."}</p>
+    <div class="aidd-home-hero__actions"><a class="aidd-home-primary" href={local("/learn/")}>{chinese ? "选择学习路径" : "Find your learning route"}<span aria-hidden="true">→</span></a><a class="aidd-home-secondary" href={link("/atlas/")}>{chinese ? "选择资源" : "Choose a resource"}<span aria-hidden="true">↗</span></a><a class="aidd-home-secondary" href={local("/labs/")}>{chinese ? "打开实验" : "Open labs"}<span aria-hidden="true">↗</span></a></div>
+    <p class="aidd-home-collection">{chinese ? `${siteOverview.curriculum.trackCount} 条学习轨道 · ${siteOverview.catalog.count} 条记录` : `${siteOverview.curriculum.trackCount} learning tracks · ${siteOverview.catalog.count} resource records`}</p>
+  </div>
+</section>
+
+<HomeWorkflow chinese={chinese} />
+
+<section class="aidd-home-case" aria-labelledby="home-case-title">
+  <div class="aidd-home-case__story"><p class="eyebrow">{chinese ? "真实结果 · 保留失败证据" : "Worked case · adverse evidence retained"}</p><h2 id="home-case-title">{chinese ? "同一靶点，为什么基线排名会改变？" : "Same target. Why does the baseline ranking change?"}</h2><p>{chinese ? "ChEMBL 37 的 EGFR 比较在主要划分和另一测定上保留了不同的排名。一次固定评价得到了一个结果；它没有保证这个排名能迁移到下一次测定。" : "The ChEMBL 37 EGFR comparison retains different rankings on its primary partition and a separate assay. A frozen evaluation establishes a result; it does not guarantee that the ranking will transfer to another assay."}</p><dl><div><dt>{chinese ? "对象" : "Object"}</dt><dd>EGFR · CHEMBL203</dd></div><div><dt>{chinese ? "端点" : "Endpoint"}</dt><dd>pChEMBL · exact IC50</dd></div><div><dt>{chinese ? "执行模式" : "Mode"}</dt><dd>{chinese ? "阅读已有结果" : "Read retained results"}</dd></div></dl><p class="aidd-home-case__limit">{chinese ? "两个评价是不同的比较。相关采集实验曾访问共享标签；这不是未经接触的确认集，也没有报告置信区间或 p 值。" : "These are separate comparisons. A related acquisition lab had accessed shared labels. This is not untouched confirmation, and no confidence intervals or p values are reported."}</p><a class="aidd-home-primary" href={local("/labs/chembl-egfr-representation-baselines/")}>{chinese ? "检查比较、表格与协议" : "Inspect the comparison, tables and protocol"}<span aria-hidden="true">→</span></a>{egfrCase && <p class="aidd-home-source-date">{chinese ? "保留结果来源日期" : "Retained result source date"}: {egfrCase.sourceDate}</p>}</div>
+  <div class="aidd-home-case__figure"><AtlasFigure id="representation-flips" />{chinese && <p class="aidd-home-language-label">原始英文图、数值与下载文件保持不变。</p>}</div>
+</section>
+
+<p class="aidd-home-visual-library"><a href={local("/report/figures/")}>{chinese ? "打开科学图件阅读台 · PDF 与可编辑方法图" : "Open the scientific figure library · PDFs and editable diagrams"}<span aria-hidden="true"> ↗</span></a></p>
+
+<section class="aidd-home-search-section" aria-label={chinese ? "查找课程、资源与实验" : "Find lessons, resources and labs"}>
+  <form class="home-search aidd-home-search" role="search" aria-label={chinese ? "搜索 AIDD Commons" : "Search AIDD Commons"} action={local("/search/")} method="get">
+    <label for="home-resource-query">{chinese ? "你正在研究什么？" : "What are you working on?"}</label>
+    <div class="home-search__field"><input id="home-resource-query" type="search" name="q" placeholder={chinese ? "试试 EGFR、Boltz、assay 或 uncertainty…" : "Try EGFR, Boltz, assay or uncertainty…"} /><button type="submit">{chinese ? "搜索 Commons" : "Search Commons"}<span aria-hidden="true">↗</span></button></div>
+  </form>
+  <div class="aidd-home-search__examples"><span>{chinese ? "从一个对象开始" : "Start with an object"}</span>{["EGFR", "Boltz", "ChEMBL", "RDKit"].map((query) => <a href={`${local("/search/")}?${new URLSearchParams({ q: query })}`}>{query}<span aria-hidden="true">↗</span></a>)}</div>
+</section>
+
+<section class="aidd-home-backgrounds" aria-labelledby="home-background-title">
+  <div class="aidd-home-section-heading"><div><p class="eyebrow">{chinese ? "从你的背景出发" : "Start from your background"}</p><h2 id="home-background-title">{chinese ? "不必从同一扇门进入" : "Choose a useful starting point"}</h2></div><a href={local("/learn/")}>{chinese ? "全部路径" : "All learning routes"}<span aria-hidden="true">→</span></a></div>
+  <div class="aidd-home-background-grid">{backgrounds.map((entry, index) => <article><div class="aidd-home-background__objects" aria-hidden="true"><ScientificIcon name={backgroundObjects[index][0]} size={74} /><span>→</span><ScientificIcon name={backgroundObjects[index][1]} size={64} /></div><p class="aidd-home-background__label"><span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>{entry.label}</p><h3><a href={local(`/learn/tracks/${entry.track}/`)}>{entry.title}<span aria-hidden="true">↗</span></a></h3><p>{entry.description}</p><span class="aidd-home-background__path">{entry.detail}</span></article>)}</div>
+</section>
+
+<section class="aidd-home-desk" aria-label={chinese ? "继续学习与资源阅读" : "Continue learning and inspect resources"}>
+  <LearningProgressPanel chinese={chinese} routes={progressRoutes} lessons={progressLessons} compact />
+  <div class="aidd-home-records"><div class="aidd-home-section-heading"><div><p class="eyebrow">{chinese ? "资源阅读台 · 英文来源记录" : "Resource reading desk"}</p><h2>{chinese ? "从用途读到复用条件" : "Read from purpose to reuse conditions"}</h2></div><a href={link("/atlas/")}>{chinese ? "资源图谱" : "Atlas"}<span aria-hidden="true">↗</span></a></div><ul>{selectedResources.map((resource) => <li><div><a href={link(`/atlas/${resource.id}/`)}><strong>{resource.name}</strong><span aria-hidden="true">↗</span></a><p>{resource.summary}</p></div><span class="aidd-home-records__date">{chinese ? "核验" : "Verified"}<time datetime={resource.last_verified}>{resource.last_verified}</time></span></li>)}</ul><p class="aidd-home-records__boundary">{chinese ? "访问方式、许可和七项资产开放性分别记录。英文资源摘要保留来源语言；可用代码不代表其他资产均可用。" : "Access, licence and seven asset-openness dimensions are recorded separately. Available code does not establish that every other asset is available."}</p></div>
+</section>
+
+<details class="home-track-directory aidd-home-directory">
+  <summary><span>{chinese ? "浏览全部学习轨道" : "Browse all learning tracks"}</span><span class="home-track-directory__count">{siteOverview.curriculum.trackCount}</span></summary>
+  <ul>{workbenchData.tracks.map((track) => <li><a href={link(chinese ? track.hrefZh : track.href)}>{chinese ? track.titleZh : track.title}<span aria-hidden="true">↗</span></a></li>)}</ul>
+</details>
+<p class="aidd-home-language-note">{chinese ? `英语内容为规范版本；这里提供现有课程正文和 ${siteOverview.labs.guideCount} 个实验说明的译文。数值面板和下载文件保留原始格式，目录计数不表示已观察到学习效果。` : "English is canonical. Existing lessons and lab guides have Chinese translations. Numerical panels and downloads retain their original format; catalogue coverage is not evidence of learning outcomes."}</p>
+
+<style>
+  .aidd-home-visual-library { margin: .5rem 0 0; font-size: .875rem; }
+  .aidd-home-visual-library a { display: inline-flex; align-items: center; min-height: 44px; }
+  .aidd-home-hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3rem); padding: .5rem 0 1.5rem; align-items: end; }
+  .aidd-home-hero h1 { max-width: 24ch; margin: 0; font-size: clamp(2rem, 3.1vw, 3rem); line-height: 1.12; letter-spacing: -.045em; font-weight: 650; }
+  .aidd-home-hero .eyebrow { font-size: .75rem; margin: 0 0 .7rem; }
+  .aidd-home-collection { margin: .6rem 0 0; font-size: .8125rem; color: var(--atlas-muted); }
+  .aidd-home-hero__purpose { max-width: 61ch; margin: 0; color: var(--atlas-muted); font-size: 1rem; line-height: 1.65; }
+  .aidd-home-hero__actions { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; margin-top: .8rem; }
+  .aidd-home-primary, .aidd-home-secondary { display: inline-flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 44px; padding: .55rem .8rem; font-size: .875rem; font-weight: 650; text-decoration: none; }
+  .aidd-home-primary { border: 1px solid var(--atlas-teal); background: var(--atlas-teal); color: var(--atlas-action-ink); }
+  .aidd-home-primary:hover { background: var(--atlas-teal-deep); color: var(--atlas-action-ink); }
+  .aidd-home-secondary { padding-inline: 0; border-bottom: 1px solid var(--atlas-rule-strong); color: var(--atlas-teal-deep); }
+  .aidd-home-search-section { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(18rem, 1fr); gap: 2.5rem; align-items: end; padding: 1.5rem 0; border-bottom: 1px solid var(--atlas-rule); }
+  .aidd-home-search { margin: 0; max-width: none; }
+  .aidd-home-search label { font-size: .75rem; }
+  .aidd-home-search input { min-width: 0; font-size: .83rem; }
+  .aidd-home-search button { padding-inline: .9rem; font-size: .75rem; gap: .8rem; }
+  .aidd-home-search__examples { display: flex; gap: .4rem .85rem; flex-wrap: wrap; align-items: center; padding-bottom: .15rem; }
+  .aidd-home-search__examples > span { flex-basis: 100%; margin-bottom: .1rem; color: var(--atlas-muted); font-size: .75rem; }
+  .aidd-home-search__examples a { display: inline-flex; align-items: center; gap: .65rem; min-height: 44px; font-family: var(--atlas-font-mono); font-size: .75rem; }
+  .aidd-home-backgrounds { margin-top: 1.5rem; }
+  .aidd-home-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.3rem; }
+  .aidd-home-section-heading .eyebrow { margin: 0 0 .4rem; font-size: .75rem; }
+  .aidd-home-section-heading h2 { margin: 0; font-size: clamp(1.25rem, 2.2vw, 1.75rem); line-height: 1.25; letter-spacing: -.035em; }
+  .aidd-home-section-heading > a { display: inline-flex; align-items: center; gap: .75rem; min-height: 44px; font-size: .75rem; white-space: nowrap; }
+  .aidd-home-background-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--atlas-rule-strong); border-bottom: 1px solid var(--atlas-rule); }
+  .aidd-home-background-grid article { display: flex; flex-direction: column; padding: 1.35rem 1.5rem 1.25rem 0; min-width: 0; }
+  .aidd-home-background-grid article + article { border-left: 1px solid var(--atlas-rule); padding-left: 1.5rem; }
+  .aidd-home-background__objects { display: flex; align-items: center; gap: 1rem; height: 5.5rem; margin-bottom: .8rem; }
+  .aidd-home-background__objects > span { color: var(--atlas-rule-strong); font-size: 1.2rem; }
+  .aidd-home-background__label { display: flex; gap: .65rem; margin: 0 0 .85rem; color: var(--atlas-teal-deep); font-size: .75rem; font-weight: 600; }
+  .aidd-home-background__label span { font-family: var(--atlas-font-mono); }
+  .aidd-home-background-grid h3 { margin: 0; font-size: 1.15rem; line-height: 1.35; letter-spacing: -.025em; }
+  .aidd-home-background-grid h3 a { display: flex; gap: .75rem; justify-content: space-between; min-height: 44px; color: var(--atlas-ink); text-decoration: none; }
+  .aidd-home-background-grid h3 a span { color: var(--atlas-teal-deep); font-size: .9rem; }
+  .aidd-home-background-grid article > p:not(.aidd-home-background__label) { margin: .65rem 0 .8rem; color: var(--atlas-muted); font-size: 1rem; line-height: 1.65; }
+  .aidd-home-background__path { margin-top: auto; color: var(--atlas-muted); font-size: .75rem; font-family: var(--atlas-font-mono); }
+  .aidd-home-case { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.25fr); gap: 1.75rem; padding: 1.75rem 0 1.25rem; border-bottom: 1px solid var(--atlas-rule); align-items: start; }
+  .aidd-home-case .eyebrow { font-size: .75rem; margin: 0 0 .6rem; }
+  .aidd-home-case h2 { margin: 0; font-size: clamp(1.4rem, 2.2vw, 1.9rem); line-height: 1.2; letter-spacing: -.04em; }
+  .aidd-home-case__story > p:not(.eyebrow) { color: var(--atlas-muted); font-size: 1rem; line-height: 1.65; }
+  .aidd-home-case dl { display: grid; margin: .9rem 0; border-top: 1px solid var(--atlas-rule); }
+  .aidd-home-case dl > div { display: grid; grid-template-columns: 5rem 1fr; gap: .75rem; padding: .55rem 0; border-bottom: 1px solid var(--atlas-rule); font-size: .75rem; }
+  .aidd-home-case dt { color: var(--atlas-muted); }
+  .aidd-home-case dd { margin: 0; font-family: var(--atlas-font-mono); }
+  .aidd-home-case__story .aidd-home-case__limit { padding-left: .8rem; border-left: 2px solid var(--atlas-emphasis); font-size: .75rem; line-height: 1.65; }
+  .aidd-home-case__story .aidd-home-source-date { font-size: .75rem; }
+  .aidd-home-case__figure { min-width: 0; }
+  .aidd-home-case__figure :global(.atlas-figure) { margin-top: 0; margin-bottom: 0; }
+  .aidd-home-case__figure :global(.atlas-figure__caption) { font-size: .75rem; line-height: 1.65; }
+  .aidd-home-language-label { color: var(--atlas-muted); font-size: .75rem; }
+  .aidd-home-desk { display: grid; grid-template-columns: minmax(17rem, .75fr) minmax(0, 1.3fr); gap: 1.75rem; padding: 1.75rem 0; align-items: start; }
+  .aidd-home-records { min-width: 0; }
+  .aidd-home-records h2 { font-size: 1.35rem; }
+  .aidd-home-records ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--atlas-rule-strong); }
+  .aidd-home-records li { display: grid; grid-template-columns: minmax(0, 1fr) 5.5rem; gap: 1rem; padding: .8rem 0; border-bottom: 1px solid var(--atlas-rule); }
+  .aidd-home-records li a { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 44px; font-size: .9rem; text-decoration: none; }
+  .aidd-home-records li p { margin: .2rem 0; color: var(--atlas-muted); font-size: 1rem; line-height: 1.65; }
+  .aidd-home-records__date { color: var(--atlas-muted); font-size: .75rem; padding-top: .75rem; text-align: right; }
+  .aidd-home-records__date time { display: block; margin-top: .3rem; font-family: var(--atlas-font-mono); }
+  .aidd-home-records__boundary { margin: 1rem 0 0; color: var(--atlas-muted); font-size: .75rem; line-height: 1.65; }
+  .aidd-home-directory { margin: 0; }
+  .aidd-home-directory summary { padding-block: 1.1rem; font-size: .95rem; }
+  .aidd-home-directory a { font-size: .75rem; }
+  .aidd-home-language-note { margin: 1.25rem 0 0; max-width: 110ch; color: var(--atlas-muted); font-size: .75rem; line-height: 1.7; }
+  @media (max-width: 950px) {
+    .aidd-home-hero { gap: 1.5rem; }
+    .aidd-home-case { grid-template-columns: 1fr; gap: 1.25rem; }
+    .aidd-home-case__story { max-width: 75ch; }
+    .aidd-home-case__figure { max-width: 55rem; }
+    .aidd-home-desk { gap: 1.5rem; }
+  }
+  @media (max-width: 700px) {
+    .aidd-home-hero { grid-template-columns: 1fr; padding-top: .25rem; padding-bottom: 1.25rem; gap: .9rem; }
+    .aidd-home-hero h1 { max-width: 24ch; font-size: clamp(1.9rem, 7vw, 2.5rem); }
+    .aidd-home-hero__actions { margin-top: .75rem; }
+    .aidd-home-search-section { grid-template-columns: 1fr; gap: .5rem; padding-block: 1.25rem; }
+    .aidd-home-search__examples { gap: .2rem 1rem; }
+    .aidd-home-search__examples > span { flex-basis: auto; margin-right: .25rem; }
+    .aidd-home-background-grid { grid-template-columns: 1fr; }
+    .aidd-home-background-grid article { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); column-gap: 1rem; padding: 1rem 0; }
+    .aidd-home-background-grid article + article { border-left: 0; padding-left: 0; border-top: 1px solid var(--atlas-rule); }
+    .aidd-home-background__objects { grid-row: 1 / 5; flex-direction: column; gap: .25rem; height: auto; margin: 0; }
+    .aidd-home-background__objects > span { line-height: 1; transform: rotate(90deg); }
+    .aidd-home-background__label { margin-bottom: .3rem; }
+    .aidd-home-background-grid h3 a { align-items: center; }
+    .aidd-home-background-grid article > p:not(.aidd-home-background__label) { margin: .4rem 0 .6rem; }
+    .aidd-home-case { padding-block: 1.5rem 1.25rem; }
+    .aidd-home-desk { grid-template-columns: 1fr; padding-block: 1.5rem; gap: 1.5rem; }
+    .aidd-home-section-heading { align-items: flex-start; }
+  }
+  @media (max-width: 390px) {
+    .aidd-home-hero h1 { font-size: 1.9rem; }
+    .aidd-home-section-heading > a { white-space: normal; }
+    .aidd-home-records li { grid-template-columns: 1fr; gap: 0; }
+    .aidd-home-records__date { text-align: left; padding-top: .5rem; }
+    .aidd-home-records__date time { display: inline; margin-left: .5rem; }
+  }
+</style>

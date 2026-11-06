@@ -5,6 +5,23 @@ Source version 0.3.1, 25 October 2026. Dated source packages are listed on the
 records teaching delivery and scientific boundaries. It does not report
 human learning outcomes or an established global ranking.
 
+## Unreleased workbench development
+
+The local development candidate updated 6 November 2026 adds bilingual Learn and
+track hubs, shared search across resources and teaching material, a paginated
+Atlas with resource comparison, and scientific views for all 18 tracks. The
+views include source-bound molecular structures, representation choices and
+retained-result comparisons, with explanatory text and tables. Lab and report
+explorers read the frozen case outputs. Local progress is self-reported and
+remains in the reader's browser. Figure-library search and enlargement, consistent
+plot/table/CSV selections and localized Atlas, Audit, Report and Contribute controls
+provide additional inspection routes without translating the original evidence.
+
+The candidate builds 882 HTML pages, including Chinese resource-detail interfaces. It is separate from released v0.3.1 and is
+not yet a new public deployment or release. The delivery counts below describe
+the released baseline. Neither the candidate's software checks nor the revised
+local manuscript establish learning gains or comparative research utility.
+
 ## Teaching delivery
 
 The following quantities describe different objects and are not additive.

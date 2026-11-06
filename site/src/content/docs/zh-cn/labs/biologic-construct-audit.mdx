@@ -4,6 +4,7 @@ description: 阅读真实治疗实体记录，区分模态、产品特定构建�
 ---
 
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import ScientificTeachingView from "../../../../components/ScientificTeachingView.astro";
 
 <ScrollableRegions />
 
@@ -15,24 +16,31 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 本实验室的模式是在冻结协议下进行全新独立计算。使用项目的 Python 3.11 环境和 CPU，无需加速器或额外依赖。若要重新联网获取，`download` 会请求协议声明的 UniProt 检索、各条目以及选定的 DailyMed 标签。它记录精确 URL、响应长度、来源版本和 UTC 获取时间，且仅在验证通过后替换嵌入的来源快照。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
+```bash
+.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py show
+.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py check
+.venv/bin/python -m pytest labs/tests/biologic_construct_audit -q
+```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/biologic_construct_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
 ```bash
 .venv/bin/python labs/biologic_construct_audit/run_lab.py download
-.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py show
-.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py check
 .venv/bin/python labs/biologic_construct_audit/export_summary.py
-.venv/bin/python -m pytest labs/tests/biologic_construct_audit -q
 ```
 
-若要离线进行全新独立计算，保留已提交的来源快照，从以下命令开始。它们读取的选定段落与产生下文已提交观察结果的段落相同。
+</details>
 
-```bash
-.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py show
-.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py check
-.venv/bin/python labs/biologic_construct_audit/export_summary.py
-.venv/bin/python -m pytest labs/tests/biologic_construct_audit -q
-```
+默认读者路线是读取已提交快照的离线复现。上面的 `show` 和 `check` 读取的段落与下文表格相同。维护操作中的 `download` 会替换来源快照，不能与已记录的表格混作同一份数据。
 
 `show` 输出来源层面的审计结果和归一化字段值。`check` 重新计算不变量，失败时返回非零退出码。这两条命令均不写入文件。导出命令仅在协议与审计检查通过后覆盖精简摘要，检查失败时不写入摘要。之后的联网获取可能改变来源段落，因此下列表格描述的是已记录的快照。
+
+<ScientificTeachingView track="biologics-design" chinese compact />
 
 ## 记录与四字段规则
 
@@ -135,7 +143,7 @@ DailyMed 在同一条记录中陈述了 agalsidase-beta 的模态、同源二聚
 
 ## 来源与条款
 
-以下来源段落于 2026-10-23 获取并阅读。快照保留 UniProt 的药用注释以及 DailyMed 中协议声明的描述与作用机制段落。[构建体身份课程](/learn/biologics-design/construct-identity-and-objectives/)也于同日阅读。
+以下来源段落于 2026-10-23 获取并阅读。快照保留 UniProt 的药用注释以及 DailyMed 中协议声明的描述与作用机制段落。[构建体身份课程](/zh-cn/learn/biologics-design/construct-identity-and-objectives/)也于同日阅读。
 
 | 来源 | 记录 | 已记录版本 |
 | --- | --- | ---: |

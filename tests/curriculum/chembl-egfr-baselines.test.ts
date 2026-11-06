@@ -85,7 +85,7 @@ describe("ChEMBL 37 EGFR representation baseline tranche", () => {
         "utf8",
       ),
       readFile(join(repositoryRoot, "labs/chembl_egfr/README.md"), "utf8"),
-      readFile(join(repositoryRoot, "site/src/pages/labs/index.astro"), "utf8"),
+      readFile(join(repositoryRoot, "site/dist/labs/index.html"), "utf8"),
       readFile(
         join(
           repositoryRoot,

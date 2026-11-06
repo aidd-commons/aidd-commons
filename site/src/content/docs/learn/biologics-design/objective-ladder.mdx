@@ -5,9 +5,12 @@ description: Read sequence, structure, affinity and annotation records at the ob
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="biologics-design/objective-ladder" />
 <ScrollableRegions />
+
+<TeachingViewLink track="biologics-design" />
 
 ## Learning goals and prerequisites
 
@@ -58,13 +61,13 @@ Each cell names the record found at its own objective. Sequence fractions cover 
 | DHFR · P00374 | 1BOZ against P00374 · 185/186 · 0.9946 · chain A position 31, deposited G, reference F | 1BOZ · X-RAY DIFFRACTION · P00374 2-187, 186 residues · AF-P00374-F1, 96.12 | 1BOZ · 1693/1495 rows · 0 outliers · 1 clash | None · `no-affinity-record` | P00374 · 1 annotation · 1.5.1.3 | UniProtKB P00374 function annotation |
 | TP53 · P04637 | 1YCS against P04637 · 199/199 · 1.0000 | 1YCS · X-RAY DIFFRACTION · P04637 94-292, 199 residues · AF-P04637-F1, 75.06 | 1YCS · 3291/1501 rows · 0 outliers · 0 clashes | 1YCS · RA273H · wild type 2.2e-06 M · mutant 1.8e-06 M · ITC | None · `no-catalysis-annotation` | UniProtKB P04637 function annotation |
 | ESR1 · P03372 | 11SD against P03372 · 30/30 · 1.0000 | 11SD · X-RAY DIFFRACTION · P03372 581-595, 15 residues in two chains · AF-P03372-F1, 66.44 | 11SD · 3845/93 rows · 0 outliers · 0 clashes | None · `no-affinity-record` | None · `no-catalysis-annotation` | UniProtKB P03372 function annotation |
-| ABCD1 · P08183 | 6C0V against P08183 · 1278/1280 · 0.9984 · chain A positions 556 and 1201, deposited Q, reference E | 6C0V · ELECTRON MICROSCOPY · P08183 1-1280, 1280 residues · AF-P08183-F1, 84.56 | 6C0V · 8976/8912 rows · 0 outliers · 0 clashes | None · `no-affinity-record` | P08183 · 7 annotations · 7.6.2.2 and 7.6.2.1 | UniProtKB P08183 function annotation |
+| ABCB1 · P08183 | 6C0V against P08183 · 1278/1280 · 0.9984 · chain A positions 556 and 1201, deposited Q, reference E | 6C0V · ELECTRON MICROSCOPY · P08183 1-1280, 1280 residues · AF-P08183-F1, 84.56 | 6C0V · 8976/8912 rows · 0 outliers · 0 clashes | None · `no-affinity-record` | P08183 · 7 annotations · 7.6.2.2 and 7.6.2.1 | UniProtKB P08183 function annotation |
 
-The six entities and six objectives make 36 cells. Records occupy 31 cells, and 5 are empty. By objective, the numbers of entities with a record are sequence recovery 6, folding 6, structural plausibility 6, binding 3, catalysis 4 and biological function 6. The aligned position counts for EGFR and ESR1 include two chains. The single DHFR clash is a pair 1.92 angstrom apart in the NADPH cofactor, outside the examined entity. ABCD1 has 7 catalytic-activity annotations but 2 distinct catalogue numbers.
+The six entities and six objectives make 36 cells. Records occupy 31 cells, and 5 are empty. By objective, the numbers of entities with a record are sequence recovery 6, folding 6, structural plausibility 6, binding 3, catalysis 4 and biological function 6. The aligned position counts for EGFR and ESR1 include two chains. The single DHFR clash is a pair 1.92 angstrom apart in the NADPH cofactor, outside the examined entity. ABCB1 has 7 catalytic-activity annotations but 2 distinct catalogue numbers.
 
 ## The empty cells
 
-DHFR's binding cell is empty because the affinity archive has no row naming a structure of that target, and its declared structure 1BOZ has no bound component. ESR1's binding cell remains empty despite A1DAI in 11SD. ABCD1's binding cell remains empty despite ATP and MG in 6C0V. Neither component presence supplies a measured affinity. TP53 and ESR1 have no catalytic-activity annotation or enzyme catalogue number on their accessions, so their catalysis cells are empty. These are five source-specific absences, not proof that evidence is absent everywhere.
+DHFR's binding cell is empty because the affinity archive has no row naming a structure of that target, and its declared structure 1BOZ has no bound component. ESR1's binding cell remains empty despite A1DAI in 11SD. ABCB1's binding cell remains empty despite ATP and MG in 6C0V. Neither component presence supplies a measured affinity. TP53 and ESR1 have no catalytic-activity annotation or enzyme catalogue number on their accessions, so their catalysis cells are empty. These are five source-specific absences, not proof that evidence is absent everywhere.
 
 ## Worked case
 
@@ -72,7 +75,7 @@ Consider the ESR1 geometry cell. Its audit includes 3845 coordinate rows, but on
 
 ## Independent exercise
 
-A report treats the ATP component in 6C0V as evidence that ABCD1 has a measured binding value. Which record would fill the binding cell, and what does this reading show instead?
+A report treats the ATP component in 6C0V as evidence that ABCB1 has a measured binding value. Which record would fill the binding cell, and what does this reading show instead?
 
 <details data-worked-answer>
 <summary>Worked answer</summary>

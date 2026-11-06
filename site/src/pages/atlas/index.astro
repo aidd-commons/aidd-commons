@@ -1,31 +1,43 @@
 ---
-import { readFile } from "node:fs/promises";
+import { localizedPath } from "../../lib/site-locale.js";
 import ResourceExplorer from "../../components/ResourceExplorer.astro";
 import SiteShell from "../../components/SiteShell.astro";
-import type { Resource } from "../../data/resource.js";
-
-const resources = JSON.parse(
-  await readFile(
-    new URL("../../../public/data/resources.v1.json", import.meta.url),
-    "utf8",
-  ),
-) as Resource[];
+import { catalogResources, siteOverview } from "../../lib/site-overview.js";
+const catalog = siteOverview.catalog;
+const chinese = Astro.props.chinese ?? false;
+const t = (english: string, chineseText: string) => chinese ? chineseText : english;
+const local = (path: string) => localizedPath(path, chinese);
 ---
 
-<SiteShell
-  title="Scientific Atlas"
-  description="Filter source-grounded AIDD resources by pipeline stage, kind, access, and lifecycle."
+<SiteShell lang={chinese ? "zh-CN" : "en"}
+  title={t("Scientific Atlas","科学资源图谱")}
+  description={t("Find and compare source-grounded AIDD resources by scientific scope and seven independent asset dimensions.","按科学范围与七个独立资产维度查找、比较有来源依据的 AIDD 资源。")}
 >
-  <section aria-labelledby="atlas-title">
-    <p class="eyebrow">Evidence-backed registry</p>
-    <h1 id="atlas-title" class="page-heading">Scientific Atlas</h1>
+  <section class="page-header" aria-labelledby="atlas-title">
+    <p class="eyebrow">{t("Resource search · recorded evidence","资源检索 · 已记录证据")}</p>
+    <h1 id="atlas-title" class="page-heading">{t("Scientific Atlas","科学资源图谱")}</h1>
     <p class="page-intro">
-      Filter resources without collapsing access, lifecycle, evidence, caveats, and
-      openness into one label. Query parameters make a filter set shareable.
+      {t("Find a resource for your scientific question, then inspect what its sources establish and which assets you can reuse.", "围绕科学问题查找资源，再检查其来源支持哪些结论、哪些资产可以复用。")}
     </p>
+    <p class="atlas-snapshot">{catalog.count}{t(" catalogue records · checks dated ", " 条目录记录 · 核查日期 ")}{catalog.lastVerified.from}–{catalog.lastVerified.through}{t(". Access, lifecycle and asset availability remain separate claims.", "。访问权限、生命周期与资产可用性分别记录。")}</p>
+    <nav class="atlas-tools" aria-label={t("Atlas data and guidance","图谱数据与阅读指引")}>
+      <a href={local("/data/resources.v1.json")} download>{t("Catalogue JSON","目录 JSON")}</a>
+      <a href={local("/data/resources.v1.csv")} download>{t("Catalogue CSV","目录 CSV")}</a>
+      <a href={local("/data/openness.v1.json")} download>{t("Asset states JSON","资产状态 JSON")}</a>
+      <a href={local("/learn/foundations/resource-map/")}>{t("Find resources through a lesson","从课程中寻找资源")}</a>
+      <a href={local("/atlas/browse/")}>{t("Browse all records without JavaScript","无需 JavaScript 浏览全部记录")}</a>
+    </nav>
   </section>
 
-  <section class="section" aria-label="Atlas resource explorer">
-    <ResourceExplorer resources={resources} />
+  {chinese && <p class="atlas-snapshot" data-source-language="en">界面提供中文；资源名称、摘要、范围说明和来源证据保留英语原文。</p>}
+  <section class="section atlas-explorer-section" aria-label={t("Atlas resource explorer","图谱资源检索器")}>
+    <ResourceExplorer resources={catalogResources} chinese={chinese} />
   </section>
 </SiteShell>
+
+<style>
+  .section.atlas-explorer-section { margin-block-start: 1rem; }
+  .atlas-snapshot { margin: .6rem 0; max-width: 90ch; color: var(--atlas-muted); font-size: .84rem; }
+  .atlas-tools { display: flex; flex-wrap: wrap; gap: 0 1.25rem; font-size: .83rem; }
+  .atlas-tools a { display: inline-flex; align-items: center; min-height: 44px; }
+</style>

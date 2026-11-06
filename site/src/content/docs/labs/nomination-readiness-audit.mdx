@@ -4,6 +4,7 @@ description: Apply a frozen go, hold and stop rule to ChEMBL 37 measurement coun
 ---
 
 import ScrollableRegions from "../../../components/ScrollableRegions.astro";
+import ScientificTeachingView from "../../../components/ScientificTeachingView.astro";
 
 <ScrollableRegions />
 
@@ -19,13 +20,25 @@ The mode is fresh independent computation over a frozen protocol and a cached Ch
 
 Run these commands from the repository root. `show` prints the rule, each parent's counts and state, and its missing measurements. `check` recomputes the invariants and exits non-zero on a failure. The exporter writes the compact committed summary only after the checks pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/nomination_readiness_audit/run_lab.py download
 .venv/bin/python labs/nomination_readiness_audit/inspect_nomination_readiness_audit.py show
 .venv/bin/python labs/nomination_readiness_audit/inspect_nomination_readiness_audit.py check
-.venv/bin/python labs/nomination_readiness_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/nomination_readiness_audit -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/nomination_readiness_audit/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/nomination_readiness_audit/export_summary.py
+```
+
+</details>
 
 | Command | Output location | Write behaviour |
 | --- | --- | --- |
@@ -34,6 +47,8 @@ Run these commands from the repository root. `show` prints the rule, each parent
 | Exporter | `labs/nomination_readiness_audit/summary.json` | Overwrites the derived summary after successful checks |
 
 No model is fitted, no split is drawn and no prediction is made. The commands recount the fixed cohort. An independent student exercise appears in the linked lesson and does not overwrite author results.
+
+<ScientificTeachingView track="candidate-nomination" compact />
 
 ## Measurement and frozen rule
 
@@ -93,6 +108,17 @@ For this parent, a newly admitted point record with an unseen assay, document an
 A count does not say a compound is good. A `go` compound is not thereby a candidate, and a `stop` compound is not thereby inactive. These conditions measure the amount and recorded coverage of admitted evidence. They do not assess effect size, agreement, target relevance, selectivity, safety or exposure.
 
 The cohort was selected for teaching and is not a random sample of ChEMBL. The state counts estimate no population rate. The grouping convention and duplicate flags cannot establish experimental independence from the records alone. The laboratory neither tests whether these thresholds are the right thresholds nor changes them after seeing the counts. It proposes missing observations and performs no new biological experiment. Reader learning outcomes remain not observed.
+
+## Independent inspection task
+
+Inspect the closest non-go parent and identify its missing count under the frozen rule. If that count is later supplied, what would change about the readiness state and what would remain unestablished about the compound?
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+An additional qualifying measurement could change the rule-defined state only after its identity, endpoint and grouping are checked. A state transition does not establish potency quality, safety, exposure, clinical usefulness or candidate nomination. The frozen rule is a coverage exercise and must not be revised to promote a preferred parent.
+
+</details>
 
 ## Sources and terms
 

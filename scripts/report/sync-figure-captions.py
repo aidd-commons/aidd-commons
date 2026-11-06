@@ -28,7 +28,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 FIGURE_DIR = ROOT / "report/figures/out"
-REPORT = ROOT / "report/aidd-commons-living-report-v0.1.md"
+REPORT = ROOT / "report/aidd-commons-living-report-v0.2.md"
 
 #: An embedded figure: the alt text, the path, and the trailing Pandoc attribute block.
 FIGURE = re.compile(

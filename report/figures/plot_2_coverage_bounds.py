@@ -83,249 +83,140 @@ THRESHOLD_TITLES = {
 
 
 def build() -> dict[str, Path]:
-    """Draw the figure and write its two files plus its caption fragment."""
+    """Show every interval in one aligned provider-by-threshold matrix."""
     style.apply_style("light")
-    tokens = style.tokens("light")
-    colours = style.categorical("light")
+    tokens, colours = style.tokens(), style.categorical()
     payload = style.load_json(style.DATA_DIR / "comparison.v1.json")
-
-    names = {provider["id"]: provider["name"] for provider in payload["providers"]}
-    classes = {provider["id"]: provider["provider_class"] for provider in payload["providers"]}
+    names = {p["id"]: p["name"] for p in payload["providers"]}
+    classes = {p["id"]: p["provider_class"] for p in payload["providers"]}
     thresholds = list(payload["thresholds"])
-
-    bounds: dict[str, dict[str, tuple[int, int]]] = defaultdict(dict)
-    for summary in payload["summaries"]:
-        bounds[summary["provider_id"]][summary["threshold"]] = (summary["lower"], summary["upper"])
-
-    order = [SELF_ID] + sorted(
-        (provider for provider in bounds if provider != SELF_ID), key=lambda pid: names[pid]
-    )
+    bounds = defaultdict(dict)
+    for row in payload["summaries"]:
+        pair = (row["lower"], row["upper"])
+        if not 0 <= pair[0] <= pair[1] <= payload["taxonomy"]["topics"]:
+            raise ValueError(f"invalid coverage interval {row}")
+        bounds[row["provider_id"]][row["threshold"]] = pair
+    if set(bounds) != set(names):
+        raise ValueError("coverage summaries do not contain every declared provider")
+    order = [SELF_ID] + sorted((p for p in bounds if p != SELF_ID), key=lambda p: names[p])
+    if any(set(bounds[p]) != set(thresholds) for p in order):
+        raise ValueError("a provider is missing a required threshold")
+    total = payload["taxonomy"]["topics"]
     class_order = ["curriculum", "tutorial-collection", "benchmark-hub", "specialist-reference"]
-    class_colour = {
-        "curriculum": colours["teal"],
-        "tutorial-collection": colours["coral"],
-        "benchmark-hub": colours["ember"],
-        "specialist-reference": colours["slate"],
-    }
-    class_marker = {
+    markers = {
         "curriculum": "o",
         "tutorial-collection": "s",
         "benchmark-hub": "^",
         "specialist-reference": "D",
     }
-
-    rows = list(range(len(order)))[::-1]
-    row_position = {provider: position for provider, position in zip(order, rows, strict=True)}
-
-    fig = style.figure(style.FIGURE_WIDTH, 6.9)
-    axes = style.axes_grid(
+    fig = style.figure(height=6.65)
+    style.heading(
         fig,
-        2,
-        3,
-        left=0.225,
-        right=0.985,
-        bottom=0.135,
-        top=0.905,
-        wspace=0.30,
-        hspace=0.28,
+        "Evidence bounds, rather than a leaderboard",
+        (
+            f"{len(order)} providers × {len(thresholds)} thresholds · {total} historical "
+            f"topics · {payload['as_of']}"
+        ),
     )
-
-    panel_titles = [
-        THRESHOLD_TITLES["explained"],
-        THRESHOLD_TITLES["worked"],
-        THRESHOLD_TITLES["executable"],
-        THRESHOLD_TITLES["executable-on-real-data"],
-        THRESHOLD_TITLES["assessed"],
-    ]
-
-    for index, (ax, panel) in enumerate(zip(axes[:5], panel_titles, strict=True)):
-        threshold = thresholds[index]
-        ax.axhspan(
-            row_position[SELF_ID] - 0.5,
-            row_position[SELF_ID] + 0.5,
-            color=tokens["rule"],
-            alpha=0.35,
-            zorder=0,
-        )
-        for provider in order:
-            lower, upper = bounds[provider][threshold]
-            position = row_position[provider]
-            ax.plot(
-                [lower, upper],
-                [position, position],
-                color=class_colour[classes[provider]],
-                marker=class_marker[classes[provider]],
-                markersize=4.2,
-                markeredgecolor=tokens["ink"],
-                markeredgewidth=0.5,
-                linewidth=1.7,
-                solid_capstyle="butt",
-                zorder=3,
+    axes = style.axes_grid(fig, 1, 5, left=0.295, right=0.978, bottom=0.135, top=0.81, wspace=0.16)
+    ys = list(range(len(order)))[::-1]
+    for col, (ax, threshold) in enumerate(zip(axes, thresholds, strict=True)):
+        for y, p in zip(ys, order, strict=True):
+            lo, hi = bounds[p][threshold]
+            own = p == SELF_ID
+            colour = colours["teal"] if own else colours["slate"]
+            ax.plot([0, total], [y, y], color=tokens["rule"], lw=0.5, zorder=0)
+            if own:
+                ax.plot(
+                    lo, y, marker="D", ms=5.2, color=colour, mec=tokens["ink"], mew=0.5, zorder=4
+                )
+            else:
+                ax.plot([lo, hi], [y, y], color=colour, lw=1.8, zorder=2)
+                ax.plot(
+                    lo,
+                    y,
+                    marker=markers[classes[p]],
+                    ms=4,
+                    mfc=tokens["panel"],
+                    mec=colour,
+                    mew=0.9,
+                    zorder=3,
+                )
+                ax.plot(
+                    hi,
+                    y,
+                    marker=markers[classes[p]],
+                    ms=4,
+                    mfc=colour,
+                    mec=colour,
+                    mew=0.6,
+                    zorder=3,
+                )
+            ax.annotate(
+                str(lo) if lo == hi else f"{lo}–{hi}",
+                (total / 2, y),
+                xytext=(0, -11),
+                textcoords="offset points",
+                ha="center",
+                va="center",
+                fontsize=8.0,
+                fontweight="bold" if own else "normal",
+                color=tokens["ink"],
             )
-        ax.set_xlim(-2, 104)
-        ax.set_ylim(-0.7, len(order) - 0.3)
-        ax.set_xticks([0, 30, 60, 90])
-        ax.set_yticks(rows)
-        ax.set_yticklabels(
-            [DISPLAY.get(provider, names[provider]) for provider in order],
-            fontsize=7.8,
-        )
-        if index not in (0, 3):
-            ax.set_yticklabels([])
-        else:
+        ax.set_xlim(-5, total + 5)
+        ax.set_ylim(-0.9, len(order) - 0.1)
+        ax.set_xticks([0, total])
+        ax.set_yticks(ys)
+        ax.set_yticklabels([DISPLAY.get(p, names[p]) for p in order] if col == 0 else [])
+        if col == 0:
             ax.get_yticklabels()[0].set_fontweight("bold")
-        ax.tick_params(axis="y", length=0)
-        ax.grid(axis="x", linewidth=0.6, alpha=0.7)
-        ax.set_axisbelow(True)
-        style.title(ax, panel)
-        value = bounds[SELF_ID][threshold][0]
-        ax.annotate(
-            str(value),
-            xy=(value, row_position[SELF_ID]),
-            xytext=(-5, 0),
-            textcoords="offset points",
-            ha="right",
-            va="center",
-            fontsize=7.6,
-            color=tokens["ink"],
-            fontweight="bold",
+        ax.tick_params(axis="y", length=0, pad=9)
+        for spine in ["top", "right", "left"]:
+            ax.spines[spine].set_visible(False)
+        label = THRESHOLD_TITLES[threshold].replace(
+            "Executable on real data", "Real-data\nexecution"
         )
+        style.title(ax, label)
+        ax.set_xlabel("Topics", fontsize=8.2)
+    from matplotlib.lines import Line2D
 
-    axes[3].set_xlabel("Topics out of 93", fontsize=8.5)
-    axes[4].set_xlabel("Topics out of 93", fontsize=8.5)
-
-    # The sixth panel answers the question the five panels raise: where this
-    # project's exact count sits against the strongest bound any external
-    # provider reaches on the same threshold.
-    summary_ax = axes[5]
-    threshold_rows = list(range(len(thresholds)))[::-1]
-    for provider in order:
-        if provider == SELF_ID:
-            continue
-        for threshold, position in zip(thresholds, threshold_rows, strict=True):
-            lower, upper = bounds[provider][threshold]
-            summary_ax.plot(
-                [lower, upper],
-                [position, position],
-                color=tokens["rule"],
-                linewidth=1.0,
-                alpha=0.9,
-                zorder=1,
-            )
-    for threshold, position in zip(thresholds, threshold_rows, strict=True):
-        external_lower = max(
-            bounds[provider][threshold][0] for provider in order if provider != SELF_ID
+    handles = [
+        Line2D(
+            [], [], marker=markers[c], ms=4.5, mfc=tokens["panel"], mec=colours["slate"], ls="none"
         )
-        external_upper = max(
-            bounds[provider][threshold][1] for provider in order if provider != SELF_ID
-        )
-        own = bounds[SELF_ID][threshold][0]
-        summary_ax.plot(
-            external_lower,
-            position,
-            marker="o",
-            markersize=5.0,
-            markerfacecolor="none",
-            markeredgecolor=colours["coral"],
-            markeredgewidth=1.1,
-            linestyle="none",
-            zorder=3,
-        )
-        summary_ax.plot(
-            external_upper,
-            position,
-            marker="o",
-            markersize=5.0,
-            markerfacecolor=colours["coral"],
-            markeredgecolor=tokens["ink"],
-            markeredgewidth=0.4,
-            linestyle="none",
-            zorder=3,
-        )
-        summary_ax.plot(
-            own,
-            position,
-            marker="D",
-            markersize=5.4,
-            markerfacecolor=colours["teal"],
-            markeredgecolor=tokens["ink"],
-            markeredgewidth=0.4,
-            linestyle="none",
-            zorder=4,
-        )
-    summary_ax.set_xlim(-2, 104)
-    summary_ax.set_ylim(-0.7, len(thresholds) - 0.3)
-    summary_ax.set_xticks([0, 30, 60, 90])
-    summary_ax.set_yticks(threshold_rows)
-    summary_ax.set_yticklabels(
-        ["Explained", "Worked", "Executable", "On real data", "Assessed"], fontsize=7.8
-    )
-    summary_ax.tick_params(axis="y", length=0)
-    summary_ax.grid(axis="x", linewidth=0.6, alpha=0.7)
-    summary_ax.set_axisbelow(True)
-    style.title(summary_ax, "External bounds")
-    summary_ax.set_xlabel("Topics out of 93", fontsize=8.5)
-    for threshold, position in zip(thresholds, threshold_rows, strict=True):
-        own = bounds[SELF_ID][threshold][0]
-        summary_ax.annotate(
-            str(own),
-            xy=(own, position),
-            xytext=(-5, 0),
-            textcoords="offset points",
-            ha="right",
-            va="center",
-            fontsize=7.4,
-            color=tokens["ink"],
-            fontweight="bold",
-        )
-
-    summary_handles = [
-        _point_handle(colours["teal"], "D", filled=True),
-        _point_handle(colours["coral"], "o", filled=False),
-        _point_handle(colours["coral"], "o", filled=True),
+        for c in class_order
     ]
-    summary_legend = fig.legend(
-        summary_handles,
-        [
-            "AIDD Commons, exact count",
-            "Largest external lower bound",
-            "Largest external upper bound",
-        ],
-        loc="lower right",
-        ncol=1,
-        fontsize=7.6,
-        handletextpad=0.5,
-        borderpad=0.2,
-        frameon=False,
-        bbox_to_anchor=(0.995, 0.004),
-        alignment="left",
-    )
-    summary_legend.set_in_layout(False)
-
-    handles = [_legend_handle(class_colour[key], class_marker[key]) for key in class_order]
-    labels = [
-        "Curriculum",
-        "Tutorial collection",
-        "Benchmark hub",
-        "Specialist reference",
-    ]
-    figure_legend = fig.legend(
+    fig.legend(
         handles,
-        labels,
-        loc="lower center",
-        ncol=4,
-        fontsize=8.0,
-        handletextpad=0.5,
-        columnspacing=1.6,
-        frameon=False,
-        bbox_to_anchor=(0.36, 0.004),
+        ["Curriculum", "Tutorial collection", "Benchmark hub", "Specialist reference"],
+        ncol=2,
+        loc="lower left",
+        bbox_to_anchor=(0.29, 0.025),
+        fontsize=8.2,
+        handlelength=1,
+        handletextpad=0.4,
+        columnspacing=1.5,
     )
-    figure_legend.set_in_layout(False)
-
+    fig.text(
+        0.035,
+        0.095,
+        "Open marker: lower\nFilled marker: upper",
+        fontsize=8.0,
+        color=tokens["muted"],
+        va="top",
+    )
+    style.footnote(
+        fig,
+        (
+            "Bounds express unresolved evidence, not statistical uncertainty; the first "
+            "row has direct observations at every threshold."
+        ),
+        y=0.014,
+        wrap_width=132,
+    )
     written = style.save(fig, STEM)
     own = style.english_list(
-        f"{bounds[SELF_ID][threshold][0]} {THRESHOLD_TITLES[threshold].lower()}"
-        for threshold in thresholds
+        f"{bounds[SELF_ID][t][0]} {THRESHOLD_TITLES[t].lower()}" for t in thresholds
     )
     style.register_caption(FIGURE_NUMBER, CAPTION.format(own=own))
     return written

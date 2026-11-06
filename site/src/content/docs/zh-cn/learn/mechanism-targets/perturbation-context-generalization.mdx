@@ -5,6 +5,7 @@ description: 用基线语境、干预、目标分布和泛化单位定义扰动�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 英文原文：[Perturbation prediction across cellular contexts](/learn/mechanism-targets/perturbation-context-generalization/)。
 
@@ -13,6 +14,8 @@ import ScrollableRegions from "../../../../../components/ScrollableRegions.astro
 <LessonProgress lessonId="mechanism-targets/perturbation-context-generalization" />
 
 <ScrollableRegions />
+
+<TeachingViewLink track="mechanism-targets" chinese />
 
 ## 学习目标
 
@@ -49,7 +52,7 @@ import ScrollableRegions from "../../../../../components/ScrollableRegions.astro
 
 于 2026-10-25 核查的 [PIE 数据集内发布](https://huggingface.co/arcinstitute/PIE_replogle_wdataset)明确了这种群体目标。Perceiver IO 结合知识嵌入、基线对照均值和训练响应证据。对每个语境与扰动的配对，它逐基因预测差异表达概率（`p_de`）、log2 倍数变化（`lfc_pred`）和处理后平均表达变化（`delta_p_pred`）。三者是不同的量，其中没有一项是单个细胞的前后轨迹，均值变化也不能决定完整表达分布。[处理后数据定义](https://huggingface.co/datasets/arcinstitute/PIE_replogle_nadig_essential)将对照选择、过滤和统计阈值纳入目标的一部分。
 
-其[规范分割](https://huggingface.co/datasets/arcinstitute/PIE_splits)区分 `unseen_ctx`、`unseen_pert` 与 `unseen_ctx_pert`。已发布的 4 个检查点目录指明被留出的细胞系，是独立的折而非集成模型。留出语境测试可以允许使用该语境的未扰动基线，同时不允许使用其扰动响应。[单细胞模型阅读课](/zh-cn/learn/representations/single-cell-and-virtual-cell-models/)分别说明代码、检查点与数据条款。本课没有运行 PIE 模型。
+其[规范分割](https://huggingface.co/datasets/arcinstitute/PIE_splits)区分 `unseen_ctx`、`unseen_pert` 与 `unseen_ctx_pert`。已发布的 4 个检查点目录指明被留出的细胞系，对应不同的留出语境折，而非集成模型。留出语境测试可以允许使用该语境的未扰动基线，同时不允许使用其扰动响应。[单细胞模型阅读课](/zh-cn/learn/representations/single-cell-and-virtual-cell-models/)分别说明代码、检查点与数据条款。本课没有运行 PIE 模型。
 
 ### 构造的留出练习
 
@@ -110,35 +113,23 @@ import ScrollableRegions from "../../../../../components/ScrollableRegions.astro
 真实细胞系（MCF7 与 PC3）中的转录响应，一个化合物在一个细胞系里的转录谱，能
 在多大程度上预测它在另一个细胞系里的转录谱？
 
-不做任何校正、直接用原始测量表达值计算一次：匹配化合物对的 Spearman rho
-中位数为 0.79，但**不匹配**的化合物对中位数也有 0.70——两个细胞系的原始
-表达谱共享了太多背景结构，以至于比较绝对表达值几乎分不清真实信号和噪声，
-这正是本课在抽象层面警示的、条件均值对照要防范的同一种失效。先减去每条
-表达谱自身、同一块板上载体对照孔的中位数基线——恰恰是本课输入契约要求
-记录的那类语境变量——就能去掉这部分共享结构：真实的、按化合物匹配的
-中位数 rho 变成 0.175，对照不匹配化合物对的零假设中位数为 0.034，双侧
-Mann-Whitney U 检验显示这个差异在 p = 7.9 × 10⁻⁸² 处显著。即使做完基线
-校正，1,721 个真实化合物里仍有约五分之一呈现**负**的跨细胞系相关性：对
-这些化合物而言，细胞系语境不只是改变了转录响应的大小，而是反转了它的
-方向——正是上面 Alpha/Beta 的符号反转，只是这次没有人编造数字。
+原始测量表达值中，匹配化合物对的 Spearman rho 中位数为 0.79，不匹配对为 0.70。
+减去每条表达谱所在板的载体对照基线后，中位数分别变为 0.175 与 0.034。
+报告的双侧 Mann-Whitney U 检验为 p = 7.9 × 10⁻⁸²，其解释取决于所比较表达谱间的依赖。
+校正后，1,721 个化合物中约五分之一呈负的跨细胞系相关性。这是基因响应排序模式间
+的负关联，不证明每个基因或整体响应都像标量 Alpha/Beta 示例那样反转符号。
 
-**独立练习（用真实 lab 自己的输出）：** 仅使用 `show` 报告的内容，说出这次
-真实比较里，哪两个设计选择分别对应构造表格里“留出 Beta”和“共享同一个
-`delta_hat(A)`”这两条告诫，并解释为什么一个未经校正的原始相关性会把符号
-反转这个发现完全掩盖掉。
+**独立练习（使用保留的实验输出）：** 说明按板匹配的基线相减与固定循环位移分别检验
+什么。为什么两者都不等于留出 Beta 或拟合共享的 `delta_hat(A)`？说明负的跨基因
+相关性为何不同于标量的符号反转。
 
 <details data-worked-answer>
 <summary>参考答案</summary>
 
-按板匹配的载体对照差异化，相当于这次比较里“先声明基线语境再拟合任何东西”
-这条纪律，和构造表格里“留出 Beta”是同一件事：没有它，原始比较里不匹配
-化合物对也有的高相关性（rho 0.70）就说明，大部分表面上的一致性来自每条
-表达谱都共享的背景结构，而不是这个具体化合物本身的效应。用作背景的单个
-固定循环位移，相当于这次比较里“共享同一个 `delta_hat(A)`”：它检验的是
-真实的、按化合物匹配的相关性是否不同于一个任意的、确定性的错配，而不是
-每个化合物的表现是否完全一致。一个未经校正的原始相关性会报告真实匹配对
-rho 约为 0.79、打乱后的对约为 0.70，这个又小又容易被忽略的差距，完全没有
-理由让人怀疑：去掉共享基线之后，大约五分之一的真实化合物其实符号是反的。
+按板匹配的基线相减把响应定义为相对局部基线的变化。固定循环位移把匹配化合物与
+一种确定性的错配比较。两者都没有拟合加性预测器，也没有建立留出语境测试。
+原始中位数 0.79 与 0.70 说明，仅凭绝对表达一致性不能识别化合物特异的一致性；
+校正后的比较回答的是另一个描述性问题。
 
 </details>
 

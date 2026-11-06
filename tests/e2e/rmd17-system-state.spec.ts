@@ -44,14 +44,12 @@ test("rMD17 development lab keeps its public evidence readable at desktop and 37
   }));
   expect(pageWidth.scroll).toBeLessThanOrEqual(pageWidth.client);
 
-  await page.goto("/labs/");
+  await page.goto("/labs/?q=rMD17");
   await expect(
-    page.getByRole("link", { name: "Study the rMD17 evidence" }),
+    page.locator(`lab-explorer a[href="${labRoute}"]`),
   ).toHaveAttribute("href", labRoute);
   await expect(
-    page.getByText("Benzene and uracil evaluations completed", {
-      exact: false,
-    }),
+    page.locator('[data-lab-id="rmd17-system-state-energy-baselines"]'),
   ).toBeVisible();
 });
 

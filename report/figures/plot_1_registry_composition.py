@@ -6,7 +6,8 @@ This is a live projection, not a frozen release snapshot. Its caption identifies
 the projection schema and the range of record verification dates. Nothing in
 this script is estimated or carried over from an earlier export.
 
-What the figure shows: how many records of each kind the registry holds.
+What the figure shows: ranked record counts by kind, with the exact record
+count and its share of the same catalogue population adjacent to each mark.
 
 What it does not show: whether a record is any good. A count of kinds is not a
 count of working resources. The registry records a lifecycle status, an access
@@ -46,53 +47,68 @@ def caption(resources: list[dict], ordered: list[tuple[str, int]]) -> str:
 
 
 def build() -> dict[str, Path]:
-    """Draw the figure and write its two files plus its caption fragment."""
+    """Rank the canonical record counts, retaining exact counts and shares."""
     style.apply_style("light")
-    tokens = style.tokens("light")
+    tokens, colours = style.tokens(), style.categorical()
     resources = style.load_json(style.DATA_DIR / "resources.v1.json")
-
-    counts = Counter(record["kind"] for record in resources)
-    ordered = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
-    names = [name for name, _ in ordered]
-    values = [count for _, count in ordered]
-
-    fig = style.figure(style.FIGURE_WIDTH, 4.2)
-    ax = fig.add_subplot(111)
-    fig.subplots_adjust(left=0.16, right=0.97, bottom=0.13, top=0.90)
-
-    positions = list(range(len(names)))[::-1]
-    container = ax.barh(
-        positions,
-        values,
-        height=0.68,
-        color=style.categorical()["teal"],
-        edgecolor=tokens["ink"],
-        linewidth=0.6,
+    ordered = sorted(
+        Counter(record["kind"] for record in resources).items(),
+        key=lambda item: (-item[1], item[0]),
     )
-    for bar, index in zip(container, range(len(names)), strict=True):
-        bar.set_hatch(style.hatch_for_index(index))
-
-    ax.set_yticks(positions)
-    ax.set_yticklabels([name.replace("-", " ") for name in names])
+    snapshot = catalogue_projection(resources)
+    fig = style.figure(height=4.05)
+    style.heading(
+        fig,
+        "What the Atlas contains",
+        f"{snapshot.records} records · kinds describe objects, not verification",
+    )
+    ax = fig.add_axes((0.24, 0.17, 0.56, 0.64))
+    positions = list(range(len(ordered)))[::-1]
+    for y, (_name, count) in zip(positions, ordered, strict=True):
+        ax.plot([0, count], [y, y], color=style.fill_colours()["teal"], lw=5, solid_capstyle="butt")
+        ax.plot(count, y, marker="o", ms=7, color=colours["teal"], mec=tokens["ink"], mew=0.6)
+        ax.text(
+            1.04,
+            y,
+            f"{count}",
+            transform=ax.get_yaxis_transform(),
+            va="center",
+            ha="right",
+            fontweight="bold",
+        )
+        ax.text(
+            1.23,
+            y,
+            f"{count / snapshot.records:.1%}",
+            transform=ax.get_yaxis_transform(),
+            va="center",
+            ha="right",
+            color=tokens["muted"],
+        )
+    ax.set_yticks(positions, [name.replace("-", " ") for name, _ in ordered])
+    ax.set_ylim(-0.6, len(ordered) - 0.4)
+    ax.set_xlim(0, max(count for _, count in ordered) * 1.07)
     ax.set_xlabel("Records in the catalogue")
-    ax.set_xlim(0, max(values) * 1.14)
-    ax.xaxis.grid(True, linewidth=0.6, alpha=0.7)
-    ax.set_axisbelow(True)
-    ax.spines["left"].set_color(tokens["rule"])
-    style.title(ax, "Registry composition by kind")
-    style.bar_labels(ax, container, values, orientation="horizontal", pad=4)
-
+    style.clean_axis(ax)
     ax.text(
-        0.995,
-        1.02,
-        f"{sum(values)} records",
+        1.04,
+        1.04,
+        "Records",
         transform=ax.transAxes,
         ha="right",
-        va="bottom",
-        fontsize=8.5,
+        fontsize=8.2,
         color=tokens["muted"],
     )
-
+    ax.text(
+        1.23, 1.04, "Share", transform=ax.transAxes, ha="right", fontsize=8.2, color=tokens["muted"]
+    )
+    style.footnote(
+        fig,
+        (
+            f"Evidence dates {snapshot.verified_from}–{snapshot.verified_through} · no "
+            f"quality or openness ranking"
+        ),
+    )
     written = style.save(fig, STEM)
     style.register_caption(FIGURE_NUMBER, caption(resources, ordered))
     return written

@@ -5,9 +5,12 @@ description: Read seven separate openness claims alongside access, licence scope
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="structure-and-pockets/asset-openness-and-reuse" />
 <ScrollableRegions />
+
+<TeachingViewLink track="structure-and-pockets" />
 
 ## Learning goals and prerequisites
 
@@ -37,7 +40,9 @@ Read each licence's scope text before drawing even a narrow reuse conclusion. A 
 
 ## Worked case across two inference releases
 
-The `model-boltz-2` record, reviewed on 2026-10-21, marks inference code and weights `available`, with a recorded MIT licence scope covering source code and weights. Its training code, data recipe, training data and evaluation code remain `unverified`. The same scope says named evaluation sets are not covered. An available weight file therefore does not make the reported evaluation independently reproducible from this record.
+The current `model-boltz-2` record was last verified on 2026-10-23. It retains README and licence evidence re-opened on 2026-10-21 and separate training-data evidence reviewed on 2026-10-23. It marks inference code and weights `available`, with a recorded MIT licence scope covering source code and weights.
+
+The record also marks `data_recipe` and `training_data` `available`. Its `model-boltz-2-readme` evidence describes the structure model's PDB and OpenFold self-distillation inputs, downloadable preprocessed training data and a documented processing pipeline. The caveat says the two affinity outputs were trained on largely different datasets that are not named, so their training data remain unverified. Training code and evaluation code remain `unverified`. The licence scope says the named evaluation sets are not covered. These recorded availability claims therefore do not establish independent reproduction of the reported evaluation.
 
 The `model-alphafold-3-inference` record, reviewed on 2026-09-04, marks inference code `available` but weights `unverified`. Its Apache-2.0 scope is `inference-code`. A caveat says parameters are supplied under separate terms. The common observation is availability of inference code. The records support different statements about weights and do not justify assigning the code terms to them. Read the full evidence identifiers and caveats with the [audit guide](/labs/asset-openness-audit/).
 
@@ -48,7 +53,7 @@ Compare `tool-rdkit` and `db-uniprot` in the audit's per-record output. State wh
 <details data-worked-answer>
 <summary>Worked answer</summary>
 
-`tool-rdkit` marks training code `not_applicable` because its recorded repository evidence describes a classical toolkit rather than a fitted model. Its access is `open_source`, and its BSD-3-Clause scope names the RDKit source code but excludes third-party components from that grant. `db-uniprot` leaves training code `unverified`. Its access is also `unverified`, and the record has no licence entry. Neither row by itself settles a proposed use. For RDKit, inspect the recorded licence file and any relevant component terms. For UniProt, inspect its current access and terms pages. The records were last verified on 2026-10-23, so a later change requires a new review.
+`tool-rdkit` marks training code `not_applicable` because its recorded repository evidence describes a classical toolkit rather than a fitted model. Its access is `open_source`, and its BSD-3-Clause scope names the RDKit source code but excludes third-party components from that grant. `db-uniprot` leaves training code `unverified`. Its access is `source_available`, and its caveat records downloads without an account through the FTP tree and REST interface. The record still has no licence entry because the recorded review did not establish the terms. Neither row by itself settles a proposed use. For RDKit, inspect the recorded licence file and any relevant component terms. For UniProt, inspect its current access and terms pages. Both records retain 2026-10-23 as their last-verified date, so a later upstream change requires a new review.
 
 </details>
 
@@ -58,6 +63,8 @@ The catalogue tracks declarations and cited pages, not a tested installation or 
 
 ## Sources and review date
 
-The records and their evidence entries were read locally on 2026-10-23. The worked case points to the [Boltz repository](https://github.com/jwohlwend/boltz), whose catalogue record names MIT for code and weights, and the [AlphaFold 3 inference repository](https://github.com/google-deepmind/alphafold3), whose record names Apache-2.0 for inference code. The exercise points to the [RDKit repository](https://github.com/rdkit/rdkit), whose record names BSD-3-Clause for source code, and the [UniProt site](https://www.uniprot.org/), whose record has no verified licence. These are recorded source claims with their own review dates, not a fresh audit of those sites. Original lesson prose is CC BY 4.0; linked resources retain their own terms.
+The original local lesson review was dated 2026-10-23. On 2026-10-26, the lesson text was checked against the four current canonical catalogue records, including their openness values, access levels, licence scopes, caveats and recorded review dates. No upstream page was reopened and no fresh upstream availability or licence review was performed.
 
-Last reviewed on 2026-10-23.
+The worked case points to the [Boltz repository](https://github.com/jwohlwend/boltz), whose catalogue record names MIT for code and weights, and the [AlphaFold 3 inference repository](https://github.com/google-deepmind/alphafold3), whose record names Apache-2.0 for inference code. The exercise points to the [RDKit repository](https://github.com/rdkit/rdkit), whose record names BSD-3-Clause for source code, and the [UniProt site](https://www.uniprot.org/), whose record has no verified licence. These are recorded source claims with their own review dates, not a fresh audit of those sites. Original lesson prose is CC BY 4.0; linked resources retain their own terms.
+
+Last local consistency review on 2026-10-26. Source-record review dates are unchanged.

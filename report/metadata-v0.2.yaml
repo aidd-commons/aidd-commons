@@ -1,0 +1,71 @@
+---
+title: "Open Development of AI Drug Discovery"
+subtitle: "AIDD Commons · Cumulative Living Report v0.2"
+author: "AIDD Commons contributors"
+date: "PDF edition · 6 November 2026"
+lang: en-GB
+documentclass: report
+papersize: a4
+geometry:
+  - margin=24mm
+fontsize: 11pt
+mainfont: "Georgia"
+sansfont: "Arial"
+colorlinks: true
+linkcolor: "AtlasBlue"
+urlcolor: "AtlasBlue"
+citecolor: "AtlasTeal"
+toc: true
+toc-depth: 2
+numbersections: true
+secnumdepth: 2
+reference-section-title: References
+header-includes:
+  - |
+    \definecolor{AtlasBlue}{HTML}{1F5F99}
+    \definecolor{AtlasTeal}{HTML}{087E8B}
+    \usepackage{microtype}
+    \usepackage{xurl}
+    \usepackage{newunicodechar}
+    \newunicodechar{⁻}{\textsuperscript{−}}
+    \newunicodechar{⁸}{\textsuperscript{8}}
+    \newunicodechar{²}{\textsuperscript{2}}
+    \usepackage{pdflscape}
+    \usepackage{float}
+    \floatplacement{figure}{H}
+    \usepackage{caption}
+    \captionsetup{font=small,labelfont=bf}
+    \makeatletter
+    \@removefromreset{figure}{chapter}
+    \@removefromreset{table}{chapter}
+    \makeatother
+    \renewcommand{\thefigure}{\arabic{figure}}
+    \renewcommand{\thetable}{\arabic{table}}
+    \usepackage{fancyhdr}
+    \pagestyle{fancy}
+    \fancyhf{}
+    \fancyhead[L]{\sffamily\small AIDD Commons}
+    \fancyhead[R]{\sffamily\small Living Report v0.2}
+    \fancyfoot[C]{\sffamily\small\thepage}
+    \setlength{\headheight}{14pt}
+    \setlength{\emergencystretch}{3em}
+    \hyphenpenalty=10000
+    \exhyphenpenalty=50
+    \raggedbottom
+    \raggedright
+    \Urlmuskip=0mu
+    \renewcommand{\UrlFont}{\sffamily\small}
+    \frenchspacing
+    \let\originaltableofcontents\tableofcontents
+    \renewcommand{\tableofcontents}{\originaltableofcontents\clearpage}
+include-before:
+  - |
+    **About this edition.** This is the complete cumulative v0.2 report,
+    extending the original volume with current laboratory evidence, comparison
+    methods, frontier resources and linked scientific teaching views. All 20
+    report figures are embedded. Evidence dates and frozen results retain their
+    original scope. The historical v0.1 PDF and the dated addendum remain
+    separately accessible from the [Report page](https://gxcaesar.github.io/aidd-commons/report/).
+
+    \clearpage
+---

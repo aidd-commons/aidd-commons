@@ -40,12 +40,24 @@ non-zero if the committed summary no longer matches what the cached data produce
 drift between the committed numbers and the data is a failure rather than a silent
 refresh.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 uv run python labs/rosetta_cross_modality/run_lab.py download
 uv run python labs/rosetta_cross_modality/inspect_rosetta_cross_modality.py show
 uv run python labs/rosetta_cross_modality/inspect_rosetta_cross_modality.py check
+```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/rosetta_cross_modality/summary.json`. It also writes per-perturbation values to `labs/rosetta_cross_modality/results/computed-summary.json`, which is not the public aggregate. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
 uv run python labs/rosetta_cross_modality/export_summary.py
 ```
+
+</details>
 
 Python 3.11.15 with NumPy 2.4.6, the versions the committed summary records. Network
 access is needed only for the one-time download of the two published objects into the

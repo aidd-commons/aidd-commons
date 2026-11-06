@@ -23,7 +23,7 @@ const linkedEvidence = ids
 <span class="claim-evidence">
   {linkedEvidence.length > 0 ? (
     <>
-      <span>Evidence: </span>
+      <span>{Astro.url.pathname.includes("/zh-cn/") ? "证据：" : "Evidence: "}</span>
       {linkedEvidence.map((entry, index) => (
         <Fragment>
           {index > 0 && ", "}

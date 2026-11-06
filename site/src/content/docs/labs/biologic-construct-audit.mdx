@@ -4,6 +4,7 @@ description: Read real therapeutic records and distinguish modality, product-spe
 ---
 
 import ScrollableRegions from "../../../components/ScrollableRegions.astro";
+import ScientificTeachingView from "../../../components/ScientificTeachingView.astro";
 
 <ScrollableRegions />
 
@@ -15,24 +16,31 @@ Read the [construct identity lesson](/learn/biologics-design/construct-identity-
 
 The mode is fresh independent computation under a frozen protocol. Use the project Python 3.11 environment and CPU. No accelerator or additional dependency is needed. For a fresh network fetch, `download` requests the declared UniProt search, its individual entries and selected DailyMed labels. It records the exact URLs, response lengths, source versions and UTC retrieval time. It replaces the embedded source snapshot only after validation.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
+```bash
+.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py show
+.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py check
+.venv/bin/python -m pytest labs/tests/biologic_construct_audit -q
+```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/biologic_construct_audit/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
 ```bash
 .venv/bin/python labs/biologic_construct_audit/run_lab.py download
-.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py show
-.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py check
 .venv/bin/python labs/biologic_construct_audit/export_summary.py
-.venv/bin/python -m pytest labs/tests/biologic_construct_audit -q
 ```
 
-For an offline fresh independent computation, retain the committed source snapshot and start with the following commands. They read the same selected passages that produced the committed observations below.
+</details>
 
-```bash
-.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py show
-.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py check
-.venv/bin/python labs/biologic_construct_audit/export_summary.py
-.venv/bin/python -m pytest labs/tests/biologic_construct_audit -q
-```
+The default reader route is an offline reproduction from the committed snapshot. The `show` and `check` commands above read the same passages as the tables below. The maintainer `download` replaces that snapshot, so its refreshed passages must not be presented as the source of the recorded tables.
 
 `show` prints the source-level audit and normalized field values. `check` recomputes its invariants and exits non-zero on failure. Both write nothing. The exporter overwrites only the compact summary after the protocol and audit checks pass. It writes no summary when a check fails. A later live fetch can change the source passages, so the tables below describe the recorded snapshot.
+
+<ScientificTeachingView track="biologics-design" compact />
 
 ## Records and four-field rules
 

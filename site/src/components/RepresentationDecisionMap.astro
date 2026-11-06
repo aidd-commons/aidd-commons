@@ -1,217 +1,82 @@
 ---
+import ScientificIcon from "./ScientificIcon.astro";
+interface Props { chinese?: boolean; }
+const { chinese = Astro.url.pathname.includes("/zh-cn/") } = Astro.props;
 const steps = [
-  {
-    number: "01",
-    title: "Resolve the entity",
-    body: "Parent, salt, mixture, protomer, tautomer, stereoisomer, conformer, or complex are different scientific objects.",
-  },
-  {
-    number: "02",
-    title: "Name endpoint dependence",
-    body: "Ask whether the measurement can depend on connectivity, local motifs, stereochemistry, geometry, environment, or an ensemble.",
-  },
-  {
-    number: "03",
-    title: "Choose the least lossy baseline",
-    body: "Begin with the lowest-cost representation that preserves the variables the endpoint can use.",
-  },
-  {
-    number: "04",
-    title: "Freeze a matched comparison",
-    body: "Hold entities, labels, splits, preprocessing, and metrics fixed before changing the representation or encoder.",
-  },
-];
-
+  { number: "01", icon: "molecule", title: chinese ? "先确定实体" : "Resolve the entity", short: chinese ? "化学对象" : "Chemical object", body: chinese ? "parent、盐、混合物、质子化状态、互变异构体、立体异构体、构象与复合物是不同的科学对象。" : "Parent, salt, mixture, protomer, tautomer, stereoisomer, conformer, or complex are different scientific objects." },
+  { number: "02", icon: "assay", title: chinese ? "明确端点依赖" : "Name endpoint dependence", short: chinese ? "测量语境" : "Measurement context", body: chinese ? "测量是否依赖连接关系、局部基序、立体化学、几何、环境或构象集合？" : "Ask whether the measurement can depend on connectivity, local motifs, stereochemistry, geometry, environment, or an ensemble." },
+  { number: "03", icon: "model", title: chinese ? "选择信息损失最小的基线" : "Choose the least lossy baseline", short: chinese ? "保留相关区别" : "Preserve relevant distinctions", body: chinese ? "从能保留端点相关变量的最低成本表示开始。" : "Begin with the lowest-cost representation that preserves the variables the endpoint can use." },
+  { number: "04", icon: "data", title: chinese ? "固定匹配的比较" : "Freeze a matched comparison", short: chinese ? "比较边界" : "Comparison boundary", body: chinese ? "改变表示或编码器前，固定实体、标签、划分、预处理与指标。" : "Hold entities, labels, splits, preprocessing, and metrics fixed before changing the representation or encoder." },
+] as const;
 const families = [
-  ["ID", "registry linkage"],
-  ["DESC", "global scalars"],
-  ["FP", "local environments"],
-  ["2D", "connectivity graph"],
-  ["SEQ", "serialized syntax"],
-  ["3D", "state and geometry"],
+  { short: "ID", label: chinese ? "注册库关联" : "registry linkage", kind: "record" },
+  { short: "DESC", label: chinese ? "全局标量" : "global scalars", kind: "scalars" },
+  { short: "FP", label: chinese ? "局部环境" : "local environments", kind: "bits" },
+  { short: "2D", label: chinese ? "连接图" : "connectivity graph", kind: "graph" },
+  { short: "SEQ", label: chinese ? "序列化语法" : "serialized syntax", kind: "tokens" },
+  { short: "3D", label: chinese ? "状态与几何" : "state and geometry", kind: "space" },
 ];
 ---
 
-<section
-  class="representation-decision-map"
-  aria-labelledby="representation-map-title"
-  data-representation-map
->
-  <header>
-    <p class="representation-decision-map__eyebrow">Decision map</p>
-    <h2 id="representation-map-title">Representation is a chain of scientific choices</h2>
-    <p>
-      The useful question is not “which encoding is best?” It is “which distinctions
-      must survive for this endpoint and decision?”
-    </p>
-  </header>
-
+<section class="representation-decision-map not-content" aria-labelledby="representation-map-title" data-representation-map lang={chinese ? "zh-CN" : "en"}>
+  <header><p class="representation-decision-map__eyebrow">{chinese ? "从对象到比较" : "Object → endpoint → comparison"}</p><h2 id="representation-map-title">{chinese ? "表示是一系列科学选择" : "Representation is a chain of scientific choices"}</h2><p>{chinese ? "先问哪些区别必须为这个端点与决策保留下来，再选择编码。" : "Ask which distinctions must survive for this endpoint and decision before choosing an encoding."}</p></header>
   <ol class="representation-decision-map__steps">
-    {steps.map((step) => (
-      <li>
-        <span aria-hidden="true">{step.number}</span>
-        <div>
-          <h3>{step.title}</h3>
-          <p>{step.body}</p>
-        </div>
-      </li>
-    ))}
+    {steps.map((step, index) => <li><span class="representation-decision-map__number">{step.number}</span><h3>{step.title}</h3><div class="representation-decision-map__object"><ScientificIcon name={step.icon} size={84} /></div><strong class="representation-decision-map__short">{step.short}</strong><p>{step.body}</p>{index < steps.length - 1 && <span class="representation-decision-map__arrow" aria-hidden="true">→</span>}</li>)}
   </ol>
-
-  <ul class="representation-decision-map__families" aria-label="Representation families">
-    {families.map(([short, label]) => (
-      <li>
-        <strong>{short}</strong>
-        <span>{label}</span>
-      </li>
-    ))}
-  </ul>
+  <div class="representation-decision-map__encoding-row"><p>{chinese ? "六种计算视图" : "Six computational views"}<span>{chinese ? "同一对象的不同信息边界" : "Different information boundaries for an object"}</span></p><ul class="representation-decision-map__families" aria-label={chinese ? "表示家族" : "Representation families"}>
+    {families.map((family) => <li><div class={`representation-glyph representation-glyph--${family.kind}`} aria-hidden="true">
+      {family.kind === "record" && <span class="representation-glyph__record"><i></i><i></i><i></i></span>}
+      {family.kind === "scalars" && <span class="representation-glyph__scalars"><i></i><i></i><i></i></span>}
+      {family.kind === "bits" && <span class="representation-glyph__bits">{[1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1].map((bit) => <i class:list={{ "is-set": bit }}></i>)}</span>}
+      {family.kind === "graph" && <ScientificIcon name="molecule" size={58} />}
+      {family.kind === "tokens" && <span class="representation-glyph__tokens"><i>[ ]</i><i>[ ]</i><i>[ ]</i></span>}
+      {family.kind === "space" && <ScientificIcon name="simulation" size={58} />}
+    </div><strong>{family.short}</strong><span>{family.label}</span></li>)}
+  </ul></div>
+  <div class="representation-decision-map__matched" aria-label={chinese ? "匹配比较的共同边界" : "Shared boundary for a matched comparison"}><span class="representation-decision-map__fixed">{chinese ? "保持固定" : "Hold fixed"}</span><p>{chinese ? "实体 · 标签 · 划分 · 预处理 · 指标" : "Entities · labels · splits · preprocessing · metrics"}</p><span class="representation-decision-map__vary">{chinese ? "改变表示 / 编码器" : "Vary representation / encoder"}</span></div>
+  <p class="representation-decision-map__note">{chinese ? "箭头表示决策顺序。插图、位格和标量符号都是概念示意，不是计算得到的特征、分子结构证据或性能排名。" : "Arrows show decision order. Illustrations, bit cells and scalar glyphs are conceptual, not computed features, molecular structure evidence or a performance ranking."}</p>
 </section>
 
 <style>
-  .representation-decision-map {
-    position: relative;
-    margin-block: 2rem 3rem;
-    overflow: hidden;
-    border: 1px solid var(--atlas-rule);
-    background:
-      radial-gradient(
-        circle at 100% 0%,
-        color-mix(in srgb, var(--atlas-coral) 14%, transparent),
-        transparent 34%
-      ),
-      linear-gradient(
-        145deg,
-        color-mix(in srgb, var(--atlas-teal) 12%, var(--atlas-panel)),
-        var(--atlas-panel) 58%
-      );
-    box-shadow: var(--atlas-shadow);
-  }
-
-  .representation-decision-map header {
-    max-width: 48rem;
-    padding: clamp(1.25rem, 4vw, 2.25rem);
-  }
-
-  .representation-decision-map__eyebrow {
-    margin: 0 0 0.45rem;
-    color: var(--atlas-teal-deep);
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .representation-decision-map h2 {
-    margin: 0;
-    color: var(--atlas-ink);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(1.55rem, 4vw, 2.4rem);
-    font-weight: 500;
-    letter-spacing: -0.025em;
-    line-height: 1.05;
-  }
-
-  .representation-decision-map header > p:last-child {
-    max-width: 62ch;
-    margin-bottom: 0;
-    color: var(--atlas-muted);
-  }
-
-  .representation-decision-map__steps {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin: 0;
-    padding: 0;
-    border-top: 1px solid var(--atlas-rule);
-    list-style: none;
-  }
-
-  .representation-decision-map__steps li {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 0.8rem;
-    padding: 1.1rem;
-    border-right: 1px solid var(--atlas-rule);
-    border-bottom: 1px solid var(--atlas-rule);
-  }
-
-  .representation-decision-map__steps li:nth-child(even) {
-    border-right: 0;
-  }
-
-  .representation-decision-map__steps li > span {
-    display: grid;
-    width: 2.15rem;
-    height: 2.15rem;
-    place-items: center;
-    border: 1px solid var(--atlas-teal);
-    border-radius: 50%;
-    color: var(--atlas-teal-deep);
-    font-size: 0.7rem;
-    font-weight: 800;
-  }
-
-  .representation-decision-map__steps h3 {
-    margin: 0;
-    color: var(--atlas-ink);
-    font-size: 0.98rem;
-  }
-
-  .representation-decision-map__steps p {
-    margin: 0.3rem 0 0;
-    color: var(--atlas-muted);
-    font-size: 0.86rem;
-    line-height: 1.5;
-  }
-
-  .representation-decision-map__families {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 0.45rem;
-    margin: 0;
-    padding: 1rem;
-    list-style: none;
-  }
-
-  .representation-decision-map__families li {
-    min-width: 0;
-    padding: 0.65rem 0.45rem;
-    border-top: 3px solid var(--atlas-teal);
-    background: color-mix(in srgb, var(--atlas-bg) 65%, transparent);
-    text-align: center;
-  }
-
-  .representation-decision-map__families strong,
-  .representation-decision-map__families span {
-    display: block;
-  }
-
-  .representation-decision-map__families strong {
-    color: var(--atlas-ink);
-    font-size: 0.78rem;
-    letter-spacing: 0.06em;
-  }
-
-  .representation-decision-map__families span {
-    margin-top: 0.2rem;
-    color: var(--atlas-muted);
-    font-size: 0.68rem;
-    line-height: 1.3;
-  }
-
-  @media (max-width: 46rem) {
-    .representation-decision-map__steps {
-      grid-template-columns: 1fr;
-    }
-
-    .representation-decision-map__steps li,
-    .representation-decision-map__steps li:nth-child(even) {
-      border-right: 0;
-    }
-
-    .representation-decision-map__families {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
+  .representation-decision-map { margin-block: 2rem; border-block: 1px solid var(--atlas-rule-strong); color: var(--atlas-ink); background: var(--atlas-panel); }
+  .representation-decision-map header { padding: 1.25rem 0 1rem; }
+  .representation-decision-map__eyebrow { margin: 0 0 .45rem; color: var(--atlas-teal-deep); font-size: .75rem; font-weight: 650; letter-spacing: .04em; }
+  .representation-decision-map h2 { margin: 0; font-size: clamp(1.35rem, 3vw, 1.9rem); font-weight: 650; line-height: 1.25; letter-spacing: -.025em; }
+  .representation-decision-map header > p:last-child { margin: .65rem 0 0; color: var(--atlas-muted); font-size: .88rem; line-height: 1.6; }
+  .representation-decision-map__steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.2rem; margin: 0; padding: 0; list-style: none; }
+  .representation-decision-map__steps li { position: relative; display: flex; flex-direction: column; min-width: 0; padding: .75rem 0; border-top: 1px solid var(--atlas-rule); }
+  .representation-decision-map__number { font: .75rem var(--atlas-font-mono); color: var(--atlas-teal-deep); }
+  .representation-decision-map__steps h3 { margin: .35rem 0 .6rem; font-size: .88rem; line-height: 1.4; min-height: 2.8em; }
+  .representation-decision-map__object { display: flex; align-items: center; justify-content: center; min-height: 92px; }
+  .representation-decision-map__short { display: block; margin-top: .3rem; font-size: .75rem; line-height: 1.5; font-weight: 650; text-align: center; }
+  .representation-decision-map__steps p { margin: .5rem 0 0; color: var(--atlas-muted); font-size: .78rem; line-height: 1.6; }
+  .representation-decision-map__arrow { position: absolute; right: -1.05rem; top: 8.3rem; color: var(--atlas-ink); font-size: 1.1rem; }
+  .representation-decision-map__encoding-row { padding-block: .8rem 1rem; border-top: 1px solid var(--atlas-rule); }
+  .representation-decision-map__encoding-row > p { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin: 0 0 .8rem; font-size: .8rem; font-weight: 650; }
+  .representation-decision-map__encoding-row > p > span { color: var(--atlas-muted); font-size: .75rem; font-weight: 400; }
+  .representation-decision-map__families { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .65rem; margin: 0; padding: 0; list-style: none; }
+  .representation-decision-map__families li { display: flex; flex-direction: column; min-width: 0; align-items: center; text-align: center; }
+  .representation-decision-map__families strong { margin-top: .35rem; font: .78rem var(--atlas-font-mono); }
+  .representation-decision-map__families li > span { display: block; margin-top: .3rem; color: var(--atlas-muted); font-size: .75rem; line-height: 1.4; }
+  .representation-glyph { display: grid; height: 60px; width: 100%; place-items: center; color: var(--atlas-teal-deep); }
+  .representation-glyph i { margin: 0; }
+  .representation-glyph__record { display: grid; gap: 5px; width: 37px; height: 47px; border: 1px solid var(--atlas-rule-strong); padding: 9px 6px; background: color-mix(in srgb, var(--atlas-teal) 5%, transparent); }
+  .representation-glyph__record i { display: block; border-top: 2px solid var(--atlas-teal); }
+  .representation-glyph__record i:last-child { width: 65%; }
+  .representation-glyph__scalars { display: flex; gap: 4px; align-items: end; width: 40px; height: 40px; border-bottom: 1px solid var(--atlas-rule-strong); }
+  .representation-glyph__scalars i { display: block; flex: 1; height: 60%; background: var(--atlas-teal); }
+  .representation-glyph__scalars i:nth-child(2) { height: 90%; background: var(--atlas-teal-deep); }
+  .representation-glyph__scalars i:nth-child(3) { height: 40%; }
+  .representation-glyph__bits { display: grid; grid-template-columns: repeat(4, 9px); gap: 3px; }
+  .representation-glyph__bits i { display: block; width: 9px; height: 9px; border: 1px solid var(--atlas-rule-strong); }
+  .representation-glyph__bits .is-set { background: var(--atlas-teal); border-color: var(--atlas-teal-deep); }
+  .representation-glyph__tokens { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; width: 58px; }
+  .representation-glyph__tokens i { padding: 1px 3px; border: 1px solid var(--atlas-rule-strong); font: .75rem var(--atlas-font-mono); }
+  .representation-decision-map__matched { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .4rem .8rem; align-items: center; padding: .8rem 0; border-block: 1px solid var(--atlas-rule); }
+  .representation-decision-map__matched p { margin: 0; font-size: .78rem; line-height: 1.6; }
+  .representation-decision-map__fixed { padding: .25rem .4rem; border: 1px solid var(--atlas-rule-strong); font-size: .75rem; font-weight: 650; }
+  .representation-decision-map__vary { grid-column: 2; padding-left: .65rem; border-left: 2px dashed var(--atlas-teal); color: var(--atlas-teal-deep); font-size: .75rem; }
+  .representation-decision-map__note { margin: .75rem 0; color: var(--atlas-muted); font-size: .75rem; line-height: 1.6; }
+  @media (max-width: 48rem) { .representation-decision-map__steps { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem 1.5rem; } .representation-decision-map__steps h3 { min-height: 2.8em; } .representation-decision-map__arrow { top: 7rem; } .representation-decision-map__steps li:nth-child(2) .representation-decision-map__arrow { display: none; } }
+  @media (max-width: 30rem) { .representation-decision-map__steps { grid-template-columns: 1fr; gap: .8rem; } .representation-decision-map__steps li { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: .3rem .7rem; } .representation-decision-map__number, .representation-decision-map__steps h3, .representation-decision-map__steps p { grid-column: 2; min-height: 0; margin: 0; } .representation-decision-map__steps p { grid-row: 3; } .representation-decision-map__object { grid-column: 1; grid-row: 1 / 4; align-self: center; } .representation-decision-map__short { grid-column: 1; grid-row: 4; text-align: left; color: var(--atlas-teal-deep); } .representation-decision-map__arrow { top: auto; bottom: -1rem; left: 35px; right: auto; transform: rotate(90deg); } .representation-decision-map__steps li:nth-child(2) .representation-decision-map__arrow { display: block; } .representation-decision-map__families { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; } }
 </style>

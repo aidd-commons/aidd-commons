@@ -5,10 +5,13 @@ description: Recover a chemical structure from a picture, and keep the origin an
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="data-governance/structure-from-images" />
 
 <ScrollableRegions />
+
+<TeachingViewLink track="data-governance" />
 
 ## Learning goals and prerequisites
 
@@ -152,11 +155,12 @@ licensed for the intended use, or sufficient to reproduce a result.
 | [MolNexTR](/atlas/model-molnextr/) | available | available | available | available | available | available | available |
 | [SwinOCSR](/atlas/model-swinocsr/) | unverified | unverified | unverified | unverified | unverified | unverified | unverified |
 
-The values are the record claims as reviewed on 2026-10-21. Two records report every
-dimension as available. One reports every dimension as unverified while its
-repository does ship inference, training and evaluation scripts, because a repository
-with no licence file does not establish availability for use. The dimensions that are
-never available across the family are the two that describe how the weights were made.
+The values are the record claims as reviewed on 2026-10-21. MolScribe and
+MolNexTR report every dimension as available, including the data recipe and
+training data, although the upstream provenance described above remains
+incomplete. SwinOCSR's all-unverified row records an unresolved verification
+state despite the visible scripts. Missing licence terms constrain reuse;
+they do not, by themselves, establish that an asset is unavailable.
 
 ## What the licences permit
 
@@ -268,11 +272,12 @@ The provenance of the 500 rows is known to the project. 180 rows carry a structu
 that a person typed from the source document's own structure table. 320 rows carry a
 structure that a model read from a figure.
 
-The project applies two checks to the 320 image-derived rows. 27 of them return a
-string that does not survive a chemical sanity check, because the returned string has
-a disconnected fragment or an impossible valence, and those rows are held for a
-person to correct. 41 of the remaining 293 rows carry a canonical structure the
-table already holds, because the same compound was depicted more than once.
+The project applies two declared checks to the 320 image-derived rows.
+27 fail either its task-specific single-component policy or a valence check
+and are held for human correction. Disconnected components are not generally
+invalid chemistry, since a record can legitimately describe a salt or mixture.
+Of the remaining 293 rows, 41 carry a canonical structure already held in the
+table, because the same compound was drawn more than once.
 
 The project can now report 432 distinct structures, which is 500 rows less 27 rows
 less 41 rows. It can also report that 252 of the 432 came from a picture. It cannot
@@ -286,10 +291,10 @@ row's error estimable in principle and traceable in practice. The third is the r
 state, which separates a structure a person has corrected from one that has only been
 validated.
 
-Nothing else in the pipeline is missing. The 432 is the right count of rows, the 27
-and the 41 are the right exclusions, and the units are right. The table is still not
-a table of 432 known molecules, and the gap between those two statements is exactly
-what the three fields carry.
+The arithmetic gives 432 surviving rows after the stated exclusions of 27
+and 41. That does not establish complete provenance or 432 correctly
+identified molecules. Origin, model/checkpoint where applicable, and review
+state preserve the distinction between a counted row and a verified identity.
 
 ## Where the evidence stops
 
@@ -355,11 +360,11 @@ The two exclusions remove 46 rows and then 93 rows, so 800 rows less 46 rows les
 rows leaves 661 rows. The image-derived survivors are 560 less 46 less 93, which is
 421, and the typed survivors are the remaining 240.
 
-The three fields are the structure origin, the model and checkpoint that produced the
-structure, and the review state. The second table needs all three, because it mixes
-the same two kinds of rows in the same proportions. A table in which every structure
-came from a typed source table would need none of them, and that difference is the
-reason the origin field is worth a column.
+The three fields are structure origin, model/checkpoint where applicable,
+and review state. Both exports mix typed and image-derived structures,
+although their proportions differ. A typed-only table still needs origin
+and review state; its model/checkpoint field can be explicitly not applicable.
+Manual transcription also needs verification against the source.
 
 The description establishes that each of the 514 strings parses as a molecule with a
 legal valence. It leaves open whether the molecule is the one that was depicted,

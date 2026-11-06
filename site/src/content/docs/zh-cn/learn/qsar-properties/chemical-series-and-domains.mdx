@@ -5,11 +5,14 @@ description: 将化学规范化和配对分子变化连接到划分设计、相�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="qsar-properties/chemical-series-and-domains" />
 <ScrollableRegions />
 
 英文原文：[Canonical English lesson](/learn/qsar-properties/chemical-series-and-domains/)。
+
+<TeachingViewLink track="qsar-properties" chinese />
 
 ## 为明确化学对象预测明确性质
 
@@ -104,7 +107,7 @@ T(Q,B) = 3/4 = 0.75
 [SAR 归因实验](/zh-cn/labs/sar-attribution/)在生成规则写明于文件中的数据上拟合模型，
 因此成因是已知的而不是推断出来的。一个与该成因相关的混杂因子，
 在 8 个活跃分子里有 7 个拿走了更大份额的原子功劳，
-而打破该相关的那对匹配分子被排成了相反的顺序。**这正是真实活性数据永远不允许你做的那项核对。**
+而打破该相关的那对匹配分子被排成了相反的顺序。构造案例的生成规则提供了直接参照。真实活性数据的因果核对需要独立干预与对照，归因本身并不足够。
 
 ## 独立练习
 

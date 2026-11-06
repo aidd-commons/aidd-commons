@@ -4,12 +4,15 @@ description: 将分子生成视为受约束搜索，之后再由实验提供证�
 ---
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 英文原文：[Generation and search](/learn/molecular-generation/generation-and-search/)。
 
 译文更新：2026-09-08。
 
 <LessonProgress lessonId="molecular-generation/generation-and-search" />
+
+<TeachingViewLink track="molecular-generation" chinese />
 
 ## 基础
 
@@ -41,6 +44,21 @@ import LessonProgress from "../../../../../components/LessonProgress.astro";
 [生成资源指南](/zh-cn/learn/molecular-generation/generation-resource-guide/)
 区分 REINVENT 4 与已归档的 3.2 实现、分布学习与目标驱动任务，并通过手算说明
 候选有效率、唯一性和新颖性的分母。
+
+## 有边界的推演与独立任务
+
+阅读[性质预测](/zh-cn/learn/qsar-properties/property-prediction/)后，在选择提议模型之前定义筛选决策。在既有[约束搜索构造案例](/zh-cn/learn/molecular-generation/flows-and-constrained-search/)中，B 分数较好，但资源代理 h = 0.68 未通过固定的 h ≥ 0.70 门槛。C 在两个最大化分数上支配 A，但先固定 A 后，仍可能不满足单独的 batch diversity 要求。这些是构造分数，不是图库分子的活性。
+
+硬约束未通过后，加权均值能否挽救 B？若 batch 第一成员从 A 改为 C，需要记录什么？
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+不能。硬排除先于排序。更换第一成员后，应从新参考项应用同一声明 diversity 规则，并保留替代选择。生成集更大或模型 density 更高，都不提供实验确认。链接课程区分提议机制、约束定义与 batch 策略。
+
+</details>
+
+本教学任务新增于 2026-10-26；原来源审阅日期保持如下。
 
 ## v0.1 尚未教授的内容
 

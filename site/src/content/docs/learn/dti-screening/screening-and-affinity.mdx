@@ -4,8 +4,11 @@ description: Design drug-target interaction and virtual-screening comparisons ar
 ---
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="dti-screening/screening-and-affinity" />
+
+<TeachingViewLink track="dti-screening" />
 
 ## Foundations
 
@@ -37,6 +40,21 @@ Systems such as [DiffDock](https://github.com/gcorso/DiffDock),
 [Uni-Dock](https://github.com/dptech-corp/Uni-Dock), and
 [NeuralPLexer](https://github.com/zrqiao/NeuralPLexer) expose distinct assets
 and protocols; do not merge their reported numbers into one leaderboard.
+
+## A bounded worked decision and independent task
+
+After [molecular representations](/learn/representations/small-molecule-representations/), separate a pose from a ranking endpoint. The existing constructed [shortlist case](/learn/dti-screening/screening-prevalence-and-transfer/) has 1000 library compounds, 20 assay-defined actives and 8 actives in the top 50. Its EF50 is (8/50)/(20/1000) = 8. The calculation describes enrichment in this library; it supplies neither binding free energy nor a new assay observation.
+
+A second library has a different active prevalence. Which parts of the old result must be redefined before interpreting its shortlist? Would a favorable docking score replace the missing assay labels?
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+Declare the new library, label definition, active count, top fraction and follow-up. Enrichment and predictive value depend on that population. A docking score describes its scoring convention, not observed binding or an interchangeable affinity constant. The next lesson derives the prevalence dependence and keeps pose assumptions visible.
+
+</details>
+
+Teaching task added on 2026-10-26; the original source-review date remains below.
 
 ## What v0.1 does not yet teach
 

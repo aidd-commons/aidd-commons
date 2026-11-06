@@ -8,10 +8,15 @@ replays, the acquisition checkpoints, and for every policy the fraction of the
 top-decile actives recovered, the scaffold fraction reached and the evaluation
 mean absolute error.
 
-What the figure shows. The left column of each row plots recovery against the
-number of compounds acquired, and the right column plots the evaluation error
-at the same checkpoints, for the two named policies and for the five random
-policy instances. The two named policies are the ones the campaign is about,
+What the figure shows. The first column of each row plots recovery against the
+number of compounds acquired, the second plots the evaluation error
+at the same checkpoints, and the third shows their source-recorded normalized
+recovery AUC, for the two named policies and the five random policy instances.
+The AUC definition is the trapezoidal recovery integral over acquired-count
+checkpoints, divided by the final acquired count, as implemented by
+`labs/src/aidd_commons/pool_budget.py:recovery_curve` and frozen in
+`labs/pool_budget/real-protocol.json`.
+The two named policies are the ones the campaign is about,
 so they are drawn in the categorical colours; the five random instances are a
 family, drawn in one colour with a distinct marker each, because they are five
 fixed seeds of the same policy and not five different methods.
@@ -49,150 +54,146 @@ NAMED = {
 CAPTION = (
     "Acquisition policies on two retrospective assay replays, {summary}. The two named policies "
     "are drawn in colour and the five random policy instances in one colour with a distinct marker "
-    "each, because they are five fixed seeds of one policy rather than five methods. These are "
+    "each, because they are five fixed seeds of one policy rather than five methods. "
+    "Normalized recovery AUC is the trapezoidal integral over acquired-count checkpoints "
+    "divided by the final acquired count. These are "
     "retrospective replays and not prospective experiments, the random seeds are not independent "
     "replicates, and no confidence intervals or p values are reported."
 )
 
 
 def build() -> dict[str, Path]:
-    """Draw the figure and write its two files plus its caption fragment."""
+    """Keep every trajectory and expose the campaign's integral summary beside it."""
     style.apply_style("light")
-    tokens = style.tokens("light")
-    colours = style.categorical("light")
-
-    real = style.load_json(style.REPO_ROOT / "labs" / "pool_budget" / "real-summary.json")
-    uncertainty = style.load_json(
-        style.REPO_ROOT / "labs" / "pool_budget" / "uncertainty-summary.json"
+    tokens, colours = style.tokens(), style.categorical()
+    real = style.load_json(style.REPO_ROOT / "labs/pool_budget/real-summary.json")
+    uncertainty = style.load_json(style.REPO_ROOT / "labs/pool_budget/uncertainty-summary.json")
+    fig = style.figure(height=6.2)
+    style.heading(
+        fig,
+        "Acquisition policy changes recovery and evaluation error",
+        "Two retrospective assay replays · all five fixed random policy instances retained",
     )
-
-    fig = style.figure(style.FIGURE_WIDTH, 6.0)
     axes = style.axes_grid(
         fig,
         2,
-        2,
-        left=0.075,
-        right=0.985,
-        bottom=0.145,
-        top=0.905,
-        wspace=0.24,
-        hspace=0.46,
+        3,
+        left=0.08,
+        right=0.905,
+        bottom=0.20,
+        top=0.80,
+        wspace=0.48,
+        hspace=0.66,
+        width_ratios=[1.25, 1.25, 0.8],
     )
-
     summary_parts = []
-    for index, assay in enumerate(ASSAYS):
-        recovery_ax, mae_ax = axes[2 * index], axes[2 * index + 1]
+    for row, assay in enumerate(ASSAYS):
+        recovery_ax, mae_ax, auc_ax = axes[3 * row : 3 * row + 3]
         checkpoints = real["assays"][assay]["budget"]["checkpoints"]
-        policies = {policy["name"]: policy for policy in real["assays"][assay]["policies"]}
+        if checkpoints != uncertainty["assays"][assay]["budget"]["checkpoints"]:
+            raise ValueError("campaign checkpoints differ")
+        policies = {p["name"]: p for p in real["assays"][assay]["policies"]}
         policies["ensemble-variance-uncertainty"] = uncertainty["assays"][assay]["policy"]
-
-        for name in ["maxmin", "ensemble-variance-uncertainty"]:
-            colour_key, marker, dash = NAMED[name]
+        names = ["maxmin", "ensemble-variance-uncertainty"] + sorted(
+            n for n in policies if n.startswith("random")
+        )
+        if len(names) != 7:
+            raise ValueError("expected two named policies and five fixed random instances")
+        for name in names:
             policy = policies[name]
-            recovery_ax.plot(
-                checkpoints,
-                policy["recovery"],
-                color=colours[colour_key],
+            if name in NAMED:
+                colour, marker, dash = NAMED[name]
+                filled = True
+            else:
+                colour = "slate"
+                marker = RANDOM_MARKERS[names[2:].index(name)]
+                dash = (0, (2, 2))
+                filled = False
+            for axis, metric in [(recovery_ax, "recovery"), (mae_ax, "evaluation_mae")]:
+                values = policy[metric]
+                if len(values) != len(checkpoints):
+                    raise ValueError(f"{assay} {name} missing {metric} checkpoint")
+                axis.plot(
+                    checkpoints,
+                    values,
+                    color=colours[colour],
+                    marker=marker,
+                    ms=4.2 if filled else 3.2,
+                    mfc=colours[colour] if filled else tokens["panel"],
+                    mec=colours[colour],
+                    mew=0.8,
+                    lw=1.5 if filled else 0.8,
+                    ls=dash,
+                    zorder=4 if filled else 2,
+                )
+            y = 6 - names.index(name)
+            auc_ax.plot(
+                policy["normalized_auc"],
+                y,
                 marker=marker,
-                markersize=5.0,
-                markerfacecolor=colours[colour_key],
-                markeredgecolor=tokens["ink"],
-                markeredgewidth=0.4,
-                linewidth=1.8,
-                linestyle=dash,
-                zorder=4,
+                ms=5,
+                mfc=colours[colour] if filled else tokens["panel"],
+                mec=colours[colour],
+                ls="none",
             )
-            mae_ax.plot(
-                checkpoints,
-                policy["evaluation_mae"],
-                color=colours[colour_key],
-                marker=marker,
-                markersize=5.0,
-                markerfacecolor=colours[colour_key],
-                markeredgecolor=tokens["ink"],
-                markeredgewidth=0.4,
-                linewidth=1.8,
-                linestyle=dash,
-                zorder=4,
+            auc_ax.text(
+                1.04,
+                y,
+                f"{policy['normalized_auc']:.4f}",
+                transform=auc_ax.get_yaxis_transform(),
+                ha="left",
+                va="center",
+                fontsize=8,
             )
-
-        for seed_index, name in enumerate(
-            sorted(name for name in policies if name.startswith("random"))
-        ):
-            policy = policies[name]
-            recovery_ax.plot(
-                checkpoints,
-                policy["recovery"],
-                color=colours["slate"],
-                marker=RANDOM_MARKERS[seed_index],
-                markersize=4.2,
-                markerfacecolor="none",
-                markeredgecolor=colours["slate"],
-                markeredgewidth=1.0,
-                linewidth=1.0,
-                linestyle=(0, (2, 2)),
-                zorder=3,
-            )
-            mae_ax.plot(
-                checkpoints,
-                policy["evaluation_mae"],
-                color=colours["slate"],
-                marker=RANDOM_MARKERS[seed_index],
-                markersize=4.2,
-                markerfacecolor="none",
-                markeredgecolor=colours["slate"],
-                markeredgewidth=1.0,
-                linewidth=1.0,
-                linestyle=(0, (2, 2)),
-                zorder=3,
-            )
-
-        budget = real["assays"][assay]["budget"]
-        recovery_ax.set_ylabel("Top-decile actives recovered", fontsize=8.5)
-        recovery_ax.set_xlabel("Compounds acquired", fontsize=8.5)
-        recovery_ax.set_xticks(checkpoints)
+        for axis in [recovery_ax, mae_ax]:
+            axis.set_xticks(checkpoints)
+            axis.set_xlabel("Compounds acquired", fontsize=8.3)
+            style.clean_axis(axis, axis="y")
         recovery_ax.set_ylim(0, 0.27)
-        recovery_ax.grid(axis="y", linewidth=0.6, alpha=0.7)
-        recovery_ax.set_axisbelow(True)
-        style.title(recovery_ax, f"{assay} recovery")
-
-        mae_ax.set_ylabel("Evaluation MAE", fontsize=8.5)
-        mae_ax.set_xlabel("Compounds acquired", fontsize=8.5)
-        mae_ax.set_xticks(checkpoints)
-        mae_ax.grid(axis="y", linewidth=0.6, alpha=0.7)
-        mae_ax.set_axisbelow(True)
-        style.title(mae_ax, f"{assay} evaluation error")
-
+        recovery_ax.set_ylabel("Top-decile recovery", fontsize=8.3)
+        mae_ax.set_ylabel("Evaluation MAE", fontsize=8.3)
+        auc_ax.set_ylim(-0.6, 6.6)
+        auc_ax.set_yticks(
+            range(7), ["R4", "R3", "R2", "R1", "R0", "Variance", "Maxmin"], fontsize=8
+        )
+        auc_ax.set_xlabel("Recovery AUC", fontsize=8.3)
+        auc_ax.set_xlim(-0.012, 0.20)
+        auc_ax.set_xticks([0, 0.1, 0.2])
+        style.clean_axis(auc_ax)
+        style.title(recovery_ax, f"({chr(97 + row * 3)}) Recovery")
+        style.title(mae_ax, f"({chr(98 + row * 3)}) Evaluation error")
+        style.title(auc_ax, f"({chr(99 + row * 3)}) Normalized AUC")
+        fig.text(0.08, 0.855 - row * 0.365, assay, fontsize=9.4, fontweight="bold")
+        budget = real["assays"][assay]["budget"]
         maxmin = policies["maxmin"]
         ensemble = policies["ensemble-variance-uncertainty"]
         summary_parts.append(
-            f"on {assay}, {budget['acquired_count']} compounds were acquired against a pool of "
-            f"{budget['original_pool_parent_count']}, and the diversity policy recovered "
-            f"{maxmin['normalized_auc']:.4f} of the top decile against "
+            f"on {assay}, {budget['acquired_count']} compounds were acquired against a "
+            f"pool of {budget['original_pool_parent_count']}, and the diversity policy "
+            f"reached normalized recovery AUC {maxmin['normalized_auc']:.4f} against "
             f"{ensemble['normalized_auc']:.4f} for the ensemble-variance policy"
         )
-
-    handles = [
-        _handle(colours["teal"], "o", "-"),
-        _handle(colours["coral"], "s", "--"),
+    handles = [_handle(colours["teal"], "o", "-"), _handle(colours["coral"], "s", "--")] + [
+        _handle(colours["slate"], m, (0, (2, 2))) for m in RANDOM_MARKERS
     ]
-    labels = ["Maxmin diversity", "Ensemble variance"]
-    for seed_index, name in enumerate(["random-0", "random-1", "random-2", "random-3", "random-4"]):
-        handles.append(_handle(colours["slate"], RANDOM_MARKERS[seed_index], (0, (2, 2))))
-        labels.append(name)
-    figure_legend = fig.legend(
+    fig.legend(
         handles,
-        labels,
+        ["Maxmin diversity", "Ensemble variance"] + [f"Random {i}" for i in range(5)],
         loc="lower center",
+        bbox_to_anchor=(0.5, 0.06),
         ncol=4,
-        fontsize=8.0,
-        handletextpad=0.5,
-        columnspacing=1.6,
-        frameon=False,
-        bbox_to_anchor=(0.5, 0.004),
+        fontsize=8,
+        handlelength=1.8,
+        columnspacing=1.2,
     )
-    figure_legend.set_in_layout(False)
-
+    style.footnote(
+        fig,
+        (
+            "Policy seeds are fixed instances, not independent biological replicates. AUC "
+            "is a normalized recovery integral, not a final recovery fraction."
+        ),
+        y=0.018,
+    )
     written = style.save(fig, STEM)
     style.register_caption(FIGURE_NUMBER, CAPTION.format(summary=style.english_list(summary_parts)))
     return written

@@ -5,9 +5,12 @@ description: Read the agents that plan experiments, the platforms that drive ins
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="scientific-agents/autonomous-laboratory-agents" />
 <ScrollableRegions />
+
+<TeachingViewLink track="scientific-agents" />
 
 ## Learning goals and prerequisites
 
@@ -71,12 +74,14 @@ proposal for an agent that generates, critiques and ranks research hypotheses
 alongside a human scientist. It enters this family as a paper rather than as a
 running system, and its record carries no code repository.
 
-Two benchmarks complete the family. [ChemBench](https://github.com/lamalab-org/chembench)
-tests language models on chemistry knowledge at several difficulty levels, over
-the evaluation stage. [LAB-Bench](https://github.com/Future-House/LAB-Bench)
-evaluates biology-research capability with literature, database, figure, table,
-protocol and sequence questions and a multiple-choice evaluation interface, over
-the evaluation, evidence-synthesis and analysis stages.
+Three benchmark-related records complete the family.
+[ChemBench](https://github.com/lamalab-org/chembench) tests chemistry knowledge.
+[LAB-Bench](https://github.com/Future-House/LAB-Bench) evaluates biology-research
+questions involving literature, databases, figures, tables, protocols and
+sequences. [AI-Researcher](/atlas/benchmark-ai-researcher/) describes a
+research-agent system and benchmark suite for automated machine-learning
+research projects. These are different evaluation tasks; none supplies a
+matched comparison of all systems in this lesson.
 
 The boundary that separates them is simple to state and easy to lose. An answer
 that is graded correctly is an answer. A plan that was written is a plan. An
@@ -347,13 +352,9 @@ Answer the following using only the Atlas records for this family.
    the record does not establish the instrument licences, the facility terms or
    the consumable terms either.
 
-4. A supportable sentence is this. We inspected the repository, README and
-   licence file behind each of the eight records. Six of the eight establish
-   inference code, the LAB-Bench record establishes evaluation code only, the
-   co-scientist record leaves every openness dimension unverified, and the
-   AI-Researcher record states no licence at all. No training recipe, no
-   matched comparison and no reproducible evaluation is established. Nothing was
-   run, and no performance claim is made.
+4. We inspected the eight records' documented capabilities and licence
+   limits, without executing a common evaluation or establishing that the
+   laboratory workflow transfers to the group's instrument.
 
 </details>
 

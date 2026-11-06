@@ -3,11 +3,11 @@
   "artifact_type": "constructed-binder-dataset",
   "authored_on": "2026-09-11",
   "provenance": "Authored by hand for teaching. No value here is a real measurement, no molecule was assayed, and nothing is a screening proposal. The numbers are plausible in shape so the arithmetic is legible, and they are not data.",
-  "stores": "Measurements and declared rules. No molecule carries a class label, because a class is produced by a choice and this lab is about the choices.",
+  "stores": "Constructed values and declared rules. No molecule carries a class label, because a class is produced by a choice and this lab is about the choices.",
   "endpoint": {
     "quantity": "negative log of a hypothetical binding constant, in the shape of a pChEMBL value",
     "assay_uncertainty": 0.3,
-    "what_the_uncertainty_means": "A repeat measurement of the same compound is expected to move by about this much. A compound within this distance of a cutoff has not been placed on either side of it by the measurement."
+    "what_the_uncertainty_means": "A declared sensitivity distance in this constructed example, not an estimated error distribution or confidence interval. Values within this distance of the cutoff are flagged for sensitivity; no probability of crossing the cutoff is specified."
   },
   "primary_threshold": {
     "value": 6.0,
@@ -49,7 +49,7 @@
   },
   "generalization_units": {
     "molecule": "Each compound counts once.",
-    "scaffold": "Compounds sharing a Bemis-Murcko scaffold count once, because a split that separates molecules but not scaffolds puts near-copies on both sides.",
+    "scaffold": "Compounds sharing a Bemis-Murcko scaffold form a group. Molecule-level splitting can place members of a group on both sides. Counting groups does not establish statistical independence between scaffolds.",
     "acyclic_note": "An acyclic molecule has no Bemis-Murcko scaffold. The unit is not merely coarser for such a compound, it is undefined, and the lab reports how many are in that state rather than quietly assigning them one."
   }
 }

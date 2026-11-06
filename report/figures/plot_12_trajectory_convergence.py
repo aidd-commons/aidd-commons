@@ -11,7 +11,8 @@ What the figure shows. The cumulative mean of the radius of gyration over the
 first k chronologically ordered frames, compared with the full 100,000-frame
 mean, for both molecules. The horizontal axis is the number of frames included
 on a log scale and the vertical axis is the signed difference from the full
-trajectory mean.
+trajectory mean. The second panel reuses the same later-frame observations
+with a magnified vertical scale, so that small reversals remain visible.
 
 The malonaldehyde curve does not settle monotonically. It is closer at a
 thousand frames than it is at ten thousand, so a reader who checked only the
@@ -52,94 +53,96 @@ CAPTION = (
 
 
 def build() -> dict[str, Path]:
-    """Draw the figure and write its two files plus its caption fragment."""
+    """Keep the full trajectory and explicitly inspect its later-frame reversals."""
     style.apply_style("light")
-    tokens = style.tokens("light")
-    colours = style.categorical("light")
-    dashes = style.dashes("light")
-
+    tokens, colours = style.tokens(), style.categorical()
     page = read_observable_page()
-    convergence = sorted(page["convergence"], key=lambda entry: entry["frames"])
-    frames = [entry["frames"] for entry in convergence]
-
-    fig = style.figure(style.FIGURE_WIDTH, 4.2)
-    ax = fig.add_subplot(111)
-    fig.subplots_adjust(left=0.10, right=0.985, bottom=0.145, top=0.90)
-
-    series = [
-        ("ethanol", "Ethanol", colours["teal"], "o", dashes["teal"]),
-        ("malonaldehyde", "Malonaldehyde", colours["coral"], "s", dashes["coral"]),
-    ]
-    for key, _label, colour, marker, dash in series:
-        values = [entry[key] for entry in convergence]
-        ax.plot(
-            frames,
-            values,
-            color=colour,
-            marker=marker,
-            markersize=6.0,
-            markerfacecolor=colour,
-            markeredgecolor=tokens["ink"],
-            markeredgewidth=0.5,
-            linewidth=1.8,
-            linestyle=dash,
-            zorder=3,
-        )
-        for frame, value in zip(frames, values, strict=True):
-            if value == 0:
-                continue
-            ax.annotate(
-                f"{value:+.5f}",
-                xy=(frame, value),
-                xytext=(0, 9 if key == "ethanol" else -15),
-                textcoords="offset points",
-                ha="center",
-                fontsize=7.0,
-                color=tokens["ink"],
+    convergence = sorted(page["convergence"], key=lambda r: r["frames"])
+    frames = [r["frames"] for r in convergence]
+    fig = style.figure(height=5.4)
+    style.heading(
+        fig,
+        "More frames do not guarantee monotone convergence",
+        (
+            "Same retained chronological observations · full-trajectory mean is a "
+            "reference, not an independent truth"
+        ),
+    )
+    full = fig.add_axes((0.15, 0.56, 0.79, 0.24))
+    late = fig.add_axes((0.15, 0.19, 0.79, 0.23))
+    series = [("ethanol", "Ethanol", "teal", "o"), ("malonaldehyde", "Malonaldehyde", "coral", "s")]
+    for ax, selected, label in [
+        (full, convergence, "(a) Full chronological range"),
+        (
+            late,
+            [r for r in convergence if r["frames"] >= 1000],
+            "(b) Later frames · magnified vertical scale",
+        ),
+    ]:
+        ax.axhline(0, color=tokens["muted"], lw=0.8, ls="--")
+        for key, name, colour, marker in series:
+            xs = [r["frames"] for r in selected]
+            ys = [r[key] for r in selected]
+            ax.plot(
+                xs,
+                ys,
+                color=colours[colour],
+                marker=marker,
+                ms=6,
+                lw=1.7,
+                ls=style.dashes()[colour],
+                mec=tokens["ink"],
+                mew=0.5,
+                label=name,
             )
-
-    ax.axhline(0, color=tokens["ink"], linewidth=0.9, zorder=2)
-    ax.annotate(
-        "the full-trajectory mean",
-        xy=(frames[0], 0),
-        xytext=(6, -12),
-        textcoords="offset points",
-        ha="left",
-        fontsize=7.4,
-        color=tokens["muted"],
-    )
-    ax.set_xscale("log")
-    ax.set_xticks(frames)
-    ax.set_xticklabels([f"{frame:,}" for frame in frames], fontsize=8.4)
-    ax.set_xlabel("Frames included, chronologically ordered", fontsize=8.5)
-    ax.set_ylabel("Difference from the full-trajectory mean (Å)", fontsize=8.5)
-    ax.set_ylim(-0.032, 0.012)
-    ax.grid(axis="y", linewidth=0.6, alpha=0.7)
-    ax.set_axisbelow(True)
-    style.title(ax, "Cumulative mean against the full trajectory")
-
-    handles = [
-        _handle(colour, marker, dash) for _, _, colour, marker, dash in series
-    ]
-    ax.legend(
-        handles,
-        [label for _, label, _, _, _ in series],
-        loc="lower left",
-        fontsize=8.2,
-        handletextpad=0.5,
-        borderpad=0.3,
-        frameon=False,
+            for x, y in zip(xs, ys, strict=True):
+                if ax == full and x > 1000:
+                    continue
+                ax.annotate(
+                    f"{y:+.5f}",
+                    (x, y),
+                    xytext=(0, 11 if key == "ethanol" else -14),
+                    textcoords="offset points",
+                    ha="center",
+                    va="center",
+                    fontsize=8.1,
+                )
+        ax.set_xscale("log")
+        xs = [r["frames"] for r in selected]
+        ax.set_xticks(xs, [f"{x:,}" for x in xs])
+        ax.set_xlim(min(xs) / 1.35, max(xs) * 1.35)
+        ax.set_xlabel("Chronologically ordered frames · log scale")
+        ax.set_ylabel("Mean difference (Å)")
+        style.clean_axis(ax, axis="y")
+        style.title(ax, label)
+    full.set_ylim(-0.035, 0.014)
+    ys = [r[k] for r in convergence if r["frames"] >= 1000 for k in SYSTEMS]
+    pad = max(max(ys) - min(ys), 0.0001) * 0.45
+    late.set_ylim(min(ys) - pad, max(ys) + pad)
+    fig.legend(
+        *full.get_legend_handles_labels(),
         ncol=2,
-        columnspacing=1.6,
+        loc="lower center",
+        bbox_to_anchor=(0.56, 0.072),
+        fontsize=8.5,
     )
-
-    written = style.save(fig, STEM)
+    style.footnote(
+        fig,
+        (
+            "Both panels reuse the same values; no smoothing, new simulation or "
+            "independent replication. One trajectory and one level of theory per molecule."
+        ),
+        y=0.02,
+    )
     values_text = style.english_list(
-        f"{entry['ethanol']:+.5f} Å for ethanol and {entry['malonaldehyde']:+.5f} Å for "
-        f"malonaldehyde at {entry['frames']:,} frames"
-        for entry in convergence
-        if entry["frames"] != max(frames)
+        (
+            f"{r['ethanol']:+.5f} Å for ethanol and {r['malonaldehyde']:+.5f} Å for "
+            f"malonaldehyde at {r['frames']:,} frames"
+        )
+        for r in convergence
+        if r["frames"] != max(frames)
     )
+    written = style.save(fig, STEM)
     style.register_caption(FIGURE_NUMBER, CAPTION.format(values=values_text))
     return written
 

@@ -1,0 +1,36 @@
+{
+  "versions": [
+    {
+      "id": "v0.2",
+      "title": "Open Development of AI Drug Discovery",
+      "date": "2026-11-06",
+      "state": "Complete cumulative report",
+      "href": "/reports/aidd-commons-living-report-v0.2.html",
+      "format": "Full report \u00b7 HTML + PDF",
+      "description": "The complete report with 13 chapters and 20 figures, including laboratory evidence, comparison methods, frontier resources and linked teaching views.",
+      "dateLabel": "Edition",
+      "pdfHref": "/reports/aidd-commons-living-report-v0.2.pdf",
+      "pdfDate": "2026-11-06"
+    },
+    {
+      "id": "v0.2 addendum",
+      "title": "Dated coverage and teaching updates",
+      "date": "2026-09-08",
+      "state": "Historical companion text",
+      "href": "/report/v0-2/",
+      "format": "Web addendum",
+      "description": "Dated updates retained separately; this companion is not the complete report.",
+      "dateLabel": "Prepared"
+    },
+    {
+      "id": "v0.1",
+      "title": "An open map for AI drug discovery",
+      "date": "2026-09-04",
+      "state": "Historical snapshot",
+      "href": "/reports/aidd-commons-living-report-v0.1.pdf",
+      "format": "PDF",
+      "description": "The original complete PDF, retained unchanged under its original version. The cumulative v0.2 edition expands this volume.",
+      "dateLabel": "Snapshot"
+    }
+  ]
+}

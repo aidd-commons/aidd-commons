@@ -25,8 +25,8 @@ other number carrying those units. It is the output of seven declared choices.
 
 ## 1. Five components move the number, two move what it means
 
-**Search, pose generation, scoring, rescoring and constraints** each change the
-number. A different amount of searching finds different poses, so the best score
+**Search, pose generation, scoring, rescoring and constraints** can each change
+the reported number. A different amount of searching finds different poses, so the best score
 found is a property of the search as much as of the ligand. A constraint removes
 poses from consideration, so it changes which pose is best.
 
@@ -60,8 +60,10 @@ The command works out every pair and names the components that block it:
 - `p-baseline` against `p-constrained`: blocked by search and constraints
 - `p-rescored` against `p-constrained`: blocked by search, rescoring and constraints
 
-**Shared units are not shared scale.** Three protocols, three numbers, one
-reference ligand, and no legitimate comparison among them.
+Shared units alone do not establish comparability. The lab's frozen rule refuses
+to treat these different protocols as a controlled ligand-ranking comparison.
+The protocol differences can still be compared. A search-effort difference does
+not necessarily change the scoring function's scale.
 
 ## 4. What a protocol without validation cannot report
 
@@ -70,9 +72,9 @@ python labs/docking_protocol/inspect_protocol.py check
 ```
 
 `p-constrained` declares no validation and no decoys. The lab records what it
-therefore cannot report: **any claim that its scores behave as scores**, because
-nothing was validated, and **any enrichment figure**, because there is no decoy
-set to enrich against.
+therefore cannot report: a claim of validated pose or ranking quality, and an enrichment figure against
+the declared decoy set under this protocol. This rule bounds the lab's reporting;
+it does not claim that all enrichment calculations require the same decoy design.
 
 Eleven checks run. A protocol that is not fully declared stops the run before any
 comparison is attempted, because a comparison against an unstated protocol is not
@@ -88,35 +90,27 @@ Say what you would need to establish before the comparison means anything, and
 what you would do if that information no longer exists.
 
 <details data-worked-answer>
-<summary>Worked answer — the five questions, and the fallback</summary>
+<summary>Worked answer: separate score definition, search and validation</summary>
 
-**Same program is not the same protocol.** The five score-moving components can
-all differ between two runs of one program: exhaustiveness, box definition and
-padding, how conformers and protonation states were generated, which scoring
-function was selected, whether anything was rescored, and whether any constraint
-was applied. Any one of those makes -9.4 and -7.1 numbers on different scales.
+The program name does not establish a matched protocol. Recover the receptor
+state, ligand and protonation preparation, box, scoring and rescoring functions,
+constraints, search effort and random seed. A different scoring function can
+change the numerical scale. A different search effort can change which pose is
+found while leaving that scoring function and its units unchanged. The
+[AutoDock Vina FAQ](https://autodock-vina.readthedocs.io/en/latest/faq.html)
+makes this distinction in its description of exhaustiveness and search.
 
-**Two of them are especially likely here.** Different people at different times
-usually means different box definitions, because the box is drawn by hand around
-whatever reference was available then. And exhaustiveness is the setting people
-raise when a run looks unconverged, so the series that was worked on harder tends
-to carry the larger number.
+Nothing in the slide establishes which settings differed or whether either run
+was validated. Check those records. Reference-pose recovery tests pose placement;
+a ranking claim also needs an appropriate known-active comparison under the same
+declared protocol. Neither check alone establishes binding affinity or activity.
 
-**Validation is the one nobody will have.** Even if both protocols match, a score
-means something only if the protocol was checked, usually by redocking a reference
-ligand and reporting the RMSD. If neither run has that, the comparison is between
-two unvalidated quantities and matching protocols would not rescue it.
-
-**What to do if the information is gone.** Do not reconstruct it from memory, and
-do not compare the numbers with a caveat attached, because the caveat does not
-travel with the number onto the next slide. **Redock both series under one
-declared protocol.** It is cheap relative to the decision, it produces numbers
-that are comparable by construction, and it is the only route that ends with a
-defensible sentence.
-
-If redocking is not possible, the honest report is that the two numbers cannot be
-compared and that the progression decision rests on whatever evidence is not a
-docking score.
+If the records are missing, the reported -9.4 and -7.1 do not support a controlled
+comparison of the series. A new matched computation can address that missing
+comparison, with its own input record and validation. It remains a new
+calculation, not a reconstruction of the missing run. If that work is unavailable,
+base the progression decision on other suitable evidence and leave the docking
+comparison unresolved.
 
 </details>
 

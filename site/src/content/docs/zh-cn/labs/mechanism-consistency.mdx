@@ -13,13 +13,25 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 模式是按冻结协议进行全新独立计算。使用项目的 Python 3.11 环境和 CPU。数据来自原实验的缓存快照。第一条命令只验证缓存，不抓取或复制数据。如果缓存缺失，请先通过原实验取得。缓存就绪后无需网络或加速器。检查命令不改动已提交的汇总。导出命令仅在检查通过后覆盖这份小型汇总。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/mechanism_consistency/run_lab.py download
 .venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py show
 .venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py check
-.venv/bin/python labs/mechanism_consistency/export_summary.py
 .venv/bin/python -m pytest labs/tests/mechanism_consistency -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/mechanism_consistency/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/mechanism_consistency/export_summary.py
+```
+
+</details>
 
 ## 竞争解释与判别量
 
@@ -61,7 +73,7 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 可检查的证伪量是 `generic_stress_count`。它统计匹配 rho 至少为 0.1 且错配 rho 严格更高的化合物，观测值为 123。这些案例在固定对照下不利于靶点特异性模式，却不能证明一般应激是其原因。
 
-从 `show` 输出中找一个被判为 `informative_mismatched_control` 的化合物，说明为什么只看匹配相关系数会夸大机制证据。随后提出一种近靶点的扰动或挽救实验，使两种解释产生不同预测。将你的方案与[课程中的实例](/learn/mechanism-targets/perturbation-to-target-validation/)比较。
+从 `show` 输出中找一个被判为 `informative_mismatched_control` 的化合物，说明为什么只看匹配相关系数会夸大机制证据。随后提出一种近靶点的扰动或挽救实验，使两种解释产生不同预测。将你的方案与[课程中的实例](/zh-cn/learn/mechanism-targets/perturbation-to-target-validation/)比较。
 
 ## 材料边界与来源
 

@@ -5,11 +5,14 @@ description: 把公开的机器学习原子间势当作产物而不是排名来�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="physics-based-modeling/ml-potentials" />
 <ScrollableRegions />
 
 英文原文：[Machine-learning interatomic potentials](/learn/physics-based-modeling/ml-potentials/)。
+
+<TeachingViewLink track="physics-based-modeling" chinese />
 
 ## 学习目标与先修
 
@@ -166,16 +169,15 @@ Materials Project 能量或 CHGNet 能量不可直接比较。SevenNet 文档报
 <details data-worked-answer>
 <summary>参考答案</summary>
 
-1. 训练代码在 6 份中可得。数据配方在 6 份中全部未核实,所以训练输入的计数是 0。
-   这个差别正是要点:跑过一次训练脚本不等于复现那次训练,因为在没人拿得到的语料库上跑过的脚本,
-   是一个其输出无法被核查的脚本。想重训的读者手上有代码,在两个例子里还有语料库,在另外四份里
-   有代码和一个名字。
+1. 6 份记录都有训练代码，0 份核实了数据配方。这不意味着没有训练文件，其中两份
+   把训练数据记为可得。代码、输入可获取性和完整配方是不同要求，仅凭这些记录
+   不能确立原始训练的精确复现。
 2. 两份是 CHGNet 与 SevenNet。许可记录告诉你该产物可以按什么条款使用与再分发;它不告诉你该产物
    是否存在可取得的形式、权重是否就是论文所用的那批,以及背后的语料库是否够得着。
 3. 该语料库是 Alexandria 子样本,由 NequIP 与 SevenNet 两份记录点名;另一处是第二个 OMat24 资产的
    条款。取不到该语料库的读者仍能使用发布的权重,因为权重按各自的许可发布,而评测它们并不需要语料库。
-   他失去的是重训的能力、在相关化学上微调的能力,以及判断权重能外推多远的依据,因为那个判断是关于
-   语料库的说法。
+   缺少原始语料阻碍该训练的精确复现，也限制对其覆盖范围的审计。
+   仍可在另行取得且获准使用的标注数据上微调，但需要自己的评估。
 
 </details>
 

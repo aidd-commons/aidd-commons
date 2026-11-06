@@ -2,7 +2,22 @@
 
 ## Unreleased
 
-No changes yet.
+- Deliver the complete cumulative v0.2 Report in PDF and HTML: thirteen chapters,
+  twenty embedded figures and source-backed text/table/caption checks. Keep the
+  dated addendum separate and preserve the historical v0.1 PDF.
+
+- Compact bilingual Home, Learn and track pages around their scientific views.
+- Add Chinese Atlas, Audit, Report and Contribute interfaces while identifying
+  original English source material; retain search state across language and detail navigation.
+- Add figure-library search, type filters, keyboard-accessible enlargement and
+  links to all 18 teaching views. Refine plot labels, units and native diagram spacing.
+- Keep plot selections, source tables and CSV downloads consistent on fixed axes.
+- Separate learner commands from maintenance operations that overwrite retained
+  summaries, and correct teaching claims and source-identity labels.
+- Correct the trajectory-balance reward term, benchmark filtering arithmetic,
+  and distinctions between constructed examples, association and independent evidence.
+- Synchronize the local manuscript and its figure placement. These changes have
+  not yet been published as a new release.
 
 ## 0.3.1 — 25 October 2026
 

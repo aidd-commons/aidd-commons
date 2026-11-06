@@ -13,17 +13,29 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 模式为按冻结协议进行全新独立计算。使用项目的 Python 3.11 环境和 CPU。快照缓存后，以下命令不需要网络或加速器。下载步骤使用单独的缓存副本。检查命令不改动已提交的汇总。导出命令只在检查通过后覆盖小型汇总。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/specificity_margin_audit/run_lab.py download
 .venv/bin/python labs/specificity_margin_audit/inspect_specificity_margin_audit.py show
 .venv/bin/python labs/specificity_margin_audit/inspect_specificity_margin_audit.py check
-.venv/bin/python labs/specificity_margin_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/specificity_margin_audit -q
 ```
 
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/specificity_margin_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/specificity_margin_audit/export_summary.py
+```
+
+</details>
+
 ## 实验读取的材料
 
-[LiteFold 镜像](https://huggingface.co/datasets/LiteFold/SKEMPI2)以宽度不齐的 JSONL 表示 SKEMPI 2.0 档案。本实验复用已有的[亲和力读取器](/labs/skempi-affinity/)，验证行顺序、按位置对齐及解析后的数值，然后从已验证的主值读取 `Protein 1` 和 `Protein 2` 标签。它只去除标签首尾空白，不合并别名，也不从溢出片段重建字段。只有两个标签齐全且至少有一个解析后的亲和力值时，该行才计入配对。配对的先后顺序不改变其身份。
+[LiteFold 镜像](https://huggingface.co/datasets/LiteFold/SKEMPI2)以宽度不齐的 JSONL 表示 SKEMPI 2.0 档案。本实验复用已有的[亲和力读取器](/zh-cn/labs/skempi-affinity/)，验证行顺序、按位置对齐及解析后的数值，然后从已验证的主值读取 `Protein 1` 和 `Protein 2` 标签。它只去除标签首尾空白，不合并别名，也不从溢出片段重建字段。只有两个标签齐全且至少有一个解析后的亲和力值时，该行才计入配对。配对的先后顺序不改变其身份。
 
 2026-10-23 的本地计算读取了 7085 行，其中 2544 行至少有一个解析后的测量值。在这些行中，2487 行包含两个蛋白标签，构成 102 个不同的无序配对和 171 个不同的蛋白标签。其余 57 个有测量值的行在读取器的主值中缺少完整的配对标签，因此保留在档案行数中，却不能分配伙伴。汇总记录了这些计数和完整的逐蛋白表。镜像中解析字段缺失不能证明上游 CSV 缺少该值。
 
@@ -223,6 +235,17 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 ## 材料的限制
 
 这项清点不估计特异性边际，不断言某个蛋白具有特异性，也不把只有一个已观测伙伴的蛋白视作已经对其他伙伴测量。它不预测未测量蛋白，也不按行数或伙伴数排名。标签未经实体归一化，不同写法的别名可能改变计数。缺少两个标签的 57 个有测量值的行不能消除这一限制。尚未观测到读者学习成效。
+
+## 独立检查任务
+
+档案注明 154 个蛋白只有一个被计数的 partner。对其中一个蛋白，写出估计 specificity margin 所需的对照，并解释为何对同一 partner 重复测量亲和力不能替代另一个 partner。
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+Specificity margin 需要针对预期对象及明确替代 partner 的匹配测量，并保持构造、条件与终点定义相容。同一对的重复观察可帮助描述该对，却不能产生第二个 partner。Partner 数量标记报告覆盖，而不是实测选择性或其他结合的不存在。
+
+</details>
 
 ## 来源与署名
 

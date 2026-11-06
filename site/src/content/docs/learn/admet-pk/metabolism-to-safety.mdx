@@ -5,9 +5,12 @@ description: Connect metabolic routes, DDI roles, toxicity endpoints, and multi-
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="admet-pk/metabolism-to-safety" />
 <ScrollableRegions />
+
+<TeachingViewLink track="admet-pk" />
 
 ## Learning goals and prerequisites
 
@@ -62,15 +65,15 @@ robustness check, and both sit far from either 0 or 1: apparent CYP3A4
 potency is a real but weak positive signal for CYP2D6 potency here, not a
 strong predictor and not independent noise either.
 
-Two named examples from the clean-pair subset show what that weak
-correlation hides. Albaconazole (`CHEMBL298817`) is markedly CYP3A4-
+Two named examples illustrate different record structures: one clean pair
+and one heterogeneous set. Albaconazole (`CHEMBL298817`) is markedly CYP3A4-
 selective: pIC50 7.40 against CYP3A4 versus 4.50 against CYP2D6, in the same
-document. Quinidine (`CHEMBL1294`) is not a clean pair at all, and that
-absence is itself informative: it carries exactly one admitted CYP3A4
-record (pIC50 4.55) against 32 independent CYP2D6 records spanning a pIC50
-range of 4.1, more than a 10,000-fold range in reported potency, with a
-median pIC50 of 7.37. A single number for "quinidine and CYP" would have
-to choose among 33 real measurements before it named anything.
+document. Quinidine (`CHEMBL1294`) is not a clean pair: it carries exactly
+one admitted CYP3A4 record (pIC50 4.55) against 32 admitted CYP2D6 records
+spanning a pIC50 range of 4.1, more than a 10,000-fold range in reported
+potency, with a median pIC50 of 7.37. Distinct records need not be independent
+measurements. A single number for "quinidine and CYP" would have to specify
+which of these 33 records it summarizes.
 
 **Independent exercise:** A safety summary states "Compound Z inhibits
 CYP450, IC50 = 50 nM." Using only the assay-system distinction this case
@@ -223,7 +226,7 @@ weighted desirability function may aid resource allocation but needs fixed
 normalization and weights. Both approaches fail when endpoint systems differ,
 when concentration is not comparable to expected exposure, or when a safety
 mechanism is unknown. The FDA's DDI framework is risk-oriented; it does not turn
-an in-vitro result into a clinical label [FDA in-vitro DDI guidance](https://www.fda.gov/media/134582/download).
+an in-vitro result into a clinical label [FDA ICH M12 guidance](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/m12-drug-interaction-studies).
 
 **Handworked exercise (not runnable or empirical):** Apply the same constructed
 gates to U: `pIC50 5.95`, solubility `32`, clearance `30`, viability `91%`; and
@@ -246,12 +249,13 @@ other drug is the victim in that specified interaction.
 
 ## Separate the levels yourself
 
-The [safety evidence lab](/labs/safety-evidence/) computes structural alerts from
-structures while storing only findings that required an experiment, so the two can
-never be printed as one column. Seven of twelve compounds alert and five of those
-were never measured at all, the reassuring direction fails outright with positive
-findings on compounds that alert on nothing, and one of twelve carries any
-organism-level evidence.
+The [safety evidence lab](/labs/safety-evidence/) computes structural alerts
+from structures and keeps them separate from **constructed teaching records**
+representing experimental findings. In that invented dataset, seven of twelve
+compounds alert, five of those have no measurement record, some compounds
+without alerts have positive findings, and one of twelve has organism-level
+evidence. These counts illustrate evidence levels; they are not observed
+safety measurements on real compounds.
 
 ## Sources and next lesson
 
@@ -263,7 +267,7 @@ were fetched live on 2026-09-12 and are reproducible with the lab's own
 <div data-case-sources>
 
 - [ICH M12 Drug Interaction Studies: Questions and Answers — FDA](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/m12-drug-interaction-studies-questions-and-answers)
-- [In Vitro Drug Interaction Studies — FDA final guidance](https://www.fda.gov/media/134582/download)
+- [ICH M12 Drug Interaction Studies — FDA guidance](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/m12-drug-interaction-studies)
 - [FDA examples of drugs that interact with CYP enzymes and transporters](https://www.fda.gov/drugs/drug-interactions-labeling/healthcare-professionals-fdas-examples-drugs-interact-cyp-enzymes-and-transporter-systems)
 - [ChEMBL 37 activity records for CYP3A4 (CHEMBL340) and CYP2D6 (CHEMBL289)](https://www.ebi.ac.uk/chembl/api/data/status.json), read via the [CYP assay-system lab](/labs/cyp-assay-system/)
 

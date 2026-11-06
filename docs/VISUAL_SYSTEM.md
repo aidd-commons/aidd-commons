@@ -1,14 +1,69 @@
 # Visual system
 
-This file records the colours the site uses, where each one comes from, how the theme is
-chosen, and what the figures have to survive. Every number below was measured, and the
-procedure that produced it is named next to it.
+This file records the site's interface, colour tokens, reading measures and theme contract.
+The interface was revised on 2026-11-06 toward a scientific reference tool. The palette
+measurements below describe the retained palette evidence, not a new usability study.
 
-The site has two halves that must look like one site. The lessons, the lab guides, the
-resource pages and the report are rendered by Starlight. The home page, the atlas index, the
-audit index, the lab index, the report index, the contribute page and the Chinese home and
-lab pages are rendered by a custom shell. Both halves read the same colour tokens from
-`site/src/styles/global.css`, and both halves answer to the same theme control.
+The site has two halves that must look like one site. The lessons, lab guides and historical report pages are rendered by Starlight. Home, Atlas index and resource details, Audit, Labs, Report and Contribute use
+a shared custom shell in both interface languages. Both halves read the same colour, font and spacing
+tokens from `site/src/styles/global.css`, and both halves answer to the same theme signal.
+
+## Interface and reading hierarchy
+
+The home page connects an AIDD question to an interactive scientific workflow,
+background-specific learning entries, an actual retained result and resource reading.
+The English and Chinese editions use one `HomeLanding.astro` component. Track and
+record counts describe the collection and do not measure learning. A compact introduction
+leads directly to the workflow and the retained EGFR example. Secondary search and
+background routes follow. Track pages place the substantive view before progress
+and prerequisites, and repeated conceptual context is available in a disclosure.
+
+The same search form appears in the custom shell and Starlight. It sends an ordinary
+GET query to `/search/?q=...` (or the Chinese navigation equivalent), where a compact
+index connects resources, lessons, labs, routes, cases, views and other documents.
+Ctrl/Command+K focuses that form. Source language stays distinct from navigation
+language. Search rank is text matching, not scientific quality.
+
+`/learn/` and its Chinese counterpart expose the canonical routes, track map/list,
+prerequisites and local progress. Track hubs reuse the same IDs and scientific
+teaching views. Atlas uses compact list/table/landscape views with a comparison
+tray and evidence-adjacent detail. Labs and Report connect retained quantities to
+their protocol and interpretation. Scientific object inspectors keep actual
+coordinates, static projections and readable tables together. Plot legends can hide
+individual series while preserving fixed axes; the table and CSV use exactly the
+visible source rows. Without JavaScript, every source series remains available.
+
+The figure library separates explanatory diagrams, retained-result plots and
+interactive teaching views. Search and type state survive navigation. Enlarged
+figures use a native dialog with keyboard focus containment and restoration;
+direct PDF, PNG and available native PPTX downloads remain ordinary links.
+
+Pages use a system sans-serif stack, including the platform's Chinese fallback, and a
+system monospace stack for code and identifiers. There are no downloaded fonts. The shared
+type scale keeps page titles around 30–45 px, body text at 16 px and secondary metadata at
+12–14 px. The home title can reach 48 px on a wide screen. Starlight retains its document,
+sidebar, search and pagination behavior, with the same font family, title scale and panel
+surface as the custom shell. Chinese reading prose uses a slightly greater line height.
+
+| Token                                       | Purpose                      | Value                                               |
+| ------------------------------------------- | ---------------------------- | --------------------------------------------------- |
+| `--atlas-shell-width`                       | Maximum custom-shell measure | `76rem`                                             |
+| `--atlas-reading-width`                     | Starlight prose measure      | `46rem`                                             |
+| `--atlas-radius`                            | Control corners              | `0.2rem`                                            |
+| `--atlas-space-1` through `--atlas-space-8` | Shared spacing scale         | `0.25`, `0.5`, `0.75`, `1`, `1.5`, `2`, `3`, `4rem` |
+
+Hairlines separate groups; strong borders identify controls. Flat reading surfaces replace
+raised card shadows. A panel is useful where it groups evidence or controls, rather than as
+a wrapper around every paragraph. Resource, lesson, audit and report headings use the same
+scale. Dense numerical content keeps a local scroll region where necessary.
+
+Primary controls and navigation links have a minimum 44 px touch height. At narrow widths the shared search occupies its own header row, the primary
+navigation uses a labeled menu, workflow steps remain readable, and track and
+comparison controls wrap without document overflow. Both page
+families use the same small outlined wordmark. The custom navigation has a labeled menu
+button, visible keyboard focus, Escape to
+close and a usable link list when JavaScript is unavailable. The theme control, language
+links, lesson progress and supported content remain available.
 
 ## The pinned tokens
 
@@ -18,22 +73,21 @@ of a page, and they are asserted verbatim in `tests/site/visual-system.test.ts` 
 that the figure palette carries the same nine values, so the site and the figures cannot
 drift apart.
 
-| Token | Light | Dark |
-| --- | --- | --- |
-| `--atlas-bg` | `#fbf8f1` | `#10202e` |
-| `--atlas-panel` | `#fffdf8` | `#172b3b` |
-| `--atlas-ink` | `#13283d` | `#edf3f2` |
-| `--atlas-muted` | `#536675` | `#b7c6cc` |
-| `--atlas-rule` | `#ccd4d3` | `#3d5665` |
-| `--atlas-teal` | `#087c78` | `#4fc7bf` |
+| Token               | Light     | Dark      |
+| ------------------- | --------- | --------- |
+| `--atlas-bg`        | `#fbf8f1` | `#10202e` |
+| `--atlas-panel`     | `#fffdf8` | `#172b3b` |
+| `--atlas-ink`       | `#13283d` | `#edf3f2` |
+| `--atlas-muted`     | `#536675` | `#b7c6cc` |
+| `--atlas-rule`      | `#ccd4d3` | `#3d5665` |
+| `--atlas-teal`      | `#087c78` | `#4fc7bf` |
 | `--atlas-teal-deep` | `#075e5c` | `#90e4dc` |
-| `--atlas-coral` | `#c85f51` | `#fc9a88` |
-| `--atlas-focus` | `#e05d44` | `#ffb15b` |
+| `--atlas-coral`     | `#c85f51` | `#fc9a88` |
+| `--atlas-focus`     | `#e05d44` | `#ffb15b` |
 
 Two more tokens complete the shell. `--atlas-action-ink` is the text on a filled teal
-button, `#fff` in the light theme and `#10202e` in the dark one. `--atlas-shadow` is the
-card shadow, `0 12px 30px rgb(17 40 61 / 0.08)` in the light theme and
-`0 12px 30px rgb(0 0 0 / 0.22)` in the dark one.
+button, `#fff` in the light theme and `#10202e` in the dark one. `--atlas-shadow` is
+`none` in both themes; hierarchy comes from spacing, type and rules.
 
 ## The derived tokens
 
@@ -57,13 +111,13 @@ page.
 `--atlas-surface` is a quiet fill for a chip set into the page. It is the fill behind an inline
 code block and behind Starlight's accent-low surfaces.
 
-| Token | Light | Measured against | Ratio | Dark | Measured against | Ratio |
-| --- | --- | --- | --- | --- | --- | --- |
-| `--atlas-rule-strong` | `#828f97` | `--atlas-panel` | 3.27:1 | `#697d88` | `--atlas-panel` | 3.38:1 |
-| `--atlas-rule-strong` | `#828f97` | `--atlas-bg` | 3.13:1 | `#697d88` | `--atlas-bg` | 3.86:1 |
-| `--atlas-emphasis` | `#ad574e` | `--atlas-bg` | 4.66:1 | `#faa798` | `--atlas-bg` | 8.71:1 |
-| `--atlas-emphasis` | `#ad574e` | `--atlas-panel` | 4.86:1 | `#faa798` | `--atlas-panel` | 7.64:1 |
-| `--atlas-surface` | `#e3e6e4` | `--atlas-ink` | 11.94:1 | `#2c4352` | `--atlas-ink` | 9.21:1 |
+| Token                 | Light     | Measured against | Ratio   | Dark      | Measured against | Ratio  |
+| --------------------- | --------- | ---------------- | ------- | --------- | ---------------- | ------ |
+| `--atlas-rule-strong` | `#828f97` | `--atlas-panel`  | 3.27:1  | `#697d88` | `--atlas-panel`  | 3.38:1 |
+| `--atlas-rule-strong` | `#828f97` | `--atlas-bg`     | 3.13:1  | `#697d88` | `--atlas-bg`     | 3.86:1 |
+| `--atlas-emphasis`    | `#ad574e` | `--atlas-bg`     | 4.66:1  | `#faa798` | `--atlas-bg`     | 8.71:1 |
+| `--atlas-emphasis`    | `#ad574e` | `--atlas-panel`  | 4.86:1  | `#faa798` | `--atlas-panel`  | 7.64:1 |
+| `--atlas-surface`     | `#e3e6e4` | `--atlas-ink`    | 11.94:1 | `#2c4352` | `--atlas-ink`    | 9.21:1 |
 
 The procedure is the WCAG 2.1 contrast ratio computed from the sRGB values with the standard
 relative luminance formula. The component border and the link under the pointer were also
@@ -106,9 +160,9 @@ the toggle rather than the operating system.
 
 Starlight reads its colours from a set of `--sl-*` tokens that it declares inside
 `@layer starlight.base`. `site/src/styles/global.css` is emitted unlayered, so the values it
-declares outrank Starlight's. Every `--sl-*` value in this file is an atlas token rather than
-a literal, which is what keeps the two halves from drifting apart. Starlight's layout is not
-touched.
+declares outrank Starlight's. Colour mappings point to atlas tokens. Font, content-width,
+navigation-height and heading-size mappings also align the two page families. The sidebar
+and document navigation continue to use Starlight's native behavior.
 
 The reason the mapping has to exist is measured. Before it, the atlas tokens followed the
 operating system while the Starlight tokens followed the attribute, so a reader who touched
@@ -129,9 +183,9 @@ decision.
 The categorical set is four colours, one per role, and the roles are the same in both themes
 so that a chart does not have to rename its series when the page changes theme.
 
-| Role | Light | Dark |
-| --- | --- | --- |
-| teal | `#399693` | `#4fc7bf` |
+| Role  | Light     | Dark      |
+| ----- | --------- | --------- |
+| teal  | `#399693` | `#4fc7bf` |
 | coral | `#c85f51` | `#bd7366` |
 | ember | `#8c4239` | `#ffb15b` |
 | slate | `#4d5f6d` | `#808b8f` |
@@ -140,13 +194,13 @@ The ordered ladder is a separate artefact for data with a direction. It stays in
 family and runs pale to deep in the light theme and deep to pale in the dark one, because
 the dark end of a ramp has to be the visible end on a dark panel.
 
-| Step | Light | Dark |
-| --- | --- | --- |
-| 0 | `#e6f2f1` | `#2c5c68` |
-| 1 | `#b5dcda` | `#3f8183` |
-| 2 | `#77b9bd` | `#5ba39d` |
-| 3 | `#35757f` | `#86c9c3` |
-| 4 | `#123a49` | `#bce8e3` |
+| Step | Light     | Dark      |
+| ---- | --------- | --------- |
+| 0    | `#e6f2f1` | `#2c5c68` |
+| 1    | `#b5dcda` | `#3f8183` |
+| 2    | `#77b9bd` | `#5ba39d` |
+| 3    | `#35757f` | `#86c9c3` |
+| 4    | `#123a49` | `#bce8e3` |
 
 The pale washes for bar interiors are `#dfeeee`, `#f6e5e3`, `#ede1df` and `#e3e5e8` in the
 light theme and `#245a56`, `#55342e`, `#735029` and `#3a3f40` in the dark one, in the order
@@ -158,12 +212,12 @@ Colour alone never carries a category. Every categorical key resolves in all thr
 so a printed figure, a projector and a photocopy still separate the series after colour has
 been taken away.
 
-| Role | Marker | Hatch | Dash |
-| --- | --- | --- | --- |
-| teal | `o` | none | solid |
-| coral | `s` | `//` | `--` |
-| ember | `^` | `\\` | `:` |
-| slate | `D` | `xx` | `(0, (3, 1, 1, 1))` |
+| Role  | Marker | Hatch | Dash                |
+| ----- | ------ | ----- | ------------------- |
+| teal  | `o`    | none  | solid               |
+| coral | `s`    | `//`  | `--`                |
+| ember | `^`    | `\\`  | `:`                 |
+| slate | `D`    | `xx`  | `(0, (3, 1, 1, 1))` |
 
 A line or a curve carries a marker and a linestyle. A scatter carries a marker shape. A bar,
 a stacked bar, a filled area, a pie slice, a box body and a heatmap cell carry a hatch, and
@@ -179,19 +233,21 @@ the floor declared in `report/figures/atlas_palette.py` and requires the same 10
 requires the worst measured deutan and protan distance of each theme to be at or above the
 floor and every gate of both themes to have passed.
 
-The three other floors are a luminance spread of 0.22, a contrast floor of 3.0 against the
-panel a colour is drawn on, and a minimum adjacent luminance gap of 0.05 in the ladder.
+The other constraints are a maximum categorical luminance-spread budget of 0.22, a contrast
+floor of 3.0 against the panel a colour is drawn on, and a minimum adjacent luminance gap
+of 0.05 in the ladder. The measurement record names the spread constraint
+`luminance_budget`; a smaller spread passes that constraint.
 
-| Measure | Light | Dark |
-| --- | --- | --- |
-| Worst pair, normal vision | 15.43, coral against ember | 24.00, teal against slate |
-| Worst pair, deuteranopia | 15.21, teal against slate | 13.07, teal against slate |
-| Worst pair, protanopia | 14.03, coral against ember | 14.63, teal against slate |
-| Worst pair, tritanopia | 15.39, coral against ember | 17.27, coral against ember |
-| Lowest categorical contrast on its own panel | 3.47, teal | 4.02, coral |
-| Luminance spread of the categorical set | 0.186 | 0.147 |
-| Smallest adjacent gap in the ladder | 0.139 | 0.090 |
-| Smallest distance from a ladder step to a categorical colour | 12.75 | 6.08 |
+| Measure                                                      | Light                      | Dark                       |
+| ------------------------------------------------------------ | -------------------------- | -------------------------- |
+| Worst pair, normal vision                                    | 15.43, coral against ember | 24.00, teal against slate  |
+| Worst pair, deuteranopia                                     | 15.21, teal against slate  | 13.07, teal against slate  |
+| Worst pair, protanopia                                       | 14.03, coral against ember | 14.63, teal against slate  |
+| Worst pair, tritanopia                                       | 15.39, coral against ember | 17.27, coral against ember |
+| Lowest categorical contrast on its own panel                 | 3.47, teal                 | 4.02, coral                |
+| Luminance spread of the categorical set                      | 0.186                      | 0.147                      |
+| Smallest adjacent gap in the ladder                          | 0.139                      | 0.090                      |
+| Smallest distance from a ladder step to a categorical colour | 12.75                      | 6.08                       |
 
 Tritanopia distances are reported because the house gates do not gate on them, and a palette
 that is only legible to dichromats is not a palette.
@@ -199,36 +255,24 @@ that is only legible to dichromats is not a palette.
 The categorical set and the ladder are kept disjoint, so a pale colour never means a category
 in one panel and a high value on the scale in the next.
 
-## The site figures use the brand tokens, and one pair is closer than the floor
+## Source figures on the site
 
-The report's figures draw with the derived categorical set above, which clears
-the colour-vision floor in both themes. The figures published on the site are
-drawn from the same generators but themed for the site, and there the four
-categorical roles are mapped onto the site's own four tokens: teal to
-`--atlas-teal`, coral to `--atlas-coral`, ember to `--atlas-focus` and slate to
-`--atlas-muted`.
+Scientific previews are source-generated PNGs on an explicit paper-coloured surface in
+both interface themes. Each preview opens the corresponding source-generated vector PDF,
+and an explicit PDF download link remains alongside its caption. Intrinsic dimensions and
+meaningful alt text belong to the figure manifest and `AtlasFigure.astro`. The interface
+does not recolour scientific marks through CSS.
 
-That mapping is not free. The site's coral and focus colours in the light theme
-measure 6.06 CIEDE2000 apart under deuteranopia, which is below the 10.0 floor
-the derived palette holds. The two roles are still separable in every figure,
-because the generators give each categorical key a marker, a hatch and a
-linestyle, and the second channel is what a reader without dichromatic vision
-actually reads. The number is recorded here rather than hidden, because a pair
-of series that depends on the second channel is a real cost of putting the
-brand on the chart.
+`site/scripts/make-site-figures.py` imports the native report generators and saves PDF and
+PNG pairs. `site/scripts/check-site-figures.py` checks source freshness, placements and
+delivery. Site builds run the check; they do not silently redraw stale scientific figures.
+Existing author SVG inputs are preserved, and this delivery route generates no SVG.
 
-The alternative was a separate site palette, which would have put a second set
-of measured colours on the same site as the derived one. The project chose one
-identity and made the cost explicit.
-
-The site figures are generated by `site/scripts/make-site-figures.py`, which
-imports the report's own generators and replaces their save step, so no drawing
-is re-implemented and nothing under `report/figures/` is written. The site
-build runs that script before Astro, so a changed data file cannot leave a
-stale drawing on a page. The drawings are inlined into the page rather than
-loaded as a picture, because a picture is a separate document and does not
-inherit the page's custom properties, which would leave every figure in the
-light palette whatever the reader chose.
+An earlier inline-SVG route mapped categorical colours onto brand tokens. Its light-theme
+coral/focus pair measured only 6.06 CIEDE2000 under deuteranopia, below the derived palette's
+10.0 floor. That historical cost is retained here as a warning against substituting brand
+colours for measured scientific encodings. Current previews use their source palette and
+its redundant marker, hatch and line encodings.
 
 ## What this file does not cover
 

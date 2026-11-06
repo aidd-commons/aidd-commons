@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
 const siteBuildDirectory = join(repositoryRoot, "site", "dist");
 const productAreas = [
-  ["Learn", "/learn/foundations/getting-started/"],
+  ["Learn", "/learn/"],
   ["Atlas", "/atlas/"],
   ["Labs", "/labs/"],
   ["Audit", "/audit/"],

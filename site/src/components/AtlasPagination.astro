@@ -1,0 +1,13 @@
+---
+interface Props { position: "top" | "bottom"; chinese?: boolean; }
+const { position, chinese = false } = Astro.props;
+const t = (en: string, zh: string) => chinese ? zh : en;
+---
+<nav class="atlas-pagination" data-atlas-pagination data-pagination-position={position} aria-label={chinese ? `资源结果分页（${position === "top" ? "上方" : "下方"}）` : `Resource result pages ${position === "top" ? "above" : "below"}`} hidden>
+  <p data-page-range aria-live={position === "top" ? "polite" : undefined} aria-atomic="true"></p>
+  <div class="atlas-pagination__controls">
+    <button type="button" data-page-direction="-1" disabled aria-label={t("Previous result page","上一页结果")}>{t("← Previous","← 上一页")}</button>
+    <label>{t("Page ", "第 ")}<select data-atlas-page-select disabled aria-label={t("Result page","结果页")}><option value="1">1</option></select> <span data-page-total></span></label>
+    <button type="button" data-page-direction="1" disabled aria-label={t("Next result page","下一页结果")}>{t("Next →","下一页 →")}</button>
+  </div>
+</nav>

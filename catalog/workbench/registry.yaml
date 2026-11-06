@@ -1,0 +1,129 @@
+version: 1
+# Presentation mappings only. Protocols and retained summaries remain authoritative.
+cases:
+  - id: egfr-assay-transfer
+    title: When the assay changes, the representation ranking changes
+    titleZh: 测定改变时，表示方法的排名也改变
+    summary: Compare the same three frozen EGFR baselines within the primary assay and on a separate assay. Keep the failed Morgan transfer visible.
+    summaryZh: 比较同样三个冻结 EGFR 基线在主测定与另一测定上的表现，并保留 Morgan 迁移失败的证据。
+    labSlug: chembl-egfr-representation-baselines
+    trackIds: [qsar-properties, representations, evaluation-and-reproducibility]
+    lessonIds:
+      [
+        qsar-properties/property-prediction,
+        evaluation-and-reproducibility/assay-shift-diagnosis,
+      ]
+    entity: ChEMBL parent molecule
+    entityZh: ChEMBL 母体分子
+    population: Primary scaffold-held-out parents and separate assay parents; never pooled
+    populationZh: 主测定骨架留出母体与另一测定母体分别报告，不合并
+    unit: pChEMBL
+    comparison: Train mean, Descriptor Ridge and Morgan Ridge under the frozen representation protocol
+    comparisonZh: 在冻结的表示协议下比较 Train mean、Descriptor Ridge 和 Morgan Ridge
+    interpretation: Morgan has the lowest primary MAE and the highest replication MAE; neither representation is uniformly best.
+    interpretationZh: Morgan 的主测定 MAE 最低、复现测定 MAE 最高；两种表示均未在两项测定中一致占优。
+    protocol:
+      id: chembl37-egfr-representation-v1
+      path: labs/chembl_egfr/protocol.json
+      label: Frozen EGFR endpoint, representation and split
+    result:
+      id: egfr-locked-summary
+      path: labs/chembl_egfr/locked-summary.json
+      label: Retained primary and assay-replication results
+      datePointer: /reviewed_on
+      dataPointer: /results
+    viewIds: [egfr-assay-mae]
+  - id: rmd17-within-system
+    title: Configurations are not independent molecular systems
+    titleZh: 构型不等于独立分子系统
+    summary: Inspect separate benzene and uracil energy comparisons. Each Ridge model uses its own system's training frames.
+    summaryZh: 分别检查苯与尿嘧啶的能量比较；每个 Ridge 模型都使用其所在系统的训练帧。
+    labSlug: rmd17-system-state-energy-baselines
+    trackIds:
+      [physics-based-modeling, representations, evaluation-and-reproducibility]
+    lessonIds: [physics-based-modeling/physical-model-system-state]
+    entity: Molecular configuration within a named system
+    entityZh: 指定系统中的分子构型
+    population: Benzene and uracil evaluation frames, reported separately by system
+    populationZh: 苯与尿嘧啶的评估帧，按系统分别报告
+    unit: kcal/mol
+    comparison: Per-system Ridge and training-energy mean with one development-selected alpha
+    comparisonZh: 使用开发阶段选择的同一 alpha，比较各系统 Ridge 与训练能量均值
+    interpretation: Lower within-system errors do not establish transfer to a new molecular system; frames remain correlated.
+    interpretationZh: 系统内误差较低不能证明向新分子系统的迁移；帧之间仍然相关。
+    protocol:
+      id: rmd17-system-state-v1
+      path: labs/rmd17_system_state/protocol.json
+      label: Frozen rMD17 system, frame and energy contract
+    result:
+      id: rmd17-locked-summary
+      path: labs/rmd17_system_state/locked-summary.json
+      label: Retained benzene and uracil results
+      datePointer: /reviewed_on
+      dataPointer: /results
+    viewIds: [rmd17-system-mae]
+  - id: pool-budget-replay
+    title: An equal budget does not guarantee useful recovery
+    titleZh: 相同预算不保证有效回收
+    summary: Read every fixed random policy alongside MaxMin in two retrospective EGFR assay replays, keeping their populations separate.
+    summaryZh: 在两项回顾性 EGFR 测定重放中，同时查看全部固定随机策略与 MaxMin，并保持各自总体独立。
+    labSlug: pool-budget-campaign
+    trackIds: [active-learning, qsar-properties, evaluation-and-reproducibility]
+    lessonIds: [active-learning/experiment-pools-and-budgets]
+    entity: Acquired parent molecule from an original assay pool
+    entityZh: 从原始测定池中获取的母体分子
+    population: Original acquisition pool of each assay; fixed policy instances are not biological replicates
+    populationZh: 每个测定的原始获取池；固定策略实例不是生物学重复
+    unit: fraction
+    comparison: MaxMin and all five fixed random policy instances at the same declared acquisition checkpoints
+    comparisonZh: 在相同声明获取检查点比较 MaxMin 与全部五个固定随机策略实例
+    interpretation: This is a retrospective acquisition comparison, not prospective discovery or independent corroboration of the EGFR baseline study.
+    interpretationZh: 这是回顾性获取比较，不是前瞻性发现，也不是对 EGFR 基线研究的独立佐证。
+    protocol:
+      id: chembl37-egfr-pool-budget-v1
+      path: labs/pool_budget/real-protocol.json
+      label: Frozen retrospective acquisition protocol
+    result:
+      id: pool-budget-real-summary
+      path: labs/pool_budget/real-summary.json
+      label: Retained retrospective recovery curves
+      datePointer: /completed_on
+      dataPointer: /assays
+    viewIds: [pool-budget-recovery]
+views:
+  - id: egfr-assay-mae
+    caseId: egfr-assay-transfer
+    adapter: egfr-mae
+    question: Does the representation ranking survive a change of assay?
+    questionZh: 表示方法的排名能否跨测定保持？
+    quantity: mean absolute error
+    unit: pChEMBL
+    encoding: Grouped comparison by assay and model; a lower MAE is better
+    interaction: Select an assay; preserve all three baselines in the table and export
+    caption: Frozen primary and replication MAE are separate populations. Morgan's adverse replication result remains visible.
+    captionZh: 冻结的主测定与复现测定 MAE 属于不同总体；保留 Morgan 的不利复现结果。
+    tableAnchor: completed-evaluation-and-remaining-boundaries
+  - id: rmd17-system-mae
+    caseId: rmd17-within-system
+    adapter: rmd17-mae
+    question: What can a within-system energy comparison establish?
+    questionZh: 系统内能量比较能够支持什么结论？
+    quantity: mean absolute error
+    unit: kcal/mol
+    encoding: Paired model errors within each named molecular system; a lower MAE is better
+    interaction: Select a system; never pool its frames with another system
+    caption: Retained energy errors use separately fitted models. Per-frame Ridge predictions were not retained, so no residual scatter is supplied.
+    captionZh: 保留的能量误差来自分别拟合的模型；原始逐帧 Ridge 预测未保留，因此不提供残差散点图。
+    tableAnchor: completed-evaluation-and-remaining-boundaries
+  - id: pool-budget-recovery
+    caseId: pool-budget-replay
+    adapter: pool-recovery
+    question: How much of the original top decile is recovered at each equal-budget checkpoint?
+    questionZh: 在每个相同预算检查点，原始最高十分位回收了多少？
+    quantity: top-decile recovery
+    unit: fraction
+    encoding: Acquisition count on the horizontal axis and recovery fraction on the vertical axis, separated by assay
+    interaction: Select an assay and checkpoint; retain MaxMin and every fixed random curve
+    caption: Retrospective recovery is copied from every retained fixed policy. Random seeds are policy instances, not independent biological replicates.
+    captionZh: 回顾性回收率直接复制自全部保留的固定策略；随机种子是策略实例，不是独立生物学重复。
+    tableAnchor: completed-real-campaign

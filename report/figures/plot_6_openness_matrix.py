@@ -6,14 +6,12 @@ on the record id to recover the record's kind. The join key is the id and
 nothing else; the openness values are not recomputed.
 This is the live canonical projection, not a historical release snapshot.
 
-What the figure shows. Each cell is one record kind against one of the seven
-openness dimensions. The fill is the share of that kind's records for which the
-dimension is available, counted over the records for which the dimension
-applies at all, because a dimension that does not apply to a record kind is
-not evidence about it. The hatch says why the rest is not available: an
-unverified dimension is unknown, a dimension recorded as not available is
-decided, and a dimension that does not apply to that kind is outside the
-question.
+What the figure shows. Each cell crosses one record kind with one of the seven
+openness dimensions. The fraction gives the number available over applicable
+records, because a dimension that does not apply is outside that question.
+The adjacent strip covers the complete record population, retaining available,
+unverified, not-available and not-applicable states separately. A dotted
+unverified segment is unknown, not evidence of unavailability.
 
 What it does not show. Openness is recorded per dimension and never collapsed
 into a single label, so this figure does not collapse it either. A cell that
@@ -60,9 +58,9 @@ def caption(resources: list[dict]) -> str:
     return (
         f"Openness by record kind and by the seven openness dimensions, over {snapshot.records} "
         f"catalogue records. {snapshot.source_note()} "
-        "The fill is the share of a kind's records for which a dimension is "
-        "available, counted over the records for which it applies, and the hatch says why the rest "
-        "is not available, unverified, recorded as not available, or not applicable to that kind. "
+        "Each cell labels available records over applicable records. Its strip retains "
+        "all records in four separate states: available, unverified, not available and "
+        "not applicable; not-applicable records are excluded only from the displayed fraction. "
         "Openness is recorded per dimension and is never collapsed here into a single open or "
         "closed label."
     )
@@ -76,120 +74,98 @@ def _bin_index(proportion: float) -> int:
 
 
 def build() -> dict[str, Path]:
-    """Draw the figure and write its two files plus its caption fragment."""
+    """Show complete openness-state distributions rather than a dominant remainder."""
     style.apply_style("light")
-    tokens = style.tokens("light")
-    ladder = style.ladder_colours("light")
-
+    tokens, colours = style.tokens(), style.categorical()
     openness = style.load_json(style.DATA_DIR / "openness.v1.json")
     resources = style.load_json(style.DATA_DIR / "resources.v1.json")
     validate_openness_join(resources, openness)
-    kind_of = {record["id"]: record["kind"] for record in resources}
-
-    kind_counts = Counter(kind_of.values())
-    kinds = [kind for kind, _ in sorted(kind_counts.items(), key=lambda item: (-item[1], item[0]))]
-
-    fig = style.figure(style.FIGURE_WIDTH, 5.9)
-    ax = fig.add_subplot(111)
-    fig.subplots_adjust(left=0.135, right=0.985, bottom=0.255, top=0.915)
-
-    for row, kind in enumerate(kinds):
-        records = [item for item in openness if kind_of[item["id"]] == kind]
-        for column, (dimension, _) in enumerate(DIMENSIONS):
-            states = Counter(item["openness"][dimension]["value"] for item in records)
-            applicable = states["available"] + states["not_available"] + states["unverified"]
-            proportion = states["available"] / applicable if applicable else 0.0
-            index = _bin_index(proportion)
-            if (
-                states["not_applicable"] > states["unverified"]
-                and states["not_applicable"] > states["not_available"]
-            ):
-                hatch = HATCH_BY_STATE["not_applicable"]
-            elif states["not_available"] > states["unverified"]:
-                hatch = HATCH_BY_STATE["not_available"]
-            else:
-                hatch = ""
-            ax.add_patch(
-                Rectangle(
-                    (column, row),
-                    1,
-                    1,
-                    facecolor=ladder[index],
-                    edgecolor=tokens["ink"],
-                    linewidth=0.6,
-                    hatch=hatch,
-                )
-            )
+    kind_of = {r["id"]: r["kind"] for r in resources}
+    totals = Counter(kind_of.values())
+    kinds = [k for k, _ in sorted(totals.items(), key=lambda p: (-p[1], p[0]))]
+    fig = style.figure(height=5.45)
+    style.heading(
+        fig,
+        "Seven questions of openness remain separate",
+        f"{len(resources)} records · fraction available / applicable · strip retains "
+        f"every evidence state",
+    )
+    ax = fig.add_axes((0.215, 0.22, 0.75, 0.58))
+    states_order = ["available", "unverified", "not_available", "not_applicable"]
+    fills = {
+        "available": colours["teal"],
+        "unverified": tokens["panel"],
+        "not_available": style.fill_colours()["coral"],
+        "not_applicable": style.fill_colours()["slate"],
+    }
+    hatches = {"available": "", "unverified": "..", "not_available": "xx", "not_applicable": "//"}
+    for y, kind in enumerate(kinds):
+        records = [r for r in openness if kind_of[r["id"]] == kind]
+        for x, (dim, _) in enumerate(DIMENSIONS):
+            states = Counter(r["openness"][dim]["value"] for r in records)
+            if set(states) - set(states_order):
+                raise ValueError(f"unexpected openness states {states}")
+            applicable = sum(states[s] for s in states_order[:-1])
             ax.text(
-                column + 0.5,
-                row + 0.5,
-                f"{states['available']}/{applicable}",
+                x + 0.5,
+                y + 0.28,
+                f"{states['available']}/{applicable}" if applicable else "n/a",
                 ha="center",
                 va="center",
-                fontsize=6.4,
-                color=tokens["panel"] if index >= 3 else tokens["ink"],
+                fontsize=8.1,
+                fontweight="bold",
             )
-
+            left = x + 0.08
+            for state in states_order:
+                width = 0.84 * states[state] / len(records)
+                if width:
+                    ax.add_patch(
+                        Rectangle(
+                            (left, y + 0.56),
+                            width,
+                            0.20,
+                            facecolor=fills[state],
+                            edgecolor=tokens["muted"],
+                            lw=0.4,
+                            hatch=hatches[state],
+                        )
+                    )
+                left += width
     ax.set_xlim(0, len(DIMENSIONS))
     ax.set_ylim(len(kinds), 0)
-    ax.set_xticks([column + 0.5 for column in range(len(DIMENSIONS))])
-    ax.set_xticklabels([label for _, label in DIMENSIONS], fontsize=7.4)
-    ax.set_yticks([row + 0.5 for row in range(len(kinds))])
-    ax.set_yticklabels(
-        [f"{kind.replace('-', ' ')}  ({kind_counts[kind]})" for kind in kinds], fontsize=7.8
+    ax.set_xticks([x + 0.5 for x in range(len(DIMENSIONS))], [label for _, label in DIMENSIONS])
+    ax.xaxis.tick_top()
+    ax.set_yticks(
+        [y + 0.40 for y in range(len(kinds))],
+        [f"{k.replace('-', ' ')} ({totals[k]})" for k in kinds],
     )
-    ax.tick_params(length=0)
-    for spine in ax.spines.values():
-        spine.set_visible(False)
-    style.title(ax, "Openness by record kind")
-
-    ramp_handles = [
-        Rectangle((0, 0), 1, 1, facecolor=colour, edgecolor=tokens["ink"], linewidth=0.6)
-        for colour in ladder
-    ]
-    ramp = fig.legend(
-        ramp_handles,
-        BIN_LABELS,
-        loc="lower left",
-        ncol=5,
-        fontsize=7.6,
-        handlelength=1.5,
-        handleheight=1.0,
-        columnspacing=1.2,
-        frameon=False,
-        title="Share of the applicable records with the dimension available",
-        title_fontsize=7.6,
-        bbox_to_anchor=(0.135, 0.005),
-    )
-    ramp.set_in_layout(False)
-
-    hatch_handles = [
+    ax.tick_params(length=0, pad=10)
+    for y in range(1, len(kinds)):
+        ax.axhline(y, color=tokens["rule"], lw=0.5)
+    for s in ax.spines.values():
+        s.set_visible(False)
+    handles = [
         Rectangle(
-            (0, 0),
-            1,
-            1,
-            facecolor=ladder[0],
-            edgecolor=tokens["ink"],
-            linewidth=0.6,
-            hatch=pattern,
+            (0, 0), 1, 1, facecolor=fills[s], edgecolor=tokens["muted"], lw=0.5, hatch=hatches[s]
         )
-        for pattern in ("", HATCH_BY_STATE["not_available"], HATCH_BY_STATE["not_applicable"])
+        for s in states_order
     ]
-    hatch_legend = fig.legend(
-        hatch_handles,
-        ["unverified", "not available", "not applicable"],
-        loc="lower right",
-        ncol=1,
-        fontsize=7.6,
-        handlelength=1.5,
-        handleheight=1.0,
-        frameon=False,
-        title="The rest of the cell",
-        title_fontsize=7.6,
-        bbox_to_anchor=(0.99, 0.005),
+    fig.legend(
+        handles,
+        ["Available", "Unverified", "Not available", "Not applicable"],
+        ncol=2,
+        loc="lower left",
+        bbox_to_anchor=(0.21, 0.095),
+        fontsize=8.4,
+        handlelength=1.8,
+        columnspacing=2.5,
     )
-    hatch_legend.set_in_layout(False)
-
+    style.footnote(
+        fig,
+        "A strip covers all records of that kind. The fraction excludes not-applicable "
+        "records; n/a is not zero openness.",
+        y=0.03,
+    )
     written = style.save(fig, STEM)
     style.register_caption(FIGURE_NUMBER, caption(resources))
     return written

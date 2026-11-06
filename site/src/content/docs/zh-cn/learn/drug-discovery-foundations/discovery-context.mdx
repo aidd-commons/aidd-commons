@@ -4,12 +4,15 @@ description: 在建模前连接药物化学、结构生物学、测定和实验�
 ---
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 英文原文：[Drug discovery context](/learn/drug-discovery-foundations/discovery-context/)。
 
 译文更新：2026-09-08。
 
 <LessonProgress lessonId="drug-discovery-foundations/discovery-context" />
+
+<TeachingViewLink track="drug-discovery-foundations" chinese />
 
 ## 基础
 
@@ -34,6 +37,21 @@ import LessonProgress from "../../../../../components/LessonProgress.astro";
 
 多模态靶点至候选项系统可能连接化学、结构和机制证据。其效用取决于这些连接以及
 下游实验反馈能否在同一个决策点获得。
+
+## 有边界的推演与独立任务
+
+先从[流水线](/zh-cn/learn/foundations/getting-started/)开始。本导读要求判断哪种证据对应发现决策。设一个构造分子降低 reporter 信号，同时在直接 reporter counterscreen 中有活性。第一项观察与生物效应、检测干扰或两者并存均相容；第二项为测量层面的竞争解释提供证据。任一观察本身都不能确定分子靶点。
+
+在不把该分子称为有效药物的前提下，写出下一问题。正交 assay 中应改变什么，又应保留哪些相关内容？
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+有边界的问题是：在保留相关生物学而改变检测方式后，响应是否仍存在。它检验检测依赖性，不建立临床疗效或完整机制。继续阅读[assay 对照与浓度响应](/zh-cn/learn/drug-discovery-foundations/assay-controls-dose-response/)，学习归一化和数值示例。
+
+</details>
+
+本教学任务新增于 2026-10-26；原来源审阅日期保持如下。
 
 ## v0.1 尚未教授的内容
 

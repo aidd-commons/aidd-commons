@@ -11,19 +11,31 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 ## 准备与学习目标
 
-先阅读[候选提名练习册](/learn/candidate-nomination/capstone-workbook/)和[多终点档案指南](/labs/multi-endpoint-integration/)。本实验检验按顺序保留从机制到可重复性的环节时，单个化合物的证据能够支持什么。读者将识别每个环节的来源与状态，找出第一个缺少实测证据的环节，并保留其后的测量记录而不将它们提升为提名主张。
+先阅读[候选提名练习册](/zh-cn/learn/candidate-nomination/capstone-workbook/)和[多终点档案指南](/zh-cn/labs/multi-endpoint-integration/)。本实验检验按顺序保留从机制到可重复性的环节时，单个化合物的证据能够支持什么。读者将识别每个环节的来源与状态，找出第一个缺少实测证据的环节，并保留其后的测量记录而不将它们提升为提名主张。
 
 ## 全新独立计算
 
 此模式是在冻结的 ChEMBL 37 协议下进行全新独立计算。使用固定的 Python 3.11 环境和现有缓存快照。缓存就绪后，命令不需要网络或加速器。`download` 仅验证缓存，不写入数据。`show` 连同测量记录打印各环节。`check` 重新计算证据链并核对已提交的摘要。导出命令仅在审计全部通过后覆盖这一小型摘要。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/candidate_evidence_chain/run_lab.py download
 .venv/bin/python labs/candidate_evidence_chain/inspect_candidate_evidence_chain.py show
 .venv/bin/python labs/candidate_evidence_chain/inspect_candidate_evidence_chain.py check
-.venv/bin/python labs/candidate_evidence_chain/export_summary.py
 .venv/bin/python -m pytest labs/tests/candidate_evidence_chain -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/candidate_evidence_chain/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/candidate_evidence_chain/export_summary.py
+```
+
+</details>
 
 ## 证据状态与八个环节
 
@@ -80,6 +92,6 @@ CYP 环节只描述 CYP3A4 与 CYP2D6 抑制的差异，不能证明相对于预
 | 活性 | [ChEMBL 37 版本](https://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_37/)依照 [CC BY-SA 3.0](https://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_37/LICENSE) | 2026-10-21 |
 | 内在清除率 | ChEMBL 37 中的[AstraZeneca 数据集 CHEMBL3301361](https://www.ebi.ac.uk/chembl/explore/document/CHEMBL3301361)，依照 [CC BY-SA 3.0](https://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_37/LICENSE) | 2026-09-12 |
 | CYP 抑制 | [ChEMBL 37 版本](https://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_37/)依照 [CC BY-SA 3.0](https://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_37/LICENSE) | 2026-09-12 |
-| 构造的安全性和路线案例 | [安全性证据](/labs/safety-evidence/)和[路线恢复](/labs/retro-disconnection/)，原创教学材料依照 CC BY 4.0 | 非化合物快照 |
+| 构造的安全性和路线案例 | [安全性证据](/zh-cn/labs/safety-evidence/)和[路线恢复](/zh-cn/labs/retro-disconnection/)，原创教学材料依照 CC BY 4.0 | 非化合物快照 |
 
 原创指南文字依照 CC BY 4.0，原创实验代码依照 Apache-2.0。最后审阅于 2026-10-23。

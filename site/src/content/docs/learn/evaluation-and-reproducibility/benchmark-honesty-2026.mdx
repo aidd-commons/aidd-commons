@@ -5,9 +5,12 @@ description: Read thirteen benchmark and evaluation cases whose authors examine 
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="evaluation-and-reproducibility/benchmark-honesty-2026" />
 <ScrollableRegions />
+
+<TeachingViewLink track="evaluation-and-reproducibility" />
 
 ## Learning goals and prerequisites
 
@@ -25,19 +28,18 @@ these evaluations and measured none of their numbers.
 
 ## The cases, and the question each one asked
 
-**PLABench** asked whether a reported deep-learning affinity number survives
-the removal of the training corpora the benchmark audited. It runs nine
-sequence- and structure-based models over the same targets under the same
-metrics, and it separates three regimes: a warm start, a cold drug and a cold
-target. On its ChEMBL35 arm the unfiltered set is 7,650 ligands across 84
-targets. The benchmark's similarity filter drops every test ligand within an
-ECFP4 Tanimoto of 0.85 of any ligand in the fourteen audited training
-corpora, and then drops the targets left with fewer than ten ligands. The
-resulting arm holds 4,862 ligands across 71 targets. The README reports that
-one audited corpus, SAIR, reaches that similarity threshold against 32.7% of
-the unfiltered benchmark, accounting for 2,413 removed rows, and that the
-leading model still leads after the filter, with the README's own sentence
-being that the filter is what makes the result readable.
+**PLABench** evaluates nine sequence- and structure-based models under warm,
+cold-drug and cold-target regimes. Its ChEMBL35 arm starts with 7,650 ligands
+across 84 targets. The [README](https://raw.githubusercontent.com/BioinfoMachineLearning/PLABench/main/README.md)
+reports 2,735 rows removed across fourteen audited training corpora by the
+ECFP4 Tanimoto ≥ 0.85 filter, followed by removal of targets with fewer than
+ten ligands, leaving 4,862 ligands across 71 targets. The
+[per-corpus table](https://raw.githubusercontent.com/BioinfoMachineLearning/PLABench/main/results/chembl35_leakage/leak_by_corpus.csv)
+separately gives SAIR 2,501 threshold hits (32.69% of the unfiltered arm)
+and 2,413 attributed rows. Threshold hits, attributed rows and the total
+union removed are different counts. The README reports that the leading
+model remains ahead after filtering; that conclusion stays within this
+benchmark and its audited corpora.
 
 **The Multi-Paradigm Docking Benchmark** asked whether a docking score and a
 co-folding score could be placed on one leaderboard without misleading a
@@ -240,7 +242,7 @@ number; it is the part that makes the number usable.
 
 **Handworked exercise (not runnable or empirical):** A benchmark's unfiltered
 arm holds 7,650 ligands across 84 targets. Its similarity filter removes
-2,413 rows, and a second rule then removes every target left with fewer than
+2,735 rows, and a second rule then removes every target left with fewer than
 ten ligands, leaving an arm of 4,862 ligands across 71 targets. A second
 benchmark compares fifteen generation methods across three paradigms and
 reports that the three-dimensional methods reach the stronger affinities while
@@ -257,10 +259,9 @@ that would turn its finding into a general claim about the field.
 <details data-worked-answer>
 <summary>Worked answer</summary>
 
-(a) 7,650 − 2,413 = 5,237 ligands, which is 68.5% of the unfiltered arm.
-(b) The sparse-target rule then removes 5,237 − 4,862 = 375 rows, so the
-similarity filter removed about six and a half times as many rows as the
-target rule did. The two rules are not equivalent, and a reader who reports
+(a) 7,650 − 2,735 = 4,915 ligands, about 64.25% of the unfiltered arm.
+(b) The sparse-target rule removes 4,915 − 4,862 = 53 rows, so the
+similarity filter removes about 51.6 times as many rows as the target rule. The two rules are not equivalent, and a reader who reports
 "we removed the near-duplicates" has named only the rule that did most of the
 work. (c) From the second benchmark, the affinity figure alone: it is a
 docking-oracle score, so it inherits the docking function's biases, and it

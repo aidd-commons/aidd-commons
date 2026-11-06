@@ -25,13 +25,25 @@ existing caches and writes nothing. All commands use no network once the
 snapshots are cached and need no accelerator. The export command overwrites
 the committed summary only after the contract and summary checks pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/crossdomain_tradeoff/run_lab.py download
 .venv/bin/python labs/crossdomain_tradeoff/inspect_crossdomain_tradeoff.py show
 .venv/bin/python labs/crossdomain_tradeoff/inspect_crossdomain_tradeoff.py check
-.venv/bin/python labs/crossdomain_tradeoff/export_summary.py
 .venv/bin/python -m pytest labs/tests/crossdomain_tradeoff -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/crossdomain_tradeoff/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/crossdomain_tradeoff/export_summary.py
+```
+
+</details>
 
 ## The rule this laboratory executes
 

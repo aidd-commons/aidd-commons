@@ -5,6 +5,7 @@ description: 只在靶点、测定、候选活性率与后续验证契约下解�
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import ScientificTeachingView from "../../../../../components/ScientificTeachingView.astro";
 
 英文原文：[Screening prevalence, affinity scales, and transfer](/learn/dti-screening/screening-prevalence-and-transfer/)。
 
@@ -14,6 +15,8 @@ import ScrollableRegions from "../../../../../components/ScrollableRegions.astro
 ## 学习目标与前置知识
 
 你将区分构象假设与结合主张，计算声明候选活性率下的简单排序量，并评估虚拟筛选或再利用结果能否迁移至新靶点—测定决策。请先读[筛选与亲和力](/zh-cn/learn/dti-screening/screening-and-affinity/)和[回归与分类误差](/zh-cn/learn/qsar-properties/regression-classification-errors/)。本课是浏览器/手算推理，不是可运行筛选、对接流程、活性主张或实验方案。
+
+<ScientificTeachingView track="dti-screening" chinese />
 
 ## 四种输出，四种对象
 
@@ -58,15 +61,15 @@ PR curves 保留 precision 对 prevalence 的依赖；ROC curves 在阈值间概
 
 ## 挪动定义，看着基准发生变化
 
-候选活性率只是"决定一份结合物数据集是什么"的若干选择之一。
-[结合物定义实验](/zh-cn/labs/binder-definition/)把十二个分子固定住、只挪动其余部分：
-阳性计数在一组阈值之间变化超过一倍；有四个化合物落在测定不确定度之内却被归了类；
-被扩大的阴性类里三分之二从未被测量；而六个阳性最终只占三个骨架。
+候选活性率是定义结合物数据集的一项选择。**构造的**[结合物定义实验](/zh-cn/labs/binder-definition/)
+固定十二个分子：阳性计数在不同阈值间变化超过一倍，四个化合物落在已声明的不确定度
+带内，扩大后的阴性类中三分之二没有测量，而六个阳性占据三个骨架。
+这个带标记对阈值敏感的标签，不能确定实际噪声，也不能证明标签错误。
 
 ## 去核一个真实的迁移主张
 
 [筛选迁移实验](/zh-cn/labs/screening-transport/)读取本仓库自己已完成的双测定回放，
-把两个语境都换算成"回收到的目标数"——唯一能让它们可比的单位。
+把两个语境都换算成"回收到的目标数"——比较已声明筛选决策的一种有用归一化方式。
 它显示两个测定的测量步长相差 4.92 倍、五实例基线跨度在两处都不到两个目标，
 而听起来最有决定性的那个结果只由八分之一个目标支撑。
 

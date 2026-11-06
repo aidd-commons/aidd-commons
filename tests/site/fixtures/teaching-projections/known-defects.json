@@ -1,0 +1,26 @@
+[
+  {
+    "object": "egfr",
+    "path": ["units"],
+    "value": "nanometre",
+    "diagnostic": "coordinate unit"
+  },
+  {
+    "object": "egfr",
+    "path": ["entries", 0, "atoms", 0, "xyz", 0],
+    "value": 999999,
+    "diagnostic": "coordinates differ"
+  },
+  {
+    "object": "geometry",
+    "path": ["frames", 0, "atoms", 0, "element"],
+    "value": "Xe",
+    "diagnostic": "element differs"
+  },
+  {
+    "object": "molecules",
+    "path": ["morgan", "chirality"],
+    "value": false,
+    "diagnostic": "Morgan settings differ"
+  }
+]

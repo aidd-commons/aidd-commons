@@ -11,6 +11,7 @@ export type HygieneFinding = {
 // Keeping the text shared with the builder makes curated-source re-exports stable.
 export const roadmapCompatibilityPath = "docs/ROADMAP_V0.2.md";
 export const publicRoadmapPath = "docs/PUBLIC_ROADMAP.md";
+export const unreleasedStudyDirectory = "docs/research-utility";
 export const publicRoadmapPointer = `# Public roadmap compatibility link
 
 Public milestones and limitations are maintained in [PUBLIC_ROADMAP.md](PUBLIC_ROADMAP.md).
@@ -100,6 +101,14 @@ type ReviewedExemption = {
 };
 
 const reviewedExemptions: ReviewedExemption[] = [
+  // Label-free encodings of the existing authored molecule examples, with
+  // declared RDKit version and scope. This is a public teaching object, not
+  // locked model membership or predictions; only this exact path/key is allowed.
+  {
+    key: "canonical_smiles",
+    path: "site/src/data/teaching/molecules.json",
+    rule: "pipeline-state-content",
+  },
   ...[
     "labs/binder_definition/dataset.json",
     "labs/design_space/spaces.json",
@@ -234,6 +243,19 @@ function scanPathName(
   isDirectory: boolean,
 ): boolean {
   const lowerName = name.toLowerCase();
+
+  if (
+    path === unreleasedStudyDirectory ||
+    path.startsWith(`${unreleasedStudyDirectory}/`)
+  ) {
+    addFinding(
+      findings,
+      path,
+      "unreleased-study-planning",
+      "unreleased registration provenance and study planning",
+    );
+    return true;
+  }
 
   if (isDirectory && forbiddenControlDirectories.has(lowerName)) {
     addFinding(

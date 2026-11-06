@@ -1,0 +1,24 @@
+---
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+
+export type ScientificIconName = "cell" | "protein" | "molecule" | "assay" | "simulation" | "robot" | "data" | "model";
+interface Props {
+  name: ScientificIconName;
+  size?: number;
+  label?: string;
+  class?: string;
+  loading?: "eager" | "lazy";
+}
+const { name, size = 72, label, class: className, loading = "lazy" } = Astro.props;
+const images = import.meta.glob<{ default: ImageMetadata }>("../assets/editorial/*.png", { eager: true });
+const asset = images[`../assets/editorial/${name}.png`]?.default;
+if (!asset) throw new Error(`Missing approved scientific illustration: ${name}`);
+---
+<span class:list={["scientific-icon", className]} style={`--scientific-icon-size:${size}px`} aria-hidden={label ? undefined : "true"}>
+  <Image src={asset} width={size} widths={[size, size * 2]} sizes={`${size}px`} format="webp" quality={88} alt={label ?? ""} loading={loading} decoding="async" />
+</span>
+<style>
+  .scientific-icon { display:inline-flex; flex:none; align-items:center; justify-content:center; width:var(--scientific-icon-size); height:var(--scientific-icon-size); vertical-align:middle; line-height:0; isolation:isolate; }
+  .scientific-icon img { display:block; width:100%; height:100%; object-fit:contain; margin:0; border:0; box-shadow:none; }
+</style>

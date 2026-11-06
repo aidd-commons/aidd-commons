@@ -1,0 +1,150 @@
+---
+import LearningProgressPanel from "./LearningProgressPanel.astro";
+import ScientificTeachingView from "./ScientificTeachingView.astro";
+import { workbenchData, type WorkbenchTrack } from "../lib/workbench-data";
+import { catalogResources } from "../lib/site-overview";
+import { withSiteBase } from "../lib/site-paths";
+interface Props { track: WorkbenchTrack; chinese?: boolean; }
+const { track, chinese = false } = Astro.props;
+const href = (path: string) => withSiteBase(path, import.meta.env.BASE_URL);
+const local = (path: string) => href(`${chinese ? "/zh-cn" : ""}${path}`);
+const allLessons = workbenchData.tracks.flatMap((entry) => entry.lessons);
+const lessonById = new Map(allLessons.map((lesson) => [lesson.id, lesson]));
+const trackById = new Map(workbenchData.tracks.map((entry) => [entry.id, entry]));
+const ownRoute = { id: track.id, title: chinese ? track.titleZh : track.title, lessonIds: track.lessons.map((lesson) => lesson.id), prerequisiteIds: [] };
+const progressLessons = allLessons.map((lesson) => ({ id: lesson.id, title: chinese ? lesson.titleZh : lesson.title, href: href(chinese ? lesson.hrefZh : lesson.href), prerequisiteIds: lesson.prerequisiteIds }));
+const routeLinks = workbenchData.routes.filter((route) => route.lessonIds.some((id) => ownRoute.lessonIds.includes(id)));
+const sourceIds = [...new Set(track.lessons.flatMap((lesson) => lesson.sourceIds))];
+const sources = sourceIds.map((id) => catalogResources.find((resource) => resource.id === id)!).filter(Boolean);
+const practices = track.lessons.filter((lesson) => lesson.capabilities.includes("exercise"));
+const cases = workbenchData.cases.filter((entry) => entry.trackIds.includes(track.id));
+const capabilityLabels: Record<string, string> = chinese ? { orientation: "导览", explanation: "讲解", "worked-example": "示例", exercise: "练习", runnable: "本地验证可运行" } : { orientation: "Orientation", explanation: "Explanation", "worked-example": "Worked example", exercise: "Exercise", runnable: "Locally verified runnable" };
+const prerequisiteLabels: Record<string, string> = chinese ? { none: "无", "basic-chemistry": "基础化学", "basic-cell-biology": "基础细胞生物学", "linear-algebra": "线性代数", probability: "概率", python: "Python", "molecular-notation": "分子记法", "cell-biology": "细胞生物学", statistics: "统计学", "supervised-learning": "监督学习", pharmacology: "药理学", "structural-biology": "结构生物学" } : { none: "None", "basic-chemistry": "Basic chemistry", "basic-cell-biology": "Basic cell biology", "linear-algebra": "Linear algebra", probability: "Probability", python: "Python", "molecular-notation": "Molecular notation", "cell-biology": "Cell biology", statistics: "Statistics", "supervised-learning": "Supervised learning", pharmacology: "Pharmacology", "structural-biology": "Structural biology" };
+const knowledgePrerequisites = track.prerequisites.filter((id) => id !== "none" && !trackById.has(id));
+const preceding = workbenchData.tracks.find((entry) => entry.order === track.order - 1);
+const following = workbenchData.tracks.find((entry) => entry.order === track.order + 1);
+---
+
+<nav class="track-hub-breadcrumbs" aria-label={chinese ? "面包屑" : "Breadcrumb"}><a href={local("/learn/")}>{chinese ? "学习" : "Learn"}</a><span aria-hidden="true">/</span><a href={local("/learn/#learning-tracks")}>{chinese ? "轨道地图" : "Track map"}</a><span aria-hidden="true">/</span><span aria-current="page">{String(track.order).padStart(2, "0")}</span></nav>
+<section class="track-hub-hero" aria-labelledby="track-hub-title">
+  <div><p class="eyebrow">{chinese ? "学习轨道" : "Learning track"} {String(track.order).padStart(2, "0")} / {workbenchData.tracks.length}</p><h1 id="track-hub-title">{chinese ? track.titleZh : track.title}</h1><p class="track-hub-summary">{chinese ? track.summaryZh : track.summary}</p><div class="track-hub-actions"><a href={href(chinese ? track.entryHrefZh : track.entryHref)}>{chinese ? "从入门课程开始" : "Start with the introduction"}<span aria-hidden="true">→</span></a><a href="#track-lessons">{chinese ? "查看课程与先修条件" : "View lessons and prerequisites"}<span aria-hidden="true">↓</span></a></div><dl class="track-hub-counts"><div><dt>{chinese ? "课程" : "Lessons"}</dt><dd>{track.lessons.length}</dd></div><div><dt>{chinese ? "映射教学单元" : "Mapped units"}</dt><dd>{track.unitIds.length}</dd></div><div><dt>{chinese ? "来源记录" : "Source records"}</dt><dd>{sources.length}</dd></div></dl></div>
+</section>
+
+<ScientificTeachingView track={track.id} chinese={chinese} compact />
+
+<div class="track-hub-study-tools">
+  <LearningProgressPanel chinese={chinese} routes={[ownRoute]} lessons={progressLessons} compact />
+  <section class="track-hub-prerequisites" aria-labelledby="track-prerequisites-title"><div><p class="eyebrow">{chinese ? "学习依赖" : "Learning dependencies"}</p><h2 id="track-prerequisites-title">{chinese ? "开始前需要什么？" : "What comes before this track?"}</h2><p>{chinese ? "这些是规范课程声明的先修条件。它们帮助安排阅读顺序，不会限制访问，也不代表已经测量你的掌握程度。" : "These prerequisites are declared by the canonical curriculum. They guide reading order, do not restrict access, and do not assess your proficiency."}</p></div><div class="track-hub-prerequisite-links">{track.prerequisiteIds.length ? <ul>{track.prerequisiteIds.map((id) => { const prior = trackById.get(id)!; return <li><span aria-hidden="true">↳</span><a href={href(chinese ? prior.hrefZh : prior.href)}>{chinese ? prior.titleZh : prior.title}<span aria-hidden="true">↗</span></a></li>; })}</ul> : <p>{chinese ? "无需先完成其他轨道。" : "No prior track is required."}</p>}{knowledgePrerequisites.length > 0 && <p class="track-hub-knowledge"><strong>{chinese ? "背景知识" : "Background knowledge"}</strong><span>{knowledgePrerequisites.map((id) => prerequisiteLabels[id] ?? id).join(chinese ? "、" : " · ")}</span></p>}</div></section>
+</div>
+
+<section id="track-lessons" class="track-hub-lessons" aria-labelledby="track-lessons-title"><div class="track-hub-heading"><div><p class="eyebrow">{chinese ? "按规范顺序阅读" : "Read in declared order"}</p><h2 id="track-lessons-title">{chinese ? "课程、例题与练习" : "Lessons, worked examples and practice"}</h2></div><span>{track.lessons.length} {chinese ? "节课程" : "lessons"}</span></div><p class="track-hub-capability-note">{chinese ? "标签分别描述页面包含的教学材料，并非难度或质量评分。“可运行”指已有本地验证，不是读者学习效果。" : "Tags describe the teaching material on a page, not difficulty or quality. “Runnable” refers to existing local verification, not reader learning."}</p>
+  <track-study-list data-chinese={String(chinese)}><ol>{track.lessons.map((lesson, index) => <li data-track-lesson={lesson.id}><span class="track-lesson-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span><div class="track-lesson-main"><h3><a href={href(chinese ? lesson.hrefZh : lesson.href)}>{chinese ? lesson.titleZh : lesson.title}<span aria-hidden="true">↗</span></a></h3><div class="track-lesson-capabilities">{lesson.capabilities.map((capability) => <span>{capabilityLabels[capability] ?? capability}</span>)}</div>{lesson.prerequisiteIds.length > 0 && <div class="track-lesson-prerequisites"><span>{chinese ? "先修" : "Prerequisites"}</span><ul>{lesson.prerequisiteIds.map((id) => { const prior = lessonById.get(id)!; return <li><a href={href(chinese ? prior.hrefZh : prior.href)}>{chinese ? prior.titleZh : prior.title}</a></li>; })}</ul></div>}</div><span class="track-lesson-completion" data-lesson-completion hidden></span></li>)}</ol></track-study-list>
+</section>
+
+<section class="track-hub-practice" aria-labelledby="track-practice-title"><div class="track-hub-practice__tasks"><p class="eyebrow">{chinese ? "选择一个可检查的输出" : "Choose an inspectable output"}</p><h2 id="track-practice-title">{chinese ? "把阅读变成一次独立任务" : "Turn the reading into an independent task"}</h2>{practices.length > 0 ? <ul>{practices.slice(0, 3).map((lesson) => <li><a href={href(chinese ? lesson.hrefZh : lesson.href)}>{chinese ? lesson.titleZh : lesson.title}<span aria-hidden="true">↗</span></a></li>)}</ul> : <p>{chinese ? "从入门课程的解释和来源开始。" : "Begin with the introduction’s explanation and sources."}</p>}<p class="track-hub-practice__mode">{chinese ? "执行命令前先读页面标明的模式、输入要求与输出目录。学生练习与作者已保存的结果分开。" : "Before running a command, read the page’s mode, input requirements and output directory. Student exercises stay separate from retained author results."}</p><a class="track-hub-notebook-link" href={local("/labs/notebook-guide/")}>{chinese ? "Notebook 操作与恢复指南" : "Notebook execution and recovery guide"}<span aria-hidden="true">→</span></a></div><div class="track-hub-related"><p class="eyebrow">{chinese ? "把本轨道放回整体问题" : "Place this track in the wider question"}</p><h3>{chinese ? "相关路径与已有案例" : "Connected routes and retained cases"}</h3><ul>{routeLinks.map((route) => <li><span>{route.kind === "core" ? chinese ? "核心路径" : "Core route" : chinese ? "专题路径" : "Specialist route"}</span><a href={href(chinese ? route.hrefZh : route.href)}>{chinese ? route.titleZh : route.title}<span aria-hidden="true">↗</span></a></li>)}{cases.map((entry) => <li><span>{chinese ? "阅读已有结果" : "Read retained results"}</span><a href={href(chinese ? entry.hrefZh : entry.href)}>{chinese ? entry.titleZh : entry.title}<span aria-hidden="true">↗</span></a></li>)}</ul></div></section>
+
+<section class="track-hub-sources" aria-labelledby="track-sources-title"><div class="track-hub-heading"><div><p class="eyebrow">{chinese ? "来源与复用 · 英文图谱记录" : "Sources and reuse · Atlas records"}</p><h2 id="track-sources-title">{chinese ? "继续追到原始来源" : "Continue to the original sources"}</h2></div><a href={href("/atlas/")}>{chinese ? "浏览图谱" : "Browse Atlas"}<span aria-hidden="true">↗</span></a></div><p>{chinese ? "以下是本轨道课程引用的来源记录。导航关联不自动构成对某项科学主张的支持；请打开记录阅读用途、证据、来源日期和七项资产状态。" : "These records are cited by lessons in this track. A navigation association is not automatic support for a scientific claim. Open each record to read its purpose, evidence, source date and seven asset states."}</p><ul>{sources.map((resource) => <li><a href={href(`/atlas/${resource.id}/`)}>{resource.name}<span aria-hidden="true">↗</span></a></li>)}</ul></section>
+<nav class="track-hub-neighbours" aria-label={chinese ? "相邻学习轨道" : "Adjacent learning tracks"}>{preceding ? <a href={href(chinese ? preceding.hrefZh : preceding.href)}><small>{chinese ? "上一条轨道" : "Previous track"}</small><span>← {chinese ? preceding.titleZh : preceding.title}</span></a> : <a href={local("/learn/")}><small>{chinese ? "学习枢纽" : "Learning hub"}</small><span>← {chinese ? "全部路径与轨道" : "All routes and tracks"}</span></a>}{following && <a href={href(chinese ? following.hrefZh : following.href)}><small>{chinese ? "下一条轨道" : "Next track"}</small><span>{chinese ? following.titleZh : following.title} →</span></a>}</nav>
+
+<script>
+  import { readLessonProgress } from "../lib/atlas-state";
+  class TrackStudyList extends HTMLElement {
+    private onStorage = () => this.render();
+    connectedCallback() {
+      window.addEventListener("storage", this.onStorage);
+      window.addEventListener("pageshow", this.onStorage);
+      this.render();
+    }
+    disconnectedCallback() {
+      window.removeEventListener("storage", this.onStorage);
+      window.removeEventListener("pageshow", this.onStorage);
+    }
+    private render() {
+      let completed: string[] = [];
+      try { completed = readLessonProgress(localStorage); } catch { return; }
+      this.querySelectorAll<HTMLElement>("[data-track-lesson]").forEach((lesson) => {
+        const label = lesson.querySelector<HTMLElement>("[data-lesson-completion]");
+        if (label) {
+          label.hidden = !completed.includes(lesson.dataset.trackLesson ?? "");
+          label.textContent = this.dataset.chinese === "true" ? "✓ 本机已标记完成" : "✓ Marked complete on this device";
+        }
+      });
+    }
+  }
+  if (!customElements.get("track-study-list")) customElements.define("track-study-list", TrackStudyList);
+</script>
+
+<style>
+  .track-hub-breadcrumbs { display: flex; align-items: center; flex-wrap: wrap; gap: .65rem; color: var(--atlas-muted); font-size: .875rem; margin-bottom: .5rem; }
+  .track-hub-breadcrumbs a { display: inline-flex; align-items: center; min-height: 44px; }
+  .track-hub-breadcrumbs span[aria-current] { font-family: var(--atlas-font-mono); }
+  .track-hub-hero { padding-bottom: 1.25rem; }
+  .track-hub-study-tools { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 1.5rem; align-items: start; margin-top: 1.25rem; }
+  .track-hub-hero .eyebrow { font-size: .75rem; margin: 0 0 .5rem; }
+  .track-hub-hero h1 { margin: 0; max-width: 40ch; font-size: clamp(1.8rem, 2.8vw, 2.6rem); font-weight: 650; letter-spacing: -.045em; line-height: 1.15; text-wrap: balance; }
+  .track-hub-summary { max-width: 90ch; color: var(--atlas-muted); font-size: 1rem; line-height: 1.65; margin: .7rem 0 .5rem; }
+  .track-hub-actions { display: flex; flex-wrap: wrap; gap: .3rem 1.5rem; }
+  .track-hub-actions a { display: inline-flex; align-items: center; gap: .8rem; min-height: 44px; font-size: .77rem; font-weight: 650; }
+  .track-hub-counts { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin: .6rem 0 0; }
+  .track-hub-counts > div { display: flex; align-items: baseline; gap: .4rem; }
+  .track-hub-counts dt { color: var(--atlas-muted); font-size: .75rem; }
+  .track-hub-counts dd { margin: 0; color: var(--atlas-teal-deep); font: 1rem/1.2 var(--atlas-font-mono); }
+  .track-hub-prerequisites { min-width: 0; padding: 1rem 0; border-block: 1px solid var(--atlas-rule); }
+  .track-hub-prerequisites .eyebrow { font-size: .75rem; margin: 0 0 .4rem; }
+  .track-hub-prerequisites h2 { margin: 0; font-size: 1.3rem; letter-spacing: -.025em; }
+  .track-hub-prerequisites p { color: var(--atlas-muted); font-size: .875rem; line-height: 1.6; max-width: 66ch; margin: .5rem 0; }
+  .track-hub-prerequisite-links > ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .3rem 1rem; }
+  .track-hub-prerequisite-links li { display: flex; align-items: baseline; gap: .5rem; }
+  .track-hub-prerequisite-links li > span { color: var(--atlas-muted); font-size: .8rem; }
+  .track-hub-prerequisite-links a { display: flex; align-items: center; justify-content: space-between; gap: .75rem; min-height: 44px; font-size: .75rem; }
+  .track-hub-knowledge { display: grid; gap: .2rem; margin: .5rem 0 0; border-top: 1px solid var(--atlas-rule); padding-top: .5rem; }
+  .track-hub-knowledge strong { font-size: .75rem; font-weight: 500; }
+  .track-hub-lessons { margin-top: 1.75rem; scroll-margin-top: 5rem; }
+  .track-hub-heading { display: flex; justify-content: space-between; align-items: end; gap: 1rem; margin-bottom: 1rem; }
+  .track-hub-heading .eyebrow { margin: 0 0 .4rem; font-size: .75rem; }
+  .track-hub-heading h2 { margin: 0; font-size: 1.6rem; letter-spacing: -.035em; line-height: 1.25; }
+  .track-hub-heading > span { color: var(--atlas-muted); font-family: var(--atlas-font-mono); font-size: .75rem; }
+  .track-hub-heading > a { display: inline-flex; align-items: center; gap: .75rem; min-height: 44px; font-size: .75rem; }
+  .track-hub-capability-note { max-width: 100ch; color: var(--atlas-muted); font-size: .75rem; line-height: 1.7; margin: 0 0 1.25rem; }
+  track-study-list { display: block; }
+  track-study-list > ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--atlas-rule-strong); }
+  track-study-list > ol > li { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; gap: 1rem; padding-block: 1rem; border-bottom: 1px solid var(--atlas-rule); }
+  .track-lesson-number { color: var(--atlas-teal-deep); padding-top: .4rem; font-family: var(--atlas-font-mono); font-size: .75rem; }
+  .track-lesson-main h3 { margin: 0; font-size: 1rem; letter-spacing: -.02em; line-height: 1.4; }
+  .track-lesson-main h3 > a { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 44px; text-decoration: none; color: var(--atlas-ink); }
+  .track-lesson-main h3 > a > span { color: var(--atlas-teal-deep); font-size: .8rem; }
+  .track-lesson-capabilities { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .4rem; }
+  .track-lesson-capabilities > span { padding: .15rem .4rem; background: var(--atlas-surface); color: var(--atlas-ink); border: 1px solid var(--atlas-rule); font-size: .75rem; line-height: 1.5; }
+  .track-lesson-prerequisites { display: flex; align-items: baseline; gap: .75rem; margin-top: .65rem; }
+  .track-lesson-prerequisites > span { font-size: .75rem; color: var(--atlas-muted); flex-shrink: 0; }
+  .track-lesson-prerequisites ul { display: flex; flex-wrap: wrap; gap: .1rem 1rem; margin: 0; padding: 0; list-style: none; }
+  .track-lesson-prerequisites a { display: inline-flex; align-items: center; min-height: 44px; font-size: .75rem; line-height: 1.5; }
+  .track-lesson-completion { padding-top: .65rem; color: var(--atlas-teal-deep); font-size: .75rem; white-space: nowrap; }
+  .track-hub-practice { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.75rem; padding-block: 1.75rem; }
+  .track-hub-practice .eyebrow { font-size: .75rem; margin: 0 0 .7rem; }
+  .track-hub-practice h2 { margin: 0; max-width: 26ch; font-size: 1.6rem; letter-spacing: -.035em; line-height: 1.25; }
+  .track-hub-practice__tasks > ul { padding: 0; margin: 1.2rem 0; list-style: none; border-top: 1px solid var(--atlas-rule); }
+  .track-hub-practice__tasks > ul > li { border-bottom: 1px solid var(--atlas-rule); }
+  .track-hub-practice__tasks > ul a { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 52px; padding-block: .5rem; font-size: .78rem; line-height: 1.5; }
+  .track-hub-practice__mode { max-width: 65ch; font-size: .75rem; color: var(--atlas-muted); line-height: 1.7; }
+  .track-hub-notebook-link { display: inline-flex; align-items: center; gap: 1rem; min-height: 44px; font-size: .75rem; font-weight: 650; }
+  .track-hub-related { background: var(--atlas-panel); border: 1px solid var(--atlas-rule); padding: 1.25rem; }
+  .track-hub-related h3 { margin: 0 0 1rem; font-size: 1.15rem; letter-spacing: -.025em; }
+  .track-hub-related ul { list-style: none; margin: 0; padding: 0; }
+  .track-hub-related li { border-top: 1px solid var(--atlas-rule); padding-top: .65rem; }
+  .track-hub-related li > span { color: var(--atlas-muted); font-size: .75rem; }
+  .track-hub-related li > a { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 44px; font-size: .78rem; }
+  .track-hub-sources { padding-block: 1.75rem; border-top: 1px solid var(--atlas-rule-strong); }
+  .track-hub-sources > p { max-width: 100ch; color: var(--atlas-muted); font-size: .75rem; line-height: 1.7; }
+  .track-hub-sources > ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 1.5rem; padding: 0; margin: 1.25rem 0 0; list-style: none; }
+  .track-hub-sources li { border-top: 1px solid var(--atlas-rule); min-width: 0; }
+  .track-hub-sources li > a { display: flex; align-items: center; justify-content: space-between; gap: .75rem; min-height: 52px; padding-block: .6rem; font-size: .75rem; line-height: 1.5; }
+  .track-hub-neighbours { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; border-top: 1px solid var(--atlas-rule); padding-top: 1.5rem; }
+  .track-hub-neighbours a { display: flex; flex-direction: column; gap: .5rem; min-height: 60px; font-size: .82rem; text-decoration: none; }
+  .track-hub-neighbours a:last-child { text-align: right; }
+  .track-hub-neighbours small { color: var(--atlas-muted); font-size: .75rem; }
+  [hidden] { display: none !important; }
+  @media (max-width: 850px) { .track-hub-hero { gap: 1.5rem; } .track-hub-prerequisites { gap: 1.5rem; } .track-hub-prerequisite-links > ul { grid-template-columns: 1fr; } .track-hub-practice { gap: 1.5rem; } .track-hub-sources > ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 680px) { .track-hub-study-tools, .track-hub-practice { grid-template-columns: 1fr; } .track-hub-hero h1 { font-size: 2.1rem; max-width: none; } .track-hub-study-tools { gap: 1rem; } .track-hub-prerequisite-links > ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } track-study-list > ol > li { grid-template-columns: 1.5rem minmax(0, 1fr); gap: .75rem; } .track-lesson-completion { grid-column: 2; padding-top: 0; } .track-lesson-prerequisites { flex-direction: column; gap: .1rem; } .track-hub-neighbours { gap: 1rem; } }
+  @media (max-width: 420px) { .track-hub-prerequisite-links > ul, .track-hub-sources > ul { grid-template-columns: 1fr; } .track-hub-heading { align-items: flex-start; } .track-hub-counts { gap: 1.5rem; } .track-hub-hero h1 { font-size: 1.85rem; } .track-hub-neighbours { grid-template-columns: 1fr; } .track-hub-neighbours a:last-child { text-align: left; } }
+</style>

@@ -22,13 +22,25 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 已有缓存、不写任何东西;快照就位后,其余命令都不用网络、不需要加速器。导出命令只在契约与
 汇总检查全部通过后才覆盖已提交的汇总。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/crossdomain_tradeoff/run_lab.py download
 .venv/bin/python labs/crossdomain_tradeoff/inspect_crossdomain_tradeoff.py show
 .venv/bin/python labs/crossdomain_tradeoff/inspect_crossdomain_tradeoff.py check
-.venv/bin/python labs/crossdomain_tradeoff/export_summary.py
 .venv/bin/python -m pytest labs/tests/crossdomain_tradeoff -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/crossdomain_tradeoff/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/crossdomain_tradeoff/export_summary.py
+```
+
+</details>
 
 ## 本实验执行的规则
 

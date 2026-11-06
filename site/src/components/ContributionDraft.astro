@@ -1,0 +1,47 @@
+---
+interface Props { chinese?: boolean; }
+const { chinese = false } = Astro.props;
+const t = (en: string, zh: string) => chinese ? zh : en;
+const examples = [
+  [t("Question","提问"), t("Why does a scaffold split change the interpretation of this error?","骨架划分为什么会改变这个误差的解释？"), t("Link the lesson section and share your current interpretation.","链接课程章节，并分享当前理解。")],
+  [t("Correction","更正"), t("The recorded weight licence differs from the upstream release.","记录中的权重许可与上游发布不一致。"), t("Link the exact licence and state which asset it covers.","链接准确的许可，并说明其覆盖哪项资产。")],
+  [t("Reproduction","复现"), t("The declared command fails before the first output on my environment.","在我的环境中，声明的命令在产生首个输出前失败。"), t("Include versions, command, first error and the fresh output path.","提供版本、命令、首个错误和新的输出路径。")],
+];
+---
+<section class="contribution-draft section" aria-labelledby="draft-title">
+  <div><p class="eyebrow">{t("Start from a concrete observation","从具体观察开始")}</p><h2 id="draft-title">{t("Prepare a useful question or correction","准备明确的问题或更正")}</h2><p>{t("A short, located question is enough to start. A correction needs evidence for the changed claim. The examples show the difference.","简短且定位明确的问题即可开始讨论。更正需要提供支持修改主张的证据。下方示例展示两者区别。")}</p><dl class="contribution-examples">{examples.map(([kind,example,help])=><div><dt>{kind}</dt><dd><strong>{example}</strong><p>{help}</p></dd></div>)}</dl></div>
+  <contribution-draft data-locale={chinese ? "zh-cn" : "en"}>
+    <form aria-label={t("Prepare a contribution draft","准备贡献草稿")}>
+      <label for="contribution-kind">{t("Destination","提交类型")}</label><select id="contribution-kind" name="kind"><option value="question">{t("Learning question","学习提问")}</option><option value="correction">{t("Source-backed correction","有来源依据的更正")}</option></select>
+      <label for="contribution-location">{t("Page, object and version","页面、对象与版本")}</label><input id="contribution-location" name="location" type="text" placeholder={t("Page URL · section or resource ID · version if known","页面 URL · 章节或资源 ID · 版本（若已知）")} />
+      <label for="contribution-message">{t("Your question or observation","问题或观察")}</label><textarea id="contribution-message" name="message" rows="4" placeholder={t("Name the specific point you want to discuss.","写明想讨论的具体问题。")}></textarea>
+      <label for="contribution-evidence">{t("Reasoning or primary evidence","推理或一手证据")}</label><textarea id="contribution-evidence" name="evidence" rows="3" placeholder={t("What have you tried, or what does the source establish?","你尝试过什么？来源能支持什么结论？")}></textarea>
+      <button type="submit">{t("Prepare the GitHub draft","准备 GitHub 草稿")}</button>
+    </form>
+    <p data-draft-status role="status">{t("The text stays on this page until you open the draft. GitHub requires sign-in and a separate submission.","打开草稿前，文字仅保留在此页面。GitHub 需要登录，并由你单独提交。")}</p>
+    <a data-draft-link href="https://github.com/gxCaesar/aidd-commons/issues/new?template=learning-question.yml" hidden>{t("Open the prepared draft on GitHub →","在 GitHub 打开准备好的草稿 →")}</a>
+    <noscript><p>{t("Use the contribution forms below directly.","直接使用下方贡献表单。")}</p></noscript>
+  </contribution-draft>
+</section>
+<script>
+  class ContributionDraft extends HTMLElement {
+    connectedCallback(){
+      const form=this.querySelector("form")!;
+      form.addEventListener("submit",event=>{
+        event.preventDefault();
+        const data=new FormData(form),correction=data.get("kind")==="correction";
+        const params=new URLSearchParams({template:correction?"correction.yml":"learning-question.yml",location:String(data.get("location")??"")});
+        params.set(correction?"summary":"question",String(data.get("message")??""));
+        params.set(correction?"evidence":"reasoning",String(data.get("evidence")??""));
+        const link=this.querySelector<HTMLAnchorElement>("[data-draft-link]")!;
+        link.href=`https://github.com/gxCaesar/aidd-commons/issues/new?${params}`;link.hidden=false;
+        this.querySelector("[data-draft-status]")!.textContent=this.dataset.locale === "zh-cn" ? "草稿已在本地准备。请在 GitHub 查看其余字段，再决定是否提交。" : "Draft prepared locally. Open it on GitHub to review the remaining fields and decide whether to submit.";
+        link.focus();
+      });
+    }
+  }
+  if(!customElements.get("contribution-draft"))customElements.define("contribution-draft",ContributionDraft);
+</script>
+<style>
+  .contribution-draft{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,5vw,4rem)}.contribution-examples{margin:2rem 0}.contribution-examples>div{border-top:1px solid var(--atlas-rule);padding:1rem 0;display:grid;grid-template-columns:6rem 1fr;gap:1rem}.contribution-examples dt{font-size:.75rem;font-weight:700;text-transform:uppercase;color:var(--atlas-teal-deep)}.contribution-examples dd{margin:0;font-size:.9rem}.contribution-examples p{color:var(--atlas-muted);font-size:.8rem}contribution-draft{display:block;background:var(--atlas-panel);border:1px solid var(--atlas-rule);padding:1.5rem}form{display:grid;gap:1rem}label{display:flex;flex-direction:column;gap:.4rem;font-size:.85rem}input,select,textarea{font:inherit;min-height:44px;padding:.6rem;border:1px solid var(--atlas-rule-strong);background:var(--atlas-bg);color:var(--atlas-ink);min-width:0;max-width:100%}button{min-height:44px;background:var(--atlas-teal-deep);color:var(--atlas-action-ink);border:1px solid var(--atlas-teal-deep);padding:.7rem;cursor:pointer;font:inherit}[data-draft-status]{font-size:.8rem;color:var(--atlas-muted)}[data-draft-link]:not([hidden]){min-height:44px;display:inline-flex;align-items:center}@media(max-width:48rem){.contribution-draft{grid-template-columns:1fr}}
+</style>

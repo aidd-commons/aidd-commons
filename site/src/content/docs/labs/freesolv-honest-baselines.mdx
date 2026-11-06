@@ -67,3 +67,13 @@ The v0.52 release metadata does not declare licence terms. Current repository
 README and branch licence files are not version-bound evidence for this
 historical release, so this lab does not transfer those current-branch licence
 claims to v0.52.
+## Independent inspection task
+
+Using the scaffold-primary table, identify which learned model has lower MAE and which has higher empirical 90% coverage. Can one be called better on every reported criterion? State why this single evaluation is not permission to change alpha, trees or split membership.
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+Morgan + Ridge has lower MAE, while Morgan + Random Forest has higher empirical coverage and wider intervals. Those are different criteria. Empirical coverage on this finite held-out set is not a universal guarantee. The scaffold-primary protocol and model settings were frozen; changing them after evaluation creates development on exposed evidence.
+
+</details>

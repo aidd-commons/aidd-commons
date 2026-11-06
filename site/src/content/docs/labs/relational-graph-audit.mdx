@@ -13,13 +13,25 @@ This laboratory serves `t05-relational-knowledge-graph-representation`. Read [ty
 
 Mode is fresh independent computation over a frozen protocol and the committed catalogue. Use the project Python 3.11 environment and CPU. The commands need no network, download or accelerator. The first three commands write nothing. The exporter overwrites only the small committed summary after all checks pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/relational_graph_audit/run_lab.py check
 .venv/bin/python labs/relational_graph_audit/inspect_relational_graph_audit.py show
 .venv/bin/python labs/relational_graph_audit/inspect_relational_graph_audit.py check
-.venv/bin/python labs/relational_graph_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/relational_graph_audit -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/relational_graph_audit/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/relational_graph_audit/export_summary.py
+```
+
+</details>
 
 ## Source records and graph contract
 
@@ -67,6 +79,17 @@ The 196 records with no outgoing declaration are listed by kind in the inspector
 ## Limits of the material
 
 The graph records what this catalogue declares and what its entries cite. The audit does not independently verify every linked page, decide whether the declared relation is true, or infer causality. A missing declaration is not an experimentally established negative. A candidate pair is not a relation, and a path through resource records is not a biological mechanism.
+
+## Independent inspection task
+
+The guide lists model-rxnflow among records with no outgoing declaration even though model-cgflow points to it. Draw that one directed edge and explain why the source-defined isolated flag is not a zero-degree claim. Would a shared stage add another evidenced edge?
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+An incoming edge contributes to degree but does not create an outgoing declaration. The audit uses declaration-based isolation. Shared metadata nominates a candidate pair for inspection; it does not establish a relation, scientific support or causality. A new edge needs the declared relation and its own source-record evidence.
+
+</details>
 
 ## Sources and terms
 

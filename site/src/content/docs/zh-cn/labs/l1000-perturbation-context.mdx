@@ -4,6 +4,7 @@ description: 读取同一个真实化合物在两个真实细胞系里的真实 
 ---
 
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import ScientificTeachingView from "../../../../components/ScientificTeachingView.astro";
 
 <ScrollableRegions />
 
@@ -38,6 +39,8 @@ python labs/l1000_perturbation_context/inspect_l1000_perturbation_context.py che
 是 14GB 与 5.4GB,远超本项目 CPU-first 的规模约定。本协议改为读取 978 个
 landmark 基因的 Level 2 文件(直接测量,从不是推断值),并自己计算相对于
 载体对照的差异化信号——用小得多的体量得到真实数据。
+
+<ScientificTeachingView track="mechanism-targets" chinese compact />
 
 ## 一个化合物、一个细胞系的准入规则
 

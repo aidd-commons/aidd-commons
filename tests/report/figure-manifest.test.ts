@@ -19,7 +19,7 @@ const manifests = {
 };
 
 /** The files a figure may be written under. */
-const productSuffixes = ['.pdf', '.png', '.svg'];
+const productSuffixes = ['.pdf', '.png', '.svg', '.pptx'];
 
 /** The files in the output directory that are a manifest rather than a product. */
 const manifestNames = ['captions.json', 'captions-schematics.json', 'palette-cvd.json'];
@@ -69,6 +69,10 @@ function resourcePathEntries(source: string): string[] {
 }
 
 const stems = generatorStems();
+const nativeStems = new Set([...stems.entries()].filter(([key]) => key.startsWith('S')).map(([, stem]) => stem));
+const allowedProduct = (name: string) => name.endsWith('.pptx')
+  ? nativeStems.has(name.slice(0, -5))
+  : ['.pdf', '.png', '.svg'].some((suffix) => name.endsWith(suffix));
 const buildSource = readFileSync(buildPath, 'utf8');
 const metadataSource = readFileSync(metadataPath, 'utf8');
 
@@ -124,15 +128,26 @@ describe('report figure manifest', () => {
       }
 
       if (entry.name.startsWith('.')) continue;
-      if (!entry.name.endsWith('.py')) unexpected.push(entry.name);
+      if (!entry.name.endsWith('.py') && entry.name !== 'build_schematic_masters.mjs') unexpected.push(entry.name);
     }
 
     for (const name of readdirSync(outDir)) {
       if (manifestNames.includes(name)) continue;
-      if (!productSuffixes.some((suffix) => name.endsWith(suffix))) unexpected.push(`out/${name}`);
+      if (!allowedProduct(name)) unexpected.push(`out/${name}`);
     }
 
     expect(unexpected).toEqual([]);
+  });
+
+  it('allows the seven native masters while refusing unrelated PPTX products', () => {
+    expect(nativeStems.size).toBe(7);
+    for (const stem of nativeStems) {
+      expect(allowedProduct(`${stem}.pptx`)).toBe(true);
+      expect(existsSync(resolve(outDir, `${stem}.pptx`))).toBe(true);
+    }
+    expect(allowedProduct('plot_1_registry_composition.pptx')).toBe(false);
+    expect(allowedProduct('schematic-99-unreviewed.pptx')).toBe(false);
+    expect(allowedProduct('automation-trace.json')).toBe(false);
   });
 
   it('draws the figures before the document and hands Pandoc the figure directory', () => {

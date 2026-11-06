@@ -1,45 +1,26 @@
 ---
+import { localizedPath } from "../../lib/site-locale.js";
 import AtlasFigure from "../../components/AtlasFigure.astro";
+import AssayResultExplorer from "../../components/AssayResultExplorer.astro";
 import SiteShell from "../../components/SiteShell.astro";
-import manifest from "../../../../package.json";
+import publications from "../../data/publications.json";
+const chinese = Astro.props.chinese ?? false;
+const t = (english: string, chineseText: string) => chinese ? chineseText : english;
+const currentReport = publications.versions[0];
+const local = (path: string) => localizedPath(path, chinese);
 ---
-
-<SiteShell
-  title="Living report"
-  description="A living technical map of methods, data, benchmarks, and process knowledge."
->
-  <section aria-labelledby="report-title">
-    <p class="eyebrow">Living technical context</p>
-    <h1 id="report-title" class="page-heading">Report</h1>
-    <p class="page-intro">
-      The report separates observed source facts, project decisions, open questions,
-      and future work. It is not a performance leaderboard or a claim of exhaustive coverage.
-    </p>
-    <p class="section-intro">
-      Look at the two solid borders and the two dashed ones: the editorial guide
-      separates the statements that assert something from the statements that do not,
-      so a reader can tell an observation from a decision, an open question or a plan.
-    </p>
-    <AtlasFigure id="statement-classes" />
-    <p>
-      The document these figures belong to is published as a
-      <a href="/reports/aidd-commons-living-report-v0.1.pdf" download>PDF</a>.
-    </p>
+<SiteShell lang={chinese ? "zh-CN" : "en"} title={t("Living report","持续更新的报告")} description={t("Read the scientific argument, source-backed teaching cases and versioned AIDD Commons reports.","阅读 AIDD Commons 的科学论述、有来源依据的教学案例和各版本报告。")}>
+  <section class="report-opening" aria-labelledby="report-title">
+    <div><p class="eyebrow">{t("The scientific argument","科学论述")}</p><h1 id="report-title" class="page-heading">{t("From resources to inspectable decisions.","从资源出发，形成可检查的决策。")}</h1><p class="page-intro">{t("A collection becomes useful when a reader can connect a scientific question, an explanation, a protocol and the evidence behind its interpretation.","当读者能将科学问题、解释、流程及支撑其解读的证据联系起来，资源集合才有实际用途。")}</p><div class="action-row"><a class="button-link" href={currentReport.pdfHref} download>{t("Download Report v0.2 PDF","下载 Report v0.2 PDF")}</a><a class="button-secondary" href={currentReport.href}>{t("Read the complete report","阅读完整报告")}</a><a class="button-secondary" href={local("/report/figures/")}>{t("Explore the figure library","浏览图表库")}</a><a class="button-secondary" href="#report-versions">{t("Choose a version","选择版本")}</a></div></div>
+    <aside class="report-reading-map" aria-label={t("Report reading route","报告阅读路线")}><p class="meta-label">{t("Three questions to carry through the report","贯穿报告的三个问题")}</p><ol><li><span>01</span><strong>{t("What does the source establish?","来源支持什么结论？")}</strong><p>{t("Read the object, date, access and asset-specific evidence.","核对对象、日期、访问条件以及各项资产的证据。")}</p></li><li><span>02</span><strong>{t("What does the example demonstrate?","示例说明了什么？")}</strong><p>{t("Follow the task, population, baseline and retained result.","追踪任务、总体、基线与保留的结果。")}</p></li><li><span>03</span><strong>{t("What remains to be validated?","还有什么需要验证？")}</strong><p>{t("Distinguish implemented behavior from measured human benefit.","区分已经实现的功能与已测量的人类使用收益。")}</p></li></ol></aside>
   </section>
-  <section class="section" aria-labelledby="current-report-title">
-    <h2 id="current-report-title">Current addendum: {manifest.version}</h2>
-    <p>The v0.2 addendum
-      records the comparison audit and completed teaching labs, including their
-      negative results and evidence limits. It does not replace the historical report.</p>
-    <div class="action-row">
-      <a class="button-link" href="/report/v0-2/">Read the v0.2 addendum</a>
-      <a class="button-secondary" href="/report/citation.cff" download="CITATION.cff">Download version citation</a>
-    </div>
-  </section>
-  <section class="section" aria-labelledby="historical-report-title">
-    <h2 id="historical-report-title">Historical v0.1 report</h2>
-    <p>The original eight-chapter report is preserved as the 4 September 2026
-      snapshot. It does not include the later completed labs; read it alongside the addendum.</p>
-    <a href="/reports/aidd-commons-living-report-v0.1.pdf" download>Download historical v0.1 PDF</a>
-  </section>
+  <section class="report-arguments section" aria-labelledby="report-argument-title"><p class="eyebrow">{t("Read across the four connected artifacts","串联阅读四类关联材料")}</p><h2 id="report-argument-title">{t("Follow the argument into the material","从论述进入具体材料")}</h2><div class="report-argument-grid"><article><p class="meta-label">{t("Collection","资源集合")}</p><h3>{t("Assets have separate reuse conditions","不同资产有各自的复用条件")}</h3><p>{t("Code, weights, architecture, recipes, training data and evaluation code require their own evidence. Unknown availability remains unresolved.","代码、权重、架构、数据配方、训练数据和评估代码各自需要证据。未知的可用性保持未核实状态。")}</p><a href={local("/atlas/")}>{t("Inspect a resource record →","查看资源记录 →")}</a></article><article><p class="meta-label">{t("Teaching","教学")}</p><h3>{t("Explanation needs a worked decision","解释需要完整的决策示例")}</h3><p>{t("Move from scientific objects and assumptions through a worked example to an independent exercise.","从科学对象与假设出发，经过完整示例，再进入独立练习。")}</p><a href={local("/learn/")}>{t("Explore the learning routes →","浏览学习路线 →")}</a></article><article><p class="meta-label">{t("Evaluation","评估")}</p><h3>{t("A failed transfer is part of the lesson","迁移失败也是课程的一部分")}</h3><p>{t("Read all retained baselines and the actual independent unit before extending a conclusion.","推广结论前，先检查所有保留的基线与实际独立单位。")}</p><a href={local("/labs/#frozen-reading")}>{t("Read the completed cases →","阅读已完成的案例 →")}</a></article></div></section>
+  {chinese && <p class="section-intro" data-source-language="en">版本化报告、下载文件及科学图表保留原始语言；中文界面不改变其数据、日期与证据边界。</p>}
+  <AssayResultExplorer chinese={chinese} />
+  <section class="report-next-cases section" aria-labelledby="case-reading-title"><h2 id="case-reading-title">{t("Two more boundaries worth inspecting","另外两个值得检查的边界")}</h2><div class="report-argument-grid"><article><p class="meta-label">{t("Molecular systems and frames","分子系统与构象帧")}</p><h3>{t("A large frame count does not create many independent molecules","大量构象帧不等于大量独立分子")}</h3><p>{t("The rMD17 lesson separates within-system prediction from transfer to another molecular system. Its system-level evidence stays visible.","rMD17 课程区分系统内预测与向另一分子系统迁移，并保留系统层面的证据。")}</p><a href={local("/labs/rmd17-system-state-energy-baselines/")}>{t("Inspect the system-state case →","查看系统状态案例 →")}</a></article><article><p class="meta-label">{t("Acquisition and budget","采集与预算")}</p><h3>{t("Diversity and recovery answer different questions","多样性与恢复率回答不同问题")}</h3><p>{t("Retained random controls and replay exposure constrain the interpretation of a sequential selection policy.","保留的随机对照与回放暴露限制了对序贯选择策略的解释。")}</p><a href={local("/labs/pool-budget-campaign/")}>{t("Inspect the pool-budget case →","查看候选池预算案例 →")}</a></article></div></section>
+  <section class="section" id="report-versions" aria-labelledby="report-versions-title"><p class="eyebrow">{t("Versioned reading","按版本阅读")}</p><h2 id="report-versions-title">{t("Versioned reports","报告版本")}</h2><div class="publication-list">{publications.versions.map(version=><article><div><p class="meta-label">{version.state} · {version.dateLabel} {version.date}</p><h3><a href={version.href}>{version.id}: {version.title}</a></h3><p>{version.description}</p></div><div class="publication-download"><span>{version.format}</span>{version.pdfHref && <><a href={version.pdfHref} download>{t("Download v0.2 PDF","下载 v0.2 PDF")}</a><small>{t("PDF edition","PDF 制作日期")} · {version.pdfDate}</small></>}</div></article>)}</div><p class="report-state-note">{t("The active journal manuscript is a separate development draft. Comparative research utility and reader learning have not been established by the software checks or these teaching cases.","当前期刊稿是独立的开发草稿。软件检查与这些教学案例尚不能确立比较性科研效用或读者学习效果。")}</p><a href={local("/report/citation.cff")} download="CITATION.cff">{t("Download the software version citation","下载软件版本引用")}</a></section>
+  <details class="report-editorial"><summary>{t("How to read observations, decisions and plans","如何阅读观察、决策与计划")}</summary><p>{t("This editorial key separates source observations, project decisions, open questions and future work. These statement classes are not an effectiveness result.","本说明区分来源观察、项目决策、开放问题与后续工作。这些表述类别不构成有效性结果。")}</p><AtlasFigure id="statement-classes" chinese={chinese} /></details>
 </SiteShell>
+<style>
+.report-opening{display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(2rem,5vw,5rem);align-items:start}.report-opening .page-heading{font-size:clamp(2.5rem,4.5vw,4.4rem);max-width:14ch}.report-reading-map{background:var(--atlas-panel);border-block:3px solid var(--atlas-teal);padding:1.5rem}.report-reading-map ol{padding:0;list-style:none}.report-reading-map li{position:relative;padding:1rem 0 1rem 2.5rem;border-top:1px solid var(--atlas-rule)}.report-reading-map li span{position:absolute;left:0;color:var(--atlas-teal-deep);font-family:var(--atlas-font-mono);font-size:.8rem}.report-reading-map p{font-size:.85rem;color:var(--atlas-muted)}.report-argument-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:1.5rem}.report-argument-grid article{border-top:1px solid var(--atlas-rule-strong);padding-top:1rem}.report-argument-grid h3{font-size:1.2rem}.report-argument-grid p{font-size:.9rem}.report-argument-grid a{display:inline-flex;align-items:center;min-height:44px}.publication-list article{display:flex;justify-content:space-between;gap:1.5rem;border-top:1px solid var(--atlas-rule);padding:1.5rem 0}.publication-list p{max-width:48rem}.publication-download{display:flex;flex-direction:column;align-items:flex-start;gap:.4rem;font-size:.8rem;flex-shrink:0}.publication-download a{display:inline-flex;align-items:center;min-height:44px}.publication-download small{color:var(--atlas-muted)}.report-state-note{padding:1rem;border-left:3px solid var(--atlas-coral);color:var(--atlas-muted)}.report-editorial{margin-block:3rem}.report-editorial summary{min-height:44px;cursor:pointer}@media(max-width:48rem){.report-opening{grid-template-columns:1fr}.publication-list article{flex-direction:column}}
+</style>

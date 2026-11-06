@@ -2,6 +2,7 @@
 title: Where a row split leaks
 description: Audit shared molecules, scaffolds, assays, targets and tested forms in a frozen ChEMBL 37 cohort.
 ---
+import ScientificTeachingView from "../../../components/ScientificTeachingView.astro";
 
 ## Preparation and learning objectives
 
@@ -22,13 +23,27 @@ ChEMBL API. After the snapshot is cached, the count and checks use no network.
 The commands do not fit a model. The summary exporter overwrites the derived
 summary only after its checks pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/split_leakage_audit/run_lab.py download
 .venv/bin/python labs/split_leakage_audit/inspect_split_leakage_audit.py show
 .venv/bin/python labs/split_leakage_audit/inspect_split_leakage_audit.py check
-.venv/bin/python labs/split_leakage_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/split_leakage_audit -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/split_leakage_audit/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/split_leakage_audit/export_summary.py
+```
+
+</details>
+
+<ScientificTeachingView track="evaluation-and-reproducibility" compact />
 
 ## Measurement and split
 
@@ -106,3 +121,13 @@ The [RDKit source licence](https://github.com/rdkit/rdkit/blob/master/license.tx
 was recorded as BSD 3-Clause on 2026-09-09. Original lesson prose is CC BY 4.0
 and original laboratory code is Apache-2.0. The laboratory's committed
 summary contains counts rather than activity rows. Last reviewed 2026-10-23.
+## Independent inspection task
+
+Compare the 98 row-held-out measurements with the 353 parent-held-out measurements. Why can the former contain zero parent-unseen measurements even though its rows are disjoint? State the generalization question answered by each split without selecting one from a score.
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+The same parent may contribute different measurement keys to training and test in the row split. Row disjointness does not imply parent disjointness. Parent grouping keeps that identity together and changes both the population and realized counts. Neither split is universally correct; it must match the predeclared deployment question, and this audit does not compare predictive performance.
+
+</details>

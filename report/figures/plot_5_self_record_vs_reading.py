@@ -63,143 +63,110 @@ CAPTION = (
 
 
 def build() -> dict[str, Path]:
-    """Draw the figure and write its two files plus its caption fragment."""
+    """Keep the constrained outcomes adjacent to the complete threshold comparison."""
     style.apply_style("light")
-    tokens = style.tokens("light")
-    colours = style.categorical("light")
-    hatches = style.atlas_palette.HATCH
-
+    tokens, colours = style.tokens(), style.categorical()
     payload = style.load_json(style.DATA_DIR / "comparison.v1.json")
-    reading = next(item for item in payload["second_readings"] if item["id"] == READING_ID)
+    reading = next(r for r in payload["second_readings"] if r["id"] == READING_ID)
     series = reading_series(payload, reading)
-
-    fig = style.figure(style.FIGURE_WIDTH, 5.0)
-    axes = style.axes_grid(
+    fig = style.figure(height=5.15)
+    style.heading(
         fig,
-        2,
-        1,
-        left=0.205,
-        right=0.985,
-        bottom=0.085,
-        top=0.935,
-        hspace=0.50,
-        height_ratios=[0.72, 1.4],
+        "What the retained readings agree on",
+        (
+            f"Aggregate {series.aggregate_as_of} · series "
+            f"{series.initiated_on}–{series.documented_through}"
+        ),
     )
-    outcome_ax, threshold_ax = axes
-
-    outcomes = [
-        ("Equal", reading["equal"]),
-        ("Reading deeper", reading["reading_deeper"]),
-        ("Reading shallower", reading["reading_shallower"]),
-    ]
-    positions = list(range(len(outcomes)))[::-1]
+    outcome_ax = fig.add_axes((0.30, 0.61, 0.61, 0.20))
     keys = ["equal", "reading_deeper", "reading_shallower"]
-    values = [count for _, count in outcomes]
-    container = outcome_ax.barh(
-        positions,
+    values = [reading[k] for k in keys]
+    ys = [2, 1, 0]
+    bars = outcome_ax.barh(
+        ys,
         values,
-        height=0.55,
-        color=[colours[OUTCOME_COLOUR[key]] for key in keys],
-        edgecolor=tokens["ink"],
-        linewidth=0.6,
-        zorder=3,
+        height=0.45,
+        color=[style.fill_colours()[OUTCOME_COLOUR[k]] for k in keys],
+        edgecolor=[colours[OUTCOME_COLOUR[k]] for k in keys],
+        linewidth=0.8,
     )
-    for bar, key in zip(container, keys, strict=True):
-        bar.set_hatch(hatches[OUTCOME_COLOUR[key]])
-
-    outcome_ax.set_yticks(positions)
-    outcome_ax.set_yticklabels([label for label, _ in outcomes], fontsize=8.4)
-    outcome_ax.tick_params(axis="y", length=0)
-    outcome_ax.set_xlabel(f"Topics out of {series.topics}", fontsize=8.5)
-    outcome_ax.set_xlim(0, series.topics * 1.14)
-    outcome_ax.xaxis.set_major_locator(MaxNLocator(nbins=4, integer=True))
-    outcome_ax.set_ylim(-0.6, len(outcomes) - 0.4)
-    outcome_ax.grid(axis="x", linewidth=0.6, alpha=0.7)
-    outcome_ax.set_axisbelow(True)
-    style.title(outcome_ax, "Per-topic outcome")
-    style.bar_labels(outcome_ax, container, values, orientation="horizontal", pad=4, fontsize=8.0)
-
+    for bar, k in zip(bars, keys, strict=True):
+        bar.set_hatch(style.atlas_palette.HATCH[OUTCOME_COLOUR[k]])
+    for y, n in zip(ys, values, strict=True):
+        outcome_ax.plot(n, y, marker="|", ms=9, mew=1, color=tokens["ink"])
+        outcome_ax.text(
+            1.04,
+            y,
+            str(n),
+            transform=outcome_ax.get_yaxis_transform(),
+            ha="right",
+            va="center",
+            fontweight="bold",
+        )
+    outcome_ax.set_yticks(ys, ["Same depth", "Read deeper", "Read shallower* "])
+    outcome_ax.set_xlim(0, series.topics * 1.1)
+    outcome_ax.set_ylim(-0.6, 2.6)
+    outcome_ax.set_xlabel(f"Topics out of {series.topics}")
+    outcome_ax.xaxis.set_major_locator(MaxNLocator(nbins=5, integer=True))
+    style.clean_axis(outcome_ax)
+    ax = fig.add_axes((0.30, 0.17, 0.61, 0.30))
     rows = list(reading["thresholds"])
-    row_positions = list(range(len(rows)))[::-1]
-    for entry, position in zip(rows, row_positions, strict=True):
-        recorded = entry["recorded"]
-        observed = entry["reading"]
-        threshold_ax.plot(
-            [recorded, observed],
-            [position, position],
-            color=tokens["rule"],
-            linewidth=1.4,
-            zorder=2,
+    ys = list(range(len(rows)))[::-1]
+    for row, y in zip(rows, ys, strict=True):
+        a, b = row["recorded"], row["reading"]
+        ax.plot([a, b], [y, y], lw=2, color=tokens["rule"])
+        ax.plot(a, y, "o", ms=7, mfc=colours["teal"], mec=tokens["ink"], mew=0.5)
+        ax.plot(b, y, "s", ms=8, mfc="none", mec=colours["coral"], mew=1)
+        ax.text(
+            1.04,
+            y,
+            f"{a} / {b}",
+            transform=ax.get_yaxis_transform(),
+            ha="right",
+            va="center",
+            fontsize=8.4,
         )
-        threshold_ax.plot(
-            observed,
-            position,
-            marker="s",
-            markersize=6.0,
-            markerfacecolor="none",
-            markeredgecolor=colours["coral"],
-            markeredgewidth=1.3,
-            linestyle="none",
-            zorder=3,
-        )
-        threshold_ax.plot(
-            recorded,
-            position,
-            marker="o",
-            markersize=6.0,
-            markerfacecolor=colours["teal"],
-            markeredgecolor=tokens["ink"],
-            markeredgewidth=0.5,
-            linestyle="none",
-            zorder=4,
-        )
-        gap = observed - recorded
-        threshold_ax.annotate(
-            f"+{gap}" if gap else "same",
-            xy=((recorded + observed) / 2, position),
-            xytext=(0, 7),
-            textcoords="offset points",
-            ha="center",
-            va="bottom",
-            fontsize=7.8,
-            color=tokens["ink"],
-        )
-
-    threshold_ax.set_yticks(row_positions)
-    threshold_ax.set_yticklabels(
-        [THRESHOLD_TITLES[entry["threshold"]] for entry in rows], fontsize=8.4
+    ax.set_yticks(
+        ys,
+        [
+            THRESHOLD_TITLES[r["threshold"]].replace(
+                "Executable on real data", "Real-data execution"
+            )
+            for r in rows
+        ],
     )
-    threshold_ax.tick_params(axis="y", length=0)
-    threshold_ax.set_xlabel(f"Topics out of {series.topics}", fontsize=8.5)
-    threshold_ax.set_xlim(-0.03 * series.topics, series.topics * 1.14)
-    threshold_ax.xaxis.set_major_locator(MaxNLocator(nbins=4, integer=True))
-    threshold_ax.set_ylim(-0.7, len(rows) - 0.3)
-    threshold_ax.grid(axis="x", linewidth=0.6, alpha=0.7)
-    threshold_ax.set_axisbelow(True)
-    style.title(threshold_ax, "Recorded count against the reading")
-
-    handles = [
-        _handle(colours["teal"], "o", filled=True),
-        _handle(colours["coral"], "s", filled=False),
-    ]
-    threshold_ax.legend(
-        handles,
-        ["Current self record", "Retained topic readings"],
-        loc="upper left",
-        fontsize=8.0,
-        handletextpad=0.5,
-        borderpad=0.3,
-        frameon=False,
+    ax.set_xlim(-3, series.topics * 1.1)
+    ax.set_ylim(-0.6, len(rows) - 0.4)
+    ax.set_xlabel(f"Topics out of {series.topics}")
+    style.clean_axis(ax)
+    ax.text(
+        1.04,
+        1.06,
+        "Record / reading",
+        transform=ax.transAxes,
+        ha="right",
+        fontsize=8.2,
+        color=tokens["muted"],
+    )
+    fig.legend(
+        [_handle(colours["teal"], "o", filled=True), _handle(colours["coral"], "s", filled=False)],
+        ["Current self record", "Retained readings"],
         ncol=2,
-        columnspacing=1.4,
-        bbox_to_anchor=(0.0, 1.02),
+        loc="lower center",
+        bbox_to_anchor=(0.58, 0.055),
+        fontsize=8.3,
+        handletextpad=0.4,
     )
-
+    style.footnote(
+        fig,
+        (
+            "* Shallower outcomes are constrained by the audit rule. Reviewer-authored "
+            "material and re-readings preclude independent replication."
+        ),
+        y=0.025,
+    )
     validate_count_bounds(values, outcome_ax.get_xlim())
-    validate_count_bounds(
-        [entry[key] for entry in rows for key in ("recorded", "reading")],
-        threshold_ax.get_xlim(),
-    )
+    validate_count_bounds([r[k] for r in rows for k in ("recorded", "reading")], ax.get_xlim())
     written = style.save(fig, STEM)
     style.register_caption(
         FIGURE_NUMBER,
@@ -212,12 +179,10 @@ def build() -> dict[str, Path]:
             deeper=reading["reading_deeper"],
             shallower=reading["reading_shallower"],
             reading=style.english_list(
-                f"{entry['reading']} {THRESHOLD_TITLES[entry['threshold']].lower()}"
-                for entry in reading["thresholds"]
+                f"{r['reading']} {THRESHOLD_TITLES[r['threshold']].lower()}" for r in rows
             ),
             recorded=style.english_list(
-                f"{entry['recorded']} {THRESHOLD_TITLES[entry['threshold']].lower()}"
-                for entry in reading["thresholds"]
+                f"{r['recorded']} {THRESHOLD_TITLES[r['threshold']].lower()}" for r in rows
             ),
         ),
     )

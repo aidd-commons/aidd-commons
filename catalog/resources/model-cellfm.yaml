@@ -60,7 +60,7 @@ evidence:
     label: Europe PMC record for the CellFM paper (reviewed 2026-10-21)
     supports: [identifiers, summary]
   - id: model-cellfm-readme
-    url: https://raw.githubusercontent.com/biomed-AI/CellFM/HEAD/README.md
+    url: https://raw.githubusercontent.com/biomed-AI/CellFM/main/readme.md
     label: The project page the training-data statement was read from (reviewed 2026-10-23)
     supports: [caveats]
 caveats:

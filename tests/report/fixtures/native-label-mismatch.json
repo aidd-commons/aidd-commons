@@ -1,0 +1,5 @@
+{
+  "shape_name": "master-title",
+  "replacement": "Unreviewed replacement title",
+  "expected_diagnostic": "source-derived native label differs: master-title"
+}

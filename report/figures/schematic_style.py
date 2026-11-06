@@ -28,14 +28,17 @@ and no rescaling afterwards, so the source point size is the rendered point size
 laid out in *units*, where one unit is one hundredth of the figure width in both directions, so a
 shape measures the same on the page whichever direction it is drawn along.
 
-Output is a vector PDF and a PNG preview saved from the same native canvas. The artwork
-carries no wall-clock date. Existing SVG inputs are preserved and no new SVG is written.
+The maintained seven masters are built by build_schematic_masters.mjs as native editable
+PPTX scenes. LibreOffice exports their actual PDFs, from which web PNGs are rendered.
+The Matplotlib vocabulary remains for compatibility and small source-only examples.
+Existing SVG inputs are preserved and no new SVG is written.
 """
 
 from __future__ import annotations
 
 import os
 import sys
+from functools import lru_cache
 from pathlib import Path
 
 os.environ.setdefault("SOURCE_DATE_EPOCH", "0")
@@ -592,3 +595,193 @@ def separator(canvas: Canvas, y: float, x0: float = 1.5, x1: float = 98.5) -> No
         linestyle=(0, (2.4, 2.0)),
         zorder=0.6,
     )
+
+
+# The seven maintained educational masters use one native presentation scene.
+# Keep this adapter small: callers reuse an existing actual export when its sources
+# have not changed, rather than reconstructing a second Matplotlib version.
+def native_master_sources() -> list[Path]:
+    """Inputs that can change the scientific copy, layout or conceptual objects."""
+    root = _HERE.parents[1]
+    return [
+        _HERE / "build_schematic_masters.mjs",
+        _HERE / "schematic_style.py",
+        _HERE / "atlas_palette.py",
+        root / "catalog/curriculum/tracks.yaml",
+        root / "catalog/resources/model-img2mol.yaml",
+        root / "catalog/resources/dataset-polaris-adme.yaml",
+        root / "report/aidd-commons-living-report-v0.1.md",
+        root / "docs/PROJECT_CHARTER.md",
+        root / "docs/EDITORIAL_GUIDE.md",
+        root / "docs/RESOURCE_SCHEMA.md",
+        *sorted((root / "site/src/assets/editorial").glob("*.png")),
+    ]
+
+
+def _native_source_contracts() -> dict[str, object]:
+    """Read current source copy with ordinary project Node dependencies only."""
+    return _load_native_source_contracts()
+
+
+@lru_cache(maxsize=1)
+def _load_native_source_contracts() -> dict[str, object]:
+    import json
+    import shutil
+    import subprocess
+
+    root = _HERE.parents[1]
+    managed = Path.home() / ".cache/codex-runtimes/codex-primary-runtime/dependencies"
+    node = os.environ.get("RUNTIME_NODE", str(managed / "node/bin/node"))
+    if not Path(node).is_file():
+        node = shutil.which("node") or "node"
+    env = os.environ.copy()
+    env.setdefault("RUNTIME_PYTHON", sys.executable)
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    payload = json.loads(subprocess.check_output(
+        [node, str(_HERE / "build_schematic_masters.mjs"), "--source-record"],
+        cwd=root, env=env, text=True,
+    ))
+    return {row["stem"]: row for row in payload["configs"]}
+
+
+def validate_native_master(stem: str) -> dict[str, Path]:
+    """Read-only source, native-object and actual-asset checks; no timestamps.
+
+    A checkout resets mtimes, so they cannot decide whether committed masters are
+    current. Source-derived native text, exact prerequisite marks, explicit native
+    scene revision and original embedded illustration bytes are checked instead.
+    This needs no Artifact Tool, LibreOffice, private record or network access.
+    """
+    import posixpath
+    import re
+    import struct
+    import xml.etree.ElementTree as ET
+    import zipfile
+
+    root = _HERE.parents[1]
+    outputs = {extension: _HERE / "out" / f"{stem}.{extension}" for extension in ("pdf", "png", "pptx")}
+    if not all(p.is_file() and p.stat().st_size > 0 for p in outputs.values()):
+        raise RuntimeError(f"native schematic export is incomplete: {stem}; regenerate the explicit native builder")
+    records = _native_source_contracts()
+    if stem not in records:
+        raise ValueError(f"unknown maintained native schematic: {stem}")
+    config = records[stem]
+    contract = config["native_contract"]
+    ns = {"p": "http://schemas.openxmlformats.org/presentationml/2006/main",
+          "a": "http://schemas.openxmlformats.org/drawingml/2006/main",
+          "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
+          "cp": "http://schemas.openxmlformats.org/package/2006/metadata/core-properties"}
+    normalize = lambda value: re.sub(r"\s+", " ", value).strip()
+    errors: list[str] = []
+    with zipfile.ZipFile(outputs["pptx"]) as package:
+        document = ET.fromstring(package.read("ppt/presentation.xml"))
+        size = document.find("p:sldSz", ns)
+        if [int(size.get(k)) for k in ("cx", "cy")] != [int(config[k] * 36000) for k in ("width", "height")]:
+            errors.append("native slide dimensions differ from the authored master")
+        properties = ET.fromstring(package.read("docProps/core.xml"))
+        if properties.findtext("cp:revision", namespaces=ns) != contract["scene_revision"]:
+            errors.append("native scene revision is stale")
+        slide = ET.fromstring(package.read("ppt/slides/slide1.xml"))
+        named_text = {}
+        shape_names = set()
+        for shape in slide.findall(".//p:sp", ns):
+            name = shape.find("p:nvSpPr/p:cNvPr", ns).get("name")
+            shape_names.add(name)
+            named_text[name] = "\n".join("".join(t.text or "" for t in para.findall(".//a:t", ns)) for para in shape.findall("p:txBody/a:p", ns))
+        for name, expected in contract["native_texts"].items():
+            if normalize(named_text.get(name, "")) != normalize(expected):
+                errors.append(f"source-derived native label differs: {name}")
+        connector_names = set()
+        for connector in slide.findall(".//p:cxnSp", ns):
+            name = connector.find("p:nvCxnSpPr/p:cNvPr", ns).get("name")
+            connector_names.add(name)
+            dash = connector.find("p:spPr/a:ln/a:prstDash", ns)
+            actual_dashed = dash is not None and dash.get("val") not in (None, "solid")
+            if actual_dashed != (name in contract["dashed_connectors"]):
+                errors.append(f"native connector line style differs: {name}")
+            if name != "shared-identifier-rail" and connector.find("p:spPr/a:ln/a:tailEnd", ns) is None:
+                errors.append(f"native directional arrowhead is missing: {name}")
+        if connector_names != set(contract["native_connectors"]):
+            errors.append("native connector names differ from the authored source graph")
+        if contract["relation_marks"]:
+            actual = {name for name in shape_names if re.fullmatch(r"(?:prerequisite-\d+-\d+|core-includes-\d+)", name)}
+            if actual != set(contract["relation_marks"]):
+                errors.append("native prerequisite/core inclusion marks differ from current YAML")
+        relationships = ET.fromstring(package.read("ppt/slides/_rels/slide1.xml.rels"))
+        targets = {item.get("Id"): item.get("Target") for item in relationships}
+        actual_images = {}
+        for picture in slide.findall(".//p:pic", ns):
+            name = picture.find("p:nvPicPr/p:cNvPr", ns).get("name")
+            blip = picture.find("p:blipFill/a:blip", ns)
+            relation = blip.get("{" + ns["r"] + "}embed")
+            target = targets[relation]
+            member = target.lstrip("/") if target.startswith("/") else posixpath.normpath(posixpath.join("ppt/slides", target))
+            actual_images[name] = package.read(member)
+        if set(actual_images) != set(contract["images"]):
+            errors.append("independent native image object names differ")
+        for name, asset in contract["images"].items():
+            source = root / "site/src/assets/editorial" / f"{asset}.png"
+            if not source.is_file() or actual_images.get(name) != source.read_bytes():
+                errors.append(f"embedded illustration differs from its original PNG: {name}")
+    with outputs["png"].open("rb") as reader:
+        header = reader.read(24)
+    if header[:8] != b"\x89PNG\r\n\x1a\n":
+        errors.append("preview is not an actual PNG")
+    else:
+        width, height = struct.unpack(">II", header[16:24])
+        if any(abs(actual - config[key] / 25.4 * 300) > 1.1 for actual, key in ((width, "width"), (height, "height"))):
+            errors.append("PNG dimensions differ from the 300 dpi authored master")
+    with outputs["pdf"].open("rb") as reader:
+        if reader.read(5) != b"%PDF-":
+            errors.append("download is not an actual PDF")
+    if errors:
+        raise RuntimeError(stem + ": " + "; ".join(errors) + "; explicitly regenerate the native builder")
+    return outputs
+
+
+def ensure_native_master(stem: str, *, force: bool = False) -> dict[str, Path]:
+    """Reuse a source-checked committed master; rebuild only with explicit force.
+
+    Ordinary site generation/checks remain read-only for the native masters and
+    work in a fresh checkout with ordinary project dependencies. Authors can run
+    the native builder directly or use force=True with the managed Artifact Tool
+    runtime and LibreOffice installed.
+    """
+    if force:
+        import shutil
+        import subprocess
+
+        root = _HERE.parents[1]
+        env = os.environ.copy()
+        managed = Path.home() / ".cache/codex-runtimes/codex-primary-runtime/dependencies"
+        modules = Path(env.get("RUNTIME_NODE_MODULES", str(managed / "node/node_modules")))
+        node = env.get("RUNTIME_NODE", str(managed / "node/bin/node"))
+        if not Path(node).is_file():
+            node = shutil.which("node") or "node"
+        if not (modules / "@oai/artifact-tool").is_dir():
+            raise RuntimeError("Native master regeneration needs RUNTIME_NODE_MODULES containing @oai/artifact-tool")
+        env["RUNTIME_NODE_MODULES"] = str(modules)
+        env.setdefault("RUNTIME_PYTHON", sys.executable)
+        subprocess.run([node, str(_HERE / "build_schematic_masters.mjs"), stem],
+                       cwd=root, env=env, check=True)
+        _load_native_source_contracts.cache_clear()
+    return validate_native_master(stem)
+
+
+class NativeSchematicMaster:
+    """A maintained master with native, office-exported products, not a .fig."""
+
+    def __init__(self, stem: str):
+        self.stem = stem
+
+    def save(self, out_dir: Path, stem: str | None = None) -> tuple[Path, Path]:
+        import shutil
+
+        name = stem or self.stem
+        outputs = ensure_native_master(self.stem)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        for extension, source in outputs.items():
+            target = out_dir / f"{name}.{extension}"
+            if source.resolve() != target.resolve():
+                shutil.copy2(source, target)
+        return out_dir / f"{name}.pdf", out_dir / f"{name}.png"

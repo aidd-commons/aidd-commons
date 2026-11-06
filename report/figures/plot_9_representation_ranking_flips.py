@@ -9,9 +9,9 @@ correlation is undefined.
 
 What the figure shows. The same three baselines are evaluated twice, on the
 primary partition of 132 compounds and on a separate assay replication of 170
-compounds, and the ranking is not the same on both. The left panel is a slope
-graph of the mean absolute error on a log axis, so the reader can see the two
-orderings and the gap between them. The right panel is the rank correlation of
+compounds, and the ranking is not the same on both. The upper panel pairs
+the two mean absolute errors on a common log axis, so the reader can see the two
+orderings and the gap between them. The lower panel is the rank correlation of
 each baseline on each partition, where the ranking correlation of the Morgan
 ridge turns negative on the replication.
 
@@ -65,214 +65,122 @@ CAPTION = (
 
 
 def build() -> dict[str, Path]:
-    """Draw the figure and write its two files plus its caption fragment."""
+    """Make the adverse replication visible on shared metric axes."""
     style.apply_style("light")
-    tokens = style.tokens("light")
-    colours = style.categorical("light")
-    dashes = style.dashes("light")
-
-    summary = style.load_json(style.REPO_ROOT / "labs" / "chembl_egfr" / "locked-summary.json")
+    tokens, colours = style.tokens(), style.categorical()
+    summary = style.load_json(style.REPO_ROOT / "labs/chembl_egfr/locked-summary.json")
     results = summary["results"]
-
-    fig = style.figure(style.FIGURE_WIDTH, 4.6)
-    axes = style.axes_grid(
+    fig = style.figure(height=5.45)
+    style.heading(
         fig,
-        1,
-        2,
-        left=0.075,
-        right=0.985,
-        bottom=0.155,
-        top=0.885,
-        wspace=0.26,
-        width_ratios=[1.05, 1.0],
+        "The primary winner fails to retain its rank",
+        "Frozen ChEMBL EGFR · primary n = 132 · separate assay replication n = 170",
     )
-    slope_ax, rho_ax = axes
-
-    primary_order = sorted(
-        SERIES, key=lambda item: results["primary_test"]["metrics"][item[0]]["mae"]
-    )
-    primary_offsets = {
-        key: offset
-        for key, offset in zip(
-            [item[0] for item in primary_order],
-            [-13, 0, 13],
-            strict=True,
+    ax = fig.add_axes((0.25, 0.55, 0.66, 0.24))
+    rho = fig.add_axes((0.25, 0.19, 0.66, 0.23))
+    for y, (key, _label, colour, marker) in zip([2, 1, 0], SERIES, strict=True):
+        a, b = [results[p]["metrics"][key]["mae"] for p in PARTITIONS]
+        ax.plot([a, b], [y, y], color=colours[colour], lw=1.8, ls=style.dashes()[colour])
+        ax.plot(
+            a, y, marker=marker, ms=7, mfc=colours[colour], mec=tokens["ink"], mew=0.5, ls="none"
         )
-    }
-    for key, _label, colour_key, marker in SERIES:
-        primary = results["primary_test"]["metrics"][key]
-        replication = results["assay_replication"]["metrics"][key]
-        slope_ax.plot(
-            [0, 1],
-            [primary["mae"], replication["mae"]],
-            color=colours[colour_key],
-            marker=marker,
-            markersize=6.5,
-            markerfacecolor=colours[colour_key],
-            markeredgecolor=tokens["ink"],
-            markeredgewidth=0.5,
-            linewidth=1.8,
-            linestyle=dashes[colour_key],
-            zorder=3,
+        ax.plot(
+            b, y, marker=marker, ms=8, mfc=tokens["panel"], mec=colours[colour], mew=1.2, ls="none"
         )
-        slope_ax.annotate(
-            f"{primary['mae']:.2f}",
-            xy=(0, primary["mae"]),
-            xytext=(-10, primary_offsets[key]),
-            textcoords="offset points",
-            ha="right",
-            va="center",
-            fontsize=7.6,
-            color=tokens["ink"],
-        )
-        slope_ax.annotate(
-            f"{replication['mae']:.2f}",
-            xy=(1, replication["mae"]),
-            xytext=(10, 0),
-            textcoords="offset points",
-            ha="left",
-            va="center",
-            fontsize=7.6,
-            color=tokens["ink"],
-        )
-
-    slope_ax.set_xlim(-0.42, 1.42)
-    slope_ax.set_yscale("log")
-    slope_ax.set_yticks([0.4, 0.5, 0.7, 1.0, 2.0, 3.0])
-    slope_ax.set_yticklabels(["0.4", "0.5", "0.7", "1.0", "2.0", "3.0"])
-    slope_ax.yaxis.set_minor_formatter(NullFormatter())
-    slope_ax.set_xticks([0, 1])
-    slope_ax.set_xticklabels(
-        ["Primary partition\n132 compounds", "Assay replication\n170 compounds"], fontsize=7.8
-    )
-    slope_ax.set_ylabel("Mean absolute error (log scale)", fontsize=8.5)
-    slope_ax.grid(axis="y", linewidth=0.6, alpha=0.7)
-    slope_ax.set_axisbelow(True)
-    style.title(slope_ax, "Mean absolute error on both evaluations")
-    slope_handles = [
-        _line_handle(colours[colour_key], marker, dashes[colour_key])
-        for _, _, colour_key, marker in SERIES
-    ]
-    slope_ax.legend(
-        slope_handles,
-        [label for _, label, _, _ in SERIES],
-        loc="upper left",
-        fontsize=7.6,
-        handletextpad=0.4,
-        borderpad=0.3,
-        frameon=False,
-    )
-
-    replication_order = sorted(
-        SERIES, key=lambda item: results["assay_replication"]["metrics"][item[0]]["mae"]
-    )
-    slope_ax.annotate(
-        "best on this partition",
-        xy=(1, results["assay_replication"]["metrics"][replication_order[0][0]]["mae"]),
-        xytext=(12, 18),
-        textcoords="offset points",
-        ha="left",
-        fontsize=7.4,
-        color=tokens["muted"],
-    )
-
-    rows = list(range(len(SERIES)))[::-1]
-    for row, (key, _label, colour_key, _) in zip(rows, SERIES, strict=True):
-        primary = results["primary_test"]["metrics"][key]["spearman"]
-        replication = results["assay_replication"]["metrics"][key]["spearman"]
-        if primary is None or replication is None:
-            rho_ax.annotate(
-                "undefined, constant prediction",
-                xy=(0.0, row),
-                xytext=(8, 0),
+        for v, dy in [(a, 8), (b, -10)]:
+            ax.annotate(
+                f"{v:.3f}",
+                (v, y),
+                xytext=(0, dy),
                 textcoords="offset points",
-                ha="left",
+                ha="center",
                 va="center",
-                fontsize=7.2,
+                fontsize=8.5,
+            )
+        r1, r2 = [results[p]["metrics"][key]["spearman"] for p in PARTITIONS]
+        if r1 is None or r2 is None:
+            rho.text(
+                0.02,
+                y,
+                "Undefined: constant prediction",
+                transform=rho.get_yaxis_transform(),
+                va="center",
+                fontsize=8.3,
                 color=tokens["muted"],
             )
-            continue
-        rho_ax.plot(
-            [primary, replication],
-            [row, row],
-            color=tokens["rule"],
-            linewidth=1.4,
-            zorder=2,
-        )
-        rho_ax.plot(
-            primary,
-            row,
-            marker="o",
-            markersize=6.5,
-            markerfacecolor=colours[colour_key],
-            markeredgecolor=tokens["ink"],
-            markeredgewidth=0.5,
-            linestyle="none",
-            zorder=3,
-        )
-        rho_ax.plot(
-            replication,
-            row,
-            marker="o",
-            markersize=6.5,
-            markerfacecolor="none",
-            markeredgecolor=colours[colour_key],
-            markeredgewidth=1.5,
-            linestyle="none",
-            zorder=4,
-        )
-        rho_ax.annotate(
-            f"{primary:.3f}",
-            xy=(primary, row),
-            xytext=(0, 8),
-            textcoords="offset points",
-            ha="center",
-            fontsize=7.0,
-            color=tokens["ink"],
-        )
-        rho_ax.annotate(
-            f"{replication:.3f}",
-            xy=(replication, row),
-            xytext=(0, -13),
-            textcoords="offset points",
-            ha="center",
-            fontsize=7.0,
-            color=tokens["ink"],
-        )
+        else:
+            rho.plot([r1, r2], [y, y], color=colours[colour], lw=1.8, ls=style.dashes()[colour])
+            rho.plot(
+                r1,
+                y,
+                marker=marker,
+                ms=7,
+                mfc=colours[colour],
+                mec=tokens["ink"],
+                mew=0.5,
+                ls="none",
+            )
+            rho.plot(
+                r2,
+                y,
+                marker=marker,
+                ms=8,
+                mfc=tokens["panel"],
+                mec=colours[colour],
+                mew=1.2,
+                ls="none",
+            )
+            for v, dy in [(r1, 8), (r2, -10)]:
+                rho.annotate(
+                    f"{v:.3f}",
+                    (v, y),
+                    xytext=(0, dy),
+                    textcoords="offset points",
+                    ha="center",
+                    va="center",
+                    fontsize=8.5,
+                )
+    for axis in [ax, rho]:
+        axis.set_yticks([2, 1, 0], [s[1] for s in SERIES])
+        axis.set_ylim(-0.65, 2.65)
+        style.clean_axis(axis)
+    ax.set_xscale("log")
+    ax.set_xlim(0.32, 4.7)
+    ax.set_xticks([0.4, 0.6, 1, 2, 4], ["0.4", "0.6", "1", "2", "4"])
+    ax.xaxis.set_minor_formatter(NullFormatter())
+    ax.set_xlabel("Mean absolute error · log scale · lower is better")
+    style.title(ax, "(a) Error changes with the assay partition")
+    rho.axvline(0, color=tokens["ink"], lw=0.8, ls="--")
+    rho.set_xlim(-0.15, 0.65)
+    rho.set_xlabel("Spearman rank correlation · higher is better")
+    style.title(rho, "(b) Morgan rank correlation changes sign")
+    from matplotlib.lines import Line2D
 
-    rho_ax.axvline(0, color=tokens["ink"], linewidth=0.8, zorder=2)
-    rho_ax.set_xlim(-0.12, 0.62)
-    rho_ax.set_ylim(-0.6, len(SERIES) - 0.4)
-    rho_ax.set_yticks(rows)
-    rho_ax.set_yticklabels([label for _, label, _, _ in SERIES], fontsize=8.4)
-    rho_ax.tick_params(axis="y", length=0)
-    rho_ax.set_xlabel("Spearman rank correlation", fontsize=8.5)
-    rho_ax.grid(axis="x", linewidth=0.6, alpha=0.7)
-    rho_ax.set_axisbelow(True)
-    style.title(rho_ax, "Rank correlation on both evaluations")
-
-    handles = [
-        _handle(tokens["ink"], "o", filled=True),
-        _handle(tokens["ink"], "o", filled=False),
-    ]
-    rho_ax.legend(
-        handles,
+    fig.legend(
+        [
+            Line2D([], [], marker="o", ms=6, mfc=tokens["ink"], mec=tokens["ink"], ls="none"),
+            Line2D([], [], marker="o", ms=7, mfc="none", mec=tokens["ink"], ls="none"),
+        ],
         ["Primary partition", "Assay replication"],
-        loc="lower left",
-        fontsize=8.0,
-        handletextpad=0.4,
-        borderpad=0.3,
-        frameon=False,
         ncol=2,
-        columnspacing=1.4,
+        loc="lower center",
+        bbox_to_anchor=(0.57, 0.08),
+        fontsize=8.5,
     )
-
+    style.footnote(
+        fig,
+        (
+            "Prior label exposure is disclosed. These are separate comparisons, with no "
+            "confidence intervals, p values or pooled superiority claim."
+        ),
+        y=0.025,
+    )
     flip = (
         f"The Morgan ridge is the best of the three on the primary partition at "
-        f"{results['primary_test']['metrics']['morgan_ridge']['mae']:.3f} mean absolute error, "
-        f"while the descriptor ridge is the best on the replication at "
-        f"{results['assay_replication']['metrics']['descriptor_ridge']['mae']:.3f}; the Morgan "
-        f"ridge reaches "
+        f"{results['primary_test']['metrics']['morgan_ridge']['mae']:.3f} mean absolute "
+        f"error, while the descriptor ridge is the best on the replication at "
+        f"{results['assay_replication']['metrics']['descriptor_ridge']['mae']:.3f}; the "
+        f"Morgan ridge reaches "
         f"{results['assay_replication']['metrics']['morgan_ridge']['mae']:.3f} there and "
         f"its rank correlation falls from "
         f"{results['primary_test']['metrics']['morgan_ridge']['spearman']:.3f} to "

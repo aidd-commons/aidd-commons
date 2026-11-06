@@ -4,12 +4,15 @@ description: 将暴露、毒性、DMPK 和 PK/PD 证据作为相互关联的决�
 ---
 
 import LessonProgress from "../../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 英文原文：[ADMET evaluation](/learn/admet-pk/admet-evaluation/)。
 
 译文更新：2026-09-08。
 
 <LessonProgress lessonId="admet-pk/admet-evaluation" />
+
+<TeachingViewLink track="admet-pk" chinese />
 
 ## 基础
 
@@ -31,6 +34,21 @@ ADMET 涵盖吸收、分布、代谢、排泄和毒性；PK/PD 增加暴露—�
 
 诸如 [OpenFF Evaluator](https://github.com/openforcefield/openff-evaluator) 的
 物理性质工具可以约束一项假设，但不能替代代谢、转运体或毒理学实验。
+
+## 有边界的推演与独立任务
+
+先阅读[assay 对照](/zh-cn/learn/drug-discovery-foundations/assay-controls-dose-response/)。本任务是在比较预测前识别 ADMET 终点。一对构造记录中，一项是每百万 hepatocyte 的内在清除率，另一项是每克 microsomal protein 的清除率。物种名称相同，测量基准仍可能不同。两者原始数值的比值没有经验证的生理意义。
+
+一位独立审阅者要求对这两项作统一清除率排序。写出必须保留的字段，并解释这种排序遇到的第一个障碍。
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+保留物种、基质、终点、单位、parent 身份、条件和来源。首要障碍是测量基准不相容，发生在选择模型或计算秩相关之前。可辩护比较需要明确且经验证的转换，或分别进行终点特异分析。继续阅读[暴露与 PK/PD](/zh-cn/learn/admet-pk/exposure-clearance-pkpd/)，理解派生量的证据边界。
+
+</details>
+
+本教学任务新增于 2026-10-26；原来源审阅日期保持如下。
 
 ## v0.1 尚未教授的内容
 

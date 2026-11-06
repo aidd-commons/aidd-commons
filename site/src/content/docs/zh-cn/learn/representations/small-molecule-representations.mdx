@@ -6,6 +6,7 @@ description: 根据 AIDD 决策所需的化学区分选择标识符、描述符�
 import LessonProgress from "../../../../../components/LessonProgress.astro";
 import RepresentationDecisionMap from "../../../../../components/RepresentationDecisionMap.astro";
 import ScrollableRegions from "../../../../../components/ScrollableRegions.astro";
+import ScientificTeachingView from "../../../../../components/ScientificTeachingView.astro";
 
 <LessonProgress lessonId="representations/small-molecule-representations" />
 <ScrollableRegions />
@@ -35,6 +36,8 @@ import ScrollableRegions from "../../../../../components/ScrollableRegions.astro
 3. 根据终点依赖关系而非模型流行度，选择最小充分表示；
 4. 构建匹配的描述符与指纹基线，且不允许预处理或实体泄漏；
 5. 在信任分数前，审查立体化学、质子化、互变异构、构象、哈希和适用域失败。
+
+<ScientificTeachingView track="representations" chinese />
 
 ## 科学假设
 
@@ -175,9 +178,25 @@ SMILES 模型看到的是一种序列化。字符、正则表达式、原子级�
 
 [无标签表示检查器](/zh-cn/labs/molecule-representation-inspector/) 使用七个编写的示例。从仓库根目录运行它：
 
+**执行模式：新的本地检查运行。** 此步骤解析所附示例结构并写报告，不重跑冻结的
+EGFR 评估。每次运行都创建新的输出目录：
+
+```sh
+representation_run_dir="$(mktemp -d "${TMPDIR:-/tmp}/aidd-representations.XXXXXX")"
+env UV_CACHE_DIR=.cache/uv uv run python labs/molecule_representations/run_lab.py inspect --output "$representation_run_dir/report.json"
+```
+
+<details>
+<summary>原始默认输出命令</summary>
+
+此命令写入 `tmp/molecule-representations/report.json`，文件已存在时会覆盖它。
+仅在有意替换该文件时使用。
+
 ```sh
 env UV_CACHE_DIR=.cache/uv uv run python labs/molecule_representations/run_lab.py inspect
 ```
+
+</details>
 
 它会写入 `tmp/molecule-representations/report.json`，并记录已安装的 RDKit 版本以及每个指纹选项。检查三种对比：
 

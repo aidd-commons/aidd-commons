@@ -15,13 +15,25 @@ This laboratory serves `t01-entity-glossary`. Read [Entity kinds and identifiers
 
 Mode is fresh independent computation over a frozen ChEMBL 37 snapshot. Use the project Python 3.11 environment and a CPU. The validated snapshot is already cached in this repository. The download command validates and copies it into this laboratory's cache. Once cached, the task needs no network or accelerator. The inspector writes nothing. The exporter replaces only the compact committed summary after checks pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/entity_glossary_audit/run_lab.py download
 .venv/bin/python labs/entity_glossary_audit/inspect_entity_glossary_audit.py show
 .venv/bin/python labs/entity_glossary_audit/inspect_entity_glossary_audit.py check
-.venv/bin/python labs/entity_glossary_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/entity_glossary_audit -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/entity_glossary_audit/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/entity_glossary_audit/export_summary.py
+```
+
+</details>
 
 ## What the table names
 
@@ -56,6 +68,17 @@ Every one of the 488 admitted rows lacks an identifier for each kind below. The 
 ## Limits of the material
 
 The audit does not merge two identifiers, predict what a compound does, identify a target as a disease, or treat a document as proof that a measurement is true. It describes a purposefully selected teaching cohort rather than a population sample. The cached release and the admission rule bound every count. Bounds and excluded activity rows do not enter the table above.
+
+## Independent inspection task
+
+The cohort resolves to 10 parents but the admitted-row table names 9. Explain the difference without inventing a missing entity. Then choose one molecule-record identifier and state why its assay, target and document identifiers cannot replace it in a join.
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+One resolved parent has no admitted point row, so it contributes no parent identifier to this row-based count. The named fields identify different objects: tested molecular form, measurement system, target and publication. Their numerical counts cannot be added as independent molecules or substituted as join keys.
+
+</details>
 
 ## Sources and terms
 

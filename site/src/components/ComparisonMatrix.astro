@@ -7,11 +7,13 @@ import type {
 import { comparisonTrackTitle } from "../data/comparison.js";
 
 interface Props {
+  chinese?: boolean;
   providers: ComparisonProvider[];
   rows: ComparisonRow[];
 }
 
-const { providers, rows } = Astro.props;
+const { providers, rows, chinese = false } = Astro.props;
+const t = (en: string, zh: string) => chinese ? zh : en;
 const initialTrack = "foundations";
 const label = (value: string) =>
   value
@@ -56,12 +58,15 @@ const depths: CoverageDepth[] = [
 ];
 const providersById = new Map(providers.map((provider) => [provider.id, provider]));
 const initialCount = rows.filter(({ track_id }) => track_id === initialTrack).length;
+const depthSymbols: Record<CoverageDepth,string> = {assessed:"A",executable:"X",worked:"W",explained:"E",mentioned:"M",absent:"–",unverified:"?"};
+const rowsByCell = new Map(rows.map(row=>[`${row.provider_id}:${row.topic_id}`,row]));
 ---
 
-<comparison-audit>
-  <form class="comparison-controls" data-comparison-controls aria-label="Filter comparison cells">
+<comparison-audit data-locale={chinese ? "zh-cn" : "en"}>
+  <header class="comparison-heading"><p>{t("Topic-level evidence map","主题层面的证据图")}</p><h3 id="comparison-cells">{t("Inspect a provider, then open its source","检查提供方，再打开来源")}</h3><p>{t("Each mark is one recorded provider–topic claim. Teaching depth, direct review and uncertainty remain separate; the map does not rank performance.","每个标记表示一条已记录的提供方—主题主张。教学深度、直接审阅与不确定性分别记录；此图不对性能排名。")}</p></header>
+  <form class="comparison-controls" data-comparison-controls aria-label={t("Filter comparison cells","筛选比较单元格")}>
     <div class="comparison-field">
-      <label for="comparison-track">Track</label>
+      <label for="comparison-track">{t("Track","学习方向")}</label>
       <select id="comparison-track" name="track">
         {tracks.map((track) => (
           <option value={track} selected={track === initialTrack}>{comparisonTrackTitle(track)}</option>
@@ -69,9 +74,9 @@ const initialCount = rows.filter(({ track_id }) => track_id === initialTrack).le
       </select>
     </div>
     <div class="comparison-field">
-      <label for="comparison-topic">Topic</label>
+      <label for="comparison-topic">{t("Topic","主题")}</label>
       <select id="comparison-topic" name="topic">
-        <option value="">All topics in track</option>
+        <option value="">{t("All topics in track","本方向全部主题")}</option>
         {topics.map((topic) => (
           <option
             value={topic.id}
@@ -85,75 +90,90 @@ const initialCount = rows.filter(({ track_id }) => track_id === initialTrack).le
       </select>
     </div>
     <div class="comparison-field">
-      <label for="comparison-provider-class">Provider class</label>
+      <label for="comparison-provider-class">{t("Provider class","提供方类型")}</label>
       <select id="comparison-provider-class" name="providerClass">
-        <option value="">All provider classes</option>
+        <option value="">{t("All provider classes","全部提供方类型")}</option>
         {providerClasses.map((providerClass) => (
           <option value={providerClass}>{label(providerClass)}</option>
         ))}
       </select>
     </div>
     <div class="comparison-field">
-      <label for="comparison-depth">Coverage depth</label>
+      <label for="comparison-depth">{t("Coverage depth","覆盖深度")}</label>
       <select id="comparison-depth" name="depth">
-        <option value="">All depth states</option>
+        <option value="">{t("All depth states","全部深度状态")}</option>
         {depths.map((depth) => <option value={depth}>{label(depth)}</option>)}
       </select>
     </div>
     <div class="comparison-field">
-      <label for="comparison-access">Content access</label>
+      <label for="comparison-access">{t("Content access","内容访问")}</label>
       <select id="comparison-access" name="access">
-        <option value="">All content access states</option>
+        <option value="">{t("All content access states","全部内容访问状态")}</option>
         {contentAccessValues.map((access) => (
           <option value={access}>{label(access)}</option>
         ))}
       </select>
     </div>
     <div class="comparison-field">
-      <label for="comparison-language">Language</label>
+      <label for="comparison-language">{t("Language","语言")}</label>
       <select id="comparison-language" name="language">
-        <option value="">All maintained languages</option>
+        <option value="">{t("All maintained languages","全部维护语言")}</option>
         {languages.map((language) => (
           <option value={language}>{language.toUpperCase()}</option>
         ))}
       </select>
     </div>
     <div class="comparison-field">
-      <label for="comparison-review-after">Reviewed on or after</label>
+      <label for="comparison-review-after">{t("Reviewed on or after","审阅日期不早于")}</label>
       <input id="comparison-review-after" name="reviewAfter" type="date" max={reviewDates.at(-1)} />
     </div>
     <div class="check-control">
       <input id="comparison-direct" name="direct" type="checkbox" />
-      <label for="comparison-direct">Direct observations only</label>
+      <label for="comparison-direct">{t("Direct observations only","仅直接观察")}</label>
     </div>
-    <button type="reset">Reset filters</button>
+    <button type="reset">{t("Reset filters","重置筛选")}</button>
   </form>
 
-  <div class="comparison-key" aria-label="Coverage depth key">
+  <div class="comparison-key" aria-label={t("Coverage depth key","覆盖深度图例")}>
     {depths.map((depth) => (
-      <span class={`depth-badge depth-badge--${depth}`}>{label(depth)}</span>
+      <span class={`depth-badge depth-badge--${depth}`}><i aria-hidden="true">{depthSymbols[depth]}</i>{label(depth)}</span>
     ))}
   </div>
 
   <p class="result-count" data-comparison-count aria-live="polite">
-    {initialCount} comparison cells shown
+    {initialCount} {t("comparison cells shown", "个比较单元格已显示")}
   </p>
   <p class="notice" data-comparison-empty hidden>
-    No comparison cells match these filters. Reset one or more controls.
+    {t("No comparison cells match these filters. Reset one or more controls.", "没有符合这些筛选条件的比较单元格。请重置一个或多个控件。")}
   </p>
+
+  <figure class="comparison-overview" data-comparison-overview>
+    <figcaption><strong>{t("Read across topics, compare the evidence states","横跨主题，比较证据状态")}</strong><span>{t("Select a mark to open the matching source record below. D = direct review; ? = an explicit unknown default when no direct cell was encoded.","选择标记以打开下方对应的来源记录。D = 直接审阅；? = 未编码直接观察时的明确未知默认状态。")}</span></figcaption>
+    <div class="comparison-overview__scroll" role="region" aria-label={t("Provider by topic evidence matrix","提供方与主题的证据矩阵")} tabindex="0">
+      {tracks.filter(track=>track===initialTrack).map(track=>{
+        const trackTopics=topics.filter(topic=>topic.track===track);
+        return <table class="comparison-overview__matrix" data-overview-track={track} hidden={track!==initialTrack}><caption>{comparisonTrackTitle(track)} · {t("categorical teaching depth", "分类教学深度")}</caption><thead><tr><th scope="col">{t("Provider","提供方")}</th>{trackTopics.map(topic=><th scope="col" data-overview-topic={topic.id}>{topic.title}</th>)}</tr></thead><tbody>{providers.map(provider=><tr data-overview-provider={provider.id}><th scope="row">{provider.name}</th>{trackTopics.map(topic=>{
+          const row=rowsByCell.get(`${provider.id}:${topic.id}`);
+          if(!row) throw new Error(`Missing evidence-map cell ${provider.id}:${topic.id}`);
+          return <td data-overview-cell={`${provider.id}:${topic.id}`} data-overview-topic={topic.id}><a class:list={["comparison-overview__mark",`depth-${row.depth}`,{"is-default":row.coverage_origin!=="direct"}]} href={`#comparison-cell-${provider.id}-${topic.id}`} data-comparison-focus aria-label={`${provider.name}, ${topic.title}: ${label(row.depth)}; ${row.coverage_origin==="direct"?"direct review":"explicit unknown default"}. Open the source record.`}><span aria-hidden="true">{depthSymbols[row.depth]}</span><small aria-hidden="true">{row.coverage_origin==="direct"?"D":"?"}</small></a><span class="comparison-overview__filtered" hidden aria-label={t("Filtered out","已筛除")}>·</span></td>;
+        })}</tr>)}</tbody></table>;
+      })}
+    </div>
+  </figure>
+  <noscript><p class="comparison-noscript">{t("The initial Foundations map and its source records are readable without JavaScript. Filter controls require scripting.","初始基础方向图及其来源记录无需 JavaScript 即可阅读。筛选控件需要脚本。")}</p></noscript>
 
   <div class="comparison-table-wrap">
     <table class="comparison-table">
       <caption data-comparison-caption>
-        {comparisonTrackTitle(initialTrack)} coverage cells. Bounds are evaluated at explained depth.
+        {comparisonTrackTitle(initialTrack)}{t(" coverage cells. Bounds are evaluated at explained depth.", "覆盖单元格。上下界按解释深度计算。")}
       </caption>
       <thead>
         <tr>
-          <th scope="col">Provider</th>
-          <th scope="col">Topic</th>
-          <th scope="col">Depth</th>
-          <th scope="col">Explained bounds</th>
-          <th scope="col">Evidence</th>
+          <th scope="col">{t("Provider","提供方")}</th>
+          <th scope="col">{t("Topic","主题")}</th>
+          <th scope="col">{t("Depth","深度")}</th>
+          <th scope="col">{t("Explained bounds","解释深度上下界")}</th>
+          <th scope="col">{t("Evidence","证据")}</th>
         </tr>
       </thead>
       <tbody>
@@ -165,46 +185,49 @@ const initialCount = rows.filter(({ track_id }) => track_id === initialTrack).le
           return (
             <tr
               class="comparison-row"
+              id={`comparison-cell-${row.provider_id}-${row.topic_id}`}
+              tabindex="-1"
               data-track={row.track_id}
               data-provider-class={row.provider_class}
               data-depth={row.depth}
               data-origin={row.coverage_origin}
               data-provider-id={row.provider_id}
               data-topic-id={row.topic_id}
+              data-topic-order={row.topic_order}
               data-content-access={provider.access.content.value}
               data-languages={provider.languages.join(",")}
               data-last-reviewed={provider.last_verified}
               hidden={row.track_id !== initialTrack}
             >
-              <td data-label="Provider">
+              <td data-column="provider" data-label={t("Provider","提供方")}>
                 {provider.canonical_source.source_type === "url" ? (
                   <a href={provider.canonical_source.url}>{row.provider_name}</a>
                 ) : (
                   <strong>{row.provider_name}</strong>
                 )}
                 <span class="cell-subline">
-                  {label(row.provider_class)} · content {label(provider.access.content.value)}<br />
-                  {provider.languages.map((language) => language.toUpperCase()).join(", ")} · reviewed {provider.last_verified}
+                  {label(row.provider_class)} · {t("content", "内容")} {label(provider.access.content.value)}<br />
+                  {provider.languages.map((language) => language.toUpperCase()).join(", ")} · {t("reviewed", "审阅日期")} {provider.last_verified}
                 </span>
               </td>
-              <td data-label="Topic">
+              <td data-column="topic" data-label={t("Topic","主题")}>
                 <strong>{row.topic_title}</strong>
                 <span class="cell-subline">
-                  {row.topic_core ? "Core topic" : "Extended topic"} · {row.topic_id}
+                  {row.topic_core ? t("Core topic", "核心主题") : t("Extended topic", "扩展主题")} · {row.topic_id}
                 </span>
               </td>
-              <td data-label="Depth">
+              <td data-column="depth" data-label={t("Depth","深度")}>
                 <span class={`depth-badge depth-badge--${row.depth}`}>{label(row.depth)}</span>
-                <span class="cell-subline">{row.coverage_origin === "direct" ? "Direct review" : "Explicit unknown default"}</span>
+                <span class="cell-subline">{row.coverage_origin === "direct" ? t("Direct review", "直接审阅") : t("Explicit unknown default", "明确未知默认状态")}</span>
               </td>
-              <td data-label="Explained bounds">
-                <span class="bounds-pair"><span>Lower {row.lower_at_explained}</span><span>Upper {row.upper_at_explained}</span></span>
+              <td data-column="bounds" data-label={t("Explained bounds","解释深度上下界")}>
+                <span class="bounds-pair"><span>{t("Lower", "下界")} {row.lower_at_explained}</span><span>{t("Upper", "上界")} {row.upper_at_explained}</span></span>
               </td>
-              <td data-label="Evidence">
+              <td data-column="evidence" data-label={t("Evidence","证据")}>
                 <details class="cell-evidence">
-                  <summary>{row.evidence.length > 0 ? `Evidence (${row.evidence.length})` : "Evidence status"}</summary>
-                  <p><strong>Reviewed scope:</strong> {row.reviewed_scope}</p>
-                  <p><strong>Interpretation:</strong> {row.note}</p>
+                  <summary>{row.evidence.length > 0 ? `${t("Evidence", "证据")} (${row.evidence.length})` : t("Evidence status", "证据状态")}</summary>
+                  <p><strong>{t("Reviewed scope:","已审阅范围：")}</strong> {row.reviewed_scope}</p>
+                  <p><strong>{t("Interpretation:","解读：")}</strong> {row.note}</p>
                   {row.evidence.length > 0 ? (
                     <ul class="evidence-source-list">
                       {row.evidence.map((source) => (
@@ -218,7 +241,7 @@ const initialCount = rows.filter(({ track_id }) => track_id === initialTrack).le
                             </>
                           )}
                           <span class="cell-subline">
-                            {label(source.access)} · reviewed {source.reviewed_on}
+                            {label(source.access)} · {t("reviewed", "审阅日期")} {source.reviewed_on}
                             {source.version ? ` · ${source.version}` : ""}
                           </span>
                           <p>{source.observed_scope}</p>
@@ -226,7 +249,7 @@ const initialCount = rows.filter(({ track_id }) => track_id === initialTrack).le
                       ))}
                     </ul>
                   ) : (
-                    <p class="unknown-note">No topic-specific source was encoded in this dated review.</p>
+                    <p class="unknown-note">{t("No topic-specific source was encoded in this dated review.","这次带日期的评阅中未编码主题专属来源。")}</p>
                   )}
                 </details>
               </td>
@@ -241,6 +264,7 @@ const initialCount = rows.filter(({ track_id }) => track_id === initialTrack).le
 <script>
   class ComparisonAudit extends HTMLElement {
     private form?: HTMLFormElement;
+    private t(en: string, zh: string) { return this.dataset.locale === "zh-cn" ? zh : en; }
 
     connectedCallback() {
       this.form =
@@ -252,6 +276,17 @@ const initialCount = rows.filter(({ track_id }) => track_id === initialTrack).le
       this.form.addEventListener("change", () => this.applyFilters(true));
       this.form.addEventListener("reset", () => {
         requestAnimationFrame(() => this.applyFilters(true));
+      });
+      this.addEventListener("click",event=>{
+        const mark=event.target instanceof Element?event.target.closest<HTMLAnchorElement>("[data-comparison-focus]"):null;
+        if(!mark)return;
+        const row=this.querySelector<HTMLTableRowElement>(`#${CSS.escape(mark.hash.slice(1))}`);
+        if(!row||row.hidden)return;
+        event.preventDefault();
+        const evidence=row.querySelector<HTMLDetailsElement>("details");
+        if(evidence)evidence.open=true;
+        row.focus({preventScroll:true});
+        row.scrollIntoView({block:"nearest",behavior:"auto"});
       });
       this.applyFilters(false);
     }
@@ -312,6 +347,48 @@ const initialCount = rows.filter(({ track_id }) => track_id === initialTrack).le
       }
     }
 
+    /** Reuse the source rows instead of duplicating every track's evidence HTML. */
+    private renderOverview(track: string) {
+      const scroll=this.querySelector<HTMLElement>(".comparison-overview__scroll");
+      if(!scroll||scroll.querySelector<HTMLElement>("[data-overview-track]")?.dataset.overviewTrack===track)return;
+      const sourceRows=[...this.querySelectorAll<HTMLTableRowElement>("tbody .comparison-row")].filter(row=>row.dataset.track===track);
+      const topics=new Map<string,{title:string;order:number}>();
+      const providers=new Map<string,{name:string;rows:Map<string,HTMLTableRowElement>}>();
+      const text=(element:Element|null)=>element?.textContent?.replace(/\s+/g," ").trim()??"";
+      for(const row of sourceRows){
+        const topicId=row.dataset.topicId!,providerId=row.dataset.providerId!;
+        topics.set(topicId,{title:text(row.querySelector('[data-column="topic"] strong')),order:Number(row.dataset.topicOrder)});
+        if(!providers.has(providerId))providers.set(providerId,{name:text(row.querySelector('[data-column="provider"] a, [data-column="provider"] strong')),rows:new Map()});
+        providers.get(providerId)!.rows.set(topicId,row);
+      }
+      const orderedTopics=[...topics.entries()].sort((left,right)=>left[1].order-right[1].order);
+      const makeCell=(tag:"th"|"td",value:string)=>{const cell=document.createElement(tag);cell.textContent=value;return cell;};
+      const table=document.createElement("table");table.className="comparison-overview__matrix";table.dataset.overviewTrack=track;
+      const caption=table.createCaption();
+      const trackField=this.form?.elements.namedItem("track");
+      caption.textContent=(trackField instanceof HTMLSelectElement?trackField.selectedOptions.item(0)?.textContent:track)+this.t(" · categorical teaching depth", " · 分类教学深度");
+      const header=table.createTHead().insertRow();const providerHeading=makeCell("th",this.t("Provider", "提供方"));providerHeading.scope="col";header.append(providerHeading);
+      for(const [id,topic] of orderedTopics){const cell=makeCell("th",topic.title);cell.scope="col";cell.dataset.overviewTopic=id;header.append(cell);}
+      const body=table.createTBody();
+      const symbols:Record<string,string>={assessed:"A",executable:"X",worked:"W",explained:"E",mentioned:"M",absent:"–",unverified:"?"};
+      for(const [providerId,provider] of providers){
+        const providerRow=body.insertRow();providerRow.dataset.overviewProvider=providerId;
+        const providerCell=makeCell("th",provider.name);providerCell.scope="row";providerRow.append(providerCell);
+        for(const [topicId,topic] of orderedTopics){
+          const source=provider.rows.get(topicId);if(!source)continue;
+          const direct=source.dataset.origin==="direct",depth=source.dataset.depth??"unverified";
+          const cell=makeCell("td","");cell.dataset.overviewCell=`${providerId}:${topicId}`;cell.dataset.overviewTopic=topicId;
+          const mark=document.createElement("a");mark.className=`comparison-overview__mark depth-${depth}${direct?"":" is-default"}`;mark.href=`#${source.id}`;mark.dataset.comparisonFocus="";
+          mark.setAttribute("aria-label",this.t(`${provider.name}, ${topic.title}: ${depth}; ${direct?"direct review":"explicit unknown default"}. Open the source record.`, `${provider.name}，${topic.title}：${depth}；${direct?"直接审阅":"明确未知默认状态"}。打开来源记录。`));
+          const symbol=document.createElement("span");symbol.textContent=symbols[depth]??"?";symbol.setAttribute("aria-hidden","true");
+          const origin=document.createElement("small");origin.textContent=direct?"D":"?";origin.setAttribute("aria-hidden","true");
+          mark.append(symbol,origin);const filtered=document.createElement("span");filtered.className="comparison-overview__filtered";filtered.textContent="·";filtered.hidden=true;filtered.setAttribute("aria-label",this.t("Filtered out", "已筛除"));
+          cell.append(mark,filtered);providerRow.append(cell);
+        }
+      }
+      scroll.replaceChildren(table);
+    }
+
     private applyFilters(updateLocation: boolean) {
       if (!this.form) return;
       const trackField = this.form.elements.namedItem("track");
@@ -328,6 +405,7 @@ const initialCount = rows.filter(({ track_id }) => track_id === initialTrack).le
       const reviewAfter = String(formData.get("reviewAfter") ?? "");
       const directOnly = formData.get("direct") === "on";
       let visible = 0;
+      const visibleCells = new Set<string>();
 
       for (const row of this.querySelectorAll<HTMLTableRowElement>(
         "tbody .comparison-row",
@@ -343,13 +421,31 @@ const initialCount = rows.filter(({ track_id }) => track_id === initialTrack).le
           (!reviewAfter || (row.dataset.lastReviewed ?? "") >= reviewAfter) &&
           (!directOnly || row.dataset.origin === "direct");
         row.hidden = !matches;
-        if (matches) visible += 1;
+        if (matches) { visible += 1; visibleCells.add(`${row.dataset.providerId}:${row.dataset.topicId}`); }
       }
+
+      this.renderOverview(track);
+      this.querySelectorAll<HTMLTableElement>("[data-overview-track]").forEach(matrix=>{
+        matrix.hidden=matrix.dataset.overviewTrack!==track;
+        matrix.querySelectorAll<HTMLElement>("[data-overview-topic]").forEach(cell=>{cell.hidden=Boolean(topic&&cell.dataset.overviewTopic!==topic);});
+        matrix.querySelectorAll<HTMLElement>("[data-overview-cell]").forEach(cell=>{
+          const matches=visibleCells.has(cell.dataset.overviewCell??"");
+          const mark=cell.querySelector<HTMLAnchorElement>("[data-comparison-focus]");
+          if(mark)mark.hidden=!matches;
+          const filtered=cell.querySelector<HTMLElement>(".comparison-overview__filtered");
+          if(filtered)filtered.hidden=matches;
+        });
+        matrix.querySelectorAll<HTMLTableRowElement>("[data-overview-provider]").forEach(provider=>{
+          provider.hidden=![...provider.querySelectorAll<HTMLElement>("[data-overview-cell]")].some(cell=>visibleCells.has(cell.dataset.overviewCell??""));
+        });
+      });
+      const overview=this.querySelector<HTMLElement>("[data-comparison-overview]");
+      if(overview)overview.hidden=visible===0;
 
       const count = this.querySelector<HTMLElement>("[data-comparison-count]");
       const empty = this.querySelector<HTMLElement>("[data-comparison-empty]");
       const caption = this.querySelector<HTMLElement>("[data-comparison-caption]");
-      if (count) count.textContent = `${visible} comparison ${visible === 1 ? "cell" : "cells"} shown`;
+      if (count) count.textContent = this.t(`${visible} comparison ${visible === 1 ? "cell" : "cells"} shown`, `已显示 ${visible} 个比较单元格`);
       if (empty) empty.hidden = visible !== 0;
       if (caption) {
         const trackName =
@@ -360,8 +456,8 @@ const initialCount = rows.filter(({ track_id }) => track_id === initialTrack).le
           ? this.form.querySelector<HTMLOptionElement>(
               `select[name="topic"] option[value="${CSS.escape(topic)}"]`,
             )?.textContent
-          : "all topics";
-        caption.textContent = `${trackName}: ${topicName ?? topic}. Bounds are evaluated at explained depth.`;
+          : this.t("all topics", "全部主题");
+        caption.textContent = this.t(`${trackName}: ${topicName ?? topic}. Bounds are evaluated at explained depth.`, `${trackName}：${topicName ?? topic}。上下界按解释深度计算。`);
       }
 
       if (updateLocation) {
@@ -384,3 +480,11 @@ const initialCount = rows.filter(({ track_id }) => track_id === initialTrack).le
     customElements.define("comparison-audit", ComparisonAudit);
   }
 </script>
+
+<style>
+  comparison-audit{display:block;min-width:0}.comparison-heading{padding-block:1rem;border-top:1px solid var(--atlas-rule-strong)}.comparison-heading>p:first-child{font-size:.75rem;color:var(--atlas-teal-deep);letter-spacing:.06em;text-transform:uppercase;font-weight:650;margin:0 0 .4rem}.comparison-heading h3{font-size:1.2rem;margin:0}.comparison-heading>p:last-child{font-size:.85rem;color:var(--atlas-muted);line-height:1.6;max-width:60rem}
+  .comparison-controls{grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem;padding:1rem 0;margin-top:0;border-block:1px solid var(--atlas-rule)}.comparison-controls select,.comparison-controls input[type=date]{width:100%;max-width:100%;font:inherit;font-size:.82rem}.comparison-field{min-width:0}.comparison-field label{font-size:.78rem}.comparison-controls button{font-size:.8rem;box-shadow:none}.check-control{font-size:.8rem}.comparison-key{margin-top:1rem;gap:.4rem .8rem}.depth-badge{display:inline-flex;gap:.4rem;align-items:center;border:0;border-bottom:1px solid var(--atlas-rule);background:transparent;font-size:.75rem;padding:.3rem 0}.depth-badge i{display:inline-grid;place-items:center;width:1.2rem;height:1.2rem;border:1px solid var(--atlas-rule-strong);font-style:normal;font-size:.75rem;line-height:1}.depth-badge--unverified{border-bottom-style:dashed;background:none}.depth-badge--unverified i{border-style:dashed}.result-count{font-size:.82rem;font-variant-numeric:tabular-nums}
+  .comparison-overview{margin:1.5rem 0;min-width:0;border-block:1px solid var(--atlas-rule);padding-block:1rem}.comparison-overview[hidden]{display:none}.comparison-overview figcaption{display:grid;gap:.35rem;font-size:.95rem;margin-bottom:.75rem}.comparison-overview figcaption>span{font-size:.78rem;color:var(--atlas-muted);line-height:1.6}.comparison-overview__scroll{overflow:auto;max-width:100%}.comparison-overview__matrix{width:100%;min-width:42rem;border-collapse:collapse;font-size:.75rem;table-layout:fixed}.comparison-overview__matrix[hidden],.comparison-overview__matrix [hidden]{display:none!important}.comparison-overview__matrix caption{text-align:left;font-size:.78rem;color:var(--atlas-muted);padding:.6rem 0}.comparison-overview__matrix th,.comparison-overview__matrix td{padding:.4rem;border-bottom:1px solid var(--atlas-rule);text-align:center;vertical-align:middle;line-height:1.4;overflow-wrap:anywhere}.comparison-overview__matrix th:first-child{width:11rem;text-align:left;background:var(--atlas-panel);position:sticky;left:0;z-index:1}.comparison-overview__matrix thead th{font-size:.75rem;font-weight:600;vertical-align:bottom;padding-bottom:.7rem}.comparison-overview__matrix tbody th{font-size:.75rem;font-weight:500}.comparison-overview__mark{display:flex;position:relative;align-items:center;justify-content:center;min-height:44px;min-width:44px;width:100%;border:1px solid var(--atlas-rule-strong);background:var(--atlas-panel);color:var(--atlas-ink);text-decoration:none;font:600 .85rem var(--atlas-font-sans);line-height:1}.comparison-overview__mark small{position:absolute;right:.2rem;bottom:.2rem;font-size:.6rem;font-weight:500}.comparison-overview__mark.is-default{border-style:dashed;background:repeating-linear-gradient(-45deg,transparent,transparent 5px,color-mix(in srgb,var(--atlas-muted) 8%,transparent) 5px,color-mix(in srgb,var(--atlas-muted) 8%,transparent) 6px)}.depth-assessed,.depth-executable{background:color-mix(in srgb,var(--atlas-teal) 27%,var(--atlas-panel));border-color:var(--atlas-teal-deep)}.depth-worked,.depth-explained{background:color-mix(in srgb,var(--atlas-teal) 10%,var(--atlas-panel));border-color:var(--atlas-teal-deep)}.depth-absent{border-style:double}.comparison-overview__filtered{display:grid;place-items:center;min-height:44px;color:var(--atlas-muted)}
+  .comparison-table-wrap{border-inline:0}.comparison-table{font-size:.8rem;min-width:58rem}.comparison-table caption{padding:.8rem 0}.comparison-table th,.comparison-table td{padding:.75rem .6rem}.comparison-row:focus{outline:2px solid var(--atlas-teal-deep);outline-offset:-2px}.comparison-table .depth-badge{font-size:.75rem;padding:.3rem 0}.comparison-table .cell-subline{font-size:.75rem;line-height:1.5}.cell-evidence summary{font-size:.8rem;min-height:44px}.comparison-noscript{font-size:.8rem;color:var(--atlas-muted)}.comparison-overview__scroll:focus-visible,.comparison-overview__mark:focus-visible,.comparison-controls select:focus-visible,.comparison-controls input:focus-visible,.comparison-controls button:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
+  @media(max-width:58rem){.comparison-controls{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:44rem){.comparison-controls{grid-template-columns:minmax(0,1fr)}.comparison-table{min-width:0}.comparison-table tr{border:0;border-top:2px solid var(--atlas-rule-strong);box-shadow:none;background:transparent;margin-bottom:1.2rem}.comparison-table td{grid-template-columns:minmax(5.5rem,28%) minmax(0,1fr);gap:.6rem}.comparison-table td::before{font-size:.75rem}.comparison-overview__matrix{min-width:38rem}.comparison-overview__matrix th:first-child{width:9rem}}
+</style>

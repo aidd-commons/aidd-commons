@@ -26,122 +26,117 @@ const label = (value: string) =>
   value
     .replaceAll(/[-_]/gu, " ")
     .replace(/^./u, (character) => character.toUpperCase());
+const chinese = Astro.props.chinese ?? false;
+const t = (en: string, zh: string) => chinese ? zh : en;
 ---
 
-<SiteShell
-  title="Coverage audit"
-  description="A source-grounded, interval-based comparison of AIDD learning systems by topic and instructional depth."
+<SiteShell lang={chinese ? "zh-CN" : "en"}
+  title={t("Coverage audit","覆盖审计")}
+  description={t("A source-grounded, interval-based comparison of AIDD learning systems by topic and instructional depth.","以来源和区间为依据，按主题与教学深度比较 AIDD 学习系统。")}
 >
+  {chinese && <p class="section-intro" data-source-language="en">审计界面提供中文。提供方名称、主题名称、原始来源、冻结的方案说明与图注保留原始语言；数字和日期与英语版本相同。</p>}
   <section class="audit-hero" aria-labelledby="audit-title">
     <div>
-      <p class="eyebrow">Dated comparison · {comparison.as_of}</p>
-      <h1 id="audit-title" class="page-heading">AIDD coverage audit</h1>
+      <p class="eyebrow">{t("Dated comparison", "带日期的比较")} · {comparison.as_of}</p>
+      <h1 id="audit-title" class="page-heading">{t("AIDD coverage audit","AIDD 覆盖审计")}</h1>
       <p class="page-intro">
-        A transparent comparison of {comparison.providers.length} learning systems
-        across {comparison.taxonomy.tracks} tracks and {comparison.taxonomy.topics}
-        {" "}topics. Every cell preserves its evidence state and uncertainty.
+        {t("A transparent comparison of ", "透明比较 ")}{comparison.providers.length}{t(" learning systems across ", " 个学习系统，涵盖 ")}{comparison.taxonomy.tracks}{t(" tracks and ", " 个学习方向、")}{comparison.taxonomy.topics}{t(" topics. Every cell preserves its evidence state and uncertainty.", " 个主题。每个单元格保留证据状态与不确定性。")}
       </p>
       <p class="section-intro" data-comparison-date-boundary>
-        External provider observations are frozen as of {comparison.external_survey_frozen_on}.
-        This project's records extend to {comparison.as_of}. These dates describe a
-        historical comparison, not a current global ranking. The
-        <a href="https://github.com/gxCaesar/aidd-commons/blob/main/docs/CURRENT_RESOURCE_COMPARISON.md">25 October 2026 product review</a>
-        records a separate sample of current capabilities without rescoring this matrix.
+        {t("External provider observations are frozen as of ", "外部提供方的观察冻结于 ")}{comparison.external_survey_frozen_on}{t(". This project's records extend to ", "，本项目记录更新至 ")}{comparison.as_of}{t(". These dates describe a historical comparison, not a current global ranking. The ", "。这些日期描述历史比较，而非当前全球排名。")}
+        <a href="https://github.com/gxCaesar/aidd-commons/blob/main/docs/CURRENT_RESOURCE_COMPARISON.md">{t("25 October 2026 product review","2026 年 10 月 25 日产品评阅")}</a>{" "}
+        {t("records a separate sample of current capabilities without rescoring this matrix.", "另行记录当前能力样本，未重新评分本矩阵。")}
       </p>
     </div>
     <dl class="audit-snapshot">
-      <div><dt>Direct observations</dt><dd>{comparison.observations.direct_cells}</dd></div>
-      <div><dt>Explicit unknowns</dt><dd>{comparison.observations.default_unverified_cells}</dd></div>
-      <div><dt>Logical cells</dt><dd>{comparison.observations.total_cells}</dd></div>
-      <div><dt>Schema</dt><dd>{comparison.schema_version}</dd></div>
+      <div><dt>{t("Direct observations","直接观察")}</dt><dd>{comparison.observations.direct_cells}</dd></div>
+      <div><dt>{t("Explicit unknowns","明确未知项")}</dt><dd>{comparison.observations.default_unverified_cells}</dd></div>
+      <div><dt>{t("Logical cells","逻辑单元格")}</dt><dd>{comparison.observations.total_cells}</dd></div>
+      <div><dt>{t("Schema","模式版本")}</dt><dd class="audit-schema">{comparison.schema_version}</dd></div>
     </dl>
   </section>
 
+  <nav class="audit-reading-route" aria-label={t("Read the audit by question","按问题阅读审计")}>
+    <a href="#audit-principles-title"><span>{t("01 · Interpretation","01 · 解读")}</span><strong>{t("Read uncertainty as a range","以区间阅读不确定性")}</strong><p>{t("Unknown cells contribute to bounds, not evidence of absence.","未知项影响区间，不代表内容缺失。")}</p></a>
+    <a href="#matrix-title"><span>{t("02 · Source inspection","02 · 来源检查")}</span><strong>{t("Choose a track, then open a cell","选择学习方向，再打开单元格")}</strong><p>{t("Inspect provider, date, reviewed scope and its actual source.","检查提供方、日期、已审阅范围与实际来源。")}</p></a>
+    <a href="#gaps-title"><span>{t("03 · Teaching development","03 · 教学开发")}</span><strong>{t("Follow a confirmed depth gap","追踪已确认的深度缺口")}</strong><p>{t("Keep the frozen selection separate from current implementation.","区分冻结选题与当前实现。")}</p></a>
+  </nav>
   <section class="audit-principles section" aria-labelledby="audit-principles-title">
     <div>
-      <p class="meta-label">Reading rule</p>
-      <h2 id="audit-principles-title">Unknown is not absent</h2>
+      <p class="meta-label">{t("Reading rule","阅读规则")}</p>
+      <h2 id="audit-principles-title">{t("Unknown is not absent","未知不等于缺失")}</h2>
     </div>
     <p>
-      Direct observations describe only the material opened in the dated review.
-      An <strong>unverified</strong> cell is deliberately unresolved. It cannot be used
-      as evidence that a provider lacks a topic.
+      {t("Direct observations describe only the material opened in the dated review. An ", "直接观察仅描述在指定日期评阅中实际打开的材料。")}<strong>{t("unverified", "未核实")}</strong>{t(" cell is deliberately unresolved. It cannot be used as evidence that a provider lacks a topic.", "单元格表示问题尚未解决，不能作为提供方缺少某主题的证据。")}
     </p>
   </section>
 
   <section class="section" aria-labelledby="correction-window-title" data-correction-window>
-    <p class="eyebrow">Public correction window</p>
-    <h2 id="correction-window-title">Both comparison claims remain not established</h2>
+    <p class="eyebrow">{t("Public correction window","公开更正窗口")}</p>
+    <h2 id="correction-window-title">{t("Both comparison claims remain not established","两项比较性主张均尚未确立")}</h2>
     {publication?.first_published_at ? (
       <>
         <p class="section-intro" data-window-status={publication.correction_window_status}>
-          First publication was recorded at <time datetime={publication.first_published_at}>{publication.first_published_at}</time>.
-          The {publication.correction_window_days}-day correction window ends at {publication.correction_window_ends_at};
-          its status was <strong>{publication.correction_window_status}</strong> when checked on {publication.status_checked_on} (UTC).
+          {t("First publication was recorded at ", "首次公开时间记录为 ")}<time datetime={publication.first_published_at}>{publication.first_published_at}</time>。
+          {publication.correction_window_days}{t("-day correction window ends at ", " 天更正窗口结束于 ")}{publication.correction_window_ends_at}；
+          {t("its status was ", "状态为 ")}<strong>{publication.correction_window_status}</strong>{t(" when checked on ", "，核查日期 ")}{publication.status_checked_on} (UTC).
         </p>
         <p>
-          <a href={publication.correction_url!}>Submit a source-backed correction</a>.
-          Elapsed time does not establish either claim. Submitted corrections and all other claim conditions still need review.
+          <a href={publication.correction_url!}>{t("Submit a source-backed correction","提交有来源依据的更正")}</a>.
+          {t("Elapsed time does not establish either claim. Submitted corrections and all other claim conditions still need review.", "时间推移不能确立任何一项主张。提交的更正及其他主张条件仍需审阅。")}
         </p>
       </>
     ) : (
       <p class="section-intro" data-window-status="not_recorded">
-        No public publication timestamp or correction route has been recorded. The 30-day window starts with actual public availability, as recorded in the publication record.
+        {t("No public publication timestamp or correction route has been recorded. The 30-day window starts with actual public availability, as recorded in the publication record.", "尚未记录公开发布时间或更正渠道。30 天窗口从实际公开时开始，以发布记录为准。")}
       </p>
     )}
   </section>
 
   <div class="section">
     <CoverageBounds
+      chinese={chinese}
       providers={comparison.providers}
       summaries={comparison.summaries}
       totalTopics={comparison.taxonomy.topics}
     />
     <p class="section-intro">
-      The same {comparison.providers.length} providers, drawn: this project's own row
-      is a point at every threshold because every cell behind it is a direct
-      observation, and each row below it is a range whose width measures how much of
-      that provider nobody has read.
+      {t("The same ", "下图绘制相同的 ")}{comparison.providers.length}{t(" providers: this project's own row is a point at every threshold because every cell behind it is a direct observation, and each row below it is a range whose width measures how much of that provider nobody has read.", " 个提供方。本项目在每个阈值处显示为点，因为其所有单元格均为直接观察；其余区间的宽度反映该提供方尚未被审阅的材料范围。")}
     </p>
-    <AtlasFigure id="coverage-bounds" />
+    <AtlasFigure id="coverage-bounds" chinese={chinese} />
   </div>
 
   <section class="section" aria-labelledby="matrix-title">
     <div class="section-heading-row">
       <div>
-        <p class="eyebrow">Evidence-adjacent cells</p>
-        <h2 id="matrix-title">Interactive comparison matrix</h2>
+        <p class="eyebrow">{t("Evidence-adjacent cells","证据相邻的单元格")}</p>
+        <h2 id="matrix-title">{t("Interactive comparison matrix","交互比较矩阵")}</h2>
       </div>
-      <div class="audit-downloads" aria-label="Download comparison data">
+      <div class="audit-downloads" aria-label={t("Download comparison data","下载比较数据")}>
         <a href="/data/comparison.v1.json" download>JSON</a>
         <a href="/data/comparison.v1.csv" download>CSV</a>
       </div>
     </div>
     <p class="section-intro">
-      Filter one curriculum track at a time. Open any cell to inspect its reviewed
-      scope, interpretation, source, review date, and access state in place.
+      {t("Filter one curriculum track at a time. Open any cell to inspect its reviewed scope, interpretation, source, review date, and access state in place.", "每次筛选一个学习方向。打开任一单元格，即可就地检查已审阅范围、解读、来源、审阅日期与访问状态。")}
     </p>
-    <ComparisonMatrix providers={comparison.providers} rows={comparison.rows} />
+    <ComparisonMatrix chinese={chinese} providers={comparison.providers} rows={comparison.rows} />
   </section>
 
   <section class="section" aria-labelledby="gaps-title" data-gap-view>
     <div class="section-heading-row">
       <div>
-        <p class="eyebrow">Depth work queue</p>
-        <h2 id="gaps-title">Confirmed depth gaps</h2>
+        <p class="eyebrow">{t("Depth work queue","深度开发队列")}</p>
+        <h2 id="gaps-title">{t("Confirmed depth gaps","已确认的深度缺口")}</h2>
       </div>
-      <p class="gap-count">{comparison.gaps.candidates.length} confirmed</p>
+      <p class="gap-count">{comparison.gaps.candidates.length} {t("confirmed", "项已确认")}</p>
     </div>
     <p class="section-intro">
-      These are direct AIDD Commons observations below worked depth where at least
-      one external system has direct evidence at worked depth or deeper. They are
-      the evidence-backed input to the separately validated frozen selection rule.
+      {t("These are direct AIDD Commons observations below worked depth where at least one external system has direct evidence at worked depth or deeper. They are the evidence-backed input to the separately validated frozen selection rule.", "这些条目在 AIDD Commons 的直接观察中尚未达到完整示例深度，而至少一个外部系统有达到或超过该深度的直接证据。它们是经单独验证的冻结选题规则的证据输入。")}
     </p>
     {comparison.gaps.candidates.length === 0 ? (
       <p class="section-intro" data-gap-empty>
-        No evidence-backed depth gap is identified in the current records. This count
-        moves only with a new review or new teaching material, and it says nothing
-        about topics still recorded as unverified.
+        {t("No evidence-backed depth gap is identified in the current records. This count moves only with a new review or new teaching material, and it says nothing about topics still recorded as unverified.", "当前记录未识别出有证据支持的深度缺口。计数仅随新评阅或新教学材料改变，不说明仍标为未核实的主题。")}
       </p>
     ) : (
       <ol class="gap-grid">
@@ -152,9 +147,9 @@ const label = (value: string) =>
               <h3>{gap.topic_title}</h3>
               <dl>
                 <div><dt>AIDD Commons</dt><dd>{label(gap.self_depth)}</dd></div>
-                <div><dt>External depth</dt><dd>{label(gap.strongest_external_depth)}</dd></div>
+                <div><dt>{t("External depth","外部教学深度")}</dt><dd>{label(gap.strongest_external_depth)}</dd></div>
               </dl>
-              <p><strong>Observed in:</strong> {providerList(gap.external_providers_at_worked_or_deeper)}</p>
+              <p><strong>{t("Observed in:","观察于：")}</strong> {providerList(gap.external_providers_at_worked_or_deeper)}</p>
             </article>
           </li>
         ))}
@@ -164,25 +159,21 @@ const label = (value: string) =>
       <div class="candidate-tranche" aria-labelledby="candidate-tranche-title">
         <div class="candidate-tranche__heading">
           <div>
-            <p class="meta-label">Frozen selection · live implementation state</p>
-            <h3 id="candidate-tranche-title">Frozen v0.2b depth candidates</h3>
+            <p class="meta-label">{t("Frozen selection · live implementation state","冻结选题 · 当前实现状态")}</p>
+            <h3 id="candidate-tranche-title">{t("Frozen v0.2b depth candidates","冻结的 v0.2b 深度候选项")}</h3>
           </div>
           <p class="candidate-status">
-            {comparison.gaps.selected_depth_candidates.length} selected
+            {comparison.gaps.selected_depth_candidates.length} {t("selected", "项已选择")}
           </p>
         </div>
         <p>
-          Every candidate passed the seven frozen eligibility checks. Rank follows
-          transitive prerequisite value, then lower maintenance burden. Status may
-          advance without rewriting the selection snapshot. The contract and
-          resource estimates below describe selection-time feasibility; the
-          implementation status and result note describe current delivery.
+          {t("Every candidate passed the seven frozen eligibility checks. Rank follows transitive prerequisite value, then lower maintenance burden. Status may advance without rewriting the selection snapshot. The contract and resource estimates below describe selection-time feasibility; the implementation status and result note describe current delivery.", "每个候选项均通过七项冻结资格检查。排序先依据传递性先修价值，再考虑较低的维护负担。状态可推进，但不改写选题快照。下方约定与资源估算描述选题时的可行性；实现状态与结果说明描述当前交付。")}
         </p>
         <ol class="candidate-grid">
           {comparison.gaps.selected_depth_candidates.map((candidate, index) => (
             <li>
               <article class="candidate-card">
-                <p class="candidate-rank">Rank {index + 1} · {comparisonTrackTitle(candidate.track_id)}</p>
+                <p class="candidate-rank">{t("Rank", "排序")} {index + 1} · {comparisonTrackTitle(candidate.track_id)}</p>
                 <p class={`candidate-lifecycle candidate-lifecycle--${candidate.implementation.status}`}>
                   {label(candidate.implementation.status)}
                 </p>
@@ -193,26 +184,26 @@ const label = (value: string) =>
                 </p>
                 <dl class="candidate-contract">
                   <div>
-                    <dt>Independent unit</dt>
+                    <dt>{t("Independent unit","独立单位")}</dt>
                     <dd>{candidate.independent_unit.name} · n={candidate.independent_unit.observed_units}</dd>
                   </div>
                   <div>
-                    <dt>Cheap baseline</dt>
+                    <dt>{t("Cheap baseline","低成本基线")}</dt>
                     <dd>{candidate.cheap_baseline.name}</dd>
                   </div>
                   <div>
-                    <dt>Primary metric</dt>
+                    <dt>{t("Primary metric","主要指标")}</dt>
                     <dd>{candidate.evaluation.primary_metric}</dd>
                   </div>
                   <div>
-                    <dt>Validation plan at selection freeze</dt>
+                    <dt>{t("Validation plan at selection freeze","选题冻结时的验证计划")}</dt>
                     <dd>{candidate.evaluation.independent_validation}</dd>
                   </div>
                 </dl>
                 <p class="candidate-estimate">
                   CPU · {candidate.compute.estimated_runtime_minutes} min · {candidate.compute.estimated_memory_gb} GB RAM · {candidate.compute.estimated_download_mb} MB download
                 </p>
-                <p class="candidate-licence">Licence: {candidate.licence.name}</p>
+                <p class="candidate-licence">{t("Licence:", "许可：")} {candidate.licence.name}</p>
                 <p class="candidate-progress-note">{candidate.implementation.note}</p>
               </article>
             </li>
@@ -221,36 +212,40 @@ const label = (value: string) =>
       </div>
     ) : (
       <p class="notice">
-        No v0.2b depth candidate passed every frozen eligibility criterion. The
-        criteria were not weakened to fill the tranche.
+        {t("No v0.2b depth candidate passed every frozen eligibility criterion. The criteria were not weakened to fill the tranche.", "没有 v0.2b 深度候选项通过所有冻结资格标准。项目未为填满批次而降低标准。")}
       </p>
     )}
   </section>
 
   <section class="section self-audit" aria-labelledby="self-audit-title">
-    <p class="eyebrow">Unresolved internal coverage</p>
-    <h2 id="self-audit-title">Self-audit needed</h2>
+    <p class="eyebrow">{t("Unresolved internal coverage","尚未解决的内部覆盖问题")}</p>
+    <h2 id="self-audit-title">{t("Self-audit needed","需要自查")}</h2>
     <p class="section-intro">
-      These {comparison.gaps.self_audit_needed.length} AIDD Commons cells are
-      unverified and must not be interpreted as a confirmed deficiency. Review our
-      own published lessons before assigning depth work.
+      {t("These ", "这 ")}{comparison.gaps.self_audit_needed.length}{t(" AIDD Commons cells are unverified and must not be interpreted as a confirmed deficiency. Review our own published lessons before assigning depth work.", " 个 AIDD Commons 单元格尚未核实，不应被解释为已确认的不足。分配深度开发前，应先审阅本项目已发布课程。")}
     </p>
     <p class="section-intro">
-      One reading has already tested this record against something else: a reviewer
-      from a different model family read the same topics and read them deeper than
-      this project recorded.
+      {t("One reading has already tested this record against something else: a reviewer from a different model family read the same topics and read them deeper than this project recorded.", "已有一次阅读对记录进行了交叉检查：来自另一模型系列的评阅者阅读相同主题，识别出的深度高于本项目记录。")}
     </p>
-    <AtlasFigure id="second-reading" />
+    <AtlasFigure id="second-reading" chinese={chinese} />
     <details>
-      <summary>Show topics awaiting self-audit</summary>
+      <summary>{t("Show topics awaiting self-audit","显示等待自查的主题")}</summary>
       <ul class="self-audit-list">
         {comparison.gaps.self_audit_needed.map((gap) => (
           <li>
             <strong>{gap.topic_title}</strong>
-            <span>{comparisonTrackTitle(gap.track_id)} · strongest external evidence: {label(gap.strongest_external_depth)}</span>
+            <span>{comparisonTrackTitle(gap.track_id)} · {t("strongest external evidence:", "最深外部证据：")} {label(gap.strongest_external_depth)}</span>
           </li>
         ))}
       </ul>
     </details>
   </section>
 </SiteShell>
+<style>
+  .audit-snapshot .audit-schema { font-family: var(--atlas-font-mono); font-size: .85rem; font-weight: 600; white-space: nowrap; overflow-wrap: normal; }
+  .audit-reading-route { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.5rem; margin-top:2.5rem; }
+  .audit-reading-route a { display:block; padding:1.25rem; border-top:3px solid var(--atlas-teal); background:var(--atlas-panel); color:var(--atlas-ink); text-decoration:none; }
+  .audit-reading-route span { display:block; font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; color:var(--atlas-muted); margin-bottom:.7rem; }
+  .audit-reading-route strong { font-size:1.1rem; }.audit-reading-route p { font-size:.85rem; color:var(--atlas-muted); margin-bottom:0; }
+  .audit-reading-route a:hover strong { text-decoration:underline; }
+  @media(max-width:48rem) { .audit-reading-route { grid-template-columns:1fr; gap:.75rem; } }
+</style>

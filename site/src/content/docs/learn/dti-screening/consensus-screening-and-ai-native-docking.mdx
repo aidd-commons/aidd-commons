@@ -5,9 +5,12 @@ description: Read a consensus screening platform's own three-benchmark evaluatio
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="dti-screening/consensus-screening-and-ai-native-docking" />
 <ScrollableRegions />
+
+<TeachingViewLink track="dti-screening" />
 
 ## Learning goals and prerequisites
 
@@ -34,29 +37,20 @@ consensus rules. The motivation is variance reduction. No single engine's
 ranking is reliable across targets, and a ranking averaged over several
 engines is usually more stable than any one of them.
 
-The cost is that the space of settings is combinatorial, and the reader has to
-choose one point in it. The platform read in this lesson, DockM8, states in
-its own paper that it supports five docking engines, 17 pose-selection
-methods, 17 scoring functions and five consensus methods, and that it yields
-over 55 million configurable protocols. The product of those four headline
-counts is 5 × 17 × 17 × 5 = 7,225, which is not 55 million. So the paper's
-protocol count is describing a larger space than the four categories it
-names, most plausibly by counting configurable input conformers, ligand
-preparation and grid settings as well. The number is the paper's, and this
-lesson does not reconstruct it; the observation worth carrying is that a
-platform's "breadth" figure and its "number of engines" figure are different
-numbers and only the second one is checkable by hand.
+The cost is a combinatorial settings space. DockM8 reports five docking
+engines, 17 pose-selection methods, 17 scoring functions and five consensus
+methods, with over 55 million configurable protocols. The simple product
+5 × 17 × 17 × 5 = 7,225 does not reconstruct that figure. The larger count
+requires the source's full combinatorial definition; these four headline
+counts alone do not establish which additional combinations it includes.
 
-The second framework read here, TRIDS, takes a different route to the same
-problem. Its abstract describes an AI-native docking framework that guides
-conformation sampling with the gradient of an analytic scoring function.
-That changes the failure mode rather than the aim. In a conventional pipeline
-the search explores and the scoring function ranks what the search found; an
-error in the scoring function then only misranks candidates. When the
-scoring function's gradient steers the sampling, the same error steers the
-search, and the search commits to it. A framework of this kind is not a
-consensus of engines but a single search with a differentiable objective, and
-its accuracy and its physical validity are both properties of that objective.
+TRIDS describes an AI-native docking framework that guides conformation
+sampling with the gradient of an analytic scoring function. Score-guided
+search is not exclusive to AI-native docking: [AutoDock Vina](https://autodock-vina.readthedocs.io/en/latest/) also
+uses gradient optimization in its search. A scoring error can therefore
+affect both search and ranking in either setting. Compare the documented
+search procedure and objective, rather than assigning this failure mode
+only from the framework's label.
 
 ## Worked case: one platform, three benchmarks, and the authors' own conclusion
 
@@ -137,9 +131,8 @@ pose-selection or consensus strategy universally excels. (a) Compute the
 product of the four component counts and state what it is not equal to, and
 what a reader can conclude about the space of protocols from that. (b) By
 what factor does the reported median relative enrichment differ between its
-best and its worst benchmark, and what does that factor say about how much
-of the platform's headline performance is a property of the benchmark rather
-than of the platform? (c) The abstract's conclusion and the headline
+best and its worst benchmark, and what does that factor establish about variation across these evaluations,
+and what does it leave unresolved about its causes? (c) The abstract's conclusion and the headline
 enrichment point in opposite directions. Which of the two would you keep if
 you had to defend a screening decision for a target unlike all three
 benchmarks, and why? (d) Name one measurement this project would have to run
@@ -149,26 +142,16 @@ the paper's.
 <details data-worked-answer>
 <summary>Worked answer</summary>
 
-(a) 5 × 17 × 17 × 5 = 7,225. It is not 55 million, so the protocol count
-describes a larger space than the four categories the abstract names, most
-plausibly by including configurable input conformers, ligand preparation and
-grid settings. From the four counts a reader can check the second figure's
-order of magnitude and nothing finer. (b) 100 / 8.85 ≈ 11.3, so the benchmark
-choice moves the reported number by about a factor of eleven, which is
-larger than any plausible gap between two of the platform's own scoring
-functions. Most of the apparent performance is a property of the benchmark.
-(c) Keep the conclusion, not the headline. The headline is a property of one
-benchmark and one protocol family, and the paper's own conclusion says the
-ranking is not stable across targets, so a number from one benchmark cannot
-be defended for an unlike target. The conclusion is the claim that survives
-the change of benchmark, and it is also the one that tells the reader what to
-do: pick the setting per target and measure it there. (d) A decision here
-would have to fix a target, a library, a protocol setting chosen in advance
-rather than after seeing the answer, and an enrichment metric with a stated
-denominator, run against at least one other setting on the same target and
-the same library. Until such a measurement exists, the platform's numbers
-are the paper's, and the honest statement is that the benchmark moves the
-number more than the platform does.
+(a) 5 × 17 × 17 × 5 = 7,225, which is not 55 million. The four counts do
+not reconstruct the full protocol definition. (b) 100 / 8.85 ≈ 11.3 shows a
+large spread across the reported benchmark evaluations. It does not isolate
+benchmark effects from target composition, protocol choices or their
+interactions, and supplies no comparison with the spread between scoring
+functions. (c) Retain both the benchmark-specific result and its scope;
+no universally best strategy was established, so neither result guarantees
+transfer to a new target. (d) Fix a target, library, protocol-selection rule
+and enrichment denominator, then compare settings under that same protocol.
+Until then, these remain the paper's reported evaluations.
 
 </details>
 

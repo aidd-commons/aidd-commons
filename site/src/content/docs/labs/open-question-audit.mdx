@@ -11,13 +11,25 @@ Read [the mechanism and target validation lesson](/learn/mechanism-targets/pertu
 
 Mode is a fresh independent computation over a frozen protocol and committed repository records. Use the project Python 3.11 environment with PyYAML and CPU. The commands need no network, download, or accelerator. Run from the repository root. The download command verifies the 3 local inputs and writes nothing. The inspector also writes nothing. The exporter overwrites only this laboratory's compact summary after its checks pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/open_question_audit/run_lab.py download
 .venv/bin/python labs/open_question_audit/inspect_open_question_audit.py show
 .venv/bin/python labs/open_question_audit/inspect_open_question_audit.py check
-.venv/bin/python labs/open_question_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/open_question_audit -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/open_question_audit/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/open_question_audit/export_summary.py
+```
+
+</details>
 
 ## Question states
 
@@ -62,6 +74,17 @@ The note and reason counts report how many of the 93 topic records contain at le
 ## Limits of the material
 
 This audit measures whether the records still carry a falsifying observation or a missing measurement. It does not establish that any question has been answered. Wording is not evidence that a measurement was made. The literal vocabulary can miss a paraphrase or match a phrase that a human would read differently. The state counts therefore describe these dated records under the declared rule, not a ranking of tracks or a measure of reader learning.
+
+## Independent inspection task
+
+Choose an Open topic and copy its stated unresolved question. Propose one observation that would distinguish competing answers, then say whether that observation already exists in the paired note. Keep a local settled-by-measurement state separate from a claim that the whole scientific question is solved.
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+A checkable response names the topic, its recorded question, a discriminating observation and the actual evidence state. A proposed falsifier is not a completed observation. Settled by measurement means the local note reports a bounded result, not that the field has no remaining uncertainty.
+
+</details>
 
 ## Sources and terms
 

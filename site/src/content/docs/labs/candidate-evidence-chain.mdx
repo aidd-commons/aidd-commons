@@ -15,13 +15,25 @@ Read the [candidate nomination workbook](/learn/candidate-nomination/capstone-wo
 
 The mode is a fresh independent computation under a frozen ChEMBL 37 protocol. Use the pinned Python 3.11 environment and the existing cached snapshots. The commands need no network after caching and no accelerator. `download` validates those caches without writing. `show` prints each link with its measurements. `check` recomputes the chain and checks the committed summary. The export overwrites only that small summary after the audits pass.
 
+For reader reproduction, run the following commands in your own checkout with its own cache. Inspection and validation print to the terminal; these commands do not refresh the committed summary. Summary export is a separate maintainer operation in the disclosure below.
+
 ```bash
 .venv/bin/python labs/candidate_evidence_chain/run_lab.py download
 .venv/bin/python labs/candidate_evidence_chain/inspect_candidate_evidence_chain.py show
 .venv/bin/python labs/candidate_evidence_chain/inspect_candidate_evidence_chain.py check
-.venv/bin/python labs/candidate_evidence_chain/export_summary.py
 .venv/bin/python -m pytest labs/tests/candidate_evidence_chain -q
 ```
+
+<details>
+<summary>Maintainer operation: refresh the committed summary</summary>
+
+The exporter has no custom output option and replaces `labs/candidate_evidence_chain/summary.json`. It is not needed for the reader exercise. Run it only in a separate maintainer checkout when intentionally refreshing that copy of the summary, and retain the original frozen results.
+
+```bash
+.venv/bin/python labs/candidate_evidence_chain/export_summary.py
+```
+
+</details>
 
 ## Evidence states and eight links
 

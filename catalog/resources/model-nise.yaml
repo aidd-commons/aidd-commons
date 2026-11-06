@@ -12,7 +12,7 @@ identifiers:
   url: https://github.com/polizzilab/NISE
 - scheme: documentation
   value: NISE execution container image, nise.sif, published in the project Hugging Face repository
-  url: https://huggingface.co/polizzilab
+  url: https://huggingface.co/benf549/NISE/blob/main/nise.sif
 stages:
 - design
 - hit-discovery

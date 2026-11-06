@@ -4,6 +4,7 @@ description: 对 ChEMBL 37 测量计数应用冻结的 go、hold 和 stop 规则
 ---
 
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import ScientificTeachingView from "../../../../components/ScientificTeachingView.astro";
 
 <ScrollableRegions />
 
@@ -21,13 +22,25 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 从仓库根目录运行以下命令。`show` 输出规则、各母体的计数与状态，以及缺少的测量。`check` 重新计算不变量，遇到失败时以非零状态退出。导出程序仅在检查通过后写入已提交的精简汇总。
 
+读者复现请在自己的独立检出目录中运行下列命令，并保留该目录的独立缓存。检查结果输出到终端；这些命令不刷新已提交摘要。导出摘要是单独的维护操作，见后面的折叠说明。
+
 ```bash
 .venv/bin/python labs/nomination_readiness_audit/run_lab.py download
 .venv/bin/python labs/nomination_readiness_audit/inspect_nomination_readiness_audit.py show
 .venv/bin/python labs/nomination_readiness_audit/inspect_nomination_readiness_audit.py check
-.venv/bin/python labs/nomination_readiness_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/nomination_readiness_audit -q
 ```
+
+<details>
+<summary>维护者操作：刷新已提交摘要</summary>
+
+以下导出器没有自定义输出路径选项，会替换 `labs/nomination_readiness_audit/summary.json`。读者练习不需要这一步。仅在独立维护检出目录中、确认需要刷新该副本的摘要后运行，并保留原有冻结结果。
+
+```bash
+.venv/bin/python labs/nomination_readiness_audit/export_summary.py
+```
+
+</details>
 
 | 命令 | 输出位置 | 写入行为 |
 | --- | --- | --- |
@@ -36,6 +49,8 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 | 导出程序 | `labs/nomination_readiness_audit/summary.json` | 检查成功后覆盖派生汇总 |
 
 这里不拟合模型、不划分数据，也不作预测。命令重新计数固定队列。链接课程中的独立练习不会覆盖作者结果。
+
+<ScientificTeachingView track="candidate-nomination" chinese compact />
 
 ## 测量与冻结规则
 
@@ -95,6 +110,17 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 计数不能说明化合物好。`go` 化合物不因此成为候选物，`stop` 化合物也不因此被证明无活性。这些条件衡量的是准入证据的数量和记录中的覆盖，不评估效应大小、一致性、靶点相关性、选择性、安全性或暴露。
 
 队列为教学而选，不是 ChEMBL 的随机样本。状态计数不估计任何总体比例。仅凭记录，分组约定和重复标记无法建立实验独立性。本实验既不检验这些阈值是否正确，也不在看到计数后改变阈值。它提出缺少的观测，不实施新的生物学实验。读者学习效果仍未观测。
+
+## 独立检查任务
+
+检查最接近 go 的非 go parent，指出冻结规则下缺少的计数。如果以后补足该计数，readiness 状态会如何变化，哪些化合物性质仍未建立？
+
+<details data-worked-answer>
+<summary>完成后核对推理</summary>
+
+增加一条符合要求的测量，只有在核对身份、终点与分组后，才可能改变规则定义的状态。状态改变不建立效力质量、安全性、暴露、临床价值或候选提名。冻结规则是覆盖练习，不能为推动偏好 parent 而修改。
+
+</details>
 
 ## 来源与条款
 

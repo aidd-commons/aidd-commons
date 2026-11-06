@@ -5,9 +5,12 @@ description: Read dated records for flow-matching and GFlowNet artefacts through
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="molecular-generation/flow-matching-and-gflownet" />
 <ScrollableRegions />
+
+<TeachingViewLink track="molecular-generation" />
 
 ## Learning goals and prerequisites
 
@@ -17,11 +20,23 @@ This is a source reading with a hand calculation. Only the catalogue records and
 
 ## The objective decides which part of the distribution the sampler visits
 
-A generative model has a target distribution, and the training rule decides which one the sampler converges to.
+A generative objective specifies a target distribution. Reaching that target
+also depends on model capacity, coverage, optimization and numerical sampling;
+the training rule alone does not guarantee convergence.
 
-Under a maximum-likelihood objective the target is the data distribution `p_data`, so the sampler reproduces the corpus together with the regions the corpus barely covers. Under a flow-matching objective the target is still the data distribution, reached by transporting a simple base distribution along a chosen probability path. The path decides what the intermediate states are and how many steps the solver needs, but not the distribution the sampler ends at. Under a GFlowNet objective the target is proportional to a reward `R`, normalised over the terminal states, so the sampler concentrates on the states the reward prefers whether or not the corpus contains many of them.
+At the ideal population optimum, maximum likelihood targets the data
+distribution `p_data`. Standard flow matching learns a vector field along a
+chosen probability path from a base distribution to the data distribution;
+finite approximation and solver error can alter the sampled endpoint.
+A GFlowNet instead targets terminal probabilities proportional to a declared
+reward `R`, subject to the balance and support conditions below.
 
-Two consequences follow for anyone reading a candidate list. A maximum-likelihood sampler and a reward-proportional sampler visit different parts of the space, so their outputs are not two draws from one population and cannot be pooled or compared without naming the target. And the validity of a reward-proportional sampler rests entirely on the reward being a faithful proxy, because nothing in the objective ties a high-reward state to an object that exists, is stable, or can be made.
+Candidate lists must name their target distribution before they are pooled
+or compared. Reward quality is also distinct from sampling quality: even
+an exact reward-proportional sampler does not establish that high-reward
+objects are stable, valid or synthesizable. A faithful reward is necessary
+for the intended decision, while implementation and approximation can
+introduce additional failures.
 
 The objective also fixes what a comparison between two models can mean. Two models trained under the same objective on the same corpus with the same sampler budget are comparable. Two models trained under different objectives are answering different questions, and a better score from one does not transfer to the other.
 
@@ -33,17 +48,36 @@ Inference integrates the learned field. The number of solver steps and the integ
 
 The discrete variant replaces the continuous path with a schedule over discrete states, and the learned object becomes a per-step distribution over replacements rather than a velocity. [DeFoG](https://github.com/manuelmlmadeira/DeFoG) applies discrete flow matching to graph generation. [FragFM](https://github.com/lee-jwon/FragFM) applies it hierarchically, generating molecular graphs as stochastic fragment bags followed by a lossless coarse-to-fine atom-level reconstruction. The sampler then walks the chain instead of solving an ordinary differential equation.
 
-Two limits belong next to the objective. It encodes no reward, so a flow-matching model trained on a corpus has no way to prefer a better molecule within that corpus. And it makes no decoded object valid, because validity comes from the representation and from checks run after decoding.
+Plain, unconditioned corpus-matching does not itself optimize an additional
+molecular reward. Conditioning or subsequent optimization can change that
+task. The objective also does not by itself validate decoded objects;
+representation constraints and explicit checks remain necessary.
 
 ## The GFlowNet objective
 
 A GFlowNet works on an environment of states ordered by a partial order, typically a set of molecular fragments that grows. A forward policy chooses actions that move from an empty state to a terminal state, a backward policy is defined on the reversed transitions, and a reward attaches to terminal states. The trajectory balance loss asks the two policies to agree,
 
-`L_TB = (log Z + sum_t log P_F(s_{t+1} | s_t) - sum_t log P_B(s_t | s_{t+1}))^2`
+`L_TB = (log Z + sum_t log P_F(s_{t+1} | s_t) - log R(x) - sum_t log P_B(s_t | s_{t+1}))^2`
 
-where `Z` is a learned normalising term and each sum runs over the actions of one trajectory. When the forward and backward policies are consistent, the terminal distribution of the sampling process is proportional to the reward, and the objective never evaluates `R(x)/Z` over the whole state space. The relative trajectory balance variant compares two trajectories with each other instead of with `Z`.
+Here `x` is the terminal state, `R(x)` is its positive reward, and `Z` is
+a learned positive normalizer. The sums traverse the same complete
+trajectory. For a normalizable reward, satisfying this balance over the
+required trajectory support gives terminal probabilities proportional to
+`R`; finite training need not reach that solution. The reward term is
+essential. See the [original trajectory-balance objective and proposition](https://papers.neurips.cc/paper_files/paper/2022/file/27b51baca8377a0cf109f6ecc15a0f70-Paper-Conference.pdf).
+In [AGFN's relative trajectory balance formulation](https://arxiv.org/html/2503.06337v1#S5),
+the same trajectory is evaluated under a trainable posterior policy and a
+fixed pretrained prior. Its loss is
+`L_RTB = (log Z_phi + log P_post(tau) - log P_prior(tau) - log R(x))^2`.
+The normalizer `Z_phi` is still learned. At the ideal solution, the terminal
+distribution is proportional to the prior probability times the reward,
+not to the reward alone. This agrees with the
+[original RTB definition](https://arxiv.org/html/2405.20971v2#S2.SS2).
 
-The corpus is therefore not the target. A GFlowNet can end up preferring fragments that the training corpus rarely contained, because the reward and not the corpus sets the target distribution. That is what makes the family attractive for goal-directed generation, and it is also why the failure modes of a GFlowNet are the failure modes of its reward.
+The reward, rather than corpus frequency alone, defines the GFlowNet target.
+This can favor regions sparse in the corpus. Whether the learned policy
+reaches that target and whether the reward represents the desired chemistry
+are separate empirical questions.
 
 ## Libraries behind the two objectives
 
@@ -123,7 +157,14 @@ Two patterns carry the weight. The architecture and the data recipe are unverifi
 
 None of the thirteen records carries a comparison under a shared protocol, so this reading ranks nothing. The strongest comparison available inside a single record is AGFN's naming of trajectory balance against relative trajectory balance for one pretraining and fine-tuning pipeline, and the record carries no numbers for it.
 
-A matched comparison between these families would have to fix the corpus and its snapshot, the split and the held-out entities, the metric and its denominator, the validity checker and the identity rule, the sampler budget in solver steps or trajectories, the reward definition with each of its terms, the base checkpoint for any fine-tuned model, and the permission to use every dataset and weight file. Three of these records already show why the last item is separate from the rest. Graph-GRPO uses the released DeFoG weights directly, so a Graph-GRPO and DeFoG comparison is not independent. CGFlow builds on RxnFlow and TacoGFN, so a CGFlow and RxnFlow comparison is not independent either. The TacoGFN and CGFlow code also modify the GFlowNet library maintained at the Recursion repository, which is a third library beside the two GFNOrg projects.
+A matched comparison must state corpus and snapshot, split and held-out
+entities, metric and denominator, validity and identity checks, sampling
+budget, reward terms, base checkpoint, and asset permissions. Graph-GRPO
+can use DeFoG weights, and CGFlow builds on RxnFlow and TacoGFN. Shared
+weights or implementations make these related methods, not independent
+replications; controlled comparisons can still measure the effect of a
+stated change. TacoGFN and CGFlow also modify the Recursion GFlowNet library,
+which is distinct from the two GFNOrg projects.
 
 ## Worked case
 
@@ -134,7 +175,7 @@ All values in this case are **constructed for teaching**. A generator's task is 
 | Maximum likelihood | 90% | 5% | 5% |
 | Reward proportional | 10% | 30% | 60% |
 
-The two samplers visit different parts of the space. The reward-proportional target puts 90% of its mass on the two states the corpus under-represents, because B and C together carry only 10% of the corpus mass. Over 100 samples the expected counts are 90, 5 and 5 for the likelihood sampler and 10, 30 and 60 for the reward sampler. The reward sampler returns C most often, and the corpus contains only 5 examples of C. Either the corpus is thin in a region the reward likes, or the reward is wrong there, and counting samples cannot separate the two.
+The two samplers visit different parts of the space. The reward-proportional target puts 90% of its mass on the two states the corpus under-represents, because B and C together carry only 10% of the corpus mass. Over 100 samples the expected counts are 90, 5 and 5 for the likelihood sampler and 10, 30 and 60 for the reward sampler. The reward sampler returns C most often, and the corpus contains only 5 examples of C. The corpus is sparse where the reward is high; that alone does not show whether the reward is scientifically useful. Counting samples cannot validate the reward.
 
 The flow-matching half of the case is one paired sample. Let the base sample be `x_0 = 0.4` and the data sample be `x_1 = -1.2`. The straight conditional path is `x_t = (1-t) x_0 + t x_1`, which expands to `x_t = 0.4 - 1.6 t`, so the conditional velocity is the constant `x_1 - x_0 = -1.6`. At `t = 0.25` the state is `x_t = 0` and at `t = 0.75` the state is `x_t = -0.8`. The regression target at both times is `-1.6`. The velocity is what the network is asked to predict, the choice of path is a modelling decision that changes the states the model passes through and the solver steps it needs, and the terminal distribution is still the data distribution.
 

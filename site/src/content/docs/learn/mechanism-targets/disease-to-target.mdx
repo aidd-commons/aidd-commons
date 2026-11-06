@@ -4,8 +4,11 @@ description: Form target hypotheses from disease, causal, and perturbational evi
 ---
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="mechanism-targets/disease-to-target" />
+
+<TeachingViewLink track="mechanism-targets" />
 
 ## Foundations
 
@@ -34,6 +37,21 @@ than another model score.
 Biomedical language models such as [BioGPT](https://github.com/microsoft/BioGPT)
 may help retrieve hypotheses, but retrieval quality cannot turn unsupported
 text into causal evidence.
+
+## A bounded worked decision and independent task
+
+Read [biological representations](/learn/representations/biological-representations/) before defining a target claim. In a constructed locus, a disease association sits near genes T and U. A perturbation of T changes a phenotype in one cell context, but no bridge from the associated variant to T is supplied. The regional association and the perturbation therefore answer different questions; combining their names does not establish that inhibiting T benefits patients.
+
+Write two competing explanations and a discriminating observation. Which unresolved link would a target-dependent perturbation contrast address, and which would remain genetic?
+
+<details data-worked-answer>
+<summary>Check the reasoning after your attempt</summary>
+
+An alternative effector U and a detection or viability effect remain possible. A well-defined target-dependent contrast could address the T-to-phenotype link in that context, while the variant-to-effector link needs its own evidence. Continue to [genetic target hypotheses](/learn/mechanism-targets/genetics-to-target-evidence/) and [perturbation validation](/learn/mechanism-targets/perturbation-to-target-validation/) for separate assumptions and worked cases.
+
+</details>
+
+Teaching task added on 2026-10-26; the original source-review date remains below.
 
 ## What v0.1 does not yet teach
 

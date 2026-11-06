@@ -45,6 +45,10 @@ def reading_payload() -> dict:
 
 
 class FigureAuthorityTests(unittest.TestCase):
+    def test_academic_asl_does_not_inherit_mit_permissions(self):
+        self.assertEqual(plot7._licence_layer(["MIT", "ASL"]), "Other stated terms")
+        self.assertEqual(plot7._licence_layer(["MIT"]), "Permissive software licence")
+
     def test_custom_pie_model_terms_stay_outside_the_creative_commons_layer(self):
         self.assertEqual(
             plot7._licence_layer(

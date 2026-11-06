@@ -5,9 +5,12 @@ description: Ground a perturbation claim in a runnable cross-modality check, and
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
 import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
+import TeachingViewLink from "../../../../components/TeachingViewLink.astro";
 
 <LessonProgress lessonId="mechanism-targets/cross-modality-perturbation-evidence" />
 <ScrollableRegions />
+
+<TeachingViewLink track="mechanism-targets" />
 
 ## Learning goals and prerequisites
 
@@ -72,24 +75,22 @@ within itself.
 
 Two controls make that visible, and both are cheap.
 
-The first destroys only the pairing. Each perturbation keeps its plate, its batch and
-its position in the experiment, but its imaging profile is replaced by another
-perturbation's imaging profile from the same batch. Any agreement that survives this
-null is produced by the design alone, and the agreement of a real analysis has to be
-read against it rather than against zero.
+The first shuffles imaging profiles among perturbations within the same
+batch. It retains batch membership but can exchange profiles from different
+plates, so it does not preserve every plate association. The resulting null
+is a reference for this particular within-batch permutation, not a causal
+isolation of all design effects.
 
-The second fixes the training-set size. A blocked evaluation holds out a whole plate
-or a whole batch, which necessarily leaves fewer training rows than a random fold, so
-a drop in performance is ambiguous on its own. The control is a random split with
-exactly the same training and test sizes drawn from the same population. The gap
-between a blocked fold and its size-matched twin is the design cost of the structural
-separation, and it is the part of the apparent agreement that a design-blind analysis
-would have reported as biology.
+The second compares each plate- or batch-blocked evaluation with a random
+split having the same training and test sizes. Their gap is the observed
+cost of structural separation under this protocol. Size matching addresses
+training-set size, but does not separate nuisance effects from changes in
+the perturbation distribution.
 
-The last quantity is the survival ratio. It is the share of the above-null agreement
-that remains once the structure is held out, so it is bounded below by zero and above
-by one, and it reads directly as the fraction of the cross-modal signal that is a
-property of the perturbation rather than of the experiment.
+The survival ratio divides blocked agreement above the null by apparent
+agreement above the null. It is a descriptive ratio of correlations, not
+the fraction of signal caused by biology. The formula is not intrinsically
+bounded by zero and one; the observed values here happen to lie between them.
 
 ## The runnable check
 
@@ -115,15 +116,13 @@ assay plates drawn from two plate maps, which are the two batches of this batch.
 Joining the two readouts on the perturbation identifier leaves 528 perturbations that
 carry both profiles.
 
-The apparent agreement is strong. With a random five-fold split, the imaging profile
-of a held-out perturbation is predicted from its transcriptomic profile at a
-correlation of 0.8158 per perturbation and 0.8256 per imaging feature. The first control
-says the design is not the explanation. Replacing each perturbation's imaging profile
-with another perturbation's imaging profile from the same batch drops the per-feature
-agreement to 0.0033 and the per-perturbation agreement to 0.1317. A model-free check
-agrees with the fitted one, fitting nothing and drawing no split, with a median
-Spearman correlation of 0.7449 between the transcriptomic and the imaging similarity
-rankings against 0.0007 under the permuted pairing.
+With a random five-fold split, the held-out perturbation's imaging profile
+is predicted at correlation 0.8158 per perturbation and 0.8256 per feature.
+Within-batch permutation lowers these to 0.1317 and 0.0033, respectively.
+This shows sensitivity to the pairing under that null; it does not exclude
+all design confounding. The unfitted neighbourhood statistic compares
+similarity rankings, with median Spearman 0.7449 versus 0.0007 under
+permutation. It is complementary evidence from the same observations.
 
 The design is then taken apart. The imaging plate accounts for 2.71% of the imaging
 feature variance, the L1000 plate for 1.56% of the transcriptomic feature variance, and
@@ -151,14 +150,11 @@ per-feature correlation minus the null, divided by the apparent per-feature corr
 minus the null. It is 0.7653 for a held-out batch, 0.7885 for a held-out imaging plate
 and 0.8101 for a held-out transcriptome plate.
 
-Read back into the language of the earlier lesson, this is what a mechanism claim can
-rest on and what it cannot. Three quarters of the agreement between two readouts of the
-same perturbation survives an evaluation in which the model never sees the batch the
-perturbation came from. That is real support for the claim that the perturbation
-produced a coherent cellular state visible to two independent modalities. The other
-quarter does not survive, and a design-blind analysis would have reported all of it as
-though it had. The claim is therefore weaker than the statement that the signature is
-the mechanism, and stronger than the statement that the two readouts agree.
+The held-out-batch survival ratio is about three quarters. This describes
+how much above-null correlation remains under that evaluation. It supports
+cross-readout predictability within the declared study and representation,
+without quantifying a biological fraction, establishing a mechanism, or
+making two readouts from the same experiment independent replications.
 
 The named perturbations at the ends of the apparent agreement distribution show what
 the number is about and what it is not. `LAP3_WT.o` sits at 0.9861 and `MDM2_p.E421Q` at
@@ -213,13 +209,13 @@ therefore a mechanism.
 <details data-worked-answer>
 <summary>Worked answer</summary>
 
-The two controls are the null that keeps the plate and batch structure and destroys only
-the pairing, and the size-matched random split. If the design were producing the
-agreement, the permuted null would sit near the apparent 0.8256 rather than at 0.0033, and
-a blocked fold would reach the value of its size-matched random twin. The model-free
-neighbourhood concordance of 0.7449 is a third, independent agreement, because it fits
-nothing and draws no split and so cannot inherit a split-specific shortcut. Its
-permuted counterpart falls to 0.0007.
+The controls are the within-batch permutation and the size-matched random
+split. The null value 0.0033 is much lower than the apparent 0.8256, while
+blocked and random evaluations test different separation rules. No single
+pattern isolates every design effect. The model-free neighbourhood
+concordance of 0.7449, with permuted value 0.0007, is a complementary
+analysis of the same data. It avoids fitted-map shortcuts but is not an
+independent replication and can still reflect shared experimental structure.
 
 The difference is 0.7877 - 0.6326 = 0.1551, and the protocol calls it the design cost of
 the structural separation at a fixed training-set size. The blocked value of 0.6326 is

@@ -4,8 +4,15 @@ description: Build honest QSAR and molecular-property baselines before using fro
 ---
 
 import LessonProgress from "../../../../components/LessonProgress.astro";
+import ScientificTeachingView from "../../../../components/ScientificTeachingView.astro";
 
 <LessonProgress lessonId="qsar-properties/property-prediction" />
+
+## Reading goal and route
+
+This is an orientation to property prediction. After [source and entity literacy](/learn/foundations/source-and-entity-literacy/), use it to name the endpoint, molecular unit and split that a prediction claim depends on. It does not contain a model-training exercise.
+
+For a worked explanation and independent task, continue to [regression and classification errors](/learn/qsar-properties/regression-classification-errors/). Then read the [completed FreeSolv comparison](/labs/freesolv-honest-baselines/) and explain why its scaffold-primary result answers a narrower question than performance on every property endpoint.
 
 ## Foundations
 
@@ -14,6 +21,8 @@ endpoint can be measured with different assays, units, and censoring rules, so
 "the dataset" is not enough. [Therapeutics Data Commons](https://tdcommons.ai/)
 and [OGB](https://ogb.stanford.edu/) organize tasks but do not remove the need
 to read each split and licence.
+
+<ScientificTeachingView track="qsar-properties" />
 
 ## Practical workflow
 
