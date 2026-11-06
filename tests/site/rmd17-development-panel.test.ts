@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
+import { parse } from "yaml";
 
 import playwrightConfig from "../../playwright.config.js";
 import { validateRmd17DevelopmentSummary } from "../../site/src/lib/rmd17-development-summary.js";
@@ -126,7 +127,7 @@ describe("rMD17 development lab route", () => {
     expect(row).toContain("Read saved results");
   });
 
-  it("forces a fresh Astro build before the browser preview starts", async () => {
+  it("builds in CI before starting a preview without a second build", async () => {
     const sitePackage = JSON.parse(
       await readFile(join(repositoryRoot, "site", "package.json"), "utf8"),
     ) as { scripts: Record<string, string> };
@@ -138,7 +139,23 @@ describe("rMD17 development lab route", () => {
     expect(sitePackage.scripts.build).toMatch(
       /data:check.*figures:check.*astro build/u,
     );
-    expect(webServer?.command).toContain("npm --prefix site run preview");
+    const workflow = parse(
+      await readFile(
+        join(repositoryRoot, ".github", "workflows", "ci.yml"),
+        "utf8",
+      ),
+    ) as { jobs: Record<string, { steps: { run?: string }[] }> };
+    const steps = workflow.jobs["browser-and-accessibility"].steps;
+    const buildIndex = steps.findIndex(
+      (step) => step.run === "pnpm --dir site build",
+    );
+    const browserIndex = steps.findIndex(
+      (step) => step.run === "pnpm test:e2e",
+    );
+    expect(buildIndex).toBeGreaterThanOrEqual(0);
+    expect(browserIndex).toBeGreaterThan(buildIndex);
+    expect(webServer?.cwd).toBe("./site");
+    expect(webServer?.command).toContain("npm exec -- astro preview");
     expect(webServer?.reuseExistingServer).toBe(false);
   });
 
