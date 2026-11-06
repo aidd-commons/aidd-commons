@@ -11,8 +11,10 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
+    // CI builds the site before this step. Invoke Astro directly to avoid prepreview rebuilding it.
+    cwd: "./site",
     command:
-      "npm --prefix site run preview -- --ignore-lock --host 127.0.0.1 --port 4324",
+      "npm exec -- astro preview --ignore-lock --host 127.0.0.1 --port 4324",
     env: { ASTRO_PREVIEW_BACKGROUND: "0" },
     port: 4324,
     reuseExistingServer: false,

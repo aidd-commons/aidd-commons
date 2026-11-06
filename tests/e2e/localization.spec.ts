@@ -38,6 +38,7 @@ test("Chinese Audit keeps source names and numerical cells through filtering", a
   await page.getByLabel("学习方向", { exact: true }).selectOption("representations");
   await page.getByLabel("主题", { exact: true }).selectOption("t05-small-molecule-representation");
   await page.getByLabel("仅直接观察").check();
+  await page.locator("[data-comparison-records] > summary").click();
   const source = page.locator('[data-provider-id="teachopencadd"][data-topic-id="t05-small-molecule-representation"]');
   await expect(source).toBeVisible();
   await source.locator("summary").click();
@@ -50,7 +51,7 @@ test("Chinese Audit keeps source names and numerical cells through filtering", a
 test("Chinese Report and Contribute keep source downloads and local-only drafting", async ({ page }) => {
   await page.goto("/zh-cn/report/");
   await expect(page.getByRole("heading", { name: "从资源出发，形成可检查的决策。" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "阅读已发布补充报告" })).toHaveAttribute("href", "/report/v0-2/");
+  await expect(page.getByRole("link", { name: "阅读完整报告", exact: true })).toHaveAttribute("href", "/reports/aidd-commons-living-report-v0.2.html");
   await expect(page.getByRole("link", { name: "浏览图表库" })).toHaveAttribute("href", "/zh-cn/report/figures/");
   await page.goto("/zh-cn/contribute/");
   await page.getByLabel("页面、对象与版本").fill("/zh-cn/atlas/freesolv-v0-52/");

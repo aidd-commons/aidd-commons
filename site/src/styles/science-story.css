@@ -135,7 +135,7 @@ science-story.science-story {
   min-width: 36px;
 }
 .science-story__step-buttons button[aria-pressed="true"] {
-  color: #fff;
+  color: var(--atlas-action-ink, #fff);
   background: var(--story-teal);
   border-color: var(--story-teal);
 }

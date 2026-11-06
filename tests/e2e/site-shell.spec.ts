@@ -269,7 +269,7 @@ test("atlas query deep-link renders the matching resource", async ({
   for (const metadata of await cards.locator(".meta-label").allTextContents()) {
     expect(metadata).toMatch(/^dataset ·/u);
   }
-  const detailHref = await page
+  const detailHref = await cards
     .getByRole("link", { name: "FreeSolv v0.52" })
     .getAttribute("href");
   expect(detailHref).toBeTruthy();
@@ -433,7 +433,12 @@ test("coverage audit filters a track and opens adjacent evidence by keyboard", a
     /track=representations.*topic=t05-small-molecule-representation/,
   );
 
-  const cell = page.locator(
+  const records = page.locator("[data-comparison-records]");
+  await records.locator(":scope > summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(records).toHaveAttribute("open", "");
+
+  const cell = records.locator(
     '[data-provider-id="teachopencadd"][data-topic-id="t05-small-molecule-representation"]',
   );
   await expect(cell).toBeVisible();
@@ -486,6 +491,9 @@ test("mobile coverage bounds remain readable inside a local scroll region", asyn
     expect(size.scrollHeight, selector).toBeLessThanOrEqual(size.clientHeight);
   }
 
+  await page
+    .getByText("Interpretation, review dates and the correction window", { exact: true })
+    .click();
   const publication = page.locator("[data-correction-window]");
   await expect(publication.locator("time")).toBeVisible();
   const publicationDimensions = await publication.evaluate((element) => ({
@@ -497,8 +505,9 @@ test("mobile coverage bounds remain readable inside a local scroll region", asyn
     "published correction-window metadata",
   ).toBeLessThanOrEqual(publicationDimensions.clientWidth);
 
+  await page.locator(".bounds-exact > summary").click();
   const boundsRegion = page.getByRole("region", {
-    name: "Coverage bounds by depth threshold",
+    name: "Coverage bounds by provider and depth threshold",
   });
   await expect(boundsRegion).toHaveAttribute("tabindex", "0");
 

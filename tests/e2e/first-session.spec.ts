@@ -26,10 +26,11 @@ for (const route of ["/", "/zh-cn/"]) {
     const hrefs = await links.evaluateAll((elements) =>
       elements.map((element) => element.getAttribute("href")!),
     );
-    expect(hrefs).toEqual(
-      curriculum.tracks.map(
-        (track: { id: string }) => `${prefix}/learn/tracks/${track.id}/`,
-      ),
+    // The prerequisite map groups tracks by dependency depth, not registry order.
+    expect([...hrefs].sort()).toEqual(
+      curriculum.tracks
+        .map((track: { id: string }) => `${prefix}/learn/tracks/${track.id}/`)
+        .sort(),
     );
     expect(new Set(hrefs).size).toBe(curriculum.tracks.length);
     for (const href of hrefs) {

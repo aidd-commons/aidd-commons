@@ -79,7 +79,7 @@ const csv = [headers, ...rows.map(row => row.cells)].map(row => row.map(csvCell)
   </div>
   <div class="science-plot__x-ticks">{horizontalTicks.map(value => <span style={{ left: px(value) + "%" }}>{tick(value)}</span>)}</div>
   <p class="science-plot__x-label">{xLabel}</p>
-  </div><aside class="science-plot__inspector" data-plot-inspector hidden aria-label={chinese ? "所选数据点" : "Selected source points"}>
+  </div><aside class="science-plot__inspector" data-plot-inspector hidden aria-label={title + (chinese ? "：所选数据点" : ": selected source points")}>
     <p class="science-plot__inspector-label">{chinese ? "检查保留的数据点" : "Inspect retained points"}</p>
     <p class="science-plot__coordinate"><span>{xLabel}</span><output data-plot-x></output></p>
     <ul data-plot-values></ul>
