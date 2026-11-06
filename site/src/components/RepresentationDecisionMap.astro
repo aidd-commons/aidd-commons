@@ -1,5 +1,4 @@
 ---
-import ScientificIcon from "./ScientificIcon.astro";
 interface Props { chinese?: boolean; }
 const { chinese = Astro.url.pathname.includes("/zh-cn/") } = Astro.props;
 const steps = [
@@ -16,27 +15,51 @@ const families = [
   { short: "SEQ", label: chinese ? "序列化语法" : "serialized syntax", kind: "tokens" },
   { short: "3D", label: chinese ? "状态与几何" : "state and geometry", kind: "space" },
 ];
+// These dependency hypotheses are the adjacent canonical lesson's worked choices.
+const scenarios = [
+  {id:"identity", title:chinese?"注册库关联":"Registry linkage", family:"ID", needs:chinese?"结构记录与合适的标识符；先解决实体。":"A structure record and suitable identifier; resolve the entity first."},
+  {id:"global",title:chinese?"大小、极性与柔性趋势":"Size, polarity and flexibility",family:"DESC",needs:chinese?"小型、明确定义的描述符向量。":"A small, declared descriptor vector."},
+  {id:"local",title:chinese?"局部结构–活性关系":"Local structure–activity",family:"FP 2D",needs:chinese?"从圆形指纹或局部图表示开始。":"Begin with circular fingerprints or a local graph representation."},
+  {id:"quantum",title:chinese?"量子能量或力":"Quantum energy or force",family:"3D",needs:chinese?"坐标、元素、状态与物理对称性。":"Coordinates, elements, state and physical symmetries."},
+  {id:"complex",title:chinese?"蛋白质–配体几何":"Protein–ligand geometry",family:"3D",needs:chinese?"配体状态、构象或姿势、靶标构建与相互作用语境。":"Ligand state, conformer or pose, target construct and interaction context."},
+];
 ---
 
 <section class="representation-decision-map not-content" aria-labelledby="representation-map-title" data-representation-map lang={chinese ? "zh-CN" : "en"}>
   <header><p class="representation-decision-map__eyebrow">{chinese ? "从对象到比较" : "Object → endpoint → comparison"}</p><h2 id="representation-map-title">{chinese ? "表示是一系列科学选择" : "Representation is a chain of scientific choices"}</h2><p>{chinese ? "先问哪些区别必须为这个端点与决策保留下来，再选择编码。" : "Ask which distinctions must survive for this endpoint and decision before choosing an encoding."}</p></header>
   <ol class="representation-decision-map__steps">
-    {steps.map((step, index) => <li><span class="representation-decision-map__number">{step.number}</span><h3>{step.title}</h3><div class="representation-decision-map__object"><ScientificIcon name={step.icon} size={84} /></div><strong class="representation-decision-map__short">{step.short}</strong><p>{step.body}</p>{index < steps.length - 1 && <span class="representation-decision-map__arrow" aria-hidden="true">→</span>}</li>)}
+    {steps.map((step) => <li><span class="representation-decision-map__number">{step.number}</span><h3>{step.title}</h3><p>{step.body}</p></li>)}
   </ol>
-  <div class="representation-decision-map__encoding-row"><p>{chinese ? "六种计算视图" : "Six computational views"}<span>{chinese ? "同一对象的不同信息边界" : "Different information boundaries for an object"}</span></p><ul class="representation-decision-map__families" aria-label={chinese ? "表示家族" : "Representation families"}>
-    {families.map((family) => <li><div class={`representation-glyph representation-glyph--${family.kind}`} aria-hidden="true">
-      {family.kind === "record" && <span class="representation-glyph__record"><i></i><i></i><i></i></span>}
-      {family.kind === "scalars" && <span class="representation-glyph__scalars"><i></i><i></i><i></i></span>}
-      {family.kind === "bits" && <span class="representation-glyph__bits">{[1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1].map((bit) => <i class:list={{ "is-set": bit }}></i>)}</span>}
-      {family.kind === "graph" && <ScientificIcon name="molecule" size={58} />}
-      {family.kind === "tokens" && <span class="representation-glyph__tokens"><i>[ ]</i><i>[ ]</i><i>[ ]</i></span>}
-      {family.kind === "space" && <ScientificIcon name="simulation" size={58} />}
-    </div><strong>{family.short}</strong><span>{family.label}</span></li>)}
-  </ul></div>
+  <div class="representation-choice-workbench" data-representation-workbench>
+    <div class="representation-choice-workbench__question"><h3>{chinese?"端点需要什么信息？":"What information can the endpoint use?"}</h3><p>{chinese?"选择依赖假设，检查最低成本的起点。表示家族不是性能排名。":"Select a dependency hypothesis to inspect a starting view. Families are not a performance ranking."}</p></div>
+    <ol class="representation-choice-workbench__scenarios">
+      {scenarios.map((scenario,index)=><li><button type="button" data-representation-scenario={scenario.id} data-families={scenario.family} aria-pressed={index===0?"true":"false"} disabled><span>{String(index+1).padStart(2,"0")}</span><strong>{scenario.title}</strong><span aria-hidden="true">→</span></button><p data-representation-explanation={scenario.id}>{scenario.needs}</p></li>)}
+    </ol>
+    <div class="representation-choice-workbench__views"><p>{chinese?"六种计算视图":"Six computational views"}</p><ul aria-label={chinese?"表示家族":"Representation families"}>{families.map(family=><li data-representation-family={family.short}><strong>{family.short}</strong><span>{family.label}</span></li>)}</ul><p class="representation-choice-workbench__readout" data-representation-readout role="status" hidden></p><p>{chinese?"SEQ 表达序列化语法。编码选择不能补回遗漏的 assay 语境；单一构象也不是构象集合。":"SEQ expresses serialized syntax. An encoding cannot restore omitted assay context; one conformer is not an ensemble."}</p></div>
+  </div>
   <div class="representation-decision-map__matched" aria-label={chinese ? "匹配比较的共同边界" : "Shared boundary for a matched comparison"}><span class="representation-decision-map__fixed">{chinese ? "保持固定" : "Hold fixed"}</span><p>{chinese ? "实体 · 标签 · 划分 · 预处理 · 指标" : "Entities · labels · splits · preprocessing · metrics"}</p><span class="representation-decision-map__vary">{chinese ? "改变表示 / 编码器" : "Vary representation / encoder"}</span></div>
-  <p class="representation-decision-map__note">{chinese ? "箭头表示决策顺序。插图、位格和标量符号都是概念示意，不是计算得到的特征、分子结构证据或性能排名。" : "Arrows show decision order. Illustrations, bit cells and scalar glyphs are conceptual, not computed features, molecular structure evidence or a performance ranking."}</p>
+  <p class="representation-decision-map__note">{chinese ? "箭头表示决策顺序；相关视图是本章的依赖假设起点，不是计算得到的特征或性能排名。" : "Arrows show decision order. Highlighted views are starting points for this chapter’s dependency hypotheses, not computed features or a performance ranking."}</p>
 </section>
 
+<script>
+  function initializeRepresentationChoices(){
+    document.querySelectorAll<HTMLElement>("[data-representation-workbench]").forEach(root=>{
+      if(root.dataset.ready)return;root.dataset.ready="true";
+      const buttons=[...root.querySelectorAll<HTMLButtonElement>("[data-representation-scenario]")];
+      const status=root.querySelector<HTMLElement>("[data-representation-readout]")!;
+      function select(button:HTMLButtonElement){
+        buttons.forEach(item=>item.setAttribute("aria-pressed",String(item===button)));
+        const wanted=new Set((button.dataset.families??"").split(" "));
+        root.querySelectorAll<HTMLElement>("[data-representation-family]").forEach(family=>family.classList.toggle("is-relevant",wanted.has(family.dataset.representationFamily!)));
+        const text=root.querySelector<HTMLElement>(`[data-representation-explanation="${button.dataset.representationScenario}"]`)?.textContent??"";
+        status.textContent=text;
+      }
+      buttons.forEach(button=>{button.disabled=false;button.addEventListener("click",()=>select(button));});
+      status.hidden=false;select(buttons[0]);
+    });
+  }
+  initializeRepresentationChoices();document.addEventListener("astro:page-load",initializeRepresentationChoices);
+</script>
 <style>
   .representation-decision-map { margin-block: 2rem; border-block: 1px solid var(--atlas-rule-strong); color: var(--atlas-ink); background: var(--atlas-panel); }
   .representation-decision-map header { padding: 1.25rem 0 1rem; }
@@ -46,37 +69,16 @@ const families = [
   .representation-decision-map__steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.2rem; margin: 0; padding: 0; list-style: none; }
   .representation-decision-map__steps li { position: relative; display: flex; flex-direction: column; min-width: 0; padding: .75rem 0; border-top: 1px solid var(--atlas-rule); }
   .representation-decision-map__number { font: .75rem var(--atlas-font-mono); color: var(--atlas-teal-deep); }
-  .representation-decision-map__steps h3 { margin: .35rem 0 .6rem; font-size: .88rem; line-height: 1.4; min-height: 2.8em; }
-  .representation-decision-map__object { display: flex; align-items: center; justify-content: center; min-height: 92px; }
-  .representation-decision-map__short { display: block; margin-top: .3rem; font-size: .75rem; line-height: 1.5; font-weight: 650; text-align: center; }
+  .representation-decision-map__steps h3 { margin: .35rem 0 .6rem; font-size: .88rem; line-height: 1.4; min-height: 0; }
   .representation-decision-map__steps p { margin: .5rem 0 0; color: var(--atlas-muted); font-size: .78rem; line-height: 1.6; }
-  .representation-decision-map__arrow { position: absolute; right: -1.05rem; top: 8.3rem; color: var(--atlas-ink); font-size: 1.1rem; }
-  .representation-decision-map__encoding-row { padding-block: .8rem 1rem; border-top: 1px solid var(--atlas-rule); }
-  .representation-decision-map__encoding-row > p { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin: 0 0 .8rem; font-size: .8rem; font-weight: 650; }
-  .representation-decision-map__encoding-row > p > span { color: var(--atlas-muted); font-size: .75rem; font-weight: 400; }
-  .representation-decision-map__families { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .65rem; margin: 0; padding: 0; list-style: none; }
-  .representation-decision-map__families li { display: flex; flex-direction: column; min-width: 0; align-items: center; text-align: center; }
-  .representation-decision-map__families strong { margin-top: .35rem; font: .78rem var(--atlas-font-mono); }
-  .representation-decision-map__families li > span { display: block; margin-top: .3rem; color: var(--atlas-muted); font-size: .75rem; line-height: 1.4; }
-  .representation-glyph { display: grid; height: 60px; width: 100%; place-items: center; color: var(--atlas-teal-deep); }
-  .representation-glyph i { margin: 0; }
-  .representation-glyph__record { display: grid; gap: 5px; width: 37px; height: 47px; border: 1px solid var(--atlas-rule-strong); padding: 9px 6px; background: color-mix(in srgb, var(--atlas-teal) 5%, transparent); }
-  .representation-glyph__record i { display: block; border-top: 2px solid var(--atlas-teal); }
-  .representation-glyph__record i:last-child { width: 65%; }
-  .representation-glyph__scalars { display: flex; gap: 4px; align-items: end; width: 40px; height: 40px; border-bottom: 1px solid var(--atlas-rule-strong); }
-  .representation-glyph__scalars i { display: block; flex: 1; height: 60%; background: var(--atlas-teal); }
-  .representation-glyph__scalars i:nth-child(2) { height: 90%; background: var(--atlas-teal-deep); }
-  .representation-glyph__scalars i:nth-child(3) { height: 40%; }
-  .representation-glyph__bits { display: grid; grid-template-columns: repeat(4, 9px); gap: 3px; }
-  .representation-glyph__bits i { display: block; width: 9px; height: 9px; border: 1px solid var(--atlas-rule-strong); }
-  .representation-glyph__bits .is-set { background: var(--atlas-teal); border-color: var(--atlas-teal-deep); }
-  .representation-glyph__tokens { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; width: 58px; }
-  .representation-glyph__tokens i { padding: 1px 3px; border: 1px solid var(--atlas-rule-strong); font: .75rem var(--atlas-font-mono); }
   .representation-decision-map__matched { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .4rem .8rem; align-items: center; padding: .8rem 0; border-block: 1px solid var(--atlas-rule); }
   .representation-decision-map__matched p { margin: 0; font-size: .78rem; line-height: 1.6; }
   .representation-decision-map__fixed { padding: .25rem .4rem; border: 1px solid var(--atlas-rule-strong); font-size: .75rem; font-weight: 650; }
   .representation-decision-map__vary { grid-column: 2; padding-left: .65rem; border-left: 2px dashed var(--atlas-teal); color: var(--atlas-teal-deep); font-size: .75rem; }
   .representation-decision-map__note { margin: .75rem 0; color: var(--atlas-muted); font-size: .75rem; line-height: 1.6; }
-  @media (max-width: 48rem) { .representation-decision-map__steps { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem 1.5rem; } .representation-decision-map__steps h3 { min-height: 2.8em; } .representation-decision-map__arrow { top: 7rem; } .representation-decision-map__steps li:nth-child(2) .representation-decision-map__arrow { display: none; } }
-  @media (max-width: 30rem) { .representation-decision-map__steps { grid-template-columns: 1fr; gap: .8rem; } .representation-decision-map__steps li { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: .3rem .7rem; } .representation-decision-map__number, .representation-decision-map__steps h3, .representation-decision-map__steps p { grid-column: 2; min-height: 0; margin: 0; } .representation-decision-map__steps p { grid-row: 3; } .representation-decision-map__object { grid-column: 1; grid-row: 1 / 4; align-self: center; } .representation-decision-map__short { grid-column: 1; grid-row: 4; text-align: left; color: var(--atlas-teal-deep); } .representation-decision-map__arrow { top: auto; bottom: -1rem; left: 35px; right: auto; transform: rotate(90deg); } .representation-decision-map__steps li:nth-child(2) .representation-decision-map__arrow { display: block; } .representation-decision-map__families { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; } }
+  .representation-choice-workbench{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 1.5rem;margin-block:1rem;border-top:1px solid var(--atlas-rule)}.representation-choice-workbench__question{grid-column:1/-1;padding-block:1rem}.representation-choice-workbench__question h3{font-size:1.05rem;margin:0}.representation-choice-workbench__question p,.representation-choice-workbench__views>p{font-size:.78rem;line-height:1.6;color:var(--atlas-muted);margin:.4rem 0}.representation-choice-workbench__scenarios{list-style:none;padding:0;margin:0}.representation-choice-workbench__scenarios li{border-top:1px solid var(--atlas-rule)}.representation-choice-workbench__scenarios button{display:grid;grid-template-columns:1.5rem minmax(0,1fr) auto;gap:.5rem;align-items:center;text-align:left;width:100%;min-height:48px;font:inherit;font-size:.8rem;border:0;background:transparent;padding:.6rem 0;color:var(--atlas-ink);cursor:pointer}.representation-choice-workbench__scenarios button>span:first-child{font:.75rem var(--atlas-font-mono);color:var(--atlas-muted)}.representation-choice-workbench__scenarios button>strong{font-weight:600}.representation-choice-workbench__scenarios button[aria-pressed="true"]{color:var(--atlas-teal-deep)}.representation-choice-workbench__scenarios button:disabled{cursor:default;color:var(--atlas-ink)}.representation-choice-workbench__scenarios button:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:2px}.representation-choice-workbench__scenarios li>p{font-size:.78rem;line-height:1.6;color:var(--atlas-muted);margin:0 0 .7rem 2rem}.representation-choice-workbench[data-ready] .representation-choice-workbench__scenarios li>p{display:none}.representation-choice-workbench__views ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;list-style:none;padding:0;margin:.8rem 0}.representation-choice-workbench__views li{padding:.65rem .5rem;border:1px solid var(--atlas-rule);min-width:0;display:grid;gap:.3rem}.representation-choice-workbench__views li strong{font:.85rem var(--atlas-font-mono)}.representation-choice-workbench__views li>span{font-size:.75rem;color:var(--atlas-muted);line-height:1.4}.representation-choice-workbench__views li.is-relevant{border-color:var(--atlas-teal-deep);box-shadow:inset 0 3px var(--atlas-teal-deep);background:color-mix(in srgb,var(--atlas-teal) 7%,var(--atlas-panel))}.representation-choice-workbench__readout{padding:.8rem 0;border-block:1px solid var(--atlas-rule);color:var(--atlas-ink)!important;min-height:4.2rem}.representation-choice-workbench [hidden]{display:none!important}
+  @media(max-width:38rem){.representation-choice-workbench{grid-template-columns:minmax(0,1fr);gap:1rem}.representation-choice-workbench__question{grid-column:auto}.representation-choice-workbench__views ul{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media (max-width: 48rem) { .representation-decision-map__steps { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem 1.5rem; } .representation-decision-map__steps h3 { min-height: 0; } .representation-decision-map__arrow { top: 7rem; } .representation-decision-map__steps li:nth-child(2) .representation-decision-map__arrow { display: none; } }
+  @media(max-width:30rem){.representation-decision-map__steps{grid-template-columns:1fr;gap:.5rem}.representation-decision-map__steps li{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:.2rem .5rem}.representation-decision-map__steps h3{margin:0}.representation-decision-map__steps p{grid-column:2;margin:0}.representation-decision-map__matched{grid-template-columns:minmax(0,1fr)}.representation-decision-map__vary{grid-column:auto}}
+
 </style>

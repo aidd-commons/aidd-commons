@@ -1,13 +1,115 @@
 import { readFile } from "node:fs/promises";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { AxeBuilder } from "@axe-core/playwright";
 import type { Resource } from "../../site/src/data/resource.js";
 import { opennessDimensions } from "../../site/src/data/resource.js";
+import type { ComparisonPayload } from "../../site/src/data/comparison.js";
+import { filterResources, parseAtlasQuery } from "../../site/src/lib/atlas-state.js";
 
 const resources = JSON.parse(
   await readFile("site/public/data/resources.v1.json", "utf8"),
 ) as Resource[];
 const pair = ["model-boltz-1", "model-chai-1"];
+const auditData = JSON.parse(await readFile("site/public/data/comparison.v1.json", "utf8")) as ComparisonPayload;
+
+async function openComparisonTable(page: Page) {
+  const fallback = page.locator(".atlas-comparison-fallback");
+  await expect(fallback).toBeVisible();
+  if (!(await fallback.evaluate((node) => (node as HTMLDetailsElement).open)))
+    await fallback.locator(":scope > summary").click();
+}
+
+test("the early numeric heatmap drills into the same filtered population", async ({ page }) => {
+  const query = new URLSearchParams("q=protein&kind=model");
+  const population = filterResources(resources, parseAtlasQuery(query));
+  await page.goto(`/atlas/?${query}`);
+  await expect(page.locator("[data-scope-population]")).toHaveText(`${population.length} matching records`);
+  const count = page.locator("[data-atlas-overview] [data-scope-stage]").first();
+  await expect(count).toBeVisible();
+  const stage = (await count.getAttribute("data-scope-stage"))!;
+  const kind = (await count.getAttribute("data-scope-kind"))!;
+  const expected = population.filter(resource => resource.kind === kind && resource.stages.includes(stage));
+  await expect(count).toHaveText(String(expected.length));
+  await count.click();
+  await expect(page.locator("[data-result-count]")).toHaveText(`${expected.length} of ${resources.length} resources`);
+  expect(new URL(page.url()).searchParams.get("q")).toBe("protein");
+  expect(new URL(page.url()).searchParams.get("stage")).toBe(stage);
+  const offeredStages = await page.locator("[data-atlas-overview] [data-scope-stage]").evaluateAll(buttons => [...new Set(buttons.map(button => button.getAttribute("data-scope-stage")))]);
+  expect(offeredStages).toEqual([stage]);
+  const downloadEvent = page.waitForEvent("download");
+  await page.locator("[data-atlas-export]").click();
+  const exported = JSON.parse(await readFile((await (await downloadEvent).path())!, "utf8"));
+  expect(exported.map(({ id }: { id: string }) => id).sort()).toEqual(expected.map(({ id }) => id).sort());
+});
+
+test("a single-kind heatmap count remains clickable after inspecting evidence at 320px", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto(`/atlas/?q=protein&kind=model&compare=${pair.join(",")}`);
+  const evidence = page.locator('[data-inspect-asset="model-chai-1:training_code"]');
+  await evidence.click();
+  await expect(evidence).toHaveAttribute("aria-pressed", "true");
+  const count = page.locator("[data-atlas-overview] [data-scope-stage]").first();
+  const stage = await count.getAttribute("data-scope-stage");
+  await count.click();
+  expect(new URL(page.url()).searchParams.get("stage")).toBe(stage);
+  await expect(page.locator("[data-result-count]")).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test("compact asset profiles select their own claim evidence before the full table", async ({ page }) => {
+  await page.goto(`/atlas/?compare=${pair.join(",")}`);
+  await expect(page.locator("[data-inspect-asset]")).toHaveCount(pair.length * opennessDimensions.length);
+  await expect(page.locator(".atlas-comparison-fallback")).not.toHaveAttribute("open");
+  const record = resources.find(resource => resource.id === pair[1])!;
+  const dimension = "training_code";
+  const selected = page.locator(`[data-inspect-asset="${record.id}:${dimension}"]`);
+  await selected.click();
+  await expect(selected).toHaveAttribute("aria-pressed", "true");
+  const inspector = page.getByRole("region", { name: "Selected asset evidence", exact: true });
+  await expect(inspector).toContainText(record.name);
+  await expect(inspector).toContainText(record.last_verified);
+  const expected = record.evidence.filter(source => record.openness[dimension].evidence?.includes(source.id)).map(source => source.url).sort();
+  expect(await inspector.locator(".atlas-cell-sources a").evaluateAll(links => links.map(link => link.getAttribute("href")).sort())).toEqual(expected);
+  if (!expected.length) await expect(inspector).toContainText("No direct evidence recorded.");
+});
+
+test("audit interval panels retain each named provider's actual pair and selected source", async ({ page }) => {
+  await page.goto("/audit/");
+  const thresholds = [...new Set(auditData.summaries.map(row => row.threshold))];
+  for (const threshold of thresholds) {
+    await page.locator(`[data-bounds-threshold="${threshold}"]`).click();
+    const panel = page.locator(`[data-bounds-panel="${threshold}"]`);
+    await expect(panel).toBeVisible();
+    await expect(panel.locator("[data-bounds-provider]")).toHaveCount(auditData.providers.length);
+    for (const provider of auditData.providers) {
+      const row = auditData.summaries.find(row => row.threshold === threshold && row.provider_id === provider.id)!;
+      const interval = panel.locator(`[data-bounds-provider="${provider.id}"]`);
+      await expect(interval).toHaveAttribute("data-bounds-lower", String(row.lower));
+      await expect(interval).toHaveAttribute("data-bounds-upper", String(row.upper));
+    }
+  }
+  const expectedCell = auditData.rows.find(row => row.track_id === "foundations" && row.coverage_origin === "direct" && row.evidence.length > 0)!;
+  expect(expectedCell).toBeDefined();
+  const mark = page.locator(`[data-overview-cell="${expectedCell.provider_id}:${expectedCell.topic_id}"] [data-comparison-focus]`);
+  await mark.click();
+  const inspector = page.locator("[data-comparison-inspector]");
+  await expect(inspector).toBeVisible();
+  await expect(inspector.locator("h4")).toHaveText(expectedCell.topic_title);
+  await expect(inspector).toContainText(expectedCell.provider_name);
+  await expect(inspector.locator("details")).toContainText(expectedCell.reviewed_scope);
+  await expect(inspector.locator("details")).toContainText(expectedCell.note);
+  const expectedLinks = expectedCell.evidence.filter(source => source.source_type === "url").map(source => source.url).sort();
+  expect(await inspector.locator("details a").evaluateAll(links => links.map(link => link.getAttribute("href")).sort())).toEqual(expectedLinks);
+  await expect(inspector.locator("details")).toHaveAttribute("open");
+  await expect(mark).toHaveAttribute("aria-current", "true");
+  await expect(page.locator("[data-comparison-records]")).not.toHaveAttribute("open");
+  const unknownCell = auditData.rows.find(row => row.track_id === "foundations" && row.coverage_origin === "default")!;
+  expect(unknownCell).toBeDefined();
+  await page.locator(`[data-overview-cell="${unknownCell.provider_id}:${unknownCell.topic_id}"] [data-comparison-focus]`).click();
+  await expect(inspector.locator("h4")).toHaveText(unknownCell.topic_title);
+  await expect(inspector).toContainText(unknownCell.provider_name);
+  await expect(inspector).toContainText("No topic-specific source was encoded in this dated review.");
+});
 
 test("pagination keeps comparison selections across pages, refresh and Back while exporting every match", async ({
   page,
@@ -44,6 +146,7 @@ test("pagination keeps comparison selections across pages, refresh and Back whil
   const secondId = (await second.getAttribute("data-compare-id"))!;
   expect(secondId).not.toBe(firstId);
   await second.check();
+  await openComparisonTable(page);
   await expect(
     page.getByRole("region", {
       name: "Selected resource comparison",
@@ -177,6 +280,7 @@ test("Atlas keeps the initial HTML compact and loads evidence only for requested
   }
   await page.getByLabel("Compare Boltz-1", { exact: true }).check();
   await page.getByLabel("Compare Boltz-2", { exact: true }).check();
+  await openComparisonTable(page);
   await expect(
     page.getByRole("region", {
       name: "Selected resource comparison",
@@ -190,6 +294,7 @@ test("comparison preserves seven independent source-linked states, scoped licenc
   page,
 }) => {
   await page.goto(`/atlas/?compare=${pair.join(",")}`);
+  await openComparisonTable(page);
   const comparison = page.getByRole("region", {
     name: "Selected resource comparison",
     exact: true,
@@ -248,6 +353,7 @@ test("views, sort and selection survive refresh and browser Back, including a la
   ).toBeVisible();
   await expect(page.locator("[data-atlas-sort]")).toHaveValue("checked");
   await page.reload();
+  await openComparisonTable(page);
   await expect(
     page.getByRole("region", {
       name: "Selected resource comparison",
@@ -283,6 +389,7 @@ test("four-record selection limit is explicit and selected records can always be
 }) => {
   const selected = [...pair, "model-boltz-2", "model-openfold"];
   await page.goto(`/atlas/?q=Boltz&compare=${selected.join(",")}`);
+  await openComparisonTable(page);
   await expect(
     page.getByRole("region", {
       name: "Selected resource comparison",
@@ -345,6 +452,7 @@ test("unavailable index and detail inputs preserve navigation and offer a workin
   await page
     .getByRole("button", { name: "Retry comparison", exact: true })
     .click();
+  await openComparisonTable(page);
   await expect(
     page.getByRole("region", {
       name: "Selected resource comparison",
@@ -366,6 +474,7 @@ test("resource detail launches a real pair comparison through its native form", 
   await form
     .getByRole("button", { name: "Compare resource evidence", exact: true })
     .click();
+  await openComparisonTable(page);
   await expect(
     page.getByRole("region", {
       name: "Selected resource comparison",
@@ -420,6 +529,7 @@ test("malformed index and mismatched detail payloads produce diagnostics rather 
   await page
     .getByRole("button", { name: "Retry comparison", exact: true })
     .click();
+  await openComparisonTable(page);
   await expect(
     page.getByRole("region", {
       name: "Selected resource comparison",
@@ -434,6 +544,7 @@ test("comparison and landscape keep accessible tables with no document overflow 
   for (const theme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: theme });
     await page.goto(`/atlas/?q=Boltz&view=landscape&compare=${pair.join(",")}`);
+    await openComparisonTable(page);
     await expect(
       page.getByRole("region", {
         name: "Selected resource comparison",

@@ -6,7 +6,7 @@ import {
   type Curriculum,
 } from "../../../scripts/curriculum/curriculum.js";
 import curriculumSource from "../../../catalog/curriculum/tracks.yaml?raw";
-import ScientificIcon from "./ScientificIcon.astro";
+import { withSiteBase } from "../lib/site-paths";
 
 interface Props {
   chinese?: boolean;
@@ -14,8 +14,6 @@ interface Props {
 
 const { chinese = false } = Astro.props;
 const curriculum = parse(curriculumSource) as Curriculum;
-const trackIcons = ["data", "assay", "model", "data", "molecule", "cell", "molecule", "assay", "protein", "protein", "simulation", "molecule", "protein", "robot", "robot", "model", "data", "data"] as const;
-const objectIcons = ["cell", "protein", "molecule", "assay", "simulation", "robot", "data", "model"] as const;
 const unitsByTrack = new Map(
   curriculum.tracks.map((track) => [
     track.id,
@@ -64,7 +62,6 @@ const prerequisiteProjection = curriculum.units.map((unit) => ({
   id: unit.id,
   title: chinese ? unit.title_zh : unit.title,
   track: unit.track_id,
-  icon: trackIcons[(curriculum.tracks.find((track) => track.id === unit.track_id)?.order ?? 1) - 1],
   lesson: unit.lesson_id ? lessonHref(unit.lesson_id) : null,
   prerequisites: unit.prerequisites,
   dependents: curriculum.units.filter((candidate) => candidate.prerequisites.includes(unit.id)).map((candidate) => candidate.id),
@@ -88,7 +85,7 @@ const capabilityLabels = chinese
     };
 
 function lessonHref(lessonId: string): string {
-  return chinese ? `/zh-cn/learn/${lessonId}/` : `/learn/${lessonId}/`;
+  return withSiteBase(`${chinese ? "/zh-cn" : ""}/learn/${lessonId}/`, import.meta.env.BASE_URL);
 }
 
 function unitTitle(unit: Curriculum["units"][number]): string {
@@ -110,11 +107,11 @@ function unitTitle(unit: Curriculum["units"][number]): string {
     </div>
     <label>{chinese ? "选择一个已声明单元" : "Choose a declared unit"}<select data-unit-choice>{prerequisiteProjection.map((unit) => <option value={unit.id}>{unit.title}</option>)}</select></label>
     <div class="curriculum-blueprint__dependency-path">
-      <section class="curriculum-blueprint__incoming"><h4>{chinese ? "直接先修" : "Direct prerequisites"}</h4><ScientificIcon name="data" size={64} /><ul data-unit-prerequisites>{firstUnit?.prerequisites.length ? firstUnit.prerequisites.map((id) => <li><a href={"#unit-" + id}>{prerequisiteProjection.find((unit) => unit.id === id)?.title}</a></li>) : <li>{chinese ? "无声明的先修" : "None declared"}</li>}</ul></section>
+      <section class="curriculum-blueprint__incoming"><h4>{chinese ? "直接先修" : "Direct prerequisites"}</h4><ul data-unit-prerequisites>{firstUnit?.prerequisites.length ? firstUnit.prerequisites.map((id) => <li><a href={"#unit-" + id}>{prerequisiteProjection.find((unit) => unit.id === id)?.title}</a></li>) : <li>{chinese ? "无声明的先修" : "None declared"}</li>}</ul></section>
       <span class="curriculum-blueprint__connector" data-unit-incoming-edge aria-hidden="true" hidden={!firstUnit?.prerequisites.length}>→</span>
-      <section class="curriculum-blueprint__selected"><h4>{chinese ? "当前单元" : "Selected unit"}</h4><div class="curriculum-blueprint__unit-object">{objectIcons.map((icon) => <span data-unit-object={icon} hidden={icon !== firstUnit?.icon}><ScientificIcon name={icon} size={88} /></span>)}</div><a data-unit-selected href={"#unit-" + firstUnit?.id}>{firstUnit?.title}</a><a data-unit-open href={firstUnit?.lesson ?? "#unit-" + firstUnit?.id}>{labels.lesson} →</a></section>
+      <section class="curriculum-blueprint__selected"><h4>{chinese ? "当前单元" : "Selected unit"}</h4><code class="curriculum-blueprint__selected-id" data-unit-selected-id>{firstUnit?.id}</code><a data-unit-selected href={"#unit-" + firstUnit?.id}>{firstUnit?.title}</a><a data-unit-open href={firstUnit?.lesson ?? "#unit-" + firstUnit?.id}>{labels.lesson} →</a></section>
       <span class="curriculum-blueprint__connector" data-unit-outgoing-edge aria-hidden="true" hidden={!firstUnit?.dependents.length}>→</span>
-      <section class="curriculum-blueprint__outgoing"><h4>{chinese ? "以此为直接先修" : "Names this unit as a prerequisite"}</h4><ScientificIcon name="data" size={64} /><ul data-unit-dependents>{firstUnit?.dependents.map((id) => <li><a href={"#unit-" + id}>{prerequisiteProjection.find((unit) => unit.id === id)?.title}</a></li>)}</ul></section>
+      <section class="curriculum-blueprint__outgoing"><h4>{chinese ? "以此为直接先修" : "Names this unit as a prerequisite"}</h4><ul data-unit-dependents>{firstUnit?.dependents.map((id) => <li><a href={"#unit-" + id}>{prerequisiteProjection.find((unit) => unit.id === id)?.title}</a></li>)}</ul></section>
     </div>
     <p class="curriculum-blueprint__relationship-count" data-unit-relationship-count aria-live="polite"></p>
     <p class="curriculum-blueprint__dependency-note">{chinese ? "只显示课程源中声明的一跳关系。连接表示教学先修，不是生物因果、学习时长或已测得的学习成果。完整可访问列表仍在下方。" : "Only one-hop relationships declared in the curriculum source are shown. Links mean teaching prerequisites, not biological causality, learning time or measured learning outcomes. The complete accessible list remains below."}</p>
@@ -212,7 +209,7 @@ function unitTitle(unit: Curriculum["units"][number]): string {
     document.querySelectorAll<HTMLElement>("[data-prerequisite-navigator]").forEach((root) => {
       if (root.dataset.initialized) return;
       root.dataset.initialized = "true";
-      const units = JSON.parse(root.dataset.unitProjection ?? "[]") as Array<{id:string;title:string;icon:string;lesson:string|null;prerequisites:string[];dependents:string[]}>;
+      const units = JSON.parse(root.dataset.unitProjection ?? "[]") as Array<{id:string;title:string;lesson:string|null;prerequisites:string[];dependents:string[]}>;
       const chinese = root.dataset.chinese === "true";
       const select = root.querySelector<HTMLSelectElement>("[data-unit-choice]")!;
       function update() {
@@ -220,7 +217,7 @@ function unitTitle(unit: Curriculum["units"][number]): string {
         if (!unit) return;
         const chosen = root.querySelector<HTMLAnchorElement>("[data-unit-selected]")!;
         chosen.textContent = unit.title; chosen.href = "#unit-" + unit.id;
-        root.querySelectorAll<HTMLElement>("[data-unit-object]").forEach((object) => { object.hidden = object.dataset.unitObject !== unit.icon; });
+        root.querySelector("[data-unit-selected-id]")!.textContent = unit.id;
         const count = root.querySelector<HTMLElement>("[data-unit-relationship-count]")!;
         count.textContent = chinese ? `${unit.prerequisites.length} 个直接先修 → 当前单元 → ${unit.dependents.length} 个直接后续单元` : `${unit.prerequisites.length} direct prerequisites → selected unit → ${unit.dependents.length} direct dependents`;
         root.querySelector<HTMLElement>("[data-unit-incoming-edge]")!.hidden = unit.prerequisites.length === 0;
@@ -252,21 +249,21 @@ function unitTitle(unit: Curriculum["units"][number]): string {
 <style>
   .curriculum-blueprint { display: grid; gap: 1rem; margin-block: 1.5rem; color: var(--atlas-ink); }
   .curriculum-blueprint__intro { margin: 0; color: var(--atlas-muted); }
-  .curriculum-blueprint__navigator { padding: 1rem 0 0; border-block: 1px solid var(--atlas-rule-strong); }
+  .curriculum-blueprint__navigator { padding: 1rem; border: 1px solid var(--atlas-rule-strong); background: var(--atlas-panel); }
   .curriculum-blueprint__navigator-heading p { color: var(--atlas-teal-deep); font-size: .75rem; margin: 0 0 .3rem; font-weight: 650; }
   .curriculum-blueprint__navigator h3 { margin: 0 0 1rem; font-size: 1.2rem; }
   .curriculum-blueprint__navigator label { display: grid; gap: .4rem; font-size: .82rem; font-weight: 600; }
   .curriculum-blueprint__navigator select { width: 100%; min-height: 2.75rem; border: 1px solid var(--atlas-rule-strong); border-radius: 0; padding: .5rem; color: var(--atlas-ink); background: var(--atlas-panel); font: inherit; }
-  .curriculum-blueprint__dependency-path { display: grid; grid-template-columns: minmax(0, 1fr) 1.25rem minmax(0, 1.05fr) 1.25rem minmax(0, 1fr); gap: .5rem; align-items: start; margin: 1.2rem 0 .5rem; }
+  .curriculum-blueprint__dependency-path { display: grid; grid-template-columns: minmax(0, 1fr) 1rem minmax(0, 1.15fr) 1rem minmax(0, 1fr); gap: .5rem; align-items: start; margin: 1.2rem 0 .5rem; }
   .curriculum-blueprint__dependency-path section { display: flex; flex-direction: column; align-items: center; min-width: 0; padding: .75rem .5rem; border-top: 1px solid var(--atlas-rule); }
   .curriculum-blueprint__dependency-path .curriculum-blueprint__selected { border-top: 2px solid var(--atlas-teal); background: color-mix(in srgb, var(--atlas-teal) 4%, transparent); }
-  .curriculum-blueprint__dependency-path h4 { font-size: .75rem; min-height: 2.8em; margin: 0 0 .5rem; color: var(--atlas-muted); text-align: center; font-weight: 650; }
+  .curriculum-blueprint__dependency-path h4 { font-size: .75rem; min-height: 0; margin: 0 0 .5rem; color: var(--atlas-muted); text-align: center; font-weight: 650; }
   .curriculum-blueprint__dependency-path ul { align-self: stretch; margin: .6rem 0 0; padding: 0; list-style: none; font-size: .78rem; }
   .curriculum-blueprint__dependency-path li { position: relative; margin: 0; padding: .45rem .1rem .45rem .7rem; border-bottom: 1px solid var(--atlas-rule); line-height: 1.5; }
   .curriculum-blueprint__dependency-path li::before { position: absolute; left: 0; top: .95rem; width: 4px; height: 4px; border: 1px solid currentColor; border-radius: 50%; content: ''; }
-  .curriculum-blueprint__connector { align-self: start; margin-top: 6.1rem; font-size: 1.2rem; text-align: center; color: var(--atlas-ink); }
+  .curriculum-blueprint__connector { align-self: start; margin-top: 3.25rem; font-size: 1.2rem; text-align: center; color: var(--atlas-ink); }
   .curriculum-blueprint__selected a { display: block; font-size: .85rem; margin-top: .65rem; text-align: center; font-weight: 650; line-height: 1.5; }
-  .curriculum-blueprint__unit-object { display: grid; min-height: 88px; place-items: center; }
+  .curriculum-blueprint__selected-id { padding: .2rem .35rem; background: transparent; color: var(--atlas-muted); font-size: .75rem; overflow-wrap: anywhere; text-align: center; }
   .curriculum-blueprint__selected a[data-unit-open] { min-height: 44px; font-size: .78rem; }
   .curriculum-blueprint__relationship-count { margin: .5rem 0; font: .75rem var(--atlas-font-mono); color: var(--atlas-teal-deep); }
   .curriculum-blueprint__dependency-note { font-size: .75rem; color: var(--atlas-muted); line-height: 1.6; }
@@ -298,6 +295,7 @@ function unitTitle(unit: Curriculum["units"][number]): string {
   .curriculum-blueprint__status--planned::before { border-style: dashed; }
   .curriculum-blueprint__layer { border-left: 1px solid var(--atlas-rule-strong); color: var(--atlas-ink); }
   .curriculum-blueprint__delivery { margin-top: .75rem; font-size: .8rem; line-height: 1.5; }
+  .curriculum-blueprint__delivery > a { display: inline-flex; align-items: center; min-height: 44px; }
   [hidden] { display: none !important; }
   .curriculum-blueprint__connector[hidden] { display: block !important; visibility: hidden; }
   @media (max-width: 44rem) { .curriculum-blueprint__units { grid-template-columns: minmax(0, 1fr); } .curriculum-blueprint__track > summary { grid-template-columns: minmax(0, 1fr) auto; gap: .4rem; } .curriculum-blueprint__track > summary > span:first-child { grid-column: 1 / -1; } }

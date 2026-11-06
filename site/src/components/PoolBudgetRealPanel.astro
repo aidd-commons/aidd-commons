@@ -4,6 +4,7 @@ import ScientificPlot from "./ScientificPlot.astro";
 
 const percent = (value: number) => `${(100 * value).toFixed(2)}%`;
 const download = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(summary, null, 2))}`;
+const maeAxisMaximum = Math.ceil(Math.max(...Object.values(summary.assays).flatMap(assay => assay.policies.flatMap(policy => policy.evaluation_mae))) * 2) / 2;
 const recoveryAxisMaximum = Math.ceil(Math.max(...Object.values(summary.assays).flatMap(assay => assay.policies.flatMap(policy => policy.recovery))) * 10) / 10;
 ---
 
@@ -27,9 +28,13 @@ const recoveryAxisMaximum = Math.ceil(Math.max(...Object.values(summary.assays).
         ({percent(assay.budget.actual_budget_fraction)}).
         Recovery denominator: {assay.budget.top_decile_size} top-decile pool targets.
         MAE denominator: {assay.partitions.evaluation.parents} evaluation parents.</p>
+      <p class="campaign-comparison-note">Compare recovery and prediction at the same acquired-parent checkpoint. Select either plot to move both cursors; no model is refitted.</p>
       <div class="campaign-view">
         <div class="campaign-curve">
-          <ScientificPlot title={`${id}: every frozen recovery path`} xLabel="Acquired parents from the original pool" yLabel={`Top-decile recovery fraction · denominator ${assay.budget.top_decile_size}`} xMin={0} xMax={assay.budget.acquired_count} xTicks={assay.budget.checkpoints} yMin={0} yMax={recoveryAxisMaximum} yTicks={[0, .1, .2, recoveryAxisMaximum]} showTable={false} series={assay.policies.map((policy, policyIndex) => ({ name: policy.name, color: policyIndex === 0 ? "var(--atlas-teal-deep)" : "var(--atlas-muted)", marker: policyIndex, dashed: policyIndex !== 0, points: assay.budget.checkpoints.map((count, round) => ({ x: count, y: policy.recovery[round] })) }))} />
+          <ScientificPlot syncGroup={`campaign-${id}`} title={`${id}: every frozen recovery path`} xLabel="Acquired parents from the original pool" yLabel={`Top-decile recovery fraction · denominator ${assay.budget.top_decile_size}`} xMin={0} xMax={assay.budget.acquired_count} xTicks={assay.budget.checkpoints} yMin={0} yMax={recoveryAxisMaximum} yTicks={[0, .1, .2, recoveryAxisMaximum]} showTable={false} series={assay.policies.map((policy, policyIndex) => ({ name: policy.name, color: policyIndex === 0 ? "var(--atlas-teal-deep)" : "var(--atlas-muted)", marker: policyIndex, dashed: policyIndex !== 0, points: assay.budget.checkpoints.map((count, round) => ({ x: count, y: policy.recovery[round] })) }))} />
+        </div>
+        <div class="campaign-curve">
+          <ScientificPlot syncGroup={`campaign-${id}`} title={`${id}: held-evaluation prediction error`} xLabel="Acquired parents from the original pool" yLabel={`Evaluation MAE · pChEMBL · denominator ${assay.partitions.evaluation.parents}`} xMin={0} xMax={assay.budget.acquired_count} xTicks={assay.budget.checkpoints} yMin={0} yMax={maeAxisMaximum} yTicks={[0,maeAxisMaximum/4,maeAxisMaximum/2,maeAxisMaximum*3/4,maeAxisMaximum]} showTable={false} series={assay.policies.map((policy,policyIndex)=>({name:policy.name,color:policyIndex===0?"var(--atlas-teal-deep)":"var(--atlas-muted)",marker:policyIndex,dashed:policyIndex!==0,points:assay.budget.checkpoints.map((count,round)=>({x:count,y:policy.evaluation_mae[round]}))}))} />
         </div>
         <aside class="campaign-denominators" aria-label={`${id} population and budget definitions`}>
           <h4>Read the denominators</h4>
@@ -95,7 +100,7 @@ const recoveryAxisMaximum = Math.ceil(Math.max(...Object.values(summary.assays).
   .real-pool-panel>h2{margin-top:.35rem}.panel-kicker{font-size:.75rem;color:var(--atlas-teal-deep);font-weight:700;letter-spacing:.06em;text-transform:uppercase}.real-pool-panel>p>strong{font-weight:650}
   .real-pool-panel section { min-width: 0; margin-block: 1.5rem;padding-top:1.2rem;border-top:1px solid var(--atlas-rule); }.real-pool-panel section>p{font-size:.82rem;color:var(--atlas-muted)}.real-pool-panel h3{font-size:1.1rem;margin-top:.4rem}
   .panel-letter{display:flex;justify-content:space-between;gap:.7rem;font-size:.75rem;color:var(--atlas-ink)!important;font-weight:700}.panel-letter span{font-weight:400;color:var(--atlas-muted)}
-  .campaign-view{display:grid;grid-template-columns:minmax(0,2fr) minmax(11rem,1fr);gap:1.5rem;margin-block:1.25rem}.campaign-curve{min-width:0}.campaign-denominators{border-left:1px solid var(--atlas-rule);padding-left:1rem}.campaign-denominators h4{font-size:.8rem;margin:.6rem 0}.campaign-denominators dl{margin:0}.campaign-denominators dl>div{padding:.7rem 0;border-bottom:1px solid var(--atlas-rule)}.campaign-denominators dt{font-size:.75rem;color:var(--atlas-muted)}.campaign-denominators dd{margin:.25rem 0 0;font-size:1.25rem;font-variant-numeric:tabular-nums}.campaign-denominators small{display:block;font-size:.75rem;line-height:1.45;color:var(--atlas-muted);margin-top:.2rem}.campaign-denominators>p{font-size:.75rem;color:var(--atlas-muted)}
+  .campaign-view{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem;margin-block:1.25rem}.campaign-curve{min-width:0}.campaign-denominators{grid-column:1/-1;border-block:1px solid var(--atlas-rule);padding-block:.5rem;display:grid;grid-template-columns:8rem minmax(0,1fr);gap:.75rem;align-items:start}.campaign-denominators h4{font-size:.8rem;margin:.6rem 0}.campaign-denominators dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin:0}.campaign-denominators dl>div{padding:.4rem 0}.campaign-denominators dt{font-size:.75rem;color:var(--atlas-muted)}.campaign-denominators dd{margin:.25rem 0 0;font-size:1.25rem;font-variant-numeric:tabular-nums}.campaign-denominators small{display:block;font-size:.75rem;line-height:1.45;color:var(--atlas-muted);margin-top:.2rem}.campaign-comparison-note{font-size:.78rem;color:var(--atlas-muted);max-width:54rem}.campaign-denominators>p{grid-column:1/-1;margin:0;font-size:.75rem;color:var(--atlas-muted)}
   .table-scroll { max-width: 100%; overflow-x: auto; }
   table { display: table; overflow: visible; width: 100%; font-variant-numeric: tabular-nums;font-size:.8rem; }
   th, td { padding: .6rem; white-space: nowrap; }
@@ -104,6 +109,6 @@ const recoveryAxisMaximum = Math.ceil(Math.max(...Object.values(summary.assays).
   summary { cursor: pointer; padding-block: .65rem;min-height:44px;font-size:.82rem;font-weight:600; }
   .limitation { padding: .75rem; border-left: 3px solid var(--atlas-emphasis); background: color-mix(in srgb,var(--atlas-emphasis) 8%,transparent); }
   .real-pool-panel>ul,.real-pool-panel>p:last-child{font-size:.82rem}.table-scroll:focus-visible,summary:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
-  @media(max-width:54rem){.campaign-view{grid-template-columns:minmax(0,1fr)}.campaign-denominators{border-left:0;border-top:1px solid var(--atlas-rule);padding:0}.campaign-denominators dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem}}
+  @media(max-width:46rem){.campaign-view{grid-template-columns:minmax(0,1fr)}.campaign-denominators{grid-template-columns:minmax(0,1fr);padding:.5rem 0}.campaign-denominators dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem}}
   @media(max-width:32rem){.campaign-denominators dl{grid-template-columns:minmax(0,1fr)}.panel-letter{flex-wrap:wrap}}
 </style>

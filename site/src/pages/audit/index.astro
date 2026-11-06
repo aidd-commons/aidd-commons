@@ -56,11 +56,17 @@ const t = (en: string, zh: string) => chinese ? zh : en;
     </dl>
   </section>
 
+  <div class="section audit-bounds-section">
+    <CoverageBounds chinese={chinese} providers={comparison.providers} summaries={comparison.summaries} totalTopics={comparison.taxonomy.topics} />
+    <details class="audit-static-reference"><summary>{t("Static interval figure and download", "静态区间图与下载")}</summary><AtlasFigure id="coverage-bounds" chinese={chinese} /></details>
+  </div>
+
   <nav class="audit-reading-route" aria-label={t("Read the audit by question","按问题阅读审计")}>
-    <a href="#audit-principles-title"><span>{t("01 · Interpretation","01 · 解读")}</span><strong>{t("Read uncertainty as a range","以区间阅读不确定性")}</strong><p>{t("Unknown cells contribute to bounds, not evidence of absence.","未知项影响区间，不代表内容缺失。")}</p></a>
-    <a href="#matrix-title"><span>{t("02 · Source inspection","02 · 来源检查")}</span><strong>{t("Choose a track, then open a cell","选择学习方向，再打开单元格")}</strong><p>{t("Inspect provider, date, reviewed scope and its actual source.","检查提供方、日期、已审阅范围与实际来源。")}</p></a>
-    <a href="#gaps-title"><span>{t("03 · Teaching development","03 · 教学开发")}</span><strong>{t("Follow a confirmed depth gap","追踪已确认的深度缺口")}</strong><p>{t("Keep the frozen selection separate from current implementation.","区分冻结选题与当前实现。")}</p></a>
+    <a href="#coverage-bounds-title">{t("01 · Provider intervals", "01 · 提供方区间")}</a>
+    <a href="#matrix-title">{t("02 · Inspect a source cell", "02 · 检查来源单元格")}</a>
+    <a href="#gaps-title">{t("03 · Teaching development", "03 · 教学开发")}</a>
   </nav>
+  <details class="audit-method-notes"><summary>{t("Interpretation, review dates and the correction window", "解读、审阅日期与更正窗口")}</summary>
   <section class="audit-principles section" aria-labelledby="audit-principles-title">
     <div>
       <p class="meta-label">{t("Reading rule","阅读规则")}</p>
@@ -92,19 +98,7 @@ const t = (en: string, zh: string) => chinese ? zh : en;
       </p>
     )}
   </section>
-
-  <div class="section">
-    <CoverageBounds
-      chinese={chinese}
-      providers={comparison.providers}
-      summaries={comparison.summaries}
-      totalTopics={comparison.taxonomy.topics}
-    />
-    <p class="section-intro">
-      {t("The same ", "下图绘制相同的 ")}{comparison.providers.length}{t(" providers: this project's own row is a point at every threshold because every cell behind it is a direct observation, and each row below it is a range whose width measures how much of that provider nobody has read.", " 个提供方。本项目在每个阈值处显示为点，因为其所有单元格均为直接观察；其余区间的宽度反映该提供方尚未被审阅的材料范围。")}
-    </p>
-    <AtlasFigure id="coverage-bounds" chinese={chinese} />
-  </div>
+  </details>
 
   <section class="section" aria-labelledby="matrix-title">
     <div class="section-heading-row">
@@ -241,6 +235,7 @@ const t = (en: string, zh: string) => chinese ? zh : en;
   </section>
 </SiteShell>
 <style>
+  .audit-hero{padding-block:1.4rem 0;gap:2rem;align-items:start}.audit-hero .page-heading{font-size:clamp(2rem,4vw,3rem);margin-block:.3rem .5rem}.audit-hero .page-intro{font-size:1rem;margin-block:.4rem}.audit-hero [data-comparison-date-boundary]{font-size:.75rem;line-height:1.6;margin-block:.6rem}.audit-snapshot{gap:.6rem 1rem;padding:1rem;border-top:2px solid var(--atlas-teal-deep);background:var(--atlas-surface)}.audit-snapshot dt{font-size:.68rem}.audit-snapshot dd{font-size:1.65rem}.audit-bounds-section{margin-block-start:1.2rem}.audit-static-reference>summary,.audit-method-notes>summary{font-size:.78rem;cursor:pointer;min-height:44px;padding-block:.7rem}.audit-method-notes{border-block:1px solid var(--atlas-rule)}.audit-method-notes .section{margin-block:1.5rem}.audit-static-reference{margin-top:.3rem}.audit-reading-route{display:flex!important;flex-wrap:wrap;gap:.5rem 1.5rem!important;margin-top:1rem!important;border-block:1px solid var(--atlas-rule)}.audit-reading-route a{display:inline-flex!important;align-items:center;min-height:44px;font-size:.78rem;padding:0!important;border:0!important;background:transparent!important;color:var(--atlas-teal-deep)!important}
   .audit-snapshot .audit-schema { font-family: var(--atlas-font-mono); font-size: .85rem; font-weight: 600; white-space: nowrap; overflow-wrap: normal; }
   .audit-reading-route { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.5rem; margin-top:2.5rem; }
   .audit-reading-route a { display:block; padding:1.25rem; border-top:3px solid var(--atlas-teal); background:var(--atlas-panel); color:var(--atlas-ink); text-decoration:none; }

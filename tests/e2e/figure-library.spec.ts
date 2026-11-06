@@ -56,6 +56,9 @@ for (const chinese of [false, true]) {
     for (const [track, view] of Object.entries(teachingViews)) {
       const link = library.locator(`a[href="/${chinese ? "zh-cn/" : ""}learn/${view.lesson}/#scientific-view-${track}"]`);
       await expect(link).toContainText(chinese ? view.question.zh : view.question.en);
+      await expect(link.locator("[data-teaching-thumbnail]")).toHaveAttribute("src", `/figures/teaching-views/${track}.png`);
+      await link.scrollIntoViewIfNeeded();
+      await expect.poll(() => link.locator("img").evaluate(image => (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth === 960 && (image as HTMLImageElement).naturalHeight === 640)).toBe(true);
     }
   });
 
@@ -143,6 +146,36 @@ for (const chinese of [false, true]) {
     await expect(opener).toBeFocused();
   });
 }
+
+test("contact sheet opens one source inspector and browses only the filtered figures", async ({
+  page,
+}) => {
+  await page.goto("/report/figures/?type=plot&q=assay");
+  const figures = page.locator("[data-library-figure]:visible");
+  expect(await figures.count()).toBeGreaterThan(1);
+  await figures.first().locator("summary").click();
+  await expect(figures.first().locator("[data-figure-caption]")).toBeVisible();
+  await figures.nth(1).locator("summary").click();
+  await expect(figures.first().locator("[data-figure-caption]")).toBeHidden();
+  await expect(figures.nth(1).locator("[data-figure-caption]")).toBeVisible();
+  const titles = await figures.locator("h3").allTextContents();
+  const opener = figures.first().locator("[data-library-preview]");
+  await opener.click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog.locator("[data-zoom-previous]")).toBeDisabled();
+  await expect(dialog.locator("[data-zoom-position]")).toHaveText(
+    `1 / ${titles.length}`,
+  );
+  await dialog.locator("[data-zoom-next]").click();
+  await expect(dialog.locator("[data-zoom-title]")).toContainText(titles[1]);
+  await expect(dialog.locator("[data-zoom-position]")).toHaveText(
+    `2 / ${titles.length}`,
+  );
+  await page.keyboard.press("ArrowLeft");
+  await expect(dialog.locator("[data-zoom-title]")).toContainText(titles[0]);
+  await page.keyboard.press("Escape");
+  await expect(opener).toBeFocused();
+});
 
 test("without JavaScript all figures, teaching links and direct PDF previews remain available", async ({ browser, baseURL }) => {
   const context = await browser.newContext({ javaScriptEnabled: false, baseURL });

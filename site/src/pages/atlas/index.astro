@@ -13,18 +13,13 @@ const local = (path: string) => localizedPath(path, chinese);
   title={t("Scientific Atlas","科学资源图谱")}
   description={t("Find and compare source-grounded AIDD resources by scientific scope and seven independent asset dimensions.","按科学范围与七个独立资产维度查找、比较有来源依据的 AIDD 资源。")}
 >
-  <section class="page-header" aria-labelledby="atlas-title">
+  <section class="page-header atlas-header" aria-labelledby="atlas-title">
     <p class="eyebrow">{t("Resource search · recorded evidence","资源检索 · 已记录证据")}</p>
     <h1 id="atlas-title" class="page-heading">{t("Scientific Atlas","科学资源图谱")}</h1>
-    <p class="page-intro">
-      {t("Find a resource for your scientific question, then inspect what its sources establish and which assets you can reuse.", "围绕科学问题查找资源，再检查其来源支持哪些结论、哪些资产可以复用。")}
-    </p>
+    <p class="page-intro">{t("Locate a scientific resource. Inspect its scope, reusable assets and the evidence behind each claim.", "定位科学资源，检查其范围、可复用资产，以及各项主张背后的证据。")}</p>
     <p class="atlas-snapshot">{catalog.count}{t(" catalogue records · checks dated ", " 条目录记录 · 核查日期 ")}{catalog.lastVerified.from}–{catalog.lastVerified.through}{t(". Access, lifecycle and asset availability remain separate claims.", "。访问权限、生命周期与资产可用性分别记录。")}</p>
     <nav class="atlas-tools" aria-label={t("Atlas data and guidance","图谱数据与阅读指引")}>
-      <a href={local("/data/resources.v1.json")} download>{t("Catalogue JSON","目录 JSON")}</a>
-      <a href={local("/data/resources.v1.csv")} download>{t("Catalogue CSV","目录 CSV")}</a>
-      <a href={local("/data/openness.v1.json")} download>{t("Asset states JSON","资产状态 JSON")}</a>
-      <a href={local("/learn/foundations/resource-map/")}>{t("Find resources through a lesson","从课程中寻找资源")}</a>
+      <details><summary>{t("Data downloads and reading guide", "数据下载与阅读指引")}</summary><div class="atlas-tool-links"><a href={local("/data/resources.v1.json")} download>{t("Catalogue JSON","目录 JSON")}</a><a href={local("/data/resources.v1.csv")} download>{t("Catalogue CSV","目录 CSV")}</a><a href={local("/data/openness.v1.json")} download>{t("Asset states JSON","资产状态 JSON")}</a><a href={local("/learn/foundations/resource-map/")}>{t("Find resources through a lesson","从课程中寻找资源")}</a></div></details>
       <a href={local("/atlas/browse/")}>{t("Browse all records without JavaScript","无需 JavaScript 浏览全部记录")}</a>
     </nav>
   </section>
@@ -36,8 +31,13 @@ const local = (path: string) => localizedPath(path, chinese);
 </SiteShell>
 
 <style>
+  .atlas-header { padding-block: 1.4rem .5rem; }
+  .atlas-header .page-heading { font-size: clamp(2rem, 4vw, 3rem); margin-block: .3rem .5rem; }
+  .atlas-header .page-intro { font-size: 1rem; max-width: 82ch; margin-block: .3rem; }
   .section.atlas-explorer-section { margin-block-start: 1rem; }
   .atlas-snapshot { margin: .6rem 0; max-width: 90ch; color: var(--atlas-muted); font-size: .84rem; }
   .atlas-tools { display: flex; flex-wrap: wrap; gap: 0 1.25rem; font-size: .83rem; }
   .atlas-tools a { display: inline-flex; align-items: center; min-height: 44px; }
+  .atlas-tools summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; color: var(--atlas-teal-deep); text-decoration: underline; text-underline-offset: .2em; }
+  .atlas-tool-links { display: flex; flex-wrap: wrap; gap: 0 1rem; padding: .25rem .75rem; background: var(--atlas-surface); }
 </style>

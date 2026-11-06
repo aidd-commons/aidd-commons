@@ -14,3 +14,12 @@ The manuscript uses its own source-derived/native figure artwork.
 `ScientificIcon.astro` creates appropriately sized WebP delivery variants from
 these retained PNG masters. Tables and source-derived scientific graphics have
 their own sources and interpretation boundaries.
+
+## Evidence journey panorama
+
+`evidence-journey-v2.png` is a conceptual panorama generated with the built-in image
+tool on 6 November 2026. It depicts a generic cell, protein, assay equipment,
+automation and evidence dossier. The backend version was not exposed. It is not
+an identified structure, assay measurement, simulation trajectory or experimental
+result. Labels, navigation and animation state remain native website elements.
+The PNG is the retained master; Astro produces responsive WebP delivery variants.

@@ -22,8 +22,10 @@ interface Props {
   scatter?: boolean;
   chinese?: boolean;
   showTable?: boolean;
+  /** Related plots inspect the nearest retained x together; their axes stay independent. */
+  syncGroup?: string;
 }
-const { title, xLabel, yLabel, series, xMin = 0, xMax = 1, yMin = 0, yMax = 1, xTicks, yTicks, scatter = false, chinese = false, showTable = true } = Astro.props;
+const { title, xLabel, yLabel, series, xMin = 0, xMax = 1, yMin = 0, yMax = 1, xTicks, yTicks, scatter = false, chinese = false, showTable = true, syncGroup } = Astro.props;
 if (![xMin, xMax, yMin, yMax].every(Number.isFinite) || xMax <= xMin || yMax <= yMin) {
   throw new Error("ScientificPlot requires finite, increasing axis limits: " + title);
 }
@@ -45,16 +47,18 @@ const marker = (line: PlotSeries, index: number) => ((line.marker ?? index) % 7 
 // The table, initial download and marks share the same source series. Filtering is display-only.
 const hasPointLabels = series.some(line => line.points.some(point => point.label));
 const headers = [chinese ? "序列" : "Series", ...(hasPointLabels ? [chinese ? "点标签" : "Point label"] : []), xLabel, yLabel];
-const rows = series.flatMap((line, index) => line.points.map(point => ({
-  index, cells: [line.name, ...(hasPointLabels ? [point.label ?? ""] : []), String(point.x), String(point.y)],
+const rows = series.flatMap((line, index) => line.points.map((point, pointIndex) => ({
+  index, pointIndex, cells: [line.name, ...(hasPointLabels ? [point.label ?? ""] : []), String(point.x), String(point.y)],
 })));
 const csvCell = (value: string) => '"' + value.replaceAll('"', '""') + '"';
 const csv = [headers, ...rows.map(row => row.cells)].map(row => row.map(csvCell).join(",")).join("\r\n");
 ---
-<div class="science-plot not-content" data-science-plot data-chinese={chinese ? "true" : "false"}>
+<div class="science-plot not-content" data-science-plot data-chinese={chinese ? "true" : "false"} data-plot-series={JSON.stringify(series)} data-x-label={xLabel} data-y-label={yLabel} data-x-min={xMin} data-x-max={xMax} data-sync-group={syncGroup}>
   <p class="science-plot__title">{title}</p>
+  <div class="science-plot__workspace"><div class="science-plot__chart">
   <p class="science-plot__quantity">{yLabel}</p>
-  <div class="science-plot__body" role="img" aria-label={title + ". " + yLabel + "; " + xLabel}>
+  <div class="science-plot__body" data-plot-surface role="group" aria-label={title + ". " + yLabel + "; " + xLabel}>
+    <div class="science-plot__cursor" data-plot-cursor hidden aria-hidden="true" />
     {verticalTicks.map(value => <div class="science-plot__grid" style={{ bottom: py(value) + "%" }}><span>{tick(value)}</span></div>)}
     {horizontalTicks.map(value => <div class="science-plot__vertical" style={{ left: px(value) + "%" }} />)}
     {series.map((line, index) => (
@@ -65,8 +69,8 @@ const csv = [headers, ...rows.map(row => row.cells)].map(row => row.map(csvCell)
           const dy = py(point.y) - py(previous.y);
           return <i class:list={["science-plot__line", { "is-dashed": line.dashed }]} data-from={previous.x + "," + previous.y} data-to={point.x + "," + point.y} style={{ left: px(previous.x) + "%", bottom: py(previous.y) + "%", width: "hypot(" + dx + "cqw," + dy + "cqh)", transform: "translateY(50%) rotate(atan2(" + (-dy) + "cqh," + dx + "cqw))" }} />;
         })}
-        {line.points.map(point => (
-          <span class:list={["science-plot__point", "marker-" + marker(line, index)]} data-x={point.x} data-y={point.y} style={{ left: px(point.x) + "%", bottom: py(point.y) + "%" }}>
+        {line.points.map((point, pointIndex) => (
+          <span class:list={["science-plot__point", "marker-" + marker(line, index)]} data-x={point.x} data-y={point.y} data-point-index={pointIndex} style={{ left: px(point.x) + "%", bottom: py(point.y) + "%" }}>
             {point.label && <b>{point.label}</b>}
           </span>
         ))}
@@ -75,8 +79,15 @@ const csv = [headers, ...rows.map(row => row.cells)].map(row => row.map(csvCell)
   </div>
   <div class="science-plot__x-ticks">{horizontalTicks.map(value => <span style={{ left: px(value) + "%" }}>{tick(value)}</span>)}</div>
   <p class="science-plot__x-label">{xLabel}</p>
+  </div><aside class="science-plot__inspector" data-plot-inspector hidden aria-label={chinese ? "所选数据点" : "Selected source points"}>
+    <p class="science-plot__inspector-label">{chinese ? "检查保留的数据点" : "Inspect retained points"}</p>
+    <p class="science-plot__coordinate"><span>{xLabel}</span><output data-plot-x></output></p>
+    <ul data-plot-values></ul>
+    <p class="science-plot__exact" data-plot-exact role="note"></p>
+    <label class="science-plot__scrubber">{chinese ? "沿横轴选择数据点" : "Select a source x value"}<input type="range" data-plot-range min="0" max="0" value="0" step="1" /></label>
+  </aside></div>
   <div class="science-plot__readout">
-    <p class="science-plot__help" data-plot-help hidden>{chinese ? "选择图例以显示或隐藏序列。坐标范围保持不变。" : "Select a legend item to show or hide a series. Axis limits stay fixed."}</p>
+    <p class="science-plot__help" data-plot-help hidden>{chinese ? "点击图中位置或使用方向键检查数据点；图例切换序列，坐标范围不变。" : "Click the plot or use arrow keys to inspect points. Legend items filter series; axes stay fixed."}</p>
     <output data-plot-status role="status" aria-live="polite" aria-atomic="true" hidden></output>
   </div>
   <ul class="science-plot__legend" aria-label={chinese ? "序列图例" : "Series legend"}>
@@ -86,35 +97,87 @@ const csv = [headers, ...rows.map(row => row.cells)].map(row => row.map(csvCell)
     <button type="button" data-series-reset hidden>{chinese ? "显示全部序列" : "Show all series"}</button>
     {showTable && <a data-plot-download href={"data:text/csv;charset=utf-8," + encodeURIComponent("\ufeff" + csv)} download="displayed-plot-data.csv">{chinese ? "下载所示数据 CSV" : "Download displayed data CSV"}</a>}
   </div>
-  {showTable && <details class="science-plot__table"><summary>{chinese ? "查看所示数据的表格" : "Read displayed data as a table"} <span data-plot-row-count>({rows.length})</span></summary><div class="science-table-scroll" tabindex="0" role="region" aria-label={title + (chinese ? "数据表" : " data table")}><table><caption>{title} · {chinese ? "与图中所示序列一致；保留源值精度" : "Matches the displayed series; source precision retained"}</caption><thead><tr>{headers.map(header => <th scope="col">{header}</th>)}</tr></thead><tbody>{rows.map(row => <tr data-series-row={row.index}>{row.cells.map((cell, index) => index === 0 ? <th scope="row">{cell}</th> : <td>{cell}</td>)}</tr>)}</tbody></table></div></details>}
+  {showTable && <details class="science-plot__table"><summary>{chinese ? "查看所示数据的表格" : "Read displayed data as a table"} <span data-plot-row-count>({rows.length})</span></summary><div class="science-table-scroll" tabindex="0" role="region" aria-label={title + (chinese ? "数据表" : " data table")}><table><caption>{title} · {chinese ? "与图中所示序列一致；保留源值精度" : "Matches the displayed series; source precision retained"}</caption><thead><tr>{headers.map(header => <th scope="col">{header}</th>)}</tr></thead><tbody>{rows.map(row => <tr data-series-row={row.index} data-point-row={row.pointIndex}>{row.cells.map((cell, index) => index === 0 ? <th scope="row">{cell}</th> : <td>{cell}</td>)}</tr>)}</tbody></table></div></details>}
 </div>
 <script>
+  import {retainedXValues,nearestRetainedX,pointsAtNearestX,readablePlotValue} from "../lib/scientific-plot";
+  interface SourcePoint { x: number; y: number; label?: string }
+  interface SourceSeries { name: string; points: SourcePoint[] }
   function initializeScientificPlots() {
     document.querySelectorAll<HTMLElement>("[data-science-plot]").forEach(root => {
       if (root.dataset.plotReady) return;
       root.dataset.plotReady = "true";
       const chinese = root.dataset.chinese === "true";
+      const series = JSON.parse(root.dataset.plotSeries ?? "[]") as SourceSeries[];
+      const xs = retainedXValues(series);
       const toggles = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-series-toggle]"));
       const status = root.querySelector<HTMLOutputElement>("[data-plot-status]")!;
       const reset = root.querySelector<HTMLButtonElement>("[data-series-reset]")!;
       const download = root.querySelector<HTMLAnchorElement>("[data-plot-download]");
+      const surface = root.querySelector<HTMLElement>("[data-plot-surface]")!;
+      const cursor = root.querySelector<HTMLElement>("[data-plot-cursor]")!;
+      const range = root.querySelector<HTMLInputElement>("[data-plot-range]")!;
+      const values = root.querySelector<HTMLElement>("[data-plot-values]")!;
+      let selectedX = xs[0];
       const csvCell = (value: string) => '"' + value.replaceAll('"', '""') + '"';
+      const visible = () => new Set(toggles.filter(button => button.getAttribute("aria-pressed") === "true").map(button => Number(button.dataset.seriesToggle)));
+      function inspect(x: number, announce = false) {
+        const retained = nearestRetainedX(xs,x);
+        if (retained === undefined) return;
+        selectedX = retained;
+        range.value = String(xs.indexOf(selectedX));
+        range.setAttribute("aria-valuetext", `${root.dataset.xLabel}: ${readablePlotValue(selectedX)}`);
+        const xOutput=root.querySelector<HTMLOutputElement>("[data-plot-x]")!;
+        xOutput.textContent=readablePlotValue(selectedX);xOutput.title=String(selectedX);xOutput.dataset.exactValue=String(selectedX);
+        const exact=root.querySelector<HTMLElement>("[data-plot-exact]")!;
+        const exactValues=[`${root.dataset.xLabel}: ${selectedX}`];
+        const shown = visible();
+        cursor.hidden = !shown.size;
+        cursor.style.left = `${100 * (selectedX - Number(root.dataset.xMin)) / (Number(root.dataset.xMax)-Number(root.dataset.xMin))}%`;
+        values.replaceChildren();
+        root.querySelectorAll<HTMLElement>("[data-point-index], [data-point-row]").forEach(node => node.classList.remove("is-inspected"));
+        series.forEach((line,index) => {
+          if (!shown.has(index) || !line.points.length) return;
+          pointsAtNearestX(line.points,selectedX).forEach(({point,index:pointIndex}) => {
+          root.querySelector(`[data-series-index="${index}"] [data-point-index="${pointIndex}"]`)?.classList.add("is-inspected");
+          root.querySelector(`[data-series-row="${index}"][data-point-row="${pointIndex}"]`)?.classList.add("is-inspected");
+          const item = document.createElement("li");
+          const name = document.createElement("span"); name.textContent = line.name;
+          const value = document.createElement("strong"); value.textContent = readablePlotValue(point.y);
+          value.title=String(point.y);value.dataset.exactValue=String(point.y);
+          value.setAttribute("aria-label",`${line.name}: ${point.y}`);
+          exactValues.push(`${line.name}${point.label ? " · "+point.label : ""}: x=${point.x}; y=${point.y}`);
+          const detail = document.createElement("small");
+          detail.textContent = [point.label, point.x !== selectedX ? `${root.dataset.xLabel}: ${readablePlotValue(point.x)}` : ""].filter(Boolean).join(" · ");
+          item.append(name, value); if (detail.textContent) item.append(detail);
+          values.append(item);
+          });
+        });
+        exact.textContent=(chinese?"精确来源值。":"Exact source values. ")+exactValues.join(". ");
+        if (!shown.size) { const empty = document.createElement("li"); empty.textContent = chinese ? "没有显示的序列" : "No series shown"; values.append(empty); }
+        if (announce) {
+          root.dispatchEvent(new CustomEvent("science-plot-select", {bubbles:true, detail:{x:selectedX}}));
+          if (root.dataset.syncGroup) document.querySelectorAll<HTMLElement>("[data-science-plot]").forEach(other => {
+            if (other !== root && other.dataset.syncGroup === root.dataset.syncGroup) other.dispatchEvent(new CustomEvent("science-plot-select-x", {detail:{x:selectedX}}));
+          });
+        }
+      }
       function update() {
-        const visible = new Set(toggles.filter(button => button.getAttribute("aria-pressed") === "true").map(button => button.dataset.seriesToggle));
-        root.querySelectorAll<HTMLElement>("[data-series-index]").forEach(series => { series.hidden = !visible.has(series.dataset.seriesIndex); });
+        const shown = visible();
+        root.querySelectorAll<HTMLElement>("[data-series-index]").forEach(line => { line.hidden = !shown.has(Number(line.dataset.seriesIndex)); });
         const rows = Array.from(root.querySelectorAll<HTMLTableRowElement>("[data-series-row]"));
-        rows.forEach(row => { row.hidden = !visible.has(row.dataset.seriesRow); });
+        rows.forEach(row => { row.hidden = !shown.has(Number(row.dataset.seriesRow)); });
         const shownRows = rows.filter(row => !row.hidden);
         const count = root.querySelector("[data-plot-row-count]");
         if (count) count.textContent = `(${shownRows.length})`;
-        status.textContent = chinese ? `显示 ${visible.size} / ${toggles.length} 个序列` : `${visible.size} of ${toggles.length} series shown`;
-        reset.disabled = visible.size === toggles.length;
+        status.textContent = chinese ? `显示 ${shown.size} / ${toggles.length} 个序列` : `${shown.size} of ${toggles.length} series shown`;
+        reset.disabled = shown.size === toggles.length;
         if (download) {
           const headers = Array.from(root.querySelectorAll("thead th"), cell => cell.textContent ?? "");
           const cells = shownRows.map(row => Array.from(row.cells, cell => cell.textContent ?? ""));
-          const csv = [headers, ...cells].map(row => row.map(csvCell).join(",")).join("\r\n");
-          download.href = "data:text/csv;charset=utf-8," + encodeURIComponent("\ufeff" + csv);
+          download.href = "data:text/csv;charset=utf-8," + encodeURIComponent("\ufeff" + [headers, ...cells].map(row => row.map(csvCell).join(",")).join("\r\n"));
         }
+        inspect(selectedX);
       }
       toggles.forEach(button => {
         button.disabled = false;
@@ -123,8 +186,26 @@ const csv = [headers, ...rows.map(row => row.cells)].map(row => row.map(csvCell)
           update();
         });
       });
-      reset.hidden = false;
-      status.hidden = false;
+      surface.tabIndex = 0;
+      surface.setAttribute("aria-label", surface.getAttribute("aria-label") + (chinese ? "。方向键选择保留的数据点，Home 和 End 跳到两端。" : ". Arrow keys inspect retained x values; Home and End select the endpoints."));
+      range.max = String(Math.max(0,xs.length-1));
+      range.disabled = !xs.length;
+      if (!xs.length) {root.querySelector<HTMLOutputElement>("[data-plot-x]")!.textContent="—";values.textContent=chinese?"没有保留的数据点":"No retained source points";surface.removeAttribute("tabindex");}
+      range.addEventListener("input", () => inspect(xs[Number(range.value)], true));
+      surface.addEventListener("keydown", event => {
+        if (!["ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Home","End"].includes(event.key)) return;
+        event.preventDefault();
+        const index = event.key === "Home" ? 0 : event.key === "End" ? xs.length-1 : xs.indexOf(selectedX) + (["ArrowRight","ArrowUp"].includes(event.key) ? 1 : -1);
+        inspect(xs[Math.max(0,Math.min(xs.length-1,index))],true);
+      });
+      surface.addEventListener("click", event => {
+        const bounds = surface.getBoundingClientRect();
+        const x = Number(root.dataset.xMin) + (event.clientX-bounds.left)/bounds.width * (Number(root.dataset.xMax)-Number(root.dataset.xMin));
+        inspect(x,true);
+      });
+      root.addEventListener("science-plot-select-x", event => inspect((event as CustomEvent<{x:number}>).detail.x));
+      root.querySelector<HTMLElement>("[data-plot-inspector]")!.hidden = false;
+      reset.hidden = false; status.hidden = false;
       root.querySelector<HTMLElement>("[data-plot-help]")!.hidden = false;
       reset.addEventListener("click", () => { toggles.forEach(button => button.setAttribute("aria-pressed", "true")); update(); });
       update();
@@ -134,10 +215,12 @@ const csv = [headers, ...rows.map(row => row.cells)].map(row => row.map(csvCell)
   document.addEventListener("astro:page-load", initializeScientificPlots);
 </script>
 <style>
+  .science-plot__workspace{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem}.science-plot__chart{min-width:0}.science-plot__inspector{min-width:0;padding:.75rem 0;border-block:1px solid var(--atlas-rule);align-self:start}.science-plot__inspector-label{font-size:.75rem;color:var(--atlas-teal-deep);font-weight:650;margin:0 0 .6rem!important}.science-plot__coordinate{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;margin:0!important;font-size:.75rem}.science-plot__coordinate span{max-width:75%;color:var(--atlas-muted)}.science-plot__coordinate output{font-size:1.2rem;font-weight:650;font-variant-numeric:tabular-nums}.science-plot__inspector ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,10rem),1fr));list-style:none;padding:0;margin:.6rem 0!important;gap:.35rem 1.25rem}.science-plot__inspector :global(li){display:grid;grid-template-columns:minmax(0,1fr);gap:.2rem;padding:.4rem 0;border-top:1px solid var(--atlas-rule);font-size:.75rem;overflow-wrap:anywhere}.science-plot__inspector :global(li strong){overflow-wrap:anywhere;min-width:0;font-size:.78rem;font-variant-numeric:tabular-nums;font-weight:650}.science-plot__inspector :global(small){grid-column:1/-1;color:var(--atlas-muted)}.science-plot__scrubber{display:grid;gap:.3rem;font-size:.75rem;color:var(--atlas-muted)}.science-plot__scrubber input{min-height:32px;width:100%;margin:0;accent-color:var(--atlas-teal-deep)}.science-plot__cursor{position:absolute;inset-block:0;border-left:1px dashed var(--atlas-ink);pointer-events:none;z-index:3}.science-plot__point.is-inspected{z-index:4;filter:drop-shadow(0 0 2px var(--atlas-panel));outline:2px solid var(--series-color);outline-offset:3px;border-radius:50%}.science-table-scroll tr.is-inspected{background:color-mix(in srgb,var(--atlas-teal) 12%,var(--atlas-panel))!important}.science-plot__body[data-plot-surface]{cursor:crosshair}.science-plot__body:focus-visible,.science-plot__scrubber input:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:5px}@container(min-width:44rem){.science-plot__workspace{grid-template-columns:minmax(0,1fr) 12rem;gap:1.2rem}.science-plot__inspector ul{grid-template-columns:minmax(0,1fr)}}
+  .science-plot__exact{position:absolute!important;width:1px;height:1px;padding:0!important;margin:-1px!important;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   .science-plot { container-type:inline-size; min-width:0; padding:.8rem 0 .3rem; --plot-axis:2.8rem; --plot-edge:1.1rem; }
-  .science-plot__title { font-size:.88rem; font-weight:650; line-height:1.45; margin:0 0 .6rem!important; }
+  .science-plot__title { font-size:.95rem; font-weight:650; line-height:1.45; margin:0 0 .6rem!important; }
   .science-plot__quantity { font-size:.75rem; line-height:1.5; color:var(--sl-color-gray-2); margin:0 var(--plot-edge) .7rem var(--plot-axis)!important; }
-  .science-plot__body { position:relative; container-type:size; aspect-ratio:1.9; margin:0 var(--plot-edge) 0 var(--plot-axis); border-left:1px solid var(--sl-color-gray-3); border-bottom:1px solid var(--sl-color-gray-3); isolation:isolate; }
+  .science-plot__body { position:relative; container-type:size; aspect-ratio:1.75; margin:0 var(--plot-edge) 0 var(--plot-axis); border-left:1px solid var(--sl-color-gray-3); border-bottom:1px solid var(--sl-color-gray-3); isolation:isolate; }
   .science-plot__grid { position:absolute; inset-inline:0; border-top:1px solid var(--sl-color-gray-5); }
   .science-plot__grid > span { position:absolute; right:calc(100% + .5rem); top:-.55rem; font:.75rem var(--sl-font-mono,monospace); line-height:1.2; color:var(--sl-color-gray-2); white-space:nowrap; }
   .science-plot__vertical { position:absolute; inset-block:0; border-left:1px dotted var(--sl-color-gray-6); z-index:-1; }
@@ -158,7 +241,7 @@ const csv = [headers, ...rows.map(row => row.cells)].map(row => row.map(csvCell)
   .science-plot__legend { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr)); gap:.4rem 1rem; list-style:none; margin:.8rem 0 0!important; padding:0!important; font-size:.75rem; line-height:1.5; }
   .science-plot__legend li { display:flex; align-items:center; gap:.6rem; margin:0; min-width:0; overflow-wrap:anywhere; }
   .science-plot [hidden] { display:none!important; }
-  .science-plot__readout { display:flex; flex-wrap:wrap; justify-content:space-between; gap:.25rem 1rem; font-size:.72rem; color:var(--sl-color-gray-2); }
+  .science-plot__readout { display:flex; flex-wrap:wrap; justify-content:space-between; gap:.25rem 1rem; font-size:.75rem; color:var(--sl-color-gray-2); }
   .science-plot__help { margin:.3rem 0!important; line-height:1.5; }
   .science-plot__readout output { align-self:center; font-variant-numeric:tabular-nums; }
   .science-plot__legend button { display:flex; align-items:center; gap:.6rem; width:100%; min-height:44px; padding:.35rem .5rem; border:1px solid transparent; background:transparent; color:inherit; text-align:left; font:inherit; line-height:1.4; cursor:pointer; }

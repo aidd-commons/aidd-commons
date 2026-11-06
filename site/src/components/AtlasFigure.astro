@@ -41,12 +41,13 @@ const pptx = figure.pptx ? withSiteBase(`/figures/${figure.pptx}`, import.meta.e
         loading="lazy"
         decoding="async"
       />
+      <span class="atlas-figure__open" aria-hidden="true">{chinese ? "打开矢量图" : "Open vector figure"} ↗</span>
     </a>
   </div>
   <figcaption class="atlas-figure__caption">
-    <span lang="en">{figure.caption}</span>
-    <a class="atlas-figure__download" href={pdf} download>{chinese ? "下载 PDF" : "Download PDF"}</a>
-    {pptx && <a class="atlas-figure__download" href={pptx} download>{chinese ? "可编辑示意图" : "Editable diagram"}</a>}
+    <details class="atlas-figure__description"><summary>{chinese ? "阅读完整图注" : "Read the full caption"}</summary><p lang="en">{figure.caption}</p></details>
+    <div class="atlas-figure__files"><a class="atlas-figure__download" href={pdf} download>{chinese ? "下载 PDF" : "Download PDF"}</a><a class="atlas-figure__download" href={preview} download>PNG</a>
+    {pptx && <a class="atlas-figure__download" href={pptx} download>{chinese ? "可编辑示意图" : "Editable diagram"}</a>}</div>
   </figcaption>
 </figure>
 
@@ -61,7 +62,7 @@ const pptx = figure.pptx ? withSiteBase(`/figures/${figure.pptx}`, import.meta.e
     /* The source palette and its non-colour encodings keep their measured contrast
        on this paper surface in both site themes. */
     background: #fffdf8;
-    padding: 0.75rem;
+    padding: clamp(.3rem, 1vw, .7rem);
   }
 
   .atlas-figure__frame img {
@@ -71,21 +72,35 @@ const pptx = figure.pptx ? withSiteBase(`/figures/${figure.pptx}`, import.meta.e
   }
 
   .atlas-figure__preview {
+    position: relative;
     display: block;
   }
 
+  .atlas-figure__open { position: absolute; right: .3rem; bottom: .3rem; padding: .3rem .5rem; color: #fff; background: #075e5c; font-size: .7rem; }
+  .atlas-figure__preview:focus-visible, .atlas-figure__caption :is(a, summary):focus-visible { outline: 3px solid var(--atlas-focus); outline-offset: 4px; }
+
   .atlas-figure__caption {
-    margin-top: 0.7rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    justify-content: space-between;
+    gap: .1rem 1rem;
+    margin-top: 0.35rem;
     color: var(--atlas-muted);
     font-size: 0.86rem;
     line-height: 1.5;
   }
 
+  .atlas-figure__description { flex: 1 1 22rem; min-width: 0; }
+  .atlas-figure__description summary { min-height: 44px; align-content: center; cursor: pointer; font-size: .78rem; }
+  .atlas-figure__description p { margin: .3rem 0 .8rem; font-size: .8rem; }
+  .atlas-figure__files { display: flex; flex-wrap: wrap; gap: .1rem .8rem; }
+
   .atlas-figure__download {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-    margin-left: 0.5em;
     white-space: nowrap;
+    font-size: .75rem;
   }
 </style>

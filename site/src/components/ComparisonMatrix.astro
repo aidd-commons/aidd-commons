@@ -147,6 +147,7 @@ const rowsByCell = new Map(rows.map(row=>[`${row.provider_id}:${row.topic_id}`,r
     {t("No comparison cells match these filters. Reset one or more controls.", "没有符合这些筛选条件的比较单元格。请重置一个或多个控件。")}
   </p>
 
+  <div class="comparison-workspace">
   <figure class="comparison-overview" data-comparison-overview>
     <figcaption><strong>{t("Read across topics, compare the evidence states","横跨主题，比较证据状态")}</strong><span>{t("Select a mark to open the matching source record below. D = direct review; ? = an explicit unknown default when no direct cell was encoded.","选择标记以打开下方对应的来源记录。D = 直接审阅；? = 未编码直接观察时的明确未知默认状态。")}</span></figcaption>
     <div class="comparison-overview__scroll" role="region" aria-label={t("Provider by topic evidence matrix","提供方与主题的证据矩阵")} tabindex="0">
@@ -160,8 +161,15 @@ const rowsByCell = new Map(rows.map(row=>[`${row.provider_id}:${row.topic_id}`,r
       })}
     </div>
   </figure>
+  <section class="comparison-inspector" data-comparison-inspector aria-labelledby="comparison-selected-title" hidden>
+    <p class="comparison-inspector__eyebrow">{t("Selected evidence cell", "所选证据单元格")}</p>
+    <h4 id="comparison-selected-title" data-comparison-selected-title tabindex="-1"></h4>
+    <div data-comparison-selected-body></div>
+  </section>
+  </div>
   <noscript><p class="comparison-noscript">{t("The initial Foundations map and its source records are readable without JavaScript. Filter controls require scripting.","初始基础方向图及其来源记录无需 JavaScript 即可阅读。筛选控件需要脚本。")}</p></noscript>
 
+  <details class="comparison-records" data-comparison-records open><summary>{t("Read the matching source records as a table", "以表格阅读匹配的来源记录")}</summary>
   <div class="comparison-table-wrap">
     <table class="comparison-table">
       <caption data-comparison-caption>
@@ -259,11 +267,13 @@ const rowsByCell = new Map(rows.map(row=>[`${row.provider_id}:${row.topic_id}`,r
       </tbody>
     </table>
   </div>
+  </details>
 </comparison-audit>
 
 <script>
   class ComparisonAudit extends HTMLElement {
     private form?: HTMLFormElement;
+    private selectedCell = "";
     private t(en: string, zh: string) { return this.dataset.locale === "zh-cn" ? zh : en; }
 
     connectedCallback() {
@@ -271,7 +281,7 @@ const rowsByCell = new Map(rows.map(row=>[`${row.provider_id}:${row.topic_id}`,r
         this.querySelector<HTMLFormElement>("[data-comparison-controls]") ??
         undefined;
       if (!this.form) return;
-
+      this.selectedCell = location.hash.slice(1);
       this.restoreQuery();
       this.form.addEventListener("change", () => this.applyFilters(true));
       this.form.addEventListener("reset", () => {
@@ -283,12 +293,46 @@ const rowsByCell = new Map(rows.map(row=>[`${row.provider_id}:${row.topic_id}`,r
         const row=this.querySelector<HTMLTableRowElement>(`#${CSS.escape(mark.hash.slice(1))}`);
         if(!row||row.hidden)return;
         event.preventDefault();
-        const evidence=row.querySelector<HTMLDetailsElement>("details");
-        if(evidence)evidence.open=true;
-        row.focus({preventScroll:true});
-        row.scrollIntoView({block:"nearest",behavior:"auto"});
+        this.selectCell(row);
+        history.replaceState({}, "", `${location.pathname}${location.search}#${row.id}`);
+        if (event.detail === 0) this.querySelector<HTMLElement>("[data-comparison-selected-title]")?.focus({preventScroll:true});
+      });
+      window.addEventListener("popstate", () => {
+        this.form?.reset();
+        this.selectedCell = location.hash.slice(1);
+        this.restoreQuery();
+        this.applyFilters(false);
       });
       this.applyFilters(false);
+      const records = this.querySelector<HTMLDetailsElement>("[data-comparison-records]");
+      if (records) records.open = false;
+    }
+
+    private selectCell(row: HTMLTableRowElement) {
+      const inspector = this.querySelector<HTMLElement>("[data-comparison-inspector]");
+      const body = this.querySelector<HTMLElement>("[data-comparison-selected-body]");
+      const title = this.querySelector<HTMLElement>("[data-comparison-selected-title]");
+      if (!inspector || !body || !title) return;
+      this.selectedCell = row.id;
+      inspector.hidden = false;
+      title.textContent = row.querySelector('[data-column="topic"] strong')?.textContent ?? "";
+      body.replaceChildren();
+      const facts = document.createElement("dl");
+      for (const [column, label] of [["provider", this.t("Provider", "提供方")], ["depth", this.t("Teaching depth", "教学深度")], ["bounds", this.t("Explained bounds", "解释深度上下界")]]) {
+        const group = document.createElement("div");
+        const term = document.createElement("dt"); term.textContent = label;
+        const value = document.createElement("dd");
+        const source = row.querySelector(`[data-column="${column}"]`);
+        if (source) value.append(...[...source.childNodes].map(node => node.cloneNode(true)));
+        group.append(term, value); facts.append(group);
+      }
+      body.append(facts);
+      const evidence = row.querySelector<HTMLDetailsElement>("details")?.cloneNode(true) as HTMLDetailsElement | undefined;
+      if (evidence) { evidence.open = true; body.append(evidence); }
+      this.querySelectorAll<HTMLAnchorElement>("[data-comparison-focus]").forEach(mark => {
+        if (mark.hash === `#${row.id}`) mark.setAttribute("aria-current", "true");
+        else mark.removeAttribute("aria-current");
+      });
     }
 
     private restoreQuery() {
@@ -386,6 +430,11 @@ const rowsByCell = new Map(rows.map(row=>[`${row.provider_id}:${row.topic_id}`,r
           cell.append(mark,filtered);providerRow.append(cell);
         }
       }
+      // Dynamically assembled tracks use the same component-scoped visual rules.
+      const scopeAttributes = [...scroll.attributes].filter(attribute => attribute.name.startsWith("data-astro-cid-"));
+      for (const node of [table, ...table.querySelectorAll<HTMLElement>("*")]) {
+        scopeAttributes.forEach(attribute => node.setAttribute(attribute.name, attribute.value));
+      }
       scroll.replaceChildren(table);
     }
 
@@ -441,6 +490,10 @@ const rowsByCell = new Map(rows.map(row=>[`${row.provider_id}:${row.topic_id}`,r
       });
       const overview=this.querySelector<HTMLElement>("[data-comparison-overview]");
       if(overview)overview.hidden=visible===0;
+      const sourceRows = [...this.querySelectorAll<HTMLTableRowElement>("tbody .comparison-row")].filter(row => !row.hidden);
+      const selected = sourceRows.find(row => row.id === this.selectedCell) ?? sourceRows.find(row => row.dataset.providerId === "aidd-commons") ?? sourceRows[0];
+      if (selected) this.selectCell(selected);
+      else { const inspector = this.querySelector<HTMLElement>("[data-comparison-inspector]"); if (inspector) inspector.hidden = true; }
 
       const count = this.querySelector<HTMLElement>("[data-comparison-count]");
       const empty = this.querySelector<HTMLElement>("[data-comparison-empty]");
@@ -471,7 +524,7 @@ const rowsByCell = new Map(rows.map(row=>[`${row.provider_id}:${row.topic_id}`,r
         if (reviewAfter) params.set("reviewAfter", reviewAfter);
         if (directOnly) params.set("direct", "1");
         const query = params.toString();
-        history.replaceState({}, "", `${location.pathname}${query ? `?${query}` : ""}`);
+        history.replaceState({}, "", `${location.pathname}${query ? `?${query}` : ""}${selected ? `#${selected.id}` : ""}`);
       }
     }
   }
@@ -482,6 +535,8 @@ const rowsByCell = new Map(rows.map(row=>[`${row.provider_id}:${row.topic_id}`,r
 </script>
 
 <style>
+  .comparison-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(17rem,29%);gap:1.2rem;align-items:start;margin-top:.8rem;min-width:0}.comparison-workspace>.comparison-overview{margin:0;border-top:0;padding-top:0}.comparison-inspector{min-width:0;border-left:3px solid var(--atlas-teal-deep);background:var(--atlas-surface);padding:1rem;max-height:46rem;overflow:auto;scroll-margin-top:5rem}.comparison-inspector[hidden]{display:none}.comparison-inspector__eyebrow{font-size:.65rem;letter-spacing:.05em;text-transform:uppercase;color:var(--atlas-teal-deep);margin:0 0 .35rem}.comparison-inspector h4{font-size:1.05rem;line-height:1.35;margin:0 0 1rem}.comparison-inspector :global(dl){display:grid;gap:.8rem;margin:0}.comparison-inspector :global(dt){font-size:.65rem;color:var(--atlas-muted);margin-bottom:.2rem}.comparison-inspector :global(dd){font-size:.78rem;margin:0;line-height:1.5}.comparison-inspector :global(.cell-subline){display:block;font-size:.68rem;line-height:1.55;color:var(--atlas-muted);margin-top:.3rem}.comparison-inspector :global(.cell-evidence){border:0;border-top:1px solid var(--atlas-rule);margin-top:.8rem}.comparison-inspector :global(.cell-evidence summary){font-size:.76rem;cursor:pointer;min-height:44px;padding-block:.7rem}.comparison-inspector :global(.cell-evidence p){font-size:.75rem;line-height:1.6}.comparison-inspector :global(.evidence-source-list){font-size:.75rem;padding-left:1rem}.comparison-inspector :global(.evidence-source-list li){padding-block:.45rem;overflow-wrap:anywhere}.comparison-inspector :global(code){font-size:.68rem;display:block;white-space:normal;overflow-wrap:anywhere}.comparison-inspector :global(.bounds-pair){display:flex;gap:1rem;font-variant-numeric:tabular-nums}.comparison-records{margin-top:.8rem;border-top:1px solid var(--atlas-rule)}.comparison-records>summary{font-size:.8rem;cursor:pointer;min-height:44px;padding-block:.7rem}.comparison-records>summary:focus-visible,.comparison-inspector h4:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}.comparison-overview__mark[aria-current=true]{outline:3px solid var(--atlas-teal-deep);outline-offset:-3px;box-shadow:inset 0 0 0 5px var(--atlas-panel)}
+  @media(max-width:66rem){.comparison-workspace{grid-template-columns:minmax(0,1fr)}.comparison-inspector{max-height:none}.comparison-inspector :global(dl){grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:38rem){.comparison-inspector :global(dl){grid-template-columns:minmax(0,1fr)}}
   comparison-audit{display:block;min-width:0}.comparison-heading{padding-block:1rem;border-top:1px solid var(--atlas-rule-strong)}.comparison-heading>p:first-child{font-size:.75rem;color:var(--atlas-teal-deep);letter-spacing:.06em;text-transform:uppercase;font-weight:650;margin:0 0 .4rem}.comparison-heading h3{font-size:1.2rem;margin:0}.comparison-heading>p:last-child{font-size:.85rem;color:var(--atlas-muted);line-height:1.6;max-width:60rem}
   .comparison-controls{grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem;padding:1rem 0;margin-top:0;border-block:1px solid var(--atlas-rule)}.comparison-controls select,.comparison-controls input[type=date]{width:100%;max-width:100%;font:inherit;font-size:.82rem}.comparison-field{min-width:0}.comparison-field label{font-size:.78rem}.comparison-controls button{font-size:.8rem;box-shadow:none}.check-control{font-size:.8rem}.comparison-key{margin-top:1rem;gap:.4rem .8rem}.depth-badge{display:inline-flex;gap:.4rem;align-items:center;border:0;border-bottom:1px solid var(--atlas-rule);background:transparent;font-size:.75rem;padding:.3rem 0}.depth-badge i{display:inline-grid;place-items:center;width:1.2rem;height:1.2rem;border:1px solid var(--atlas-rule-strong);font-style:normal;font-size:.75rem;line-height:1}.depth-badge--unverified{border-bottom-style:dashed;background:none}.depth-badge--unverified i{border-style:dashed}.result-count{font-size:.82rem;font-variant-numeric:tabular-nums}
   .comparison-overview{margin:1.5rem 0;min-width:0;border-block:1px solid var(--atlas-rule);padding-block:1rem}.comparison-overview[hidden]{display:none}.comparison-overview figcaption{display:grid;gap:.35rem;font-size:.95rem;margin-bottom:.75rem}.comparison-overview figcaption>span{font-size:.78rem;color:var(--atlas-muted);line-height:1.6}.comparison-overview__scroll{overflow:auto;max-width:100%}.comparison-overview__matrix{width:100%;min-width:42rem;border-collapse:collapse;font-size:.75rem;table-layout:fixed}.comparison-overview__matrix[hidden],.comparison-overview__matrix [hidden]{display:none!important}.comparison-overview__matrix caption{text-align:left;font-size:.78rem;color:var(--atlas-muted);padding:.6rem 0}.comparison-overview__matrix th,.comparison-overview__matrix td{padding:.4rem;border-bottom:1px solid var(--atlas-rule);text-align:center;vertical-align:middle;line-height:1.4;overflow-wrap:anywhere}.comparison-overview__matrix th:first-child{width:11rem;text-align:left;background:var(--atlas-panel);position:sticky;left:0;z-index:1}.comparison-overview__matrix thead th{font-size:.75rem;font-weight:600;vertical-align:bottom;padding-bottom:.7rem}.comparison-overview__matrix tbody th{font-size:.75rem;font-weight:500}.comparison-overview__mark{display:flex;position:relative;align-items:center;justify-content:center;min-height:44px;min-width:44px;width:100%;border:1px solid var(--atlas-rule-strong);background:var(--atlas-panel);color:var(--atlas-ink);text-decoration:none;font:600 .85rem var(--atlas-font-sans);line-height:1}.comparison-overview__mark small{position:absolute;right:.2rem;bottom:.2rem;font-size:.6rem;font-weight:500}.comparison-overview__mark.is-default{border-style:dashed;background:repeating-linear-gradient(-45deg,transparent,transparent 5px,color-mix(in srgb,var(--atlas-muted) 8%,transparent) 5px,color-mix(in srgb,var(--atlas-muted) 8%,transparent) 6px)}.depth-assessed,.depth-executable{background:color-mix(in srgb,var(--atlas-teal) 27%,var(--atlas-panel));border-color:var(--atlas-teal-deep)}.depth-worked,.depth-explained{background:color-mix(in srgb,var(--atlas-teal) 10%,var(--atlas-panel));border-color:var(--atlas-teal-deep)}.depth-absent{border-style:double}.comparison-overview__filtered{display:grid;place-items:center;min-height:44px;color:var(--atlas-muted)}

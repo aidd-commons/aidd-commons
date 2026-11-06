@@ -65,6 +65,26 @@ button, visible keyboard focus, Escape to
 close and a usable link list when JavaScript is unavailable. The theme control, language
 links, lesson progress and supported content remain available.
 
+## Scientific scenes and linked data
+
+The redesigned Home scene uses conceptual artwork with native step controls. Learn
+uses a deterministic prerequisite graph from the canonical curriculum, with selected
+one-hop dependencies and an equivalent mobile list. A graph edge describes a learning
+dependency, never a biological causal relation. Resource matrices count the current
+filtered records; multi-stage membership is not an additive total.
+
+Scientific plots preserve source values in marks, inspected observations, tables and
+CSV. Shared cursors select retained checkpoints rather than interpolating new results.
+Whole-structure and pocket views share real source coordinates and selected residues.
+The three scientific stories distinguish conceptual progression from measurements;
+playback can pause, replay or advance one step, and reduced-motion shows static states.
+Downloaded animation is supplementary; native text and source tables remain available.
+
+Artwork, quantitative marks and scientific sources have separate roles. Generic generated
+illustrations provide context. Chemical identities, structures, numerical values and
+measured uncertainty remain tied to existing native scientific sources. No animation
+implies a new experiment or adds an unretained molecular dynamics frame.
+
 ## The pinned tokens
 
 Nine tokens carry the identity. Their values are pinned: they do not change with a redesign

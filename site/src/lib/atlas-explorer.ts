@@ -48,6 +48,7 @@ export class ResourceExplorer extends HTMLElement {
   private resultsKey = "";
   private comparisonKey = "";
   private comparisonVersion = 0;
+  private overviewKey = "";
   private details = new Map<string, Resource>();
   private searchTimer?: ReturnType<typeof setTimeout>;
 
@@ -156,6 +157,14 @@ export class ResourceExplorer extends HTMLElement {
             kind: button.dataset.landscapeKind!,
             view: "list",
           });
+        } else if (button.hasAttribute("data-scope-stage")) {
+          this.setState({
+            ...this.state,
+            stage: button.dataset.scopeStage!,
+            kind: button.dataset.scopeKind!,
+            view: "list",
+          });
+          this.node(".atlas-result-bar").scrollIntoView({ block: "start" });
         } else if (button.hasAttribute("data-retry-index")) {
           void this.loadIndex();
         } else if (button.hasAttribute("data-retry-comparison")) {
@@ -392,6 +401,15 @@ export class ResourceExplorer extends HTMLElement {
     );
     this.node("[data-result-count]").textContent =
       this.t(`${results.length} of ${this.resources.length} resources`, `${results.length} / ${this.resources.length} 项资源`);
+    this.node("[data-scope-population]").textContent = this.t(`${results.length} matching records`, `${results.length} 条匹配记录`);
+    this.node("[data-atlas-scope]").hidden = state.view === "landscape";
+    const overviewKey = serializeAtlasQuery(state);
+    if (overviewKey !== this.overviewKey || !this.node("[data-atlas-overview]").dataset.ready) {
+      this.overviewKey = overviewKey;
+      const overview = this.node("[data-atlas-overview]");
+      overview.replaceChildren(...(results.length ? [this.landscape(results, true)] : [element("p", this.t("No records in this filtered population.", "当前筛选范围内没有记录。"), "atlas-help")]));
+      overview.dataset.ready = "true";
+    }
     this.node("[data-empty-state]").hidden = results.length !== 0;
     this.node<HTMLAnchorElement>("[data-share-query]").href =
       `${location.pathname}${serializeAtlasState(state)}`;
@@ -512,7 +530,7 @@ export class ResourceExplorer extends HTMLElement {
     return li;
   }
 
-  private licenseSummary(resource: AtlasSearchEntry) {
+  private licenseSummary(resource: Pick<AtlasSearchEntry, "licenses">) {
     return resource.licenses.length
       ? resource.licenses
           .map(({ name, scope }) => `${name} (${scope})`)
@@ -589,10 +607,14 @@ export class ResourceExplorer extends HTMLElement {
     return this.tableFrame(table, this.t("Resource results table", "资源结果表"));
   }
 
-  private landscape(resources: AtlasSearchEntry[]) {
+  private landscape(resources: AtlasSearchEntry[], overview = false) {
     const matrix = atlasLandscape(resources);
+    // A selected stage remains a constraint when drilling down a cell. Showing
+    // other stages of multi-stage records would broaden that population on click.
+    const rows = this.state.stage ? matrix.rows.filter(row => row.stage === this.state.stage) : matrix.rows;
+    const maximum = Math.max(1, ...rows.flatMap(({ cells }) => cells.map(({ ids }) => ids.length)));
     const wrapper = element("div");
-    wrapper.append(
+    if (!overview) wrapper.append(
       element(
         "p",
         this.t(`Stage × resource kind for the ${matrix.total} matching records. A resource can be listed under several stages; cells are not additive. Select a count to inspect its records.`, `${matrix.total} 条匹配记录的阶段 × 资源类型分布。一项资源可属于多个阶段，单元格不可相加。选择计数查看相应记录。`),
@@ -602,7 +624,7 @@ export class ResourceExplorer extends HTMLElement {
     const table = element(
       "table",
       "",
-      "atlas-data-table atlas-landscape-table",
+      `atlas-data-table atlas-landscape-table${overview ? " atlas-scope-table" : ""}`,
     );
     table.append(
       element(
@@ -619,7 +641,7 @@ export class ResourceExplorer extends HTMLElement {
     }
     head.append(headRow);
     const body = element("tbody");
-    for (const { stage, cells } of matrix.rows) {
+    for (const { stage, cells } of rows) {
       const row = element("tr");
       const label = element(
         "th",
@@ -630,6 +652,7 @@ export class ResourceExplorer extends HTMLElement {
       for (const { kind, ids } of cells) {
         const cell = element("td");
         cell.dataset.population = String(ids.length);
+        cell.style.setProperty("--cell-strength", String(ids.length / maximum));
         if (ids.length && stage) {
           const button = element(
             "button",
@@ -637,8 +660,13 @@ export class ResourceExplorer extends HTMLElement {
             "atlas-landscape-count",
           );
           button.type = "button";
-          button.dataset.landscapeStage = stage;
-          button.dataset.landscapeKind = kind;
+          if (overview) {
+            button.dataset.scopeStage = stage;
+            button.dataset.scopeKind = kind;
+          } else {
+            button.dataset.landscapeStage = stage;
+            button.dataset.landscapeKind = kind;
+          }
           button.setAttribute(
             "aria-label",
             this.t(`${ids.length} ${this.label(kind)} records at ${this.label(stage)}`, `${this.label(stage)}阶段的 ${ids.length} 条${this.label(kind)}记录`),
@@ -661,7 +689,10 @@ export class ResourceExplorer extends HTMLElement {
       body.append(row);
     }
     table.append(head, body);
-    wrapper.append(this.tableFrame(table, this.t("Resource landscape table", "资源分布表")));
+    const frame = this.tableFrame(table, overview ? this.t("Resource scope heatmap", "资源范围热图") : this.t("Resource landscape table", "资源分布表"));
+    if (overview) frame.classList.add("atlas-scope__scroll");
+    wrapper.append(frame);
+    if (overview) return wrapper;
     const fallback = element("details");
     fallback.append(
       element(
@@ -703,6 +734,7 @@ export class ResourceExplorer extends HTMLElement {
     const key = ids.join(",");
     if (key === this.comparisonKey) return;
     this.comparisonKey = key;
+    this.node("#compare").dataset.comparisonSize = String(ids.length);
     const version = ++this.comparisonVersion;
     const tray = this.node("[data-compare-tray]");
     tray.replaceChildren(
@@ -785,8 +817,8 @@ export class ResourceExplorer extends HTMLElement {
       );
       if (version !== this.comparisonVersion || this.events?.signal.aborted)
         return;
-      panel.replaceChildren(this.comparisonTable(resources));
-      status.textContent = this.t(`${resources.length} records compared. States and evidence retain each source record's review date. Scroll within the table to read all columns.${resources.length === 4 ? " Remove one selection to compare another record." : ""}`, `已比较 ${resources.length} 条记录。状态与证据保留各来源记录的核查日期。可在表内滚动查看全部列。${resources.length === 4 ? "请移除一项后再比较其他记录。" : ""}`);
+      panel.replaceChildren(this.comparisonWorkspace(resources));
+      status.textContent = this.t(`${resources.length} records compared. Select an asset state to inspect its own evidence. Metadata do not establish a performance ranking.${resources.length === 4 ? " Remove one selection to compare another record." : ""}`, `已比较 ${resources.length} 条记录。选择资产状态以检查其各自的证据。元数据不构成性能排名。${resources.length === 4 ? "请移除一项后再比较其他记录。" : ""}`);
     } catch (error) {
       if (version !== this.comparisonVersion || this.events?.signal.aborted)
         return;
@@ -800,6 +832,59 @@ export class ResourceExplorer extends HTMLElement {
       if (version === this.comparisonVersion)
         panel.setAttribute("aria-busy", "false");
     }
+  }
+
+  private comparisonWorkspace(resources: Resource[]) {
+    const workspace = element("div", "", "atlas-evidence-workspace");
+    const profiles = element("div", "", "atlas-asset-profiles");
+    profiles.style.setProperty("--comparison-columns", String(resources.length));
+    const inspector = element("section", "", "atlas-claim-inspector");
+    inspector.tabIndex = -1;
+    inspector.setAttribute("aria-label", this.t("Selected asset evidence", "所选资产证据"));
+    const symbols: Record<string, string> = { available: "✓", not_available: "—", not_applicable: "∅", unverified: "?" };
+    const inspect = (resource: Resource, dimension: (typeof opennessDimensions)[number]) => {
+      const claim = resource.openness[dimension];
+      profiles.querySelectorAll<HTMLButtonElement>("[data-inspect-asset]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.inspectAsset === `${resource.id}:${dimension}`)));
+      inspector.replaceChildren(
+        element("p", resource.name, "meta-label"),
+        element("h3", `${this.label(dimension)} · ${this.label(claim.value)}`),
+        this.sources(resource, claim.evidence),
+        element("p", this.t(`Record checked ${resource.last_verified}. This claim describes only this asset dimension. Access and licence permissions remain separate.`, `记录核查日期 ${resource.last_verified}。此主张仅描述该资产维度。访问与许可条件分别记录。`), "atlas-help"),
+        this.link(`/atlas/${resource.id}/#openness-title`, this.t("Open the complete evidence record →", "打开完整证据记录 →")),
+      );
+    };
+    for (const resource of resources) {
+      const profile = element("article", "", "atlas-asset-profile");
+      const heading = element("h3");
+      heading.append(this.link(`/atlas/${resource.id}/`, resource.name));
+      const date = element("time", resource.last_verified);
+      date.dateTime = resource.last_verified;
+      const facts = element("p", `${this.label(resource.access_level.value)} · ${this.label(resource.status.value)}`, "atlas-help");
+      const strip = element("div", "", "atlas-asset-strip");
+      strip.setAttribute("role", "group");
+      strip.setAttribute("aria-label", this.t(`${resource.name}: seven independent asset dimensions`, `${resource.name}：七个独立资产维度`));
+      opennessDimensions.forEach((dimension) => {
+        const value = resource.openness[dimension].value;
+        const button = element("button", "", `atlas-asset-state atlas-asset-state--${value}`);
+        button.type = "button";
+        button.dataset.inspectAsset = `${resource.id}:${dimension}`;
+        button.setAttribute("aria-pressed", "false");
+        button.setAttribute("aria-label", `${resource.name}, ${this.label(dimension)}: ${this.label(value)}`);
+        const symbol = element("i", symbols[value] ?? "?");
+        symbol.setAttribute("aria-hidden", "true");
+        button.append(element("span", this.label(dimension)), symbol);
+        button.addEventListener("click", () => inspect(resource, dimension));
+        strip.append(button);
+      });
+      profile.append(heading, date, facts, strip, element("p", this.licenseSummary(resource), "atlas-profile-licence"));
+      profiles.append(profile);
+    }
+    workspace.append(element("p", this.t("✓ Available   ·   — Not available   ·   ∅ Not applicable   ·   ? Unverified", "✓ 可用   ·   — 不可用   ·   ∅ 不适用   ·   ? 未核实"), "atlas-asset-key"), profiles, inspector);
+    inspect(resources[0], "inference_code");
+    const fallback = element("details", "", "atlas-comparison-fallback");
+    fallback.append(element("summary", this.t("Full comparison table · scope, licences, all claims and sources", "完整比较表 · 范围、许可、全部主张与来源")), this.comparisonTable(resources));
+    workspace.append(fallback);
+    return workspace;
   }
 
   private comparisonTable(resources: Resource[]) {

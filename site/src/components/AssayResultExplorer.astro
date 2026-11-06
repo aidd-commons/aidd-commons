@@ -1,34 +1,43 @@
 ---
 import summary from "../../../labs/chembl_egfr/locked-summary.json";
-import EvidenceBars from "./EvidenceBars.astro";
-interface Props { chinese?: boolean; }
-const { chinese = false } = Astro.props;
+interface Props { chinese?: boolean; compact?: boolean; }
+const { chinese = false, compact = false } = Astro.props;
 const rows = Object.entries(summary.results).flatMap(([assay, result]) => Object.entries(result.metrics).map(([model, metric]) => ({ assay, model, count: result.count, mae: metric.mae, rmse: metric.rmse })));
 const labels: Record<string, string> = { train_mean: "Train mean", descriptor_ridge: "Descriptor Ridge", morgan_ridge: "Morgan Ridge" };
 const names: Record<string, string> = { primary_test: chinese ? "主评估 · CHEMBL5736995" : "Primary · CHEMBL5736995", assay_replication: chinese ? "复现 · CHEMBL3705421" : "Replication · CHEMBL3705421" };
-const maximum = Math.ceil(Math.max(...rows.map(row => row.mae)) * 2) / 2;
+const maximum = Math.ceil(Math.max(...rows.flatMap(row => [row.mae,row.rmse])) * 2) / 2;
 ---
 
-<assay-result-explorer data-rows={JSON.stringify(rows)} data-chinese={chinese}>
-  <header class="result-story-heading">
+<assay-result-explorer data-rows={JSON.stringify(rows)} data-chinese={chinese} data-compact={compact}>
+  {!compact && <header class="result-story-heading">
     <p class="eyebrow">{chinese ? "已观测案例 · 阅读已有结果" : "Observed case · reading saved results"}</p>
     <h2>{chinese ? "表示的排序会随 assay 改变" : "Representation rank changes with the assay"}</h2>
     <p>{chinese ? "同样的三条冻结基线，在两个不同 assay 的评估中得到不同排序。切换误差指标，检查结果的范围与单位。" : "The same three frozen baselines rank differently in two assay evaluations. Switch the error measure and inspect its population and units."}</p>
-  </header>
+  </header>}
   <div class="result-explorer-controls">
     <label>{chinese ? "误差指标" : "Error measure"}<select name="metric" aria-label={chinese ? "误差指标" : "Error measure"}><option value="mae">MAE</option><option value="rmse">RMSE</option></select></label>
     <p>{chinese ? "共享零起点刻度 · 全部 evaluation parents" : "Shared zero-origin scale · all evaluation parents"} · <span data-axis-max>{maximum} pChEMBL</span></p>
   </div>
-  <div class="result-comparison">
-    {Object.entries(summary.results).map(([assay, result], index) => (
-      <section aria-label={names[assay]}>
-        <p class="result-panel-label"><span>({index === 0 ? "a" : "b"})</span> {chinese ? "评估总体" : "Evaluation population"} <strong>n = {result.count}</strong></p>
-        <EvidenceBars title={names[assay]} description={chinese ? "所有三条冻结基线；未排除 parent。" : "Every frozen baseline; no parents excluded."} rows={Object.entries(result.metrics).map(([model, metric]) => ({ key: model, label: labels[model], value: metric.mae }))} maximum={maximum} units="MAE · pChEMBL" assay={assay} chinese={chinese} />
-      </section>
-    ))}
-  </div>
-  <p class="result-conclusion">{chinese ? "Morgan Ridge 的主评估 MAE 最低，复现 MAE 最高。该观察不解释转移失败的原因，也不证明哪种表示在所有 assay 中最好。" : "Morgan Ridge has the lowest primary MAE and the highest replication MAE. This observation does not identify the cause of transfer failure or establish a universally best representation."}</p>
-  <p class="result-boundary">{chinese ? "T15 在此次评估前接触了 T05 共享标签。因此，这不是完全未接触的独立确认；冻结分区、alpha 网格和已选设置均未重新调节。" : "T15 accessed labels shared with T05 before this evaluation. This is not an entirely untouched independent confirmation; the frozen split, alpha grid and selected settings were not retuned."}</p>
+  <figure class="result-paired" aria-label={chinese ? "每条冻结基线的两次 assay 评估" : "Two assay evaluations for every frozen baseline"}>
+    <figcaption><span><i class="assay-key assay-key--primary" />{names.primary_test} <strong>n = {summary.results.primary_test.count}</strong></span><span><i class="assay-key assay-key--replication" />{names.assay_replication} <strong>n = {summary.results.assay_replication.count}</strong></span></figcaption>
+    <div class="result-paired__columns"><span>{chinese ? "冻结基线" : "Frozen baseline"}</span><span class="result-paired__axis">{[0,.25,.5,.75,1].map((fraction,index)=><span data-axis-tick={index} style={`left:${fraction*100}%`}>{Number((maximum*fraction).toPrecision(3))}</span>)}</span><span>{chinese ? "主评估 / 复现" : "Primary / replication"}</span></div>
+    {Object.entries(labels).map(([model,label]) => {
+      const primary=summary.results.primary_test.metrics[model as keyof typeof summary.results.primary_test.metrics].mae;
+      const replication=summary.results.assay_replication.metrics[model as keyof typeof summary.results.assay_replication.metrics].mae;
+      return <div class="result-paired__row" data-model-pair={model}>
+        <strong>{label}</strong>
+        <div class="result-paired__track" role="img" aria-label={`${label}: ${primary} / ${replication} MAE · pChEMBL`}>
+          <i class="result-paired__difference" data-assay-link={model} style={`left:${Math.min(primary,replication)/maximum*100}%;width:${Math.abs(replication-primary)/maximum*100}%`} />
+          <span class="result-paired__point result-paired__point--primary" data-bar data-assay="primary_test" data-model={model} data-value={primary} style={`width:${primary/maximum*100}%`}><i /></span>
+          <span class="result-paired__point result-paired__point--replication" data-bar data-assay="assay_replication" data-model={model} data-value={replication} style={`width:${replication/maximum*100}%`}><i /></span>
+        </div>
+        <span class="result-paired__scores"><output data-assay="primary_test" data-model={model} title={String(primary)}>{primary.toFixed(3)}</output><span>/</span><output data-assay="assay_replication" data-model={model} title={String(replication)}>{replication.toFixed(3)}</output></span>
+      </div>;
+    })}
+    <p class="evidence-bars__unit">MAE · pChEMBL · {chinese ? "越低越好；连线仅比较两个总体的误差" : "lower is better; links compare errors in two populations"}</p>
+  </figure>
+  {!compact && <><p class="result-conclusion">{chinese ? "Morgan Ridge 的主评估 MAE 最低，复现 MAE 最高。该观察不解释转移失败的原因，也不证明哪种表示在所有 assay 中最好。" : "Morgan Ridge has the lowest primary MAE and the highest replication MAE. This observation does not identify the cause of transfer failure or establish a universally best representation."}</p>
+  <p class="result-boundary">{chinese ? "T15 在此次评估前接触了 T05 共享标签。因此，这不是完全未接触的独立确认；冻结分区、alpha 网格和已选设置均未重新调节。" : "T15 accessed labels shared with T05 before this evaluation. This is not an entirely untouched independent confirmation; the frozen split, alpha grid and selected settings were not retuned."}</p></>}
   <noscript><p>{chinese ? "图中显示 MAE。下表同时保留 MAE 和 RMSE，无需 JavaScript。" : "The plot shows MAE. Both MAE and RMSE remain available in the table without JavaScript."}</p></noscript>
   <details>
     <summary>{chinese ? "精确数值、总体与来源" : "Exact values, populations and source"}</summary>
@@ -47,7 +56,7 @@ const maximum = Math.ceil(Math.max(...rows.map(row => row.mae)) * 2) / 2;
       const rows = JSON.parse(this.dataset.rows ?? "[]") as { assay: string; model: string; mae: number; rmse: number }[];
       this.querySelector<HTMLSelectElement>("select")?.addEventListener("change", event => {
         const metric = (event.currentTarget as HTMLSelectElement).value as "mae" | "rmse";
-        const maximum = Math.ceil(Math.max(...rows.map(row => row[metric])) * 2) / 2;
+        const maximum = Math.ceil(Math.max(...rows.flatMap(row => [row.mae,row.rmse])) * 2) / 2;
         for (const row of rows) {
           const selector = `[data-assay="${row.assay}"][data-model="${row.model}"]`;
           const bar = this.querySelector<HTMLElement>(`[data-bar]${selector}`)!;
@@ -64,7 +73,12 @@ const maximum = Math.ceil(Math.max(...rows.map(row => row.mae)) * 2) / 2;
         this.querySelectorAll(".evidence-bars__unit").forEach(unit => {
           unit.textContent = `${metric.toUpperCase()} · pChEMBL · ${this.dataset.chinese === "true" ? "越低越好" : "lower is better"}`;
         });
-        this.querySelectorAll('[role="img"]').forEach(plot => plot.setAttribute("aria-label", this.dataset.chinese === "true" ? `三条基线的 ${metric.toUpperCase()}，单位 pChEMBL；精确数值见下表` : `${metric.toUpperCase()} for three baselines in pChEMBL units; exact values in the table below`));
+        this.querySelectorAll<HTMLElement>("[data-assay-link]").forEach(link => {
+          const pair=rows.filter(row=>row.model===link.dataset.assayLink);
+          const a=pair[0][metric],b=pair[1][metric];
+          link.style.left=`${Math.min(a,b)/maximum*100}%`;link.style.width=`${Math.abs(a-b)/maximum*100}%`;
+          this.querySelector(`[data-model-pair="${link.dataset.assayLink}"] [role="img"]`)?.setAttribute("aria-label",`${link.dataset.assayLink}: ${a} / ${b} ${metric.toUpperCase()} · pChEMBL`);
+        });
       });
     }
   }
@@ -72,10 +86,13 @@ const maximum = Math.ceil(Math.max(...rows.map(row => row.mae)) * 2) / 2;
 </script>
 
 <style>
+  assay-result-explorer[data-compact="true"]{padding:0;margin:0;border:0}
   assay-result-explorer{display:block;min-width:0;padding-block:1.5rem;margin-block:2rem;border-block:1px solid var(--atlas-rule-strong);color:var(--atlas-ink)}
   .result-story-heading h2{font-size:clamp(1.4rem,3vw,2rem);max-width:38rem;margin:.5rem 0}.result-story-heading>p:last-child{max-width:58rem;color:var(--atlas-muted)}
   .result-explorer-controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem;margin:1.4rem 0;font-size:.8rem}.result-explorer-controls p{margin:0;color:var(--atlas-muted)}
   label{display:flex;align-items:center;gap:.75rem;font-weight:600}select{min-height:44px;max-width:100%;padding:.5rem 1rem;background:var(--atlas-bg);color:var(--atlas-ink);border:1px solid var(--atlas-rule-strong);font:inherit}
+  .result-paired{margin:1rem 0 1.5rem;min-width:0;--model-width:9rem;--scores-width:8.5rem;--row-gap:1rem}.result-paired figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.6rem 1rem;padding-bottom:1rem;border-bottom:1px solid var(--atlas-rule);font-size:.76rem;color:var(--atlas-muted)}.result-paired figcaption>span{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem}.result-paired figcaption strong{color:var(--atlas-ink);font-weight:600;white-space:nowrap}.assay-key{display:inline-block;flex:0 0 .65rem;width:.65rem;height:.65rem;background:var(--atlas-teal-deep);border-radius:50%}.assay-key--replication{background:var(--atlas-panel);border:2px solid var(--atlas-ink);border-radius:0;transform:rotate(45deg)}.result-paired__columns,.result-paired__row{display:grid;grid-template-columns:var(--model-width) minmax(0,1fr) var(--scores-width);gap:var(--row-gap);align-items:center}.result-paired__columns{padding:1.2rem 0 .65rem;font-size:.75rem;color:var(--atlas-muted)}.result-paired__columns>span:last-child{text-align:right}.result-paired__axis{position:relative;height:1rem}.result-paired__axis>span{position:absolute;transform:translateX(-50%);font-variant-numeric:tabular-nums}.result-paired__axis>span:first-child{transform:none}.result-paired__axis>span:last-child{transform:translateX(-100%)}.result-paired__row{min-height:4rem;border-bottom:1px solid var(--atlas-rule);font-size:.82rem}.result-paired__row>strong{font-weight:600;overflow-wrap:anywhere}.result-paired__track{position:relative;height:2.5rem;border-left:1px solid var(--atlas-rule-strong);background:repeating-linear-gradient(to right,transparent 0,transparent calc(25% - 1px),var(--atlas-rule) calc(25% - 1px),var(--atlas-rule) 25%)}.result-paired__difference{position:absolute;top:50%;height:2px;background:var(--atlas-muted)}.result-paired__point{position:absolute;left:0;top:50%;height:0}.result-paired__point>i{position:absolute;right:0;width:.7rem;height:.7rem;transform:translate(50%,-50%);background:var(--atlas-teal-deep);border-radius:50%;box-shadow:0 0 0 2px var(--atlas-panel)}.result-paired__point--replication>i{background:var(--atlas-panel);border:2px solid var(--atlas-ink);border-radius:0;transform:translate(50%,-50%) rotate(45deg)}.result-paired__scores{display:flex;justify-content:flex-end;gap:.5rem;font-variant-numeric:tabular-nums;font-size:.8rem}.result-paired__scores>span{color:var(--atlas-muted)}.result-paired__scores output:first-child{font-weight:650;color:var(--atlas-teal-deep)}.evidence-bars__unit{margin:.75rem 0 0;font-size:.75rem;color:var(--atlas-muted)}
+  @media(max-width:38rem){.result-paired{--model-width:6.2rem;--scores-width:6.2rem;--row-gap:.55rem}.result-paired__row{font-size:.75rem;min-height:4.5rem}.result-paired__scores{gap:.25rem;font-size:.75rem}.result-paired__axis>span:nth-child(2),.result-paired__axis>span:nth-child(4){display:none}}
   .result-comparison{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem}.result-comparison>section{min-width:0;padding-block:1rem;border-top:1px solid var(--atlas-rule)}
   .result-panel-label{display:flex;flex-wrap:wrap;gap:.5rem;margin:0 0 .7rem;font-size:.75rem;color:var(--atlas-muted)}.result-panel-label span{font-weight:750;color:var(--atlas-ink)}.result-panel-label strong{margin-left:auto;color:var(--atlas-ink);font-variant-numeric:tabular-nums}
   .result-conclusion{border-left:3px solid var(--atlas-emphasis);padding:.6rem 0 .6rem 1rem;margin-block:1.4rem .75rem;max-width:58rem;font-size:.9rem}.result-boundary{font-size:.78rem;color:var(--atlas-muted);max-width:60rem}

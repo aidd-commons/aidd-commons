@@ -1,6 +1,6 @@
 ---
 import type { Resource } from "../data/resource.js";
-import { localizedAtlasLabel, buildAtlasIndex, emptyAtlasQuery } from "../lib/atlas-presentation.js";
+import { localizedAtlasLabel, buildAtlasIndex, emptyAtlasQuery, atlasLandscape } from "../lib/atlas-presentation.js";
 import { sortAtlasResources } from "../lib/atlas-state.js";
 import { withSiteBase } from "../lib/site-paths.js";
 import AtlasResourceCard from "./AtlasResourceCard.astro";
@@ -15,6 +15,8 @@ const t = (en: string, zh: string) => chinese ? zh : en;
 const local = (path: string) => localizedPath(path, chinese);
 const index = buildAtlasIndex(resources);
 const initial = sortAtlasResources(index, emptyAtlasQuery, "name").slice(0, 12);
+const landscape = atlasLandscape(index);
+const maximumCell = Math.max(1, ...landscape.rows.flatMap(({ cells }) => cells.map(({ ids }) => ids.length)));
 const values = (items: string[]) => [...new Set(items)].sort();
 const facets = [
   { name: "stage", label: t("Stage","阶段"), all: t("All stages","全部阶段"), values: values(resources.flatMap((resource) => resource.stages)) },
@@ -45,12 +47,24 @@ const base = import.meta.env.BASE_URL;
     <span class="meta-label">{t("Selected","已选")}</span>
     <div data-active-filters><span class="atlas-help">{t("No active filters","未设置筛选")}</span></div>
   </div>
-  <section id="compare" class="atlas-comparison" aria-labelledby="compare-title">
+  <section class="atlas-scope" aria-labelledby="atlas-scope-title" data-atlas-scope>
+    <header class="atlas-scope__heading"><div><p class="meta-label">{t("Catalogue landscape", "目录分布")}</p><h2 id="atlas-scope-title">{t("Where the records sit", "记录分布在哪些位置")}</h2></div><p data-scope-population>{resources.length} {t("matching records", "条匹配记录")}</p></header>
+    <p class="atlas-help">{t("Stage × resource type. Numbers count records, not quality. A record may occupy several stages; cells are not additive. Select a count to inspect that population.", "阶段 × 资源类型。数字统计记录数量，不表示质量。一项记录可属于多个阶段，单元格不可相加。选择计数以检查该组记录。")}</p>
+    <div data-atlas-overview>
+      <div class="atlas-table-region atlas-scope__scroll" role="region" aria-label={t("Resource scope heatmap", "资源范围热图")} tabindex="0">
+        <table class="atlas-data-table atlas-landscape-table atlas-scope-table">
+          <caption>{t("Recorded stage × type counts. Scroll to inspect all stages.", "已记录的阶段 × 类型计数。滚动以检查全部阶段。")}</caption>
+          <thead><tr><th scope="col">{t("Recorded stage", "已记录阶段")}</th>{landscape.kinds.map(kind => <th scope="col">{atlasLabel(kind)}</th>)}</tr></thead>
+          <tbody>{landscape.rows.map(({ stage, cells }) => <tr><th scope="row">{atlasLabel(stage) || t("Stage not recorded", "未记录阶段")}</th>{cells.map(({ kind, ids }) => <td data-population={ids.length} style={`--cell-strength:${ids.length / maximumCell}`}>{ids.length ? <a class="atlas-landscape-count" href={local(`/atlas/${ids[0]}/`)} aria-label={t(`${ids.length} ${kind} records at ${stage}; open the first record`, `${stage} 阶段的 ${ids.length} 条 ${kind} 记录；打开首条记录`)}>{ids.length}</a> : <span>0</span>}</td>)}</tr>)}</tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <section id="compare" class="atlas-comparison" aria-labelledby="compare-title" data-comparison-size="0">
     <div class="atlas-comparison__heading">
-      <div><p class="meta-label">{t("Reuse and evidence","复用与证据")}</p><h2 id="compare-title">{t("Compare resource records","比较资源记录")}</h2></div>
+      <div><h2 id="compare-title">{t("Compare resource records","比较资源记录")}</h2><span class="atlas-help">{t("Select 2–4 records to inspect reuse and evidence.", "选择 2–4 条记录以检查复用条件与证据。")}</span></div>
       <button type="button" data-compare-clear disabled>{t("Clear comparison","清空比较")}</button>
     </div>
-    <p class="atlas-help">{t("Choose 2–4 resources. Compare scientific scope, licences and seven independent asset dimensions. These metadata do not establish a matched performance ranking.","选择 2–4 项资源，比较科学范围、许可与七个独立资产维度。这些元数据不构成同一评估方案下的性能排名。")}</p>
     <ul class="atlas-compare-tray" data-compare-tray aria-label={t("Selected resources","已选资源")}><li>{t("No resources selected","尚未选择资源")}</li></ul>
     <p data-compare-status role="status" aria-live="polite">{t("Select resources using the Compare controls in the results.","使用结果中的“比较”控件选择资源。")}</p>
     <div data-compare-panel></div>

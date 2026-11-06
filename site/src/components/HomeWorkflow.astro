@@ -1,7 +1,7 @@
 ---
 import { withSiteBase } from "../lib/site-paths";
 import egfrStructure from "../assets/teaching/egfr-1m17.png";
-import ScientificIcon from "./ScientificIcon.astro";
+import ScienceStory from "./ScienceStory.astro";
 interface Props { chinese?: boolean; }
 const { chinese = false } = Astro.props;
 const local = (path: string) => withSiteBase(`${chinese ? "/zh-cn" : ""}${path}`, import.meta.env.BASE_URL);
@@ -43,28 +43,26 @@ const stages = [
     track: "candidate-nomination", lesson: "/learn/candidate-nomination/capstone-workbook/", lessonLabel: chinese ? "打开五案例工作簿" : "Open the five-case workbook", resource: "/atlas/?stage=candidate-nomination", resourceLabel: chinese ? "候选决策资源 · 英文记录" : "Candidate decision resources",
   },
 ];
-const stageIcons = ["cell", "protein", "assay", "robot", "data"] as const;
-const objectIcons = [
-  ["cell", "data", "model"],
-  ["protein", "molecule", "data"],
-  ["molecule", "assay", "model"],
-  ["molecule", "model", "robot"],
-  ["assay", "data", "model"],
-] as const;
 ---
 
 <workflow-navigator class="discovery-workflow not-content" aria-labelledby="discovery-workflow-title">
-  <div class="discovery-workflow__heading"><div><p class="eyebrow">{chinese ? "发现问题 → 可检查的决策" : "Discovery question → inspectable decision"}</p><h2 id="discovery-workflow-title">{chinese ? "在完整流程中定位你的问题" : "Put your question in the whole workflow"}</h2></div><span class="discovery-workflow__edition">{chinese ? "概念导览 · 可选步骤" : "Conceptual guide · select a step"}</span></div>
-  <ol class="discovery-workflow__steps" aria-label={chinese ? "药物发现步骤" : "Drug discovery steps"}>
-    {stages.map((stage, index) => <li><a href={`#workflow-${stage.id}`} data-workflow-tab={stage.id} id={`workflow-tab-${stage.id}`}><span class="discovery-workflow__number">{String(index + 1).padStart(2, "0")}</span><span class="discovery-workflow__stage-object"><ScientificIcon name={stageIcons[index]} size={82} /></span><span class="discovery-workflow__stage-label"><strong>{stage.label}</strong><small>{stage.subtitle}</small></span>{index < stages.length - 1 && <span class="discovery-workflow__step-arrow" aria-hidden="true">→</span>}</a></li>)}
-  </ol>
-  <div class="discovery-workflow__panels">
-    {stages.map((stage, index) => <section id={`workflow-${stage.id}`} data-workflow-panel={stage.id} aria-labelledby={`workflow-tab-${stage.id}`} class="discovery-workflow__panel" tabindex="-1">
-      <div class="discovery-workflow__explanation"><p class="discovery-workflow__kind"><span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>{stage.kind}</p><h3>{stage.title}</h3><p>{stage.description}</p><div class="discovery-workflow__links"><a href={local(stage.lesson)}>{stage.lessonLabel}<span aria-hidden="true">↗</span></a><a href={local(`/learn/tracks/${stage.track}/`)}>{chinese ? "进入学习轨道" : "Open the learning track"}<span aria-hidden="true">→</span></a></div></div>
-      <div class="discovery-workflow__object-view">{stage.id === "structure" && <figure class="discovery-workflow__structure"><img src={withSiteBase(egfrStructure.src, import.meta.env.BASE_URL)} width={egfrStructure.width} height={egfrStructure.height} alt={chinese ? "1M17 保留坐标的静态投影，显示 EGFR Cα 骨架与 erlotinib AQ4 重原子。" : "Static projection of retained 1M17 coordinates showing the EGFR Cα trace and erlotinib AQ4 heavy atoms."} loading="lazy" decoding="async" /><figcaption>{chinese ? "1M17 坐标投影；配体连线由几何启发式得到，不表示键级，也不是结合或功能验证。" : "1M17 coordinate projection. Ligand lines use a geometric heuristic, not bond orders; this is not binding or functional validation."}</figcaption></figure>}<p class="discovery-workflow__reading-label">{chinese ? "对象 → 检查 → 决策" : "Read the object → check → decision"}</p><ol aria-label={chinese ? "本步骤的对象与决策" : "Objects and decision in this step"}>{stage.objects.map(([label, object], position) => <li><span class="discovery-workflow__object-label">{label}</span><ScientificIcon name={objectIcons[index][position]} size={64} /><strong>{object}</strong>{position < stage.objects.length - 1 && <span class="discovery-workflow__object-arrow" aria-hidden="true">→</span>}</li>)}</ol><a class="discovery-workflow__resource" href={atlas(stage.resource)}>{stage.resourceLabel}<span aria-hidden="true">↗</span></a></div>
-    </section>)}
+  <div class="discovery-workflow__heading"><div><p class="eyebrow">{chinese ? "疾病语境 · 分子 · 实验 · 决策" : "Disease context · molecules · experiments · decisions"}</p><h2 id="discovery-workflow-title">{chinese ? "沿着证据，找到下一步" : "A connected view of discovery"}</h2></div><span class="discovery-workflow__edition">{chinese ? "交互式概念导览" : "Interactive conceptual guide"}</span></div>
+  <div class="discovery-workflow__workspace">
+    <div class="discovery-workflow__scene"><ScienceStory story="evidence" chinese={chinese} compact />
+      <ol class="discovery-workflow__steps" aria-label={chinese ? "药物发现步骤" : "Drug discovery steps"}>
+        {stages.map((stage, index) => <li><a href={`#workflow-${stage.id}`} data-workflow-tab={stage.id} id={`workflow-tab-${stage.id}`}><span class="discovery-workflow__number">{String(index + 1).padStart(2, "0")}</span><strong>{stage.label}</strong><span class="discovery-workflow__tab-marker" aria-hidden="true">↗</span></a></li>)}
+      </ol>
+    </div>
+    <div class="discovery-workflow__panels">
+      {stages.map((stage, index) => <section id={`workflow-${stage.id}`} data-workflow-panel={stage.id} aria-labelledby={`workflow-tab-${stage.id}`} class="discovery-workflow__panel" tabindex="-1">
+        <p class="discovery-workflow__kind"><span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>{stage.kind}</p><h3>{stage.title}</h3><p class="discovery-workflow__description">{stage.description}</p>
+        <dl class="discovery-workflow__facts">{stage.objects.map(([label, object]) => <div><dt>{label}</dt><dd>{object}</dd></div>)}</dl>
+        {stage.id === "structure" && <figure class="discovery-workflow__structure"><img src={withSiteBase(egfrStructure.src, import.meta.env.BASE_URL)} width={egfrStructure.width} height={egfrStructure.height} alt={chinese ? "1M17 保留坐标的静态投影，显示 EGFR Cα 骨架与 erlotinib AQ4 重原子。" : "Static projection of retained 1M17 coordinates showing the EGFR Cα trace and erlotinib AQ4 heavy atoms."} loading="lazy" decoding="async" /><figcaption>{chinese ? "1M17 坐标投影；配体连线由几何启发式得到，不表示键级，也不是结合或功能验证。" : "1M17 coordinate projection. Ligand lines use a geometric heuristic, not bond orders; this is not binding or functional validation."}</figcaption></figure>}
+        <div class="discovery-workflow__links"><a href={local(stage.lesson)}>{stage.lessonLabel}<span aria-hidden="true">↗</span></a><a href={local(`/learn/tracks/${stage.track}/`)}>{chinese ? "进入学习轨道" : "Open the learning track"}<span aria-hidden="true">→</span></a><a class="discovery-workflow__resource" href={atlas(stage.resource)}>{stage.resourceLabel}<span aria-hidden="true">↗</span></a></div>
+      </section>)}
+    </div>
   </div>
-  <p class="discovery-workflow__boundary">{chinese ? "箭头表示阅读顺序，概念插图不代表实验观测。这是课程与资源的导航关系，不是已经执行或验证的药物发现流水线。各步骤保留自身的数据、协议与评价边界。" : "Arrows show reading order; conceptual illustrations are not observations. These are navigation relationships between lessons and resources, not an executed or validated discovery pipeline. Each step keeps its own data, protocol and evaluation boundary."}</p>
+  <p class="discovery-workflow__boundary">{chinese ? "概念插图不代表实验观测。这里连接课程与资源，不是已经执行或验证的发现流水线。各步骤保留自身的数据、协议与评价边界。" : "Conceptual illustrations are not observations. These links connect lessons and resources, rather than an executed or validated pipeline. Each step keeps its own data, protocol and evaluation boundary."}</p>
 </workflow-navigator>
 
 <script>
@@ -73,16 +71,18 @@ const objectIcons = [
       const tabs = [...this.querySelectorAll<HTMLAnchorElement>("[data-workflow-tab]")];
       const panels = [...this.querySelectorAll<HTMLElement>("[data-workflow-panel]")];
       if (!tabs.length || tabs.length !== panels.length) return;
+      const story = this.querySelector<HTMLElement & { selectStep?: (index: number, updateLocation?: boolean) => void }>("science-story");
       const list = this.querySelector(".discovery-workflow__steps");
       list?.setAttribute("role", "tablist");
-      list?.setAttribute("aria-orientation", matchMedia("(max-width: 580px)").matches ? "vertical" : "horizontal");
-      const select = (tab: HTMLAnchorElement, focus = false, updateLocation = false) => {
+      list?.setAttribute("aria-orientation", "horizontal");
+      const select = (tab: HTMLAnchorElement, focus = false, updateLocation = false, updateStory = true) => {
         tabs.forEach((entry) => {
           const selected = entry === tab;
           entry.setAttribute("aria-selected", String(selected));
           entry.tabIndex = selected ? 0 : -1;
         });
         panels.forEach((panel) => { panel.hidden = panel.dataset.workflowPanel !== tab.dataset.workflowTab; });
+        if (updateStory) story?.selectStep?.(tabs.indexOf(tab), false);
         if (focus) tab.focus();
         if (updateLocation) {
           const url = new URL(location.href);
@@ -103,71 +103,65 @@ const objectIcons = [
           select(tabs[nextIndex], true, true);
         });
       });
+      this.addEventListener("science-story-step", (event) => { const index = (event as CustomEvent<{ index: number }>).detail.index; if (tabs[index]) select(tabs[index], false, false, false); });
       panels.forEach((panel) => panel.setAttribute("role", "tabpanel"));
       this.dataset.enhanced = "true";
       const requested = tabs.find((tab) => tab.hash === location.hash);
-      select(requested ?? tabs[0]);
+      select(requested ?? tabs[0], false, false, false);
+      customElements.whenDefined("science-story").then(() => {
+        if (requested) select(requested);
+        else { const current = story?.querySelector<HTMLElement>('[data-story-step][aria-pressed="true"]'); const index = Number(current?.dataset.storyStep ?? 0); if (tabs[index]) select(tabs[index], false, false, false); }
+      });
     }
   }
   if (!customElements.get("workflow-navigator")) customElements.define("workflow-navigator", WorkflowNavigator);
 </script>
 
 <style>
-  .discovery-workflow { display: block; color: var(--atlas-ink); background: var(--atlas-panel); border-block: 1px solid var(--atlas-rule-strong); }
-  .discovery-workflow__heading { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.2rem 1.5rem; }
-  .discovery-workflow .eyebrow { margin: 0 0 .4rem; font-size: .75rem; }
-  .discovery-workflow h2 { margin: 0; font-size: clamp(1.15rem, 2vw, 1.5rem); letter-spacing: -.03em; }
+  .discovery-workflow { display: block; color: var(--atlas-ink); border: 1px solid var(--atlas-rule-strong); background: var(--atlas-panel); }
+  .discovery-workflow__heading { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 1.2rem; border-bottom: 1px solid var(--atlas-rule); }
+  .discovery-workflow .eyebrow { margin: 0 0 .35rem; font-size: .75rem; letter-spacing: .04em; }
+  .discovery-workflow h2 { margin: 0; font-size: clamp(1.15rem, 2vw, 1.45rem); letter-spacing: -.025em; }
   .discovery-workflow__edition { color: var(--atlas-muted); font-size: .75rem; text-align: right; }
-  .discovery-workflow__steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; list-style: none; padding: .4rem 1rem 0; margin: 0; border-bottom: 1px solid var(--atlas-rule-strong); }
-  .discovery-workflow__steps li { min-width: 0; position: relative; }
-  .discovery-workflow__steps a { position: relative; display: grid; grid-template-rows: auto 88px 1fr; justify-items: center; gap: .35rem; height: 100%; padding: .65rem .7rem 1rem; border-bottom: 3px solid transparent; text-decoration: none; color: var(--atlas-ink); text-align: center; }
-  .discovery-workflow__steps a[aria-selected="true"] { border-bottom-color: var(--atlas-teal); background: color-mix(in srgb, var(--atlas-teal) 5%, transparent); }
+  .discovery-workflow__workspace { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(17rem, 1fr); align-items: stretch; }
+  .discovery-workflow__scene { min-width: 0; display: flex; flex-direction: column; background: var(--atlas-bg); }
+  .discovery-workflow__scene :global(science-story) { flex: 1; margin: 0; border: 0; }
+  .discovery-workflow__scene :global(.science-story__heading), .discovery-workflow__scene :global(.science-story__reading), .discovery-workflow__scene :global(.science-story__boundary), .discovery-workflow__scene :global(.science-story__step-buttons) { display: none; }
+  .discovery-workflow__scene :global(.science-story__controls) { padding: .6rem .8rem; }
+  .discovery-workflow__scene :global(.science-story__footer) { padding-inline: .8rem; }
+  .discovery-workflow__steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--atlas-rule-strong); }
+  .discovery-workflow__steps li { min-width: 0; }
+  .discovery-workflow__steps li + li { border-left: 1px solid var(--atlas-rule); }
+  .discovery-workflow__steps a { display: grid; grid-template-columns: 1fr auto; align-content: start; gap: .4rem; height: 100%; min-height: 78px; padding: .7rem .55rem; border-bottom: 3px solid transparent; text-decoration: none; color: var(--atlas-ink); }
+  .discovery-workflow__number { grid-column: 1; font-family: var(--atlas-font-mono); color: var(--atlas-muted); font-size: .75rem; }
+  .discovery-workflow__tab-marker { grid-column: 2; grid-row: 1; color: var(--atlas-muted); font-size: .75rem; }
+  .discovery-workflow__steps strong { grid-column: 1 / -1; font-size: .75rem; line-height: 1.4; font-weight: 600; }
+  .discovery-workflow__steps a[aria-selected="true"] { border-bottom-color: var(--atlas-teal); background: color-mix(in srgb, var(--atlas-teal) 8%, var(--atlas-panel)); }
+  .discovery-workflow__steps a[aria-selected="true"] .discovery-workflow__number { color: var(--atlas-teal-deep); }
   .discovery-workflow__steps a:hover { background: var(--atlas-surface); }
-  .discovery-workflow__steps a:focus-visible { outline: 3px solid var(--atlas-teal); outline-offset: -3px; }
-  .discovery-workflow__number { font-family: var(--atlas-font-mono); color: var(--atlas-teal-deep); font-size: .75rem; }
-  .discovery-workflow__stage-object { display: grid; align-items: center; }
-  .discovery-workflow__steps strong { display: block; font-size: .82rem; line-height: 1.4; }
-  .discovery-workflow__steps small { display: block; margin-top: .3rem; color: var(--atlas-muted); font-size: .75rem; line-height: 1.5; }
-  .discovery-workflow__step-arrow { position: absolute; right: -.55rem; top: 4rem; z-index: 1; color: var(--atlas-ink); font-size: 1.2rem; }
-  .discovery-workflow__panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 2rem; padding: 1.8rem 1.5rem; align-items: center; }
+  .discovery-workflow__panels { min-width: 0; border-left: 1px solid var(--atlas-rule-strong); }
+  .discovery-workflow__panel { padding: 1.2rem; scroll-margin-top: 5rem; }
   .discovery-workflow__panel + .discovery-workflow__panel { border-top: 1px solid var(--atlas-rule); }
   .discovery-workflow[data-enhanced] .discovery-workflow__panel { border-top: 0; }
-  .discovery-workflow__kind { display: flex; gap: .65rem; align-items: center; margin: 0 0 .9rem; color: var(--atlas-teal-deep); font-size: .75rem; font-weight: 650; letter-spacing: .05em; }
-  .discovery-workflow__kind span { border-bottom: 1px solid var(--atlas-teal); padding: .18rem .2rem; font-family: var(--atlas-font-mono); }
-  .discovery-workflow h3 { max-width: 28ch; margin: 0; font-size: clamp(1.25rem, 2.1vw, 1.7rem); font-weight: 650; letter-spacing: -.035em; line-height: 1.25; }
-  .discovery-workflow__explanation > p:not(.discovery-workflow__kind) { max-width: 61ch; margin: 1rem 0; color: var(--atlas-muted); font-size: .87rem; line-height: 1.7; }
-  .discovery-workflow__links { display: flex; gap: .5rem 1.25rem; flex-wrap: wrap; }
-  .discovery-workflow__links a, .discovery-workflow__resource { display: inline-flex; justify-content: space-between; align-items: center; gap: .75rem; min-height: 44px; font-size: .78rem; font-weight: 650; }
-  .discovery-workflow__object-view { min-width: 0; padding-left: 1.5rem; border-left: 1px solid var(--atlas-rule); }
-  .discovery-workflow__reading-label { color: var(--atlas-muted); font-size: .75rem; margin: 0 0 .8rem; }
-  .discovery-workflow__structure { margin: 0 0 1rem; }
-  .discovery-workflow__structure img { display: block; width: 100%; height: 180px; object-fit: contain; background: #fffdf8; }
-  .discovery-workflow__structure figcaption { margin-top: .4rem; color: var(--atlas-muted); font-size: .75rem; line-height: 1.5; }
-  .discovery-workflow__object-view ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin: 0; padding: 0; list-style: none; }
-  .discovery-workflow__object-view li { display: grid; position: relative; justify-items: center; align-content: start; gap: .45rem; min-width: 0; padding: .65rem 0; border-top: 1px solid var(--atlas-rule-strong); text-align: center; }
-  .discovery-workflow__object-view li:last-child { border-top: 2px solid var(--atlas-teal); }
-  .discovery-workflow__object-label { color: var(--atlas-muted); font-size: .75rem; letter-spacing: .04em; }
-  .discovery-workflow__object-view strong { font-size: .8rem; font-weight: 600; line-height: 1.5; }
-  .discovery-workflow__object-arrow { position: absolute; right: -1rem; top: 3rem; color: var(--atlas-ink); font-size: 1rem; }
-  .discovery-workflow__resource { margin-top: .7rem; font-size: .75rem; }
-  .discovery-workflow__boundary { margin: 0; padding: .85rem 1.5rem; border-top: 1px dashed var(--atlas-rule-strong); color: var(--atlas-muted); font-size: .75rem; line-height: 1.6; }
+  .discovery-workflow__kind { display: flex; gap: .75rem; align-items: center; margin: 0 0 .8rem; color: var(--atlas-teal-deep); font-size: .75rem; font-weight: 650; letter-spacing: .03em; }
+  .discovery-workflow__kind span { font-family: var(--atlas-font-mono); border: 1px solid var(--atlas-rule-strong); padding: .2rem .3rem; border-radius: 2px; }
+  .discovery-workflow h3 { max-width: 30ch; margin: 0; font-size: clamp(1.1rem, 1.65vw, 1.4rem); font-weight: 650; letter-spacing: -.025em; line-height: 1.3; }
+  .discovery-workflow__description { margin: .8rem 0; color: var(--atlas-muted); font-size: .8rem; line-height: 1.65; }
+  .discovery-workflow__facts { margin: .85rem 0 .75rem; border-top: 1px solid var(--atlas-rule); }
+  .discovery-workflow__facts > div { display: grid; grid-template-columns: 5rem 1fr; gap: .5rem; padding: .5rem 0; border-bottom: 1px solid var(--atlas-rule); font-size: .75rem; line-height: 1.5; }
+  .discovery-workflow__facts dt { color: var(--atlas-muted); }
+  .discovery-workflow__facts dd { margin: 0; font-weight: 500; }
+  .discovery-workflow__links { display: grid; }
+  .discovery-workflow__links a { display: inline-flex; justify-content: space-between; align-items: center; gap: .75rem; min-height: 44px; font-size: .75rem; font-weight: 600; }
+  .discovery-workflow__links .discovery-workflow__resource { color: var(--atlas-muted); font-weight: 400; }
+  .discovery-workflow__structure { margin: .75rem 0; }
+  .discovery-workflow__structure img { display: block; width: 100%; height: 130px; object-fit: contain; background: #fffdf8; }
+  .discovery-workflow__structure figcaption { margin-top: .35rem; color: var(--atlas-muted); font-size: .75rem; line-height: 1.5; }
+  .discovery-workflow__boundary { margin: 0; padding: .75rem 1.2rem; border-top: 1px solid var(--atlas-rule); color: var(--atlas-muted); font-size: .75rem; line-height: 1.6; }
+  :focus-visible { outline: 3px solid var(--atlas-teal); outline-offset: 3px; }
   [hidden] { display: none !important; }
-  @media (max-width: 800px) { .discovery-workflow__panel { grid-template-columns: 1fr; gap: 1rem; } .discovery-workflow__object-view { border-left: 0; padding: 1rem 0 0; border-top: 1px solid var(--atlas-rule); } .discovery-workflow__structure img { height: 220px; } }
-  @media (max-width: 580px) {
-    .discovery-workflow__heading { align-items: flex-start; padding: 1rem; }
-    .discovery-workflow__edition { max-width: 11ch; }
-    .discovery-workflow__steps { grid-template-columns: 1fr; padding: 0; }
-    .discovery-workflow__steps li + li { border-top: 1px solid var(--atlas-rule); }
-    .discovery-workflow__steps a { grid-template-columns: 1.5rem 48px 1fr; grid-template-rows: auto; gap: .5rem; padding: .45rem 1rem; text-align: left; border-bottom: 0; border-left: 3px solid transparent; align-items: center; justify-items: start; }
-    .discovery-workflow__steps a[aria-selected="true"] { border-left-color: var(--atlas-teal); }
-    .discovery-workflow__stage-object { width: 48px; height: 48px; }
-    .discovery-workflow__stage-object :global(.scientific-icon) { width: 48px; height: 48px; }
-    .discovery-workflow__steps small { margin-top: .1rem; }
-    .discovery-workflow__step-arrow { display: none; }
-    .discovery-workflow__panel { padding: 1.25rem 1rem; }
-    .discovery-workflow h3 { font-size: 1.4rem; }
-    .discovery-workflow__object-view ol { gap: .75rem; }
-    .discovery-workflow__object-arrow { right: -.8rem; }
-    .discovery-workflow__boundary { padding: .8rem 1rem; }
-  }
+  @media (max-width: 1000px) { .discovery-workflow__workspace { grid-template-columns: minmax(0, 1.25fr) minmax(16rem, 1fr); } .discovery-workflow__panel { padding: 1rem; } .discovery-workflow__steps strong { font-size: .75rem; } }
+  @media (max-width: 760px) { .discovery-workflow__workspace { grid-template-columns: 1fr; } .discovery-workflow__panels { border-left: 0; border-top: 1px solid var(--atlas-rule-strong); } .discovery-workflow__panel { padding: 1.1rem; } .discovery-workflow h3 { max-width: 45ch; } .discovery-workflow__description { max-width: 70ch; } .discovery-workflow__links { grid-template-columns: 1fr 1fr; column-gap: 1rem; } }
+  @media (max-width: 480px) { .discovery-workflow__heading { padding: .85rem; align-items: start; } .discovery-workflow__edition { max-width: 12ch; } .discovery-workflow__steps { grid-template-columns: repeat(3, minmax(0, 1fr)); } .discovery-workflow__steps a { min-height: 66px; padding: .5rem; } .discovery-workflow__steps li:nth-child(n+4) { border-top: 1px solid var(--atlas-rule); } .discovery-workflow__steps li:nth-child(4) { border-left: 0; } .discovery-workflow__steps strong { font-size: .75rem; } .discovery-workflow__links { grid-template-columns: 1fr; } .discovery-workflow__boundary { padding-inline: .85rem; } }
+  @media (prefers-reduced-motion: reduce) { .discovery-workflow * { scroll-behavior: auto; } }
 </style>

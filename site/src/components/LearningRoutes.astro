@@ -6,7 +6,6 @@ import {
   type Curriculum,
 } from "../../../scripts/curriculum/curriculum.js";
 import curriculumSource from "../../../catalog/curriculum/tracks.yaml?raw";
-import ScientificIcon from "./ScientificIcon.astro";
 
 interface Props {
   chinese?: boolean;
@@ -31,21 +30,6 @@ const corePath = curriculum.learning_paths.find((path) => path.kind === "core");
 const specialistPaths = curriculum.learning_paths.filter(
   (path) => path.kind === "specialist",
 );
-const trackIcons = {
-  foundations: "data", "drug-discovery-foundations": "assay", "machine-learning": "model",
-  "data-governance": "data", representations: "molecule", "mechanism-targets": "cell",
-  "qsar-properties": "molecule", "admet-pk": "assay", "dti-screening": "protein",
-  "structure-and-pockets": "protein", "physics-based-modeling": "simulation",
-  "molecular-generation": "molecule", "biologics-design": "protein",
-  "synthesis-and-automation": "robot", "active-learning": "robot", "scientific-agents": "model",
-  "evaluation-and-reproducibility": "data", "candidate-nomination": "data",
-} as const;
-const pathIcons = { core: "model", "small-molecules": "molecule", "structure-physics": "simulation", biologics: "protein", "targets-cells": "cell", "agents-feedback": "robot" } as const;
-function lessonIcon(lessonId: string) {
-  const track = lessonsByQualifiedId.get(lessonId)?.track.id as keyof typeof trackIcons;
-  return trackIcons[track] ?? "data";
-}
-
 const labels = chinese
   ? {
       capabilities: "教学能力",
@@ -115,7 +99,7 @@ function canonicalPrerequisites(lessonId: string): string[] {
     <section class="learning-routes__group" id="core-route" aria-labelledby="core-route-title">
       <p class="learning-routes__eyebrow">{labels.core}</p>
       <article class="learning-routes__route" data-learning-path={corePath.id} id={`learning-route-${corePath.id}`}>
-        <header class="learning-routes__route-heading"><ScientificIcon name="model" size={78} /><div><h2 id="core-route-title">{chinese ? corePath.title_zh : corePath.title}</h2><span class="learning-routes__route-count">{corePath.lesson_ids.filter((id) => lessonsByQualifiedId.get(id)?.lesson.type !== "core-source-path").length} {chinese ? "个有序课程节点" : "ordered lesson nodes"}</span></div></header>
+        <header class="learning-routes__route-heading"><span class="learning-routes__route-symbol" aria-hidden="true">C</span><div><h2 id="core-route-title">{chinese ? corePath.title_zh : corePath.title}</h2><span class="learning-routes__route-count">{corePath.lesson_ids.filter((id) => lessonsByQualifiedId.get(id)?.lesson.type !== "core-source-path").length} {chinese ? "个有序课程节点" : "ordered lesson nodes"}</span></div></header>
         <p>{chinese ? corePath.description_zh : corePath.description}</p>
         <ol class="learning-routes__steps">
           {corePath.lesson_ids.map((lessonId, index) => {
@@ -125,7 +109,7 @@ function canonicalPrerequisites(lessonId: string): string[] {
             const capabilities = capabilitiesForLesson(resolved.lesson);
             return (
               <li>
-                <span class="learning-routes__step"><span>{String(index + 1).padStart(2, "0")}</span><ScientificIcon name={lessonIcon(lessonId)} size={44} /></span>
+                <span class="learning-routes__step"><span>{String(index + 1).padStart(2, "0")}</span></span>
                 <div>
                   <a href={lessonHref(lessonId)}>{lessonTitle(lessonId)}</a>
                   <p>{lessonTrackTitle(lessonId)}</p>
@@ -158,7 +142,7 @@ function canonicalPrerequisites(lessonId: string): string[] {
     <div class="learning-routes__specialists">
       {specialistPaths.map((path) => (
         <article class="learning-routes__route" data-learning-path={path.id} id={`learning-route-${path.id}`}>
-          <header class="learning-routes__route-heading"><ScientificIcon name={pathIcons[path.id as keyof typeof pathIcons] ?? "data"} size={64} /><div><h3>{chinese ? path.title_zh : path.title}</h3><span class="learning-routes__route-count">{path.lesson_ids.filter((id) => lessonsByQualifiedId.get(id)?.lesson.type !== "core-source-path").length} {chinese ? "个有序课程节点" : "ordered lesson nodes"}</span></div></header>
+          <header class="learning-routes__route-heading"><span class="learning-routes__route-symbol" aria-hidden="true">↗</span><div><h3>{chinese ? path.title_zh : path.title}</h3><span class="learning-routes__route-count">{path.lesson_ids.filter((id) => lessonsByQualifiedId.get(id)?.lesson.type !== "core-source-path").length} {chinese ? "个有序课程节点" : "ordered lesson nodes"}</span></div></header>
           <p>{chinese ? path.description_zh : path.description}</p>
           {path.prerequisites.length > 0 && (
             <p class="learning-routes__external-prerequisites">
@@ -179,7 +163,7 @@ function canonicalPrerequisites(lessonId: string): string[] {
               const capabilities = capabilitiesForLesson(resolved.lesson);
               return (
                 <li>
-                  <span class="learning-routes__step"><span>{String(index + 1).padStart(2, "0")}</span><ScientificIcon name={lessonIcon(lessonId)} size={40} /></span>
+                  <span class="learning-routes__step"><span>{String(index + 1).padStart(2, "0")}</span></span>
                   <div>
                     <a href={lessonHref(lessonId)}>{lessonTitle(lessonId)}</a>
                     <p>{lessonTrackTitle(lessonId)}</p>
@@ -206,11 +190,11 @@ function canonicalPrerequisites(lessonId: string): string[] {
       ))}
     </div>
   </section>
-  <p class="learning-routes__boundary">{chinese ? "连线只表示课程源中的路径顺序；先修依赖另行列出。概念插图不代表已执行实验或已测得的学习成果。" : "Spines indicate route order from the curriculum source; prerequisite dependencies are listed separately. Conceptual illustrations do not represent executed experiments or measured learning outcomes."}</p>
+  <p class="learning-routes__boundary">{chinese ? "编号表示课程源中的路径顺序；先修依赖另行列出。路径不表示已执行实验或已测得的学习成果。" : "Numbers indicate route order from the curriculum source; prerequisite dependencies are listed separately. Routes do not represent executed experiments or measured learning outcomes."}</p>
 </section>
 
 <style>
-  .learning-routes { display: grid; gap: 2rem; margin-block: 1.5rem; color: var(--atlas-ink); }
+  .learning-routes { display: grid; gap: 1.5rem; margin-block: 1.5rem; color: var(--atlas-ink); }
   .learning-routes__group > h2, .learning-routes__route h2, .learning-routes__route h3 { margin: 0; line-height: 1.4; }
   .learning-routes__eyebrow { color: var(--atlas-teal-deep); font-size: .78rem; font-weight: 650; letter-spacing: .04em; margin: 0 0 .7rem; }
   .learning-routes__route { padding: 1rem 0; border: 0; border-top: 1px solid var(--atlas-rule-strong); background: transparent; min-width: 0; }
@@ -219,18 +203,22 @@ function canonicalPrerequisites(lessonId: string): string[] {
   .learning-routes__route h3 { font-size: 1.1rem; }
   .learning-routes__route-count { display: block; margin-top: .4rem; font: .75rem var(--atlas-font-mono); color: var(--atlas-muted); }
   .learning-routes__route > p { margin: .8rem 0 1rem; font-size: .88rem; line-height: 1.6; color: var(--atlas-muted); }
+  .learning-routes__route-symbol { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--atlas-rule-strong); border-radius: 50%; color: var(--atlas-teal-deep); font: 1.1rem var(--atlas-font-mono); }
+  .learning-routes__specialists .learning-routes__steps { grid-template-columns: 1fr; }
   .learning-routes__specialists { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; margin-top: 1rem; align-items: start; }
-  .learning-routes__steps { display: grid; gap: 0; margin: 1rem 0 0; padding: 0; list-style: none; counter-reset: none; }
-  .learning-routes__steps li { position: relative; display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: .8rem; padding: .9rem 0; border-top: 1px solid var(--atlas-rule); }
+  .learning-routes__steps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1.5rem; row-gap: 0; margin: 1rem 0 0; padding: 0; list-style: none; counter-reset: none; }
+  .learning-routes__steps li { position: relative; display: grid; grid-template-columns: 1.75rem minmax(0, 1fr); gap: .5rem; padding: .65rem 0; border-top: 1px solid var(--atlas-rule); }
   .learning-routes__step { position: relative; display: flex; flex-direction: column; align-items: center; gap: .3rem; color: var(--atlas-teal-deep); font: .75rem var(--atlas-font-mono); }
-  .learning-routes__step::before { position: absolute; top: 5.1rem; bottom: -1.3rem; left: 50%; content: ''; border-left: 1px solid var(--atlas-rule-strong); }
-  .learning-routes__step::after { position: absolute; bottom: -1.15rem; left: calc(50% - 2px); content: ''; width: 4px; height: 4px; border-right: 1px solid var(--atlas-muted); border-bottom: 1px solid var(--atlas-muted); transform: rotate(45deg); }
+  .learning-routes__step::before { position: absolute; top: 1.75rem; bottom: -.7rem; left: 50%; content: ''; border-left: 1px solid var(--atlas-rule-strong); }
+  .learning-routes__step::after { position: absolute; bottom: -.65rem; left: calc(50% - 2px); content: ''; width: 4px; height: 4px; border-right: 1px solid var(--atlas-muted); border-bottom: 1px solid var(--atlas-muted); transform: rotate(45deg); }
   .learning-routes__steps li:last-child .learning-routes__step::before, .learning-routes__steps li:last-child .learning-routes__step::after { display: none; }
+  [data-learning-path="core"] .learning-routes__step::before, [data-learning-path="core"] .learning-routes__step::after { display: none; }
   .learning-routes__steps > li > div { min-width: 0; }
+  .learning-routes__steps > li > div > a { display: inline-flex; align-items: center; min-height: 44px; }
   .learning-routes__steps a { font-weight: 650; font-size: .9rem; line-height: 1.5; overflow-wrap: anywhere; }
   .learning-routes__steps p, .learning-routes__external-prerequisites { margin: .3rem 0; color: var(--atlas-muted); font-size: .78rem; line-height: 1.6; }
   .learning-routes__steps p a, .learning-routes__external-prerequisites a { font-size: inherit; font-weight: 500; }
   .learning-routes__boundary { margin: 0; padding-top: .8rem; border-top: 1px dashed var(--atlas-rule); color: var(--atlas-muted); font-size: .75rem; line-height: 1.6; }
-  @media (max-width: 48rem) { .learning-routes__specialists { grid-template-columns: minmax(0, 1fr); } }
-  @media (max-width: 30rem) { .learning-routes__steps li { grid-template-columns: 44px minmax(0, 1fr); gap: .6rem; } .learning-routes__route h2 { font-size: 1.15rem; } .learning-routes__route-heading { gap: .6rem; } }
+  @media (max-width: 48rem) { .learning-routes__specialists, .learning-routes__steps { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 30rem) { .learning-routes__steps li { grid-template-columns: 1.5rem minmax(0, 1fr); gap: .6rem; } .learning-routes__route h2 { font-size: 1.15rem; } .learning-routes__route-heading { gap: .6rem; } }
 </style>

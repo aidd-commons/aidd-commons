@@ -11,14 +11,22 @@ const valueLabels = { available: t("Available","可用"), not_available: t("Not 
 const symbols = { available: "✓", not_available: "—", not_applicable: "∅", unverified: "?" };
 ---
 
-<section class="openness-view" aria-label={t("Dimension-specific openness evidence","各维度的开放性证据")}>
+<openness-inspector class="openness-view" aria-label={t("Dimension-specific openness evidence","各维度的开放性证据")}>
   <header><p>{t("Seven independent claims","七项独立主张")}</p><h3>{t("Inspect the reusable parts","检查可复用部分")}</h3><p>{t("Availability, licence and access are separate questions. Unknown is not a closed claim.","可用性、许可与访问是不同问题。未知不意味着问题已定论。")}</p></header>
   <ol class="openness-profile" aria-label={t("Openness dimension profile","开放性维度概况")}>
     {opennessDimensions.map((dimension,index)=>{
       const value=resource.openness[dimension].value as keyof typeof valueLabels;
-      return <li class={`openness-state-${value}`}><span class="openness-profile__number">{String(index+1).padStart(2,"0")}</span><strong>{labels[dimension]}</strong><span class="openness-profile__claim"><i aria-hidden="true">{symbols[value]??"?"}</i>{valueLabels[value]??value}</span></li>;
+      return <li class={`openness-state-${value}`}><button type="button" data-openness-dimension={dimension} aria-pressed={index === 0 ? "true" : "false"} aria-controls={`openness-claim-${dimension}`} disabled><strong>{labels[dimension]}</strong><span class="openness-profile__claim"><i aria-hidden="true">{symbols[value]??"?"}</i>{valueLabels[value]??value}</span></button></li>;
     })}
   </ol>
+  <div class="openness-inspection" data-openness-inspection hidden>
+    {opennessDimensions.map((dimension, index) => {
+      const value = resource.openness[dimension].value as keyof typeof valueLabels;
+      return <section id={`openness-claim-${dimension}`} data-openness-claim={dimension} hidden={index !== 0} aria-labelledby={`openness-claim-title-${dimension}`}><p class="openness-inspection__eyebrow">{t("Selected dimension", "所选维度")} · {resource.name}</p><h4 id={`openness-claim-title-${dimension}`}>{labels[dimension]} <span class={`openness-state-${value}`}>{valueLabels[value] ?? value}</span></h4><ClaimEvidence evidence={resource.evidence} ids={resource.openness[dimension].evidence} emptyMessage={t("Unknown — no direct evidence is recorded.", "未知：未记录直接证据。")} /><p class="openness-inspection__note">{t("Record checked", "记录核查日期")} <time datetime={resource.last_verified}>{resource.last_verified}</time>{t(". This state applies to this dimension only. Inspect licence scope and access separately.", "。此状态仅适用于该维度。许可范围与访问条件需分别检查。")}</p></section>;
+    })}
+  </div>
+  <details class="openness-table-fallback" data-openness-table open>
+  <summary>{t("Read all seven claims and sources as a table", "以表格阅读全部七项主张与来源")}</summary>
   <div class="openness-matrix" role="region" aria-label={t("Openness matrix","开放性矩阵")} tabindex="0">
     <table>
       <caption>{t("Openness claims remain dimension-specific. Each row links its own supporting evidence.","开放性主张按维度分别记录，每行链接各自的支持证据。")}</caption>
@@ -29,12 +37,35 @@ const symbols = { available: "✓", not_available: "—", not_applicable: "∅",
       })}</tbody>
     </table>
   </div>
-</section>
+  </details>
+</openness-inspector>
+
+<script>
+  class OpennessInspector extends HTMLElement {
+    connectedCallback() {
+      const buttons = this.querySelectorAll<HTMLButtonElement>("[data-openness-dimension]");
+      const inspection = this.querySelector<HTMLElement>("[data-openness-inspection]");
+      const fallback = this.querySelector<HTMLDetailsElement>("[data-openness-table]");
+      if (!inspection || !fallback) return;
+      inspection.hidden = false;
+      fallback.open = false;
+      buttons.forEach(button => {
+        button.disabled = false;
+        button.addEventListener("click", () => {
+          buttons.forEach(candidate => candidate.setAttribute("aria-pressed", String(candidate === button)));
+          this.querySelectorAll<HTMLElement>("[data-openness-claim]").forEach(claim => { claim.hidden = claim.dataset.opennessClaim !== button.dataset.opennessDimension; });
+        });
+      });
+    }
+  }
+  if (!customElements.get("openness-inspector")) customElements.define("openness-inspector", OpennessInspector);
+</script>
 
 <style>
-  .openness-view{min-width:0;color:var(--atlas-ink)}header{padding-block:1rem;border-top:1px solid var(--atlas-rule-strong)}header>p:first-child{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--atlas-teal-deep);font-weight:650;margin:0 0 .4rem}header h3{font-size:1.15rem;margin:0}header>p:last-child{font-size:.82rem;line-height:1.6;color:var(--atlas-muted);margin:.45rem 0 0}
-  .openness-profile{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));list-style:none;margin:.5rem 0 1.5rem;padding:0;gap:.7rem}.openness-profile li{min-width:0;display:flex;flex-direction:column;gap:.6rem;align-items:start;border-top:3px solid var(--atlas-rule-strong);padding:.7rem 0;font-size:.75rem;line-height:1.4}.openness-profile__number{font-size:.75rem;color:var(--atlas-muted);font-variant-numeric:tabular-nums}.openness-profile strong{font-size:.8rem;font-weight:600;min-height:2.3em}.openness-profile__claim{display:flex;gap:.4rem;align-items:center;margin-top:auto}.openness-profile__claim i,.openness-table-claim i{display:inline-grid;place-items:center;flex:0 0 1.2rem;width:1.2rem;height:1.2rem;border:1px solid currentColor;border-radius:50%;font-style:normal;font-size:.85rem;line-height:1}
+  .openness-view{display:block;min-width:0;color:var(--atlas-ink)}.openness-view [hidden]{display:none!important}header{padding-block:.7rem;border-top:1px solid var(--atlas-rule-strong)}header>p:first-child{font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--atlas-teal-deep);font-weight:650;margin:0 0 .3rem}header h3{font-size:1.15rem;margin:0}header>p:last-child{font-size:.8rem;line-height:1.5;color:var(--atlas-muted);margin:.35rem 0 0}
+  .openness-profile{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));list-style:none;margin:.5rem 0 .75rem!important;padding:0!important;gap:3px}.openness-profile li{min-width:0;margin:0;border-top:3px solid var(--atlas-rule-strong);font-size:.75rem;line-height:1.4}.openness-profile button{display:flex;flex-direction:column;gap:.65rem;align-items:start;min-height:6.3rem;width:100%;height:100%;padding:.65rem .5rem;border:0;background:var(--atlas-surface);color:inherit;font:inherit;text-align:left;cursor:pointer}.openness-profile button[aria-pressed=true]{background:color-mix(in srgb,var(--atlas-teal) 12%,var(--atlas-panel));box-shadow:inset 0 0 0 2px var(--atlas-teal-deep)}.openness-profile button:disabled{cursor:default}.openness-profile strong{font-size:.75rem;font-weight:600;min-height:2.3em}.openness-profile__claim{display:flex;gap:.4rem;align-items:center;margin-top:auto;font-size:.68rem}.openness-profile__claim i,.openness-table-claim i{display:inline-grid;place-items:center;flex:0 0 1.1rem;width:1.1rem;height:1.1rem;border:1px solid currentColor;border-radius:50%;font-style:normal;font-size:.8rem;line-height:1}
+  .openness-inspection{border-left:3px solid var(--atlas-teal-deep);background:var(--atlas-surface);padding:.85rem 1rem}.openness-inspection__eyebrow{margin:0;font-size:.7rem;color:var(--atlas-muted)}.openness-inspection h4{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem;font-size:1rem;margin:.35rem 0 .7rem}.openness-inspection h4 span{font-size:.75rem;font-weight:500;border:1px solid var(--atlas-rule);padding:.15rem .4rem}.openness-inspection__note{font-size:.75rem;color:var(--atlas-muted);margin:.6rem 0 0;line-height:1.6}.openness-table-fallback{border:0;margin-top:.5rem}.openness-table-fallback summary{cursor:pointer;font-size:.8rem;min-height:44px;padding-block:.7rem}.openness-profile button:focus-visible,.openness-table-fallback summary:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
   .openness-state-available{color:var(--atlas-teal-deep);border-color:var(--atlas-teal-deep)!important}.openness-state-not_available{color:var(--atlas-ink)}.openness-state-not_available i{border-radius:0}.openness-state-not_applicable{color:var(--atlas-muted)}.openness-state-unverified{color:var(--atlas-ink);border-top-style:double!important}.openness-state-unverified i{border-style:dashed}
   .openness-matrix{max-width:100%;overflow-x:auto;border:0;border-top:1px solid var(--atlas-rule)}.openness-matrix table{width:100%;min-width:32rem;border-collapse:collapse;font-size:.8rem}.openness-matrix caption{text-align:left;color:var(--atlas-muted);font-size:.78rem;padding:.75rem 0}.openness-matrix th,.openness-matrix td{text-align:left;vertical-align:top;border:0;border-top:1px solid var(--atlas-rule);padding:.75rem .65rem;letter-spacing:normal}.openness-matrix thead th{font-size:.75rem;color:var(--atlas-muted);font-weight:600}.openness-matrix tbody th{font-size:.8rem;font-weight:600;width:22%}.openness-matrix tbody td:nth-child(2){width:24%}.openness-table-claim{display:flex;gap:.5rem;align-items:center;font-size:.78rem}.openness-matrix:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
-  @media(max-width:55rem){.openness-profile{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:32rem){.openness-profile{grid-template-columns:repeat(2,minmax(0,1fr))}.openness-profile strong{min-height:0}}
+  @media(max-width:55rem){.openness-profile{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:32rem){.openness-profile{grid-template-columns:repeat(2,minmax(0,1fr))}.openness-profile strong{min-height:0}.openness-profile button{min-height:5.3rem}}
 </style>

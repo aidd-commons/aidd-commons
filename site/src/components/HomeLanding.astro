@@ -1,8 +1,8 @@
 ---
 import AtlasFigure from "./AtlasFigure.astro";
+import AssayResultExplorer from "./AssayResultExplorer.astro";
 import HomeWorkflow from "./HomeWorkflow.astro";
 import LearningProgressPanel from "./LearningProgressPanel.astro";
-import ScientificIcon from "./ScientificIcon.astro";
 import { catalogResources, siteOverview } from "../lib/site-overview";
 import { withSiteBase } from "../lib/site-paths";
 import { workbenchData } from "../lib/workbench-data";
@@ -25,7 +25,7 @@ const backgrounds = chinese ? [
   { label: "From research & engineering", title: "Build an evidence trail for a real comparison", description: "Bound the task and reuse conditions. Inspect resources, protocols and existing results.", track: "evaluation-and-reproducibility", detail: "Question → comparison → source" },
 ];
 const selectedResources = ["model-boltz-2", "db-chembl-37", "tool-rdkit"].map((id) => catalogResources.find((record) => record.id === id)!);
-const backgroundObjects = [["protein", "molecule"], ["data", "model"], ["simulation", "robot"]] as const;
+
 ---
 
 <section class="aidd-home-hero" aria-labelledby="home-title" data-home-workbench>
@@ -43,8 +43,8 @@ const backgroundObjects = [["protein", "molecule"], ["data", "model"], ["simulat
 <HomeWorkflow chinese={chinese} />
 
 <section class="aidd-home-case" aria-labelledby="home-case-title">
-  <div class="aidd-home-case__story"><p class="eyebrow">{chinese ? "真实结果 · 保留失败证据" : "Worked case · adverse evidence retained"}</p><h2 id="home-case-title">{chinese ? "同一靶点，为什么基线排名会改变？" : "Same target. Why does the baseline ranking change?"}</h2><p>{chinese ? "ChEMBL 37 的 EGFR 比较在主要划分和另一测定上保留了不同的排名。一次固定评价得到了一个结果；它没有保证这个排名能迁移到下一次测定。" : "The ChEMBL 37 EGFR comparison retains different rankings on its primary partition and a separate assay. A frozen evaluation establishes a result; it does not guarantee that the ranking will transfer to another assay."}</p><dl><div><dt>{chinese ? "对象" : "Object"}</dt><dd>EGFR · CHEMBL203</dd></div><div><dt>{chinese ? "端点" : "Endpoint"}</dt><dd>pChEMBL · exact IC50</dd></div><div><dt>{chinese ? "执行模式" : "Mode"}</dt><dd>{chinese ? "阅读已有结果" : "Read retained results"}</dd></div></dl><p class="aidd-home-case__limit">{chinese ? "两个评价是不同的比较。相关采集实验曾访问共享标签；这不是未经接触的确认集，也没有报告置信区间或 p 值。" : "These are separate comparisons. A related acquisition lab had accessed shared labels. This is not untouched confirmation, and no confidence intervals or p values are reported."}</p><a class="aidd-home-primary" href={local("/labs/chembl-egfr-representation-baselines/")}>{chinese ? "检查比较、表格与协议" : "Inspect the comparison, tables and protocol"}<span aria-hidden="true">→</span></a>{egfrCase && <p class="aidd-home-source-date">{chinese ? "保留结果来源日期" : "Retained result source date"}: {egfrCase.sourceDate}</p>}</div>
-  <div class="aidd-home-case__figure"><AtlasFigure id="representation-flips" />{chinese && <p class="aidd-home-language-label">原始英文图、数值与下载文件保持不变。</p>}</div>
+  <div class="aidd-home-case__story"><p class="eyebrow">{chinese ? "真实结果 · 保留失败证据" : "Worked case · adverse evidence retained"}</p><h2 id="home-case-title">{chinese ? "同一靶点，为什么基线排名会改变？" : "Same target. Why does the baseline ranking change?"}</h2><p>{chinese ? "ChEMBL 37 的 EGFR 比较在主要划分和另一测定上保留了不同的排名。一次固定评价得到了一个结果；它没有保证这个排名能迁移到下一次测定。" : "The ChEMBL 37 EGFR comparison retains different rankings on its primary partition and a separate assay. A frozen evaluation establishes a result; it does not guarantee that the ranking will transfer to another assay."}</p><dl><div><dt>{chinese ? "对象" : "Object"}</dt><dd>EGFR · CHEMBL203</dd></div><div><dt>{chinese ? "端点" : "Endpoint"}</dt><dd>pChEMBL · exact IC50</dd></div><div><dt>{chinese ? "执行模式" : "Mode"}</dt><dd>{chinese ? "阅读已有结果" : "Read retained results"}</dd></div></dl><p class="aidd-home-case__limit">{chinese ? "两个评价是不同的比较。T15 采集实验在此次评价前访问了与 T05 共享的标签；这不是未经接触的确认集，也没有报告置信区间或 p 值。" : "These are separate comparisons. Before this evaluation, the T15 acquisition lab accessed labels shared with T05. This is not untouched confirmation, and no confidence intervals or p values are reported."}</p><a class="aidd-home-primary" href={local("/labs/chembl-egfr-representation-baselines/")}>{chinese ? "检查比较、表格与协议" : "Inspect the comparison, tables and protocol"}<span aria-hidden="true">→</span></a>{egfrCase && <p class="aidd-home-source-date">{chinese ? "保留结果来源日期" : "Retained result source date"}: {egfrCase.sourceDate}</p>}</div>
+  <div class="aidd-home-case__figure"><AssayResultExplorer chinese={chinese} compact /><details class="aidd-home-case__saved-figure"><summary>{chinese ? "静态图件与 PDF" : "Static figure and PDF"}</summary><AtlasFigure id="representation-flips" /></details>{chinese && <p class="aidd-home-language-label">原始英文图、数值与下载文件保持不变。</p>}</div>
 </section>
 
 <p class="aidd-home-visual-library"><a href={local("/report/figures/")}>{chinese ? "打开科学图件阅读台 · PDF 与可编辑方法图" : "Open the scientific figure library · PDFs and editable diagrams"}<span aria-hidden="true"> ↗</span></a></p>
@@ -59,7 +59,7 @@ const backgroundObjects = [["protein", "molecule"], ["data", "model"], ["simulat
 
 <section class="aidd-home-backgrounds" aria-labelledby="home-background-title">
   <div class="aidd-home-section-heading"><div><p class="eyebrow">{chinese ? "从你的背景出发" : "Start from your background"}</p><h2 id="home-background-title">{chinese ? "不必从同一扇门进入" : "Choose a useful starting point"}</h2></div><a href={local("/learn/")}>{chinese ? "全部路径" : "All learning routes"}<span aria-hidden="true">→</span></a></div>
-  <div class="aidd-home-background-grid">{backgrounds.map((entry, index) => <article><div class="aidd-home-background__objects" aria-hidden="true"><ScientificIcon name={backgroundObjects[index][0]} size={74} /><span>→</span><ScientificIcon name={backgroundObjects[index][1]} size={64} /></div><p class="aidd-home-background__label"><span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>{entry.label}</p><h3><a href={local(`/learn/tracks/${entry.track}/`)}>{entry.title}<span aria-hidden="true">↗</span></a></h3><p>{entry.description}</p><span class="aidd-home-background__path">{entry.detail}</span></article>)}</div>
+  <div class="aidd-home-background-grid">{backgrounds.map((entry, index) => <article><p class="aidd-home-background__label"><span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>{entry.label}</p><h3><a href={local(`/learn/tracks/${entry.track}/`)}>{entry.title}<span aria-hidden="true">↗</span></a></h3><p>{entry.description}</p><span class="aidd-home-background__path">{entry.detail}</span></article>)}</div>
 </section>
 
 <section class="aidd-home-desk" aria-label={chinese ? "继续学习与资源阅读" : "Continue learning and inspect resources"}>
@@ -100,16 +100,16 @@ const backgroundObjects = [["protein", "molecule"], ["data", "model"], ["simulat
   .aidd-home-section-heading h2 { margin: 0; font-size: clamp(1.25rem, 2.2vw, 1.75rem); line-height: 1.25; letter-spacing: -.035em; }
   .aidd-home-section-heading > a { display: inline-flex; align-items: center; gap: .75rem; min-height: 44px; font-size: .75rem; white-space: nowrap; }
   .aidd-home-background-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--atlas-rule-strong); border-bottom: 1px solid var(--atlas-rule); }
-  .aidd-home-background-grid article { display: flex; flex-direction: column; padding: 1.35rem 1.5rem 1.25rem 0; min-width: 0; }
+  .aidd-home-background-grid article { display: flex; flex-direction: column; padding: 1.1rem 1.5rem 1.1rem 0; min-width: 0; }
   .aidd-home-background-grid article + article { border-left: 1px solid var(--atlas-rule); padding-left: 1.5rem; }
   .aidd-home-background__objects { display: flex; align-items: center; gap: 1rem; height: 5.5rem; margin-bottom: .8rem; }
   .aidd-home-background__objects > span { color: var(--atlas-rule-strong); font-size: 1.2rem; }
   .aidd-home-background__label { display: flex; gap: .65rem; margin: 0 0 .85rem; color: var(--atlas-teal-deep); font-size: .75rem; font-weight: 600; }
   .aidd-home-background__label span { font-family: var(--atlas-font-mono); }
-  .aidd-home-background-grid h3 { margin: 0; font-size: 1.15rem; line-height: 1.35; letter-spacing: -.025em; }
+  .aidd-home-background-grid h3 { margin: 0; font-size: 1.05rem; line-height: 1.35; letter-spacing: -.025em; }
   .aidd-home-background-grid h3 a { display: flex; gap: .75rem; justify-content: space-between; min-height: 44px; color: var(--atlas-ink); text-decoration: none; }
   .aidd-home-background-grid h3 a span { color: var(--atlas-teal-deep); font-size: .9rem; }
-  .aidd-home-background-grid article > p:not(.aidd-home-background__label) { margin: .65rem 0 .8rem; color: var(--atlas-muted); font-size: 1rem; line-height: 1.65; }
+  .aidd-home-background-grid article > p:not(.aidd-home-background__label) { margin: .65rem 0 .8rem; color: var(--atlas-muted); font-size: .875rem; line-height: 1.65; }
   .aidd-home-background__path { margin-top: auto; color: var(--atlas-muted); font-size: .75rem; font-family: var(--atlas-font-mono); }
   .aidd-home-case { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.25fr); gap: 1.75rem; padding: 1.75rem 0 1.25rem; border-bottom: 1px solid var(--atlas-rule); align-items: start; }
   .aidd-home-case .eyebrow { font-size: .75rem; margin: 0 0 .6rem; }
@@ -122,6 +122,8 @@ const backgroundObjects = [["protein", "molecule"], ["data", "model"], ["simulat
   .aidd-home-case__story .aidd-home-case__limit { padding-left: .8rem; border-left: 2px solid var(--atlas-emphasis); font-size: .75rem; line-height: 1.65; }
   .aidd-home-case__story .aidd-home-source-date { font-size: .75rem; }
   .aidd-home-case__figure { min-width: 0; }
+  .aidd-home-case__saved-figure { margin-top: .75rem; border-top: 1px solid var(--atlas-rule); }
+  .aidd-home-case__saved-figure > summary { min-height: 44px; padding-block: .6rem; font-size: .75rem; cursor: pointer; }
   .aidd-home-case__figure :global(.atlas-figure) { margin-top: 0; margin-bottom: 0; }
   .aidd-home-case__figure :global(.atlas-figure__caption) { font-size: .75rem; line-height: 1.65; }
   .aidd-home-language-label { color: var(--atlas-muted); font-size: .75rem; }
@@ -154,7 +156,7 @@ const backgroundObjects = [["protein", "molecule"], ["data", "model"], ["simulat
     .aidd-home-search__examples { gap: .2rem 1rem; }
     .aidd-home-search__examples > span { flex-basis: auto; margin-right: .25rem; }
     .aidd-home-background-grid { grid-template-columns: 1fr; }
-    .aidd-home-background-grid article { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); column-gap: 1rem; padding: 1rem 0; }
+    .aidd-home-background-grid article { display: flex; padding: 1rem 0; }
     .aidd-home-background-grid article + article { border-left: 0; padding-left: 0; border-top: 1px solid var(--atlas-rule); }
     .aidd-home-background__objects { grid-row: 1 / 5; flex-direction: column; gap: .25rem; height: auto; margin: 0; }
     .aidd-home-background__objects > span { line-height: 1; transform: rotate(90deg); }

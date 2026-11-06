@@ -5,38 +5,37 @@ import type { Curriculum } from "../../../scripts/curriculum/curriculum.js";
 import type { Resource } from "../../../catalog/schema/resource.js";
 import source from "../../../catalog/curriculum/tracks.yaml?raw";
 import resourceData from "../../public/data/resources.v1.json";
-import ScientificIcon from "./ScientificIcon.astro";
+import { withSiteBase } from "../lib/site-paths";
 
 interface Props { chinese?: boolean; }
 const { chinese = false } = Astro.props;
-const map = buildResourceMap(parse(source) as Curriculum, resourceData as Resource[]);
+const curriculum = parse(source) as Curriculum;
+const map = buildResourceMap(curriculum, resourceData as Resource[]);
 const resources = new Map(map.resources.map((resource) => [resource.id, resource]));
 const prefix = chinese ? "/zh-cn" : "";
 const assignedLessons = new Set(map.rows.flatMap((row) => row.lesson_id ? [row.lesson_id] : [])).size;
-const trackIcons = ["data", "assay", "model", "data", "molecule", "cell", "molecule", "assay", "protein", "protein", "simulation", "molecule", "protein", "robot", "robot", "model", "data", "data"] as const;
 const capabilityLabels: Record<string, string> = chinese
   ? { orientation: "导览", explanation: "讲解", "worked-example": "示例", exercise: "练习", runnable: "可运行" }
   : { orientation: "Orientation", explanation: "Explanation", "worked-example": "Worked example", exercise: "Exercise", runnable: "Runnable" };
+const local = (path: string) => withSiteBase(path, import.meta.env.BASE_URL);
+const lessonTitles = new Map(curriculum.tracks.flatMap((track) => track.lessons.map((lesson) => [`${track.id}/${lesson.id}`, chinese ? lesson.title_zh : lesson.title])));
+const projection = map.rows.map((row) => ({ ...row, title: chinese ? row.title_zh : row.title, lesson_title: row.lesson_id ? lessonTitles.get(row.lesson_id) : null, href: row.lesson_id ? local(`${prefix}/learn/${row.lesson_id}/`) : null }));
+const first = projection[0];
+const resourceProjection = map.resources.map((resource) => ({ ...resource, href: local(`/atlas/${resource.id}/`) }));
 ---
 
 <section class="curriculum-resource-map not-content" data-curriculum-resource-map aria-label={chinese ? "当前单元资源矩阵" : "Current unit resource matrix"}>
-  <figure class="resource-map-flow">
-    <ol>
-      <li><span>{chinese ? "课程单元" : "Curriculum units"}</span><ScientificIcon name="data" size={72} /><strong>{map.rows.length}</strong><small>{chinese ? "单元对象与学习目标" : "Unit identities and objectives"}</small><i aria-hidden="true">→</i></li>
-      <li><span>{chinese ? "已关联正文" : "Linked lessons"}</span><ScientificIcon name="model" size={72} /><strong>{assignedLessons}</strong><small>{chinese ? "去重后的正文目的地" : "Distinct lesson destinations"}</small><i aria-hidden="true">→</i></li>
-      <li><span>{chinese ? "已登记阅读" : "Registered reading"}</span><ScientificIcon name="data" size={72} /><strong>{map.resources.length}</strong><small>{chinese ? "正文与轨道的去重资源" : "Distinct lesson and track resources"}</small></li>
-    </ol>
-    <figcaption>{chinese ? "箭头表示源文件中登记的关联，不是资源充分性、证据强度或学习成果评分。概念插图不代表测量。" : "Arrows show registered source associations, not resource sufficiency, evidence strength or learning-outcome scores. Illustrations are conceptual, not measurements."}</figcaption>
-  </figure>
-  <p>
-    {chinese
-      ? `${map.rows.length} 个单元；Atlas 共 ${map.catalog_resource_count} 条资源。下列参考资料按现有课程关联生成，不是逐单元完整性评分。`
-      : `${map.rows.length} units; ${map.catalog_resource_count} resources in the Atlas. Reading lists follow current lesson assignments; they are not per-unit completeness scores.`}
-  </p>
-  <p><a href="/data/curriculum-resources.json" download>{chinese ? "下载当前资源关联（JSON）" : "Download current resource associations (JSON)"}</a></p>
+  <div class="resource-map-heading"><p>{chinese ? "课程源中的关联" : "Associations declared in the curriculum"}</p><h3>{chinese ? "从一个单元，读到课程与资源" : "Trace a unit to its lesson and reading"}</h3><div><span><strong>{map.rows.length}</strong> {chinese ? "单元" : "units"}</span><span aria-hidden="true">→</span><span><strong>{assignedLessons}</strong> {chinese ? "正文目的地" : "lesson destinations"}</span><span aria-hidden="true">→</span><span><strong>{map.resources.length}</strong> {chinese ? "去重资源" : "distinct resources"}</span></div></div>
+  <resource-relationship-inspector class="resource-inspector" data-rows={JSON.stringify(projection)} data-resources={JSON.stringify(resourceProjection)} data-capabilities={JSON.stringify(capabilityLabels)} data-chinese={String(chinese)}>
+    <section class="resource-inspector__units"><h4><span>01</span>{chinese ? "选择单元" : "Choose a unit"}</h4><label data-resource-controls hidden>{chinese ? "课程轨道" : "Curriculum track"}<select data-resource-track-choice>{map.tracks.map((track) => <option value={track.id}>{chinese ? track.title_zh : track.title}</option>)}</select></label><ol data-resource-unit-list>{projection.filter((row) => row.track_id === first.track_id).map((row) => <li><a href={`#resource-unit-${row.unit_id}`} data-inspect-unit={row.unit_id} aria-current={row.unit_id === first.unit_id ? "true" : undefined}>{row.title}<span aria-hidden="true">→</span></a></li>)}</ol></section>
+    <section class="resource-inspector__lesson"><h4><span>02</span>{chinese ? "课程正文" : "Lesson destination"}</h4><code data-selected-unit-id>{first.unit_id}</code><h3 data-selected-unit-title>{first.title}</h3><a data-selected-lesson href={first.href ?? `#resource-unit-${first.unit_id}`}>{first.lesson_title}<span aria-hidden="true">↗</span></a><p class="resource-inspector__activity-label">{chinese ? "已声明的章节活动" : "Declared lesson activities"}</p><ul class="resource-inspector__activities" data-selected-capabilities>{first.capabilities.map((value) => <li>{capabilityLabels[value]}</li>)}</ul><p class="resource-inspector__scope">{chinese ? "多个单元可以连接同一课程正文。章节活动不等于逐单元覆盖，也不是学习效果评分。" : "Several units can link to one lesson. Lesson activities do not establish per-unit coverage or measured learning."}</p></section>
+    <section class="resource-inspector__resources"><h4><span>03</span>{chinese ? "关联阅读" : "Registered reading"}</h4><p data-resource-count>{first.lesson_resource_ids.length} {chinese ? "项章节登记资源" : "assigned lesson resources"}</p><ul data-selected-resources>{first.lesson_resource_ids.map((id) => { const resource = resourceProjection.find((item) => item.id === id)!; return <li><a href={resource.href}>{resource.name}<span aria-hidden="true">↗</span></a><small>{resource.kind} · {resource.access_level}</small></li>; })}</ul><details class="resource-inspector__track-reading"><summary>{chinese ? "另见轨道阅读" : "Additional track reading"}<span data-track-reading-count> ({first.pathway_resource_ids.length})</span></summary><ul data-selected-track-resources>{first.pathway_resource_ids.map((id) => { const resource = resourceProjection.find((item) => item.id === id)!; return <li><a href={resource.href}>{resource.name}</a></li>; })}</ul></details></section>
+  </resource-relationship-inspector>
+  <p class="resource-map-note">{chinese ? `Atlas 共 ${map.catalog_resource_count} 条资源。这里展示源文件关联；资源充分性尚未逐单元评定。` : `The Atlas contains ${map.catalog_resource_count} resources. This view shows source associations; resource sufficiency has not been assessed per unit.`} <a href={local("/data/curriculum-resources.json")} download>{chinese ? "下载关联 JSON" : "Download associations JSON"}<span aria-hidden="true"> ↗</span></a></p>
+  <h3 class="resource-map-source-title">{chinese ? "完整可访问关联列表" : "Complete accessible association list"}</h3>
   {map.tracks.map((track, index) => (
     <details class="resource-map-track" data-resource-track={track.id} open={track.id === "foundations"}>
-      <summary><span class="resource-map-track__number">{String(index + 1).padStart(2, "0")}</span><ScientificIcon name={trackIcons[index]} size={44} /><strong>{chinese ? track.title_zh : track.title}</strong><span class="resource-map-track__count">{map.rows.filter((row) => row.track_id === track.id).length} {chinese ? "单元" : "units"}<span aria-hidden="true"> +</span></span></summary>
+      <summary><span class="resource-map-track__number">{String(index + 1).padStart(2, "0")}</span><strong>{chinese ? track.title_zh : track.title}</strong><span class="resource-map-track__count">{map.rows.filter((row) => row.track_id === track.id).length} {chinese ? "单元" : "units"}<span aria-hidden="true"> +</span></span></summary>
       <table>
         <caption>{chinese ? "课程活动与参考资料分开列出；资源充分性尚未逐单元评定。" : "Teaching activities and reading are separate; resource sufficiency has not been assessed per unit."}</caption>
         <thead><tr>
@@ -45,7 +44,7 @@ const capabilityLabels: Record<string, string> = chinese
           <th scope="col">{chinese ? "章节登记资源" : "Registered lesson resources"}</th>
         </tr></thead>
         <tbody>{map.rows.filter((row) => row.track_id === track.id).map((row) => (
-          <tr data-resource-unit={row.unit_id}>
+          <tr id={`resource-unit-${row.unit_id}`} data-resource-unit={row.unit_id}>
             <th scope="row">{row.lesson_id
               ? <a data-resource-lesson href={`${prefix}/learn/${row.lesson_id}/`}>{chinese ? row.title_zh : row.title}</a>
               : <span>{chinese ? row.title_zh : row.title} ({chinese ? "计划中" : "Planned"})</span>}</th>
@@ -68,6 +67,38 @@ const capabilityLabels: Record<string, string> = chinese
 </section>
 
 <script>
+  type RelationshipRow = { unit_id: string; track_id: string; title: string; lesson_title: string | null; href: string | null; capabilities: string[]; lesson_resource_ids: string[]; pathway_resource_ids: string[] };
+  type Reading = { id: string; name: string; kind: string; access_level: string; href: string };
+  class ResourceRelationshipInspector extends HTMLElement {
+    connectedCallback() {
+      const rows = JSON.parse(this.dataset.rows ?? "[]") as RelationshipRow[];
+      const resources = JSON.parse(this.dataset.resources ?? "[]") as Reading[];
+      const labels = JSON.parse(this.dataset.capabilities ?? "{}") as Record<string, string>;
+      const chinese = this.dataset.chinese === "true";
+      const trackChoice = this.querySelector<HTMLSelectElement>("[data-resource-track-choice]")!;
+      this.querySelector<HTMLElement>("[data-resource-controls]")!.hidden = false;
+      const select = (id: string, writeUrl: boolean) => {
+        const row = rows.find((entry) => entry.unit_id === id); if (!row) return;
+        this.dataset.selectedUnit = row.unit_id;
+        trackChoice.value = row.track_id;
+        const units = this.querySelector<HTMLOListElement>("[data-resource-unit-list]")!; units.replaceChildren();
+        rows.filter((entry) => entry.track_id === row.track_id).forEach((entry) => { const item = document.createElement("li"); const anchor = document.createElement("a"); anchor.href = `#resource-unit-${entry.unit_id}`; anchor.dataset.inspectUnit = entry.unit_id; anchor.textContent = entry.title; if (entry.unit_id === id) anchor.setAttribute("aria-current", "true"); const arrow = document.createElement("span"); arrow.textContent = "→"; arrow.setAttribute("aria-hidden", "true"); anchor.append(arrow); item.append(anchor); units.append(item); });
+        this.querySelector("[data-selected-unit-id]")!.textContent = row.unit_id;
+        this.querySelector("[data-selected-unit-title]")!.textContent = row.title;
+        const lesson = this.querySelector<HTMLAnchorElement>("[data-selected-lesson]")!; lesson.textContent = row.lesson_title ?? (chinese ? "计划中，没有正文链接" : "Planned, no lesson destination"); lesson.href = row.href ?? `#resource-unit-${row.unit_id}`;
+        const capabilities = this.querySelector<HTMLUListElement>("[data-selected-capabilities]")!; capabilities.replaceChildren(); row.capabilities.forEach((capability) => { const item = document.createElement("li"); item.textContent = labels[capability]; capabilities.append(item); });
+        this.querySelector("[data-resource-count]")!.textContent = `${row.lesson_resource_ids.length} ${chinese ? "项章节登记资源" : "assigned lesson resources"}`;
+        this.querySelector("[data-track-reading-count]")!.textContent = ` (${row.pathway_resource_ids.length})`;
+        for (const [selector, ids, withMetadata] of [["[data-selected-resources]", row.lesson_resource_ids, true], ["[data-selected-track-resources]", row.pathway_resource_ids, false]] as const) { const list = this.querySelector<HTMLUListElement>(selector)!; list.replaceChildren(); if (!ids.length) { const item = document.createElement("li"); item.textContent = chinese ? "尚未登记资源" : "No resources assigned"; list.append(item); } ids.forEach((resourceId) => { const resource = resources.find((entry) => entry.id === resourceId)!; const item = document.createElement("li"); const anchor = document.createElement("a"); anchor.href = resource.href; anchor.textContent = resource.name; item.append(anchor); if (withMetadata) { const small = document.createElement("small"); small.textContent = `${resource.kind} · ${resource.access_level}`; item.append(small); } list.append(item); }); }
+        if (writeUrl) { const url = new URL(location.href); url.searchParams.set("unit", row.unit_id); history.replaceState(null, "", url); }
+      };
+      const query = new URL(location.href).searchParams.get("unit"); select(rows.find((row) => row.unit_id === query)?.unit_id ?? rows[0].unit_id, false);
+      trackChoice.addEventListener("change", () => select(rows.find((row) => row.track_id === trackChoice.value)!.unit_id, true));
+      this.addEventListener("click", (event) => { if (!(event.target instanceof Element)) return; const anchor = event.target.closest<HTMLAnchorElement>("[data-inspect-unit]"); if (anchor && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); select(anchor.dataset.inspectUnit!, true); } });
+      this.querySelector("[data-resource-unit-list]")!.addEventListener("keydown", (event) => { if (!(event instanceof KeyboardEvent) || !(event.target instanceof HTMLAnchorElement)) return; const anchors = [...this.querySelectorAll<HTMLAnchorElement>("[data-inspect-unit]")]; const index = anchors.indexOf(event.target); const direction = event.key === "ArrowDown" ? 1 : event.key === "ArrowUp" ? -1 : 0; if (!direction) return; event.preventDefault(); const next = anchors[(index + direction + anchors.length) % anchors.length].dataset.inspectUnit!; select(next, true); this.querySelector<HTMLAnchorElement>(`[data-inspect-unit="${next}"]`)!.focus(); });
+    }
+  }
+  if (!customElements.get("resource-relationship-inspector")) customElements.define("resource-relationship-inspector", ResourceRelationshipInspector);
   document.querySelectorAll<HTMLDetailsElement>(".resource-map-track").forEach((track) => {
     const update = () => {
       const table = track.querySelector("table");
@@ -88,16 +119,43 @@ const capabilityLabels: Record<string, string> = chinese
 
 <style>
   .curriculum-resource-map { color: var(--atlas-ink); }
-  .resource-map-flow { margin: 1.5rem 0; padding-block: 1rem; border-block: 1px solid var(--atlas-rule-strong); }
-  .resource-map-flow ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; list-style: none; margin: 0; padding: 0; }
-  .resource-map-flow li { position: relative; display: flex; flex-direction: column; align-items: center; gap: .35rem; text-align: center; min-width: 0; }
-  .resource-map-flow li > span { font-size: .82rem; font-weight: 650; }
-  .resource-map-flow strong { font: 1.45rem var(--atlas-font-mono); color: var(--atlas-teal-deep); }
-  .resource-map-flow small { font-size: .75rem; line-height: 1.5; }
-  .resource-map-flow i { position: absolute; top: 3.4rem; right: -1.1rem; font-size: 1.2rem; font-style: normal; }
-  .resource-map-flow figcaption { margin-top: 1rem; color: var(--atlas-muted); font-size: .75rem; line-height: 1.6; }
+  .resource-map-heading { margin: 1.25rem 0 1rem; }
+  .resource-map-heading > p { margin: 0 0 .35rem; font-size: .75rem; color: var(--atlas-teal-deep); }
+  .resource-map-heading > h3 { margin: 0 0 .75rem; font-size: 1.35rem; line-height: 1.3; }
+  .resource-map-heading > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: .4rem .75rem; color: var(--atlas-muted); font-size: .75rem; }
+  .resource-map-heading strong { font: 1.1rem var(--atlas-font-mono); color: var(--atlas-ink); }
+  .resource-inspector { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.15fr); border: 1px solid var(--atlas-rule-strong); background: var(--atlas-panel); }
+  .resource-inspector > section { min-width: 0; padding: 1rem; }
+  .resource-inspector > section + section { border-left: 1px solid var(--atlas-rule); }
+  .resource-inspector h4 { display: flex; align-items: baseline; gap: .6rem; margin: 0 0 .9rem; font-size: .8rem; font-weight: 650; }
+  .resource-inspector h4 > span { font: .75rem var(--atlas-font-mono); color: var(--atlas-teal-deep); }
+  .resource-inspector label { display: grid; gap: .35rem; color: var(--atlas-muted); font-size: .75rem; }
+  .resource-inspector select { width: 100%; min-height: 44px; padding: .5rem; border: 1px solid var(--atlas-rule-strong); border-radius: 2px; background: var(--atlas-bg); color: var(--atlas-ink); font: inherit; font-size: .75rem; }
+  .resource-inspector__units > ol { margin: .65rem 0 0; padding: 0; list-style: none; }
+  .resource-inspector__units li { border-bottom: 1px solid var(--atlas-rule); }
+  .resource-inspector__units li a { display: flex; justify-content: space-between; align-items: center; gap: .5rem; min-height: 44px; padding: .55rem .5rem; margin: 0 -.5rem; color: var(--atlas-ink); font-size: .8rem; line-height: 1.45; text-decoration: none; border-left: 2px solid transparent; }
+  .resource-inspector__units li a[aria-current="true"] { background: color-mix(in srgb, var(--atlas-teal) 8%, var(--atlas-panel)); border-left-color: var(--atlas-teal); color: var(--atlas-teal-deep); }
+  .resource-inspector__units li a > span { color: var(--atlas-muted); }
+  .resource-inspector__lesson { background: color-mix(in srgb, var(--atlas-teal) 3%, var(--atlas-panel)); }
+  .resource-inspector__lesson > code { font-size: .75rem; color: var(--atlas-muted); overflow-wrap: anywhere; background: transparent; padding: 0; }
+  .resource-inspector__lesson h3 { margin: .65rem 0 .7rem; font-size: 1rem; line-height: 1.4; }
+  .resource-inspector__lesson > a { display: flex; justify-content: space-between; gap: .6rem; min-height: 44px; font-size: .8rem; font-weight: 600; line-height: 1.5; }
+  .resource-inspector__activity-label { border-top: 1px solid var(--atlas-rule); margin: 1rem 0 .5rem; padding-top: .75rem; font-size: .75rem; color: var(--atlas-muted); }
+  .resource-inspector__activities { display: flex; flex-wrap: wrap; gap: .3rem; padding: 0; margin: 0; list-style: none; }
+  .resource-inspector__activities li { padding: .2rem .4rem; border: 1px solid var(--atlas-rule); border-radius: 2px; color: var(--atlas-teal-deep); font-size: .75rem; }
+  .resource-inspector__scope { margin: 1rem 0 0; color: var(--atlas-muted); font-size: .75rem; line-height: 1.6; }
+  .resource-inspector__resources > p { margin: 0 0 .4rem; color: var(--atlas-muted); font: .75rem var(--atlas-font-mono); }
+  .resource-inspector__resources ul { padding: 0; margin: 0; list-style: none; }
+  .resource-inspector__resources li { padding: .5rem 0; border-bottom: 1px solid var(--atlas-rule); font-size: .75rem; }
+  .resource-inspector__resources li a { display: flex; justify-content: space-between; align-items: center; gap: .6rem; min-height: 44px; font-size: .8rem; }
+  .resource-inspector__resources li small { display: block; font-size: .75rem; overflow-wrap: anywhere; }
+  .resource-inspector__track-reading { margin-top: .75rem; }
+  .resource-inspector__track-reading summary { font-size: .75rem; padding-block: .5rem; min-height: 44px; }
+  .resource-map-note { margin: .75rem 0 1.5rem; color: var(--atlas-muted); font-size: .75rem; line-height: 1.65; }
+  .resource-map-note a { display: inline-flex; min-height: 44px; align-items: center; }
+  .resource-map-source-title { margin: 1.5rem 0 .75rem; font-size: 1rem; }
   .resource-map-track { margin: 0; border-top: 1px solid var(--atlas-rule); }
-  .resource-map-track > summary { display: grid; grid-template-columns: 1.5rem 44px minmax(0, 1fr) auto; align-items: center; gap: .6rem; padding: .85rem 0; cursor: pointer; }
+  .resource-map-track > summary { display: grid; grid-template-columns: 1.5rem minmax(0, 1fr) auto; align-items: center; gap: .6rem; padding: .85rem 0; cursor: pointer; }
   .resource-map-track__number { color: var(--atlas-muted); font: .75rem var(--atlas-font-mono); }
   .resource-map-track > summary strong { font-size: .9rem; line-height: 1.5; }
   .resource-map-track__count { font-size: .75rem; color: var(--atlas-muted); text-align: right; white-space: nowrap; }
@@ -116,5 +174,7 @@ const capabilityLabels: Record<string, string> = chinese
   .resource-map-capabilities li { margin: 0 0 .25rem; white-space: nowrap; font-size: .75rem; }
   .resource-map-capabilities span { display: inline-block; width: 1.2rem; font-family: var(--atlas-font-mono); color: var(--atlas-teal-deep); }
   :focus-visible { outline: 3px solid var(--atlas-teal); outline-offset: 3px; }
-  @media (max-width: 34rem) { .resource-map-track > summary { grid-template-columns: 1.3rem 36px minmax(0, 1fr); gap: .4rem; } .resource-map-track__count { grid-column: 3; justify-self: start; } .resource-map-track > summary :global(.scientific-icon) { width: 36px; height: 36px; } .resource-map-flow ol { gap: .7rem; } .resource-map-flow i { right: -.6rem; } .resource-map-flow li > span { font-size: .75rem; } }
+  [hidden] { display: none !important; }
+  @media (max-width: 48rem) { .resource-inspector { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .resource-inspector__units { grid-column: 1 / -1; } .resource-inspector__units > ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1.25rem; } .resource-inspector > .resource-inspector__lesson { border-left: 0; border-top: 1px solid var(--atlas-rule); } .resource-inspector > .resource-inspector__resources { border-top: 1px solid var(--atlas-rule); } }
+  @media (max-width: 34rem) { .resource-map-track > summary { grid-template-columns: 1.3rem minmax(0, 1fr); gap: .4rem; } .resource-map-track__count { grid-column: 2; justify-self: start; } .resource-inspector { grid-template-columns: 1fr; } .resource-inspector > section { padding: .85rem; } .resource-inspector > section + section { border-left: 0; border-top: 1px solid var(--atlas-rule); } .resource-inspector__units > ol { grid-template-columns: 1fr; } }
 </style>

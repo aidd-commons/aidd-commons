@@ -1,0 +1,167 @@
+---
+import { workbenchData } from "../lib/workbench-data";
+import { prerequisiteLayers } from "../lib/track-map";
+import { withSiteBase } from "../lib/site-paths";
+interface Props { chinese?: boolean; }
+const { chinese = false } = Astro.props;
+const tracks = workbenchData.tracks;
+const layers = prerequisiteLayers(tracks);
+const shortTitles = chinese ? ["开始学习", "药物发现基础", "机器学习", "数据治理", "分子与生物表示", "机制与靶点", "QSAR 与性质", "ADMET 与 PK", "相互作用与筛选", "结构与口袋", "物理建模", "分子生成", "生物大分子设计", "合成与自动化", "主动学习", "科学智能体", "评价与复现", "候选决策"] : ["Start here", "Discovery foundations", "Machine learning", "Data governance", "Representations", "Mechanism & targets", "QSAR & properties", "ADMET & PK", "Interaction & screening", "Structure & pockets", "Physics-based modelling", "Molecular generation", "Biologics design", "Synthesis & automation", "Active learning", "Scientific agents", "Evaluation & reproducibility", "Candidate nomination"];
+const projection = tracks.map((track) => ({ id: track.id, order: track.order, title: chinese ? track.titleZh : track.title, shortTitle: shortTitles[track.order - 1], summary: chinese ? track.summaryZh : track.summary, href: withSiteBase(chinese ? track.hrefZh : track.href, import.meta.env.BASE_URL), prerequisites: track.prerequisiteIds, dependents: tracks.filter((candidate) => candidate.prerequisiteIds.includes(track.id)).map((candidate) => candidate.id), lessons: track.lessons.map((lesson) => lesson.id) }));
+const byId = new Map(projection.map((track) => [track.id, track]));
+const selected = byId.get("qsar-properties")!;
+---
+<learning-track-directory class="track-atlas not-content" data-tracks={JSON.stringify(projection)} data-chinese={String(chinese)} data-selected-track={selected.id}>
+  <div class="track-atlas__toolbar">
+    <p><span class="track-atlas__key" aria-hidden="true"></span>{chinese ? "从左向右读取先修层级" : "Read prerequisite layers from left to right"}</p>
+    <div class="track-atlas__views learning-view-controls" role="group" aria-label={chinese ? "轨道显示方式" : "Track display"} hidden><button type="button" data-learning-view="map" aria-pressed="true">{chinese ? "依赖地图" : "Dependency map"}</button><button type="button" data-learning-view="list" aria-pressed="false">{chinese ? "分层列表" : "Layered list"}</button><button type="button" data-learning-view="progress" aria-pressed="false">{chinese ? "本机进度" : "Device progress"}</button></div>
+  </div>
+  <div class="track-atlas__network" data-track-network>
+    <canvas class="track-atlas__edges" aria-hidden="true"></canvas>
+    {layers.map((layer, index) => <section class="track-atlas__layer" data-track-layer={index} aria-labelledby={`track-layer-${index}`}><h3 id={`track-layer-${index}`}><span>{String(index + 1).padStart(2, "0")}</span>{chinese ? "先修层级" : "Layer"}</h3><ol>{layer.map((track) => { const item = byId.get(track.id)!; return <li id={`track-${item.id}`} class="track-atlas__node" data-hub-track={item.id} data-lesson-ids={JSON.stringify(item.lessons)} data-prerequisites={JSON.stringify(item.prerequisites)} data-selected={String(item.id === selected.id)}>
+      <div class="track-atlas__node-head"><span class="track-atlas__number">{String(item.order).padStart(2, "0")}</span><button type="button" data-track-choice={item.id} aria-label={`${chinese ? "查看依赖" : "Inspect dependencies"}: ${item.title}`} hidden><span aria-hidden="true">⊙</span></button></div><h3><a href={item.href}>{item.shortTitle}<span aria-hidden="true">↗</span></a></h3><span class="track-atlas__lesson-count">{item.lessons.length} {chinese ? "课" : "lessons"}</span><span class="track-atlas__progress" data-track-progress hidden></span>
+      <progress data-track-bar value="0" max={item.lessons.length} aria-label={`${item.title}: ${chinese ? "本机自报进度" : "self-reported device progress"}`}></progress>
+      <div class="track-atlas__list-prerequisites"><span>{chinese ? "直接先修" : "Direct prerequisites"}</span>{item.prerequisites.length ? <ul>{item.prerequisites.map((id) => <li><a href={byId.get(id)!.href}>{byId.get(id)!.shortTitle}</a></li>)}</ul> : <p>{chinese ? "无" : "None"}</p>}</div>
+    </li>; })}</ol></section>)}
+  </div>
+  <div class="track-atlas__inspector" data-track-inspector aria-live="polite">
+    <div class="track-atlas__selected"><p class="track-atlas__eyebrow">{chinese ? "当前轨道" : "Selected track"}<span data-selected-number>{String(selected.order).padStart(2, "0")}</span></p><h3 data-selected-title>{selected.title}</h3><p data-selected-summary>{selected.summary}</p><a href={selected.href} data-selected-link>{chinese ? "打开轨道与课程" : "Open track and lessons"}<span aria-hidden="true">↗</span></a></div>
+    <section><h4><span class="track-atlas__line-key track-atlas__line-key--incoming" aria-hidden="true"></span>{chinese ? "直接先修" : "Direct prerequisites"}</h4><ul data-track-prerequisites>{selected.prerequisites.map((id) => <li><a href={byId.get(id)!.href} data-inspect-track={id}><span>{String(byId.get(id)!.order).padStart(2, "0")}</span>{byId.get(id)!.shortTitle}</a></li>)}</ul></section>
+    <section><h4><span class="track-atlas__line-key" aria-hidden="true"></span>{chinese ? "以此为直接先修" : "Direct next tracks"}</h4><ul data-track-dependents>{selected.dependents.map((id) => <li><a href={byId.get(id)!.href} data-inspect-track={id}><span>{String(byId.get(id)!.order).padStart(2, "0")}</span>{byId.get(id)!.shortTitle}</a></li>)}</ul></section>
+  </div>
+  <p class="track-atlas__note">{chinese ? "选择轨道查看一跳关系。线条来自课程源中声明的跨轨道先修，层级由依赖计算；它们不表示因果、难度或学习时长。本机进度只统计自行标记的课程。" : "Select a track to inspect one-hop relationships. Lines are declared cross-track prerequisites; layers are computed from those dependencies. Neither indicates causality, difficulty or study time. Device progress counts self-marked lessons."}</p>
+</learning-track-directory>
+
+<script>
+  import { readLessonProgress } from "../lib/atlas-state";
+  import { learningProgress } from "../lib/learning-hub";
+  type Track = { id: string; order: number; title: string; shortTitle: string; summary: string; href: string; prerequisites: string[]; dependents: string[]; lessons: string[] };
+  class TrackPrerequisiteMap extends HTMLElement {
+    private observer?: ResizeObserver;
+    private tracks: Track[] = [];
+    private chinese = false;
+    private onStorage = () => this.renderProgress();
+    connectedCallback() {
+      this.tracks = JSON.parse(this.dataset.tracks ?? "[]");
+      this.chinese = this.dataset.chinese === "true";
+      this.dataset.enhanced = "true";
+      this.querySelector<HTMLElement>(".track-atlas__views")!.hidden = false;
+      this.querySelectorAll<HTMLButtonElement>("[data-track-choice]").forEach((button) => { button.hidden = false; });
+      const params = new URL(location.href).searchParams;
+      const view = params.get("view");
+      this.setView(view === "list" || view === "progress" ? view : "map");
+      this.select(this.tracks.find((track) => track.id === params.get("track"))?.id ?? this.dataset.selectedTrack!, false);
+      this.addEventListener("click", (event) => {
+        if (!(event.target instanceof Element)) return;
+        const choice = event.target.closest<HTMLButtonElement | HTMLAnchorElement>("[data-track-choice], [data-inspect-track]");
+        if (choice && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); this.select(choice.dataset.trackChoice ?? choice.dataset.inspectTrack!, true); }
+        const button = event.target.closest<HTMLButtonElement>("[data-learning-view]");
+        if (button) { this.setView(button.dataset.learningView!); this.updateUrl(); }
+      });
+      this.querySelectorAll<HTMLButtonElement>("[data-track-choice]").forEach((anchor, index, anchors) => anchor.addEventListener("keydown", (event) => {
+        const direction = event.key === "ArrowRight" || event.key === "ArrowDown" ? 1 : event.key === "ArrowLeft" || event.key === "ArrowUp" ? -1 : 0;
+        const next = event.key === "Home" ? 0 : event.key === "End" ? anchors.length - 1 : direction ? (index + direction + anchors.length) % anchors.length : -1;
+        if (next < 0) return;
+        event.preventDefault(); anchors[next].focus(); this.select(anchors[next].dataset.trackChoice!, true);
+      }));
+      this.observer = new ResizeObserver(() => this.draw());
+      this.observer.observe(this.querySelector("[data-track-network]")!);
+      window.addEventListener("storage", this.onStorage); window.addEventListener("pageshow", this.onStorage);
+      this.renderProgress();
+    }
+    disconnectedCallback() { this.observer?.disconnect(); window.removeEventListener("storage", this.onStorage); window.removeEventListener("pageshow", this.onStorage); }
+    private setView(view: string) { this.dataset.view = view; this.querySelectorAll<HTMLButtonElement>("[data-learning-view]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.learningView === view))); requestAnimationFrame(() => this.draw()); }
+    private updateUrl() { const url = new URL(location.href); url.searchParams.set("track", this.dataset.selectedTrack!); if (this.dataset.view === "map") url.searchParams.delete("view"); else url.searchParams.set("view", this.dataset.view!); history.replaceState(null, "", url); }
+    private select(id: string, updateUrl: boolean) {
+      const selected = this.tracks.find((track) => track.id === id); if (!selected) return;
+      this.dataset.selectedTrack = id;
+      this.querySelectorAll<HTMLElement>("[data-hub-track]").forEach((node) => { node.dataset.selected = String(node.dataset.hubTrack === id); node.dataset.related = String(selected.prerequisites.includes(node.dataset.hubTrack!) || selected.dependents.includes(node.dataset.hubTrack!)); const anchor = node.querySelector("[data-track-choice]"); if (node.dataset.hubTrack === id) anchor?.setAttribute("aria-current", "true"); else anchor?.removeAttribute("aria-current"); });
+      this.querySelector("[data-selected-number]")!.textContent = String(selected.order).padStart(2, "0");
+      this.querySelector("[data-selected-title]")!.textContent = selected.title;
+      this.querySelector("[data-selected-summary]")!.textContent = selected.summary;
+      this.querySelector<HTMLAnchorElement>("[data-selected-link]")!.href = selected.href;
+      for (const [key, ids] of [["prerequisites", selected.prerequisites], ["dependents", selected.dependents]] as const) {
+        const list = this.querySelector<HTMLUListElement>(`[data-track-${key}]`)!; list.replaceChildren();
+        if (!ids.length) { const li = document.createElement("li"); li.textContent = this.chinese ? "无声明关系" : "None declared"; list.append(li); }
+        ids.forEach((linkedId) => { const track = this.tracks.find((item) => item.id === linkedId)!; const li = document.createElement("li"); const anchor = document.createElement("a"); anchor.href = track.href; anchor.dataset.inspectTrack = track.id; const number = document.createElement("span"); number.textContent = String(track.order).padStart(2, "0"); anchor.append(number, document.createTextNode(track.shortTitle)); li.append(anchor); list.append(li); });
+      }
+      if (updateUrl) this.updateUrl(); requestAnimationFrame(() => this.draw());
+    }
+    private renderProgress() { let completed: string[] = []; try { completed = readLessonProgress(localStorage); } catch { /* Storage is optional. */ } this.querySelectorAll<HTMLElement>("[data-hub-track]").forEach((node) => { const count = learningProgress(JSON.parse(node.dataset.lessonIds ?? "[]"), completed); node.querySelector<HTMLProgressElement>("[data-track-bar]")!.value = count.completed; const label = node.querySelector<HTMLElement>("[data-track-progress]")!; label.hidden = false; label.textContent = `${count.completed} / ${count.total} ${this.chinese ? "已标记" : "marked"}`; }); }
+    private draw() {
+      const network = this.querySelector<HTMLElement>("[data-track-network]")!; const canvas = this.querySelector<HTMLCanvasElement>("canvas")!; const box = network.getBoundingClientRect(); const context = canvas.getContext("2d"); if (!context || box.width === 0) return;
+      const ratio = devicePixelRatio || 1; canvas.width = box.width * ratio; canvas.height = box.height * ratio; context.scale(ratio, ratio); context.clearRect(0, 0, box.width, box.height);
+      if (this.dataset.view !== "map" || matchMedia("(max-width: 900px)").matches) return;
+      const selected = this.dataset.selectedTrack; const style = getComputedStyle(this); const teal = style.getPropertyValue("--atlas-teal-deep").trim() || "#126961"; const navy = style.getPropertyValue("--atlas-ink").trim() || "#152d42";
+      const edges = this.tracks.flatMap((track) => track.prerequisites.map((from) => ({ from, to: track.id, active: from === selected || track.id === selected })));
+      edges.sort((a, b) => Number(a.active) - Number(b.active));
+      edges.forEach(({ from, to, active }) => { const start = this.querySelector<HTMLElement>(`[data-hub-track="${from}"]`)!.getBoundingClientRect(); const end = this.querySelector<HTMLElement>(`[data-hub-track="${to}"]`)!.getBoundingClientRect(); const x1 = start.right - box.left, y1 = start.top + start.height / 2 - box.top, x2 = end.left - box.left, y2 = end.top + end.height / 2 - box.top; const bend = Math.max(14, (x2 - x1) * .5); context.beginPath(); context.moveTo(x1, y1); context.bezierCurveTo(x1 + bend, y1, x2 - bend, y2, x2 - 5, y2); context.strokeStyle = active ? (to === selected ? navy : teal) : "rgba(100, 122, 132, .16)"; context.lineWidth = active ? 1.8 : .7; context.setLineDash(active && to === selected ? [3, 3] : []); context.stroke(); if (active) { context.setLineDash([]); context.beginPath(); context.moveTo(x2 - 5, y2 - 3); context.lineTo(x2, y2); context.lineTo(x2 - 5, y2 + 3); context.stroke(); } }); context.setLineDash([]);
+    }
+  }
+  if (!customElements.get("learning-track-directory")) customElements.define("learning-track-directory", TrackPrerequisiteMap);
+</script>
+
+<style>
+  .track-atlas { display: block; color: var(--atlas-ink); border: 1px solid var(--atlas-rule-strong); background: var(--atlas-panel); }
+  .track-atlas__toolbar { display: flex; justify-content: space-between; gap: 1rem; align-items: center; padding: .75rem 1rem; border-bottom: 1px solid var(--atlas-rule); }
+  .track-atlas__toolbar > p { display: flex; gap: .5rem; align-items: center; margin: 0; color: var(--atlas-muted); font-size: .75rem; }
+  .track-atlas__key { height: .45rem; width: .45rem; background: var(--atlas-teal); border-radius: 50%; }
+  .track-atlas__views { display: flex; flex-wrap: wrap; gap: .2rem; }
+  .track-atlas__views button { min-height: 44px; padding: .4rem .75rem; background: transparent; border: 0; color: var(--atlas-muted); font: inherit; font-size: .75rem; cursor: pointer; }
+  .track-atlas__views button[aria-pressed="true"] { color: var(--atlas-teal-deep); background: var(--atlas-surface); box-shadow: inset 0 -2px var(--atlas-teal); }
+  .track-atlas__network { position: relative; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1.4rem; padding: .8rem 1rem 1.2rem; min-height: 400px; background: radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--atlas-muted) 12%, transparent) 1px, transparent 0) 0 0 / 16px 16px; }
+  .track-atlas__edges { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .track-atlas__layer { z-index: 1; min-width: 0; display: flex; flex-direction: column; }
+  .track-atlas__layer > h3 { display: flex; gap: .4rem; margin: 0 0 1rem; font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--atlas-muted); font-weight: 500; }
+  .track-atlas__layer > h3 span { font-family: var(--atlas-font-mono); }
+  .track-atlas__layer > ol { display: flex; flex-direction: column; justify-content: center; gap: .75rem; margin: auto 0; padding: 0; list-style: none; }
+  .track-atlas__node { min-width: 0; border: 1px solid var(--atlas-rule-strong); border-radius: 3px; background: var(--atlas-panel); transition: border-color .15s, background .15s; }
+  .track-atlas__node { padding: .45rem .55rem .55rem; }
+  .track-atlas__node-head { display: flex; justify-content: space-between; align-items: center; min-height: 40px; }
+  .track-atlas__number { color: var(--atlas-muted); font: .75rem var(--atlas-font-mono); }
+  .track-atlas__node-head button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; margin: -.25rem -.3rem -.15rem 0; border: 0; color: var(--atlas-teal-deep); background: transparent; cursor: pointer; font-size: 1rem; }
+  .track-atlas__node-head button:hover { background: var(--atlas-surface); }
+  .track-atlas__node h3 { margin: 0; font-size: .8125rem; line-height: 1.35; font-weight: 650; }
+  .track-atlas__node h3 a { display: flex; justify-content: space-between; gap: .25rem; min-height: 44px; color: var(--atlas-ink); text-decoration: none; }
+  .track-atlas__node h3 a > span { color: var(--atlas-muted); font-size: .75rem; }
+  .track-atlas__lesson-count, .track-atlas__progress { display: block; font-size: .75rem; color: var(--atlas-muted); margin-top: .25rem; }
+  .track-atlas__node[data-selected="true"] { border-color: var(--atlas-teal-deep); background: color-mix(in srgb, var(--atlas-teal) 8%, var(--atlas-panel)); box-shadow: 0 0 0 2px color-mix(in srgb, var(--atlas-teal) 10%, transparent); }
+  .track-atlas__node[data-selected="true"] .track-atlas__number { color: var(--atlas-teal-deep); }
+  .track-atlas__node[data-related="true"] { border-color: color-mix(in srgb, var(--atlas-teal) 55%, var(--atlas-rule)); }
+  .track-atlas__node > progress, .track-atlas__progress { display: none; }
+  .track-atlas__list-prerequisites { padding: 0 .7rem .5rem; font-size: .75rem; color: var(--atlas-muted); }
+  .track-atlas__list-prerequisites > span { font-size: .75rem; }
+  .track-atlas__list-prerequisites ul { list-style: none; margin: .2rem 0 0; padding: 0; }
+  .track-atlas__list-prerequisites a { display: inline-flex; align-items: center; min-height: 44px; }
+  .track-atlas__list-prerequisites p { margin: .2rem 0 0; }
+  [data-enhanced="true"][data-view="map"] .track-atlas__list-prerequisites { display: none; }
+  .track-atlas__inspector { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 1fr); border-top: 1px solid var(--atlas-rule-strong); background: var(--atlas-bg); }
+  .track-atlas__inspector > * { min-width: 0; padding: 1rem 1.1rem; }
+  .track-atlas__inspector > * + * { border-left: 1px solid var(--atlas-rule); }
+  .track-atlas__eyebrow { display: flex; align-items: center; gap: .75rem; margin: 0 0 .5rem; color: var(--atlas-teal-deep); font-size: .75rem; }
+  .track-atlas__eyebrow span { font-family: var(--atlas-font-mono); }
+  .track-atlas__selected h3 { font-size: .95rem; line-height: 1.4; margin: 0; }
+  .track-atlas__selected > p:not(.track-atlas__eyebrow) { color: var(--atlas-muted); font-size: .875rem; line-height: 1.6; margin: .75rem 0 .25rem; }
+  .track-atlas__selected > a { display: inline-flex; align-items: center; gap: 1rem; min-height: 44px; font-size: .75rem; font-weight: 650; }
+  .track-atlas__inspector h4 { display: flex; align-items: center; gap: .4rem; font-size: .75rem; margin: 0 0 .5rem; font-weight: 500; color: var(--atlas-muted); }
+  .track-atlas__line-key { width: 1rem; border-top: 2px solid var(--atlas-teal-deep); }
+  .track-atlas__line-key--incoming { border-top-style: dashed; border-color: var(--atlas-ink); }
+  .track-atlas__inspector ul { margin: 0; padding: 0; list-style: none; }
+  .track-atlas__inspector li { color: var(--atlas-muted); font-size: .75rem; }
+  .track-atlas__inspector li a { display: flex; align-items: baseline; gap: .5rem; min-height: 44px; padding-block: .2rem; font-size: .75rem; line-height: 1.4; }
+  .track-atlas__inspector li a span { font: .75rem var(--atlas-font-mono); color: var(--atlas-muted); }
+  .track-atlas__note { margin: 0; padding: .7rem 1rem; border-top: 1px solid var(--atlas-rule); color: var(--atlas-muted); font-size: .75rem; line-height: 1.6; }
+  [data-view="list"] .track-atlas__network, [data-view="progress"] .track-atlas__network { grid-template-columns: 1fr; gap: .75rem; min-height: 0; }
+  [data-view="list"] .track-atlas__layer, [data-view="progress"] .track-atlas__layer { display: grid; grid-template-columns: 5rem 1fr; gap: 1rem; padding-block: .5rem; border-bottom: 1px solid var(--atlas-rule); }
+  [data-view="list"] .track-atlas__layer > ol, [data-view="progress"] .track-atlas__layer > ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; margin: 0; }
+  [data-view="list"] canvas, [data-view="progress"] canvas { display: none; }
+  [data-view="progress"] .track-atlas__lesson-count { display: none; }
+  [data-view="progress"] .track-atlas__progress { display: block; }
+  [data-view="progress"] .track-atlas__node > progress { display: block; width: calc(100% - 1.1rem); margin: 0 .55rem .75rem; height: .25rem; accent-color: var(--atlas-teal); }
+  [data-view="progress"] .track-atlas__list-prerequisites { display: none; }
+  :focus-visible { outline: 3px solid var(--atlas-teal); outline-offset: 3px; }
+  [hidden] { display: none !important; }
+  @media (max-width: 1100px) { .track-atlas__network { gap: 1rem; padding-inline: .7rem; } .track-atlas__node { padding-inline: .4rem; } .track-atlas__node h3 { font-size: .8125rem; } }
+  @media (max-width: 900px) { .track-atlas__network { grid-template-columns: 1fr; gap: .75rem; min-height: 0; } .track-atlas__layer, [data-view="list"] .track-atlas__layer, [data-view="progress"] .track-atlas__layer { display: grid; grid-template-columns: 4.5rem 1fr; gap: .75rem; border-bottom: 1px solid var(--atlas-rule); padding-block: .4rem; } .track-atlas__layer > h3 { flex-direction: column; margin: .3rem 0; } .track-atlas__layer > ol, [data-view="list"] .track-atlas__layer > ol, [data-view="progress"] .track-atlas__layer > ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; gap: .5rem; } .track-atlas__node h3 { font-size: .78rem; } .track-atlas__node { padding-inline: .75rem; } .track-atlas__edges { display: none; } [data-enhanced="true"][data-view="map"] .track-atlas__list-prerequisites { display: block; } .track-atlas__inspector { grid-template-columns: 1fr 1fr; } .track-atlas__selected { grid-column: 1 / -1; } .track-atlas__inspector > :nth-child(2) { border-left: 0; } .track-atlas__inspector > section { border-top: 1px solid var(--atlas-rule); } .track-atlas__toolbar { flex-wrap: wrap; gap: .35rem; } }
+  @media (max-width: 500px) { .track-atlas__layer, [data-view="list"] .track-atlas__layer, [data-view="progress"] .track-atlas__layer { grid-template-columns: 2.5rem 1fr; } .track-atlas__layer > ol, [data-view="list"] .track-atlas__layer > ol, [data-view="progress"] .track-atlas__layer > ol { grid-template-columns: 1fr; } .track-atlas__node { display: grid; grid-template-columns: 2rem 1fr; column-gap: .4rem; padding: .5rem .75rem; } .track-atlas__node-head { display: contents; } .track-atlas__number { grid-column: 1; grid-row: 1; padding-top: .35rem; } .track-atlas__node-head button { grid-column: 1; grid-row: 2 / 4; min-height: 44px; width: 44px; margin: 0; justify-self: start; } .track-atlas__node h3 { grid-column: 2; grid-row: 1; } .track-atlas__node h3 a { min-height: 44px; align-items: center; } .track-atlas__lesson-count, .track-atlas__progress, .track-atlas__list-prerequisites, .track-atlas__node > progress { grid-column: 2; margin-top: 0; } .track-atlas__list-prerequisites { padding: .3rem 0 0; } .track-atlas__inspector > * { padding: .8rem; } .track-atlas__views button { font-size: .75rem; padding-inline: .5rem; } }
+</style>

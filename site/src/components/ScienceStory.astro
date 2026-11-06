@@ -1,0 +1,142 @@
+---
+import { Image } from "astro:assets";
+import evidenceArt from "../assets/editorial/evidence-journey-v2.png";
+import { renderStoryFrame, scienceStory } from "../lib/science-stories";
+import { storyMedia, type StoryId } from "../lib/story-media";
+import { withSiteBase } from "../lib/site-paths";
+import "../styles/science-story.css";
+interface Props { story: StoryId; chinese?: boolean; compact?: boolean; }
+const { story, chinese = false, compact = false } = Astro.props;
+const locale = chinese ? "zh-cn" : "en";
+const definition = scienceStory(story, locale);
+const media = storyMedia(story, locale);
+const t = (en: string, zh: string) => chinese ? zh : en;
+const last = definition.steps.length - 1;
+const asset = (path: string) => withSiteBase(path, import.meta.env.BASE_URL);
+---
+<science-story class:list={["science-story", "not-content", { "science-story--compact": compact }]} data-story={story} data-locale={locale} data-duration={media.durationSeconds} aria-label={definition.title}>
+  <div class="science-story__heading"><p>{t("Scientific story", "科学故事")} <span aria-hidden="true">/</span> {t("Conceptual", "概念演示")}</p><span>{media.durationSeconds}s</span></div>
+  <div class:list={["science-story__stage", { "science-story__stage--evidence": story === "evidence" }]}>
+    {story === "evidence" && <Image class="science-story__art" src={evidenceArt} alt="" widths={[480, 960, 1440]} sizes={compact ? "(max-width: 800px) 90vw, 50vw" : "(max-width: 1000px) 90vw, 960px"} format="webp" quality={78} loading="lazy" decoding="async" />}
+    <div class="science-story__native" data-story-scene><div class="science-story__static-wide" set:html={renderStoryFrame(story, .999999, locale)} /><div class="science-story__static-narrow" set:html={renderStoryFrame(story, .999999, locale, true)} /></div>
+  </div>
+  <div class="science-story__reading"><p class="science-story__step-count" data-story-count>{String(last + 1).padStart(2, "0")} / {String(definition.steps.length).padStart(2, "0")}</p><div><h3 data-story-title>{definition.steps[last].title}</h3><p data-story-detail>{definition.steps[last].detail}</p></div></div>
+  <div class="science-story__controls" data-story-controls hidden>
+    <button type="button" class="science-story__play" data-story-play data-play-label={t("Play", "播放")} data-pause-label={t("Pause", "暂停")} aria-label={t("Play animation", "播放动画")}>{t("Play", "播放")}</button>
+    <button type="button" data-story-replay>{t("Replay", "重播")}</button>
+    <div class="science-story__step-buttons" aria-label={t("Choose a story step", "选择故事步骤")}>
+      {definition.steps.map((step, index) => <button type="button" data-story-step={index} aria-label={`${t("Step", "步骤")} ${index + 1}: ${step.title}`} aria-pressed={index === last}>{String(index + 1).padStart(2, "0")}</button>)}
+    </div>
+    <progress max="100" value="100" data-story-progress aria-label={t("Story progress", "故事进度")}></progress>
+  </div>
+  <p class="science-story__boundary">{definition.boundary}</p>
+  <div class="science-story__footer">
+    <details class="science-story__transcript"><summary>{t("Read all steps", "阅读全部步骤")}</summary><ol>{definition.steps.map((step) => <li><strong>{step.title}</strong><p>{step.detail}</p></li>)}</ol></details>
+    <details class="science-story__downloads"><summary>{t("Download animation", "下载动画")}</summary><div><a href={asset(media.mp4)} download>MP4</a><a href={asset(media.webm)} download>WebM</a><a href={asset(media.gif)} download>GIF</a><a href={asset(media.poster)} download>{t("Static poster", "静态图")}</a></div></details>
+  </div>
+  <span class="science-story__sr-only" data-story-status aria-live="polite" aria-atomic="true"></span>
+</science-story>
+<script>
+  import { renderStoryFrame, scienceStory } from "../lib/science-stories";
+  import type { StoryId, StoryLocale } from "../lib/story-media";
+  class ScienceStory extends HTMLElement {
+    private dispose?: () => void;
+    private choose?: (index: number) => void;
+    selectStep(index: number, _updateLocation = false) { this.choose?.(index); }
+    connectedCallback() {
+      if (this.dispose) return;
+      const story = this.dataset.story as StoryId;
+      const locale = this.dataset.locale as StoryLocale;
+      const definition = scienceStory(story, locale);
+      const scene = this.querySelector<HTMLElement>("[data-story-scene]");
+      const title = this.querySelector<HTMLElement>("[data-story-title]");
+      const detail = this.querySelector<HTMLElement>("[data-story-detail]");
+      const count = this.querySelector<HTMLElement>("[data-story-count]");
+      const play = this.querySelector<HTMLButtonElement>("[data-story-play]");
+      const progress = this.querySelector<HTMLProgressElement>("[data-story-progress]");
+      const status = this.querySelector<HTMLElement>("[data-story-status]");
+      const controls = this.querySelector<HTMLElement>("[data-story-controls]");
+      const steps = [...this.querySelectorAll<HTMLButtonElement>("[data-story-step]")];
+      if (!scene || !title || !detail || !count || !play || !progress || !controls) return;
+      const abort = new AbortController();
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+      let value = 0;
+      let lastStep = -1;
+      let frame = 0;
+      let priorTime = 0;
+      let visible = false;
+      let wantsPlay = !reduced.matches;
+      let narrow = this.clientWidth < 680;
+      const duration = Number(this.dataset.duration) * 1000;
+      const setPlayState = () => {
+        const running = wantsPlay && visible && !document.hidden && !reduced.matches;
+        play.textContent = (running ? play.dataset.pauseLabel : play.dataset.playLabel) ?? "Play";
+        play.setAttribute("aria-label", play.textContent);
+        play.setAttribute("aria-pressed", String(running));
+        this.dataset.playing = String(running);
+        return running;
+      };
+      const paint = (announce = false) => {
+        scene.innerHTML = renderStoryFrame(story, value, locale, narrow);
+        const selected = Math.min(steps.length - 1, Math.floor(value * steps.length));
+        if (selected !== lastStep || announce) {
+          title.textContent = definition.steps[selected].title;
+          detail.textContent = definition.steps[selected].detail;
+          count.textContent = `${String(selected + 1).padStart(2, "0")} / ${String(steps.length).padStart(2, "0")}`;
+          steps.forEach((button, index) => button.setAttribute("aria-pressed", String(index === selected)));
+          if (announce && status) status.textContent = `${selected + 1}. ${definition.steps[selected].title}. ${definition.steps[selected].detail}`;
+          if (selected !== lastStep) this.dispatchEvent(new CustomEvent("science-story-step", { bubbles: true, detail: { index: selected } }));
+          lastStep = selected;
+        }
+        progress.value = Math.round(value * 100);
+      };
+      const stopFrame = () => { cancelAnimationFrame(frame); frame = 0; priorTime = 0; };
+      const tick = (time: number) => {
+        frame = 0;
+        if (!setPlayState()) { priorTime = 0; return; }
+        if (priorTime) value = Math.min(.999999, value + Math.min(100, time - priorTime) / duration);
+        priorTime = time;
+        paint();
+        if (value >= .999999) { wantsPlay = false; setPlayState(); priorTime = 0; return; }
+        frame = requestAnimationFrame(tick);
+      };
+      const reconcile = () => { stopFrame(); if (setPlayState()) frame = requestAnimationFrame(tick); };
+      play.addEventListener("click", () => {
+        if (reduced.matches) return;
+        if (value >= .999999) value = 0;
+        wantsPlay = !wantsPlay;
+        reconcile();
+      }, { signal: abort.signal });
+      this.querySelector("[data-story-replay]")?.addEventListener("click", () => {
+        value = 0; wantsPlay = !reduced.matches; paint(true); reconcile();
+      }, { signal: abort.signal });
+      this.choose = (index: number) => {
+        const selected = Number.isFinite(index) ? Math.max(0, Math.min(steps.length - 1, Math.floor(index))) : 0;
+        wantsPlay = false; value = Math.min(.999999, (selected + .5) / steps.length); paint(true); reconcile();
+      };
+      steps.forEach((button, index) => button.addEventListener("click", () => this.choose?.(index), { signal: abort.signal }));
+      reduced.addEventListener("change", () => {
+        if (reduced.matches) { wantsPlay = false; value = .999999; paint(); }
+        reconcile();
+      }, { signal: abort.signal });
+      document.addEventListener("visibilitychange", reconcile, { signal: abort.signal });
+      const observer = new IntersectionObserver((entries) => {
+        visible = entries.some((entry) => entry.isIntersecting);
+        reconcile();
+      }, { threshold: .15 });
+      observer.observe(this);
+      const resize = new ResizeObserver(() => {
+        const next = this.clientWidth < 680;
+        if (next !== narrow) { narrow = next; paint(); }
+      });
+      resize.observe(this);
+      value = reduced.matches ? .999999 : 0;
+      paint();
+      controls.hidden = false;
+      this.dataset.enhanced = "true";
+      this.dispose = () => { stopFrame(); observer.disconnect(); resize.disconnect(); abort.abort(); };
+    }
+    disconnectedCallback() { this.dispose?.(); this.dispose = undefined; this.choose = undefined; }
+  }
+  if (!customElements.get("science-story")) customElements.define("science-story", ScienceStory);
+</script>
