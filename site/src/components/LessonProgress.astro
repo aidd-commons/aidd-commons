@@ -1,22 +1,121 @@
 ---
+import { parse } from "yaml";
+import type { Curriculum } from "../../../scripts/curriculum/curriculum.js";
+import curriculumSource from "../../../catalog/curriculum/tracks.yaml?raw";
 import LessonResources from "./LessonResources.astro";
 import LessonFeedback from "./LessonFeedback.astro";
-import { withoutSiteBase } from "../lib/site-paths";
+import { withSiteBase, withoutSiteBase } from "../lib/site-paths";
+import { workbenchData } from "../lib/workbench-data";
+
 interface Props {
   lessonId: string;
 }
 
 const { lessonId } = Astro.props;
 const chinese = withoutSiteBase(Astro.url.pathname, import.meta.env.BASE_URL).startsWith("/zh-cn/");
+const link = (path: string) => withSiteBase(path, import.meta.env.BASE_URL);
+const curriculum = parse(curriculumSource) as Curriculum;
+const [trackId] = lessonId.split("/");
+const wbTrack = workbenchData.tracks.find((item) => item.id === trackId);
+const wbLesson = wbTrack?.lessons.find((item) => item.id === lessonId);
+const allLessonsById = new Map(
+  workbenchData.tracks.flatMap((track) => track.lessons.map((lesson) => [lesson.id, lesson])),
+);
+const mappedUnits = (curriculum.units ?? []).filter((unit) => unit.lesson_id === lessonId);
+const capabilityLabels: Record<string, { en: string; zh: string }> = {
+  orientation: { en: "Orientation", zh: "导引" },
+  explanation: { en: "Mechanism", zh: "机制解释" },
+  "worked-example": { en: "Worked case", zh: "实例推演" },
+  exercise: { en: "Exercise", zh: "独立练习" },
+  runnable: { en: "Runnable CPU lab", zh: "可运行 CPU 实验" },
+};
+const layerLabels: Record<string, { en: string; zh: string }> = {
+  core: { en: "Core unit", zh: "核心单元" },
+  practice: { en: "Practice unit", zh: "实践单元" },
+  research: { en: "Research unit", zh: "研究单元" },
+};
 ---
 
-<lesson-progress data-lesson-id={lessonId} data-complete-label={chinese ? "已完成" : "Completed"} data-incomplete-label={chinese ? "未完成" : "Not completed"}>
-  <button class="lesson-progress__button" type="button" aria-pressed="false">{chinese ? "标记本课完成" : "Mark lesson complete"}</button>
-  <p data-progress-status aria-live="polite">{chinese ? "未完成" : "Not completed"}</p>
-</lesson-progress>
+<section class="lesson-contract not-content" data-lesson-contract aria-label={chinese ? "本课契约与课程定位" : "Lesson contract and curriculum position"}>
+  {wbTrack && (
+    <div class="lesson-contract__topbar">
+      <a class="lesson-contract__track" href={link(chinese ? wbTrack.hrefZh : wbTrack.href)}>
+        <span class="lesson-contract__track-num">{chinese ? `轨道 ${String(wbTrack.order).padStart(2, "0")}` : `Track ${String(wbTrack.order).padStart(2, "0")}`}</span>
+        <span>{chinese ? wbTrack.titleZh : wbTrack.title}</span>
+        <span aria-hidden="true">↗</span>
+      </a>
+      <div class="lesson-contract__badges">
+        {wbLesson && (
+          <span class="lesson-contract__badge lesson-contract__badge--step">
+            {chinese ? `第 ${wbLesson.order} / ${wbTrack.lessons.length} 课` : `Lesson ${wbLesson.order} of ${wbTrack.lessons.length}`}
+          </span>
+        )}
+        {mappedUnits.length > 0 && (
+          <span class="lesson-contract__badge lesson-contract__badge--assessed">
+            {chinese ? "真实数据测评 · Assessed" : "Assessed · Real Data"}
+          </span>
+        )}
+        {(wbLesson?.capabilities ?? []).map((cap) => (
+          <span class="lesson-contract__badge">
+            {capabilityLabels[cap] ? (chinese ? capabilityLabels[cap].zh : capabilityLabels[cap].en) : cap}
+          </span>
+        ))}
+      </div>
+    </div>
+  )}
 
-<LessonResources lessonId={lessonId} />
-<LessonFeedback lessonId={lessonId} />
+  {mappedUnits.length > 0 && (
+    <dl class="lesson-contract__units">
+      <div class="lesson-contract__unit-group">
+        <dt>{chinese ? `对应规范教学单元 (${mappedUnits.length})` : `Mapped curriculum ${mappedUnits.length === 1 ? "unit" : "units"} (${mappedUnits.length})`}</dt>
+        <dd>
+          <ul class="lesson-contract__unit-list">
+            {mappedUnits.map((unit) => (
+              <li>
+                <div class="lesson-contract__unit-head">
+                  <span class="lesson-contract__layer">{layerLabels[unit.layer] ? (chinese ? layerLabels[unit.layer].zh : layerLabels[unit.layer].en) : unit.layer}</span>
+                  <strong>{chinese ? unit.title_zh : unit.title}</strong>
+                  {unit.historical_topic_ids && unit.historical_topic_ids.length > 0 && (
+                    <code class="lesson-contract__topic-id">{unit.historical_topic_ids.join(", ")}</code>
+                  )}
+                </div>
+                <p>{chinese ? unit.learning_objective_zh : unit.learning_objective}</p>
+              </li>
+            ))}
+          </ul>
+        </dd>
+      </div>
+    </dl>
+  )}
+
+  {wbLesson && wbLesson.prerequisiteIds.length > 0 && (
+    <div class="lesson-contract__prereqs">
+      <span class="lesson-contract__prereqs-label">{chinese ? "先修课程：" : "Prerequisites:"}</span>
+      <ul class="lesson-contract__prereqs-list">
+        {wbLesson.prerequisiteIds.map((prereqId) => {
+          const prereq = allLessonsById.get(prereqId);
+          return prereq ? (
+            <li>
+              <a href={link(chinese ? prereq.hrefZh : prereq.href)}>
+                {chinese ? prereq.titleZh : prereq.title}
+              </a>
+            </li>
+          ) : null;
+        })}
+      </ul>
+    </div>
+  )}
+
+  <div class="lesson-contract__Workbench">
+    <lesson-progress data-lesson-id={lessonId} data-complete-label={chinese ? "已完成" : "Completed"} data-incomplete-label={chinese ? "未完成" : "Not completed"}>
+      <button class="lesson-progress__button" type="button" aria-pressed="false">{chinese ? "标记本课完成" : "Mark lesson complete"}</button>
+      <p data-progress-status aria-live="polite">{chinese ? "未完成" : "Not completed"}</p>
+    </lesson-progress>
+
+    <LessonResources lessonId={lessonId} />
+    <LessonFeedback lessonId={lessonId} />
+  </div>
+</section>
 
 <script>
   import {
@@ -72,3 +171,167 @@ const chinese = withoutSiteBase(Astro.url.pathname, import.meta.env.BASE_URL).st
     customElements.define("lesson-progress", LessonProgress);
   }
 </script>
+
+<style>
+  .lesson-contract {
+    margin: 0 0 1.5rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--atlas-rule-strong);
+    border-left: 3px solid var(--atlas-teal-deep);
+    background: var(--atlas-panel);
+    min-width: 0;
+  }
+  .lesson-contract__topbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid var(--atlas-rule);
+  }
+  .lesson-contract__track {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 44px;
+    font-size: 0.82rem;
+    font-weight: 650;
+    color: var(--atlas-teal-deep);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  .lesson-contract__track-num {
+    font-family: var(--atlas-font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.12rem 0.4rem;
+    border: 1px solid var(--atlas-rule-strong);
+    background: var(--atlas-surface);
+    color: var(--atlas-ink);
+  }
+  .lesson-contract__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+  }
+  .lesson-contract__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.48rem;
+    border: 1px solid var(--atlas-rule);
+    background: var(--atlas-bg);
+    font-family: var(--atlas-font-mono);
+    font-size: 0.7rem;
+    color: var(--atlas-muted);
+    line-height: 1.35;
+  }
+  .lesson-contract__badge--step {
+    color: var(--atlas-ink);
+    font-weight: 600;
+  }
+  .lesson-contract__badge--assessed {
+    border-color: var(--atlas-teal-deep);
+    background: color-mix(in srgb, var(--atlas-teal) 16%, var(--atlas-panel));
+    color: var(--atlas-ink);
+    font-weight: 650;
+  }
+  .lesson-contract__units {
+    margin: 0.7rem 0 0;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid var(--atlas-rule);
+  }
+  .lesson-contract__unit-group > dt {
+    font-family: var(--atlas-font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--atlas-muted);
+    margin: 0 0 0.45rem;
+  }
+  .lesson-contract__unit-group > dd {
+    margin: 0;
+  }
+  .lesson-contract__unit-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .lesson-contract__unit-list li {
+    padding: 0.45rem 0.6rem;
+    border-left: 2px solid var(--atlas-rule-strong);
+    background: var(--atlas-bg);
+    min-width: 0;
+  }
+  .lesson-contract__unit-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.55rem;
+    font-size: 0.84rem;
+    line-height: 1.4;
+  }
+  .lesson-contract__layer {
+    font-family: var(--atlas-font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    color: var(--atlas-teal-deep);
+    font-weight: 650;
+  }
+  .lesson-contract__topic-id {
+    font-family: var(--atlas-font-mono);
+    font-size: 0.68rem;
+    color: var(--atlas-muted);
+    background: transparent;
+    padding: 0;
+  }
+  .lesson-contract__unit-list p {
+    margin: 0.2rem 0 0;
+    font-size: 0.79rem;
+    line-height: 1.55;
+    color: var(--atlas-muted);
+  }
+  .lesson-contract__prereqs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.65rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--atlas-rule);
+    font-size: 0.78rem;
+  }
+  .lesson-contract__prereqs-label {
+    font-family: var(--atlas-font-mono);
+    font-size: 0.72rem;
+    color: var(--atlas-muted);
+  }
+  .lesson-contract__prereqs-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+  }
+  .lesson-contract__prereqs-list a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 0.78rem;
+    overflow-wrap: anywhere;
+  }
+  .lesson-contract__Workbench {
+    margin-top: 0.65rem;
+    display: grid;
+    gap: 0.55rem;
+  }
+  .lesson-contract__Workbench lesson-progress {
+    padding: 0.55rem 0.7rem;
+    background: var(--atlas-bg);
+  }
+</style>

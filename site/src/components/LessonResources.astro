@@ -34,3 +34,38 @@ const sources = sourceIds.map((id) => {
     </ul>
   </details>
 )}
+
+<style>
+  .lesson-resources {
+    border: 1px solid var(--atlas-rule);
+    background: var(--atlas-bg);
+    padding: 0 0.75rem;
+    font-size: 0.82rem;
+  }
+  .lesson-resources summary {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    cursor: pointer;
+    font-weight: 650;
+    color: var(--atlas-teal-deep);
+  }
+  .lesson-resources p {
+    margin: 0 0 0.5rem;
+    color: var(--atlas-muted);
+    font-size: 0.78rem;
+    line-height: 1.55;
+  }
+  .lesson-resources ul {
+    margin: 0 0 0.65rem;
+    padding-left: 1.1rem;
+    display: grid;
+    gap: 0.25rem;
+  }
+  .lesson-resources a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    overflow-wrap: anywhere;
+  }
+</style>

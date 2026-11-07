@@ -3,6 +3,7 @@ import AtlasFigure from "./AtlasFigure.astro";
 import AssayResultExplorer from "./AssayResultExplorer.astro";
 import HomeWorkflow from "./HomeWorkflow.astro";
 import LearningProgressPanel from "./LearningProgressPanel.astro";
+import figureManifest from "../data/atlas-figures.json";
 import { catalogResources, siteOverview } from "../lib/site-overview";
 import { withSiteBase } from "../lib/site-paths";
 import { workbenchData } from "../lib/workbench-data";
@@ -11,10 +12,37 @@ interface Props { chinese?: boolean; }
 const { chinese = false } = Astro.props;
 const local = (path: string) => withSiteBase(`${chinese ? "/zh-cn" : ""}${path}`, import.meta.env.BASE_URL);
 const link = (path: string) => withSiteBase(path, import.meta.env.BASE_URL);
+const asset = (file: string) => withSiteBase(`/figures/${file}`, import.meta.env.BASE_URL);
 const core = workbenchData.routes.find((route) => route.kind === "core")!;
 const progressRoutes = [{ ...core, title: chinese ? core.titleZh : core.title }];
 const progressLessons = workbenchData.tracks.flatMap((track) => track.lessons.map((lesson) => ({ id: lesson.id, title: chinese ? lesson.titleZh : lesson.title, href: link(chinese ? lesson.hrefZh : lesson.href), prerequisiteIds: lesson.prerequisiteIds })));
 const egfrCase = workbenchData.cases.find((entry) => entry.id === "egfr-assay-transfer");
+const featuredFigureMeta = [
+  {
+    reportNumber: 1,
+    badgeEn: "Figure 01 · Architecture",
+    badgeZh: "图 01 · 系统架构",
+    summaryEn: "Four coupled artefacts: 18-track curriculum, 232-record Atlas, CPU labs, and living report.",
+    summaryZh: "四层耦合制品：18 轨道课程、232 记录图谱、CPU 实验与动态报告。",
+  },
+  {
+    reportNumber: 11,
+    badgeEn: "Figure 11 · Coverage Audit",
+    badgeZh: "图 11 · 覆盖审计",
+    summaryEn: "13 providers × 93 topics: 93/93 real-data assessed units in the direct-review row vs external bounds.",
+    summaryZh: "13 个提供方 × 93 个主题：93/93 真实数据测评直接记录基线与外部上下界对比。",
+  },
+  {
+    reportNumber: 16,
+    badgeEn: "Figure 16 · Assay Transfer",
+    badgeZh: "图 16 · 测定迁移",
+    summaryEn: "ChEMBL 37 EGFR baseline ranking inversion between primary split (n=132) and replication (n=170).",
+    summaryZh: "ChEMBL 37 EGFR 主划分（n=132）与独立测定复现（n=170）之间的基线排名反转。",
+  },
+].map((item) => {
+  const entry = figureManifest.library.find((fig) => fig.reportNumber === item.reportNumber)!;
+  return { ...item, entry };
+});
 const backgrounds = chinese ? [
   { label: "从生物与化学进入", title: "把实验问题变成模型任务", description: "从测定、分子与目标端点开始，再读表示与基线。", track: "drug-discovery-foundations", detail: "测定 → 表示 → 预测" },
   { label: "从 AI 与计算进入", title: "先认识模型之外的生物对象", description: "区分记录、化学 parent、测定和靶点，理解数据如何形成。", track: "data-governance", detail: "对象 → 数据 → 评价" },
@@ -36,7 +64,7 @@ const selectedResources = ["model-boltz-2", "db-chembl-37", "tool-rdkit"].map((i
   <div class="aidd-home-hero__entry">
     <p class="aidd-home-hero__purpose">{chinese ? "把一个发现问题连接到课程、资源、代码与证据。先检查已有结果，再开始自己的练习。" : "Connect a discovery question to its lessons, resources, code and evidence. Inspect a retained result, then begin your own exercise."}</p>
     <div class="aidd-home-hero__actions"><a class="aidd-home-primary" href={local("/learn/")}>{chinese ? "选择学习路径" : "Find your learning route"}<span aria-hidden="true">→</span></a><a class="aidd-home-secondary" href={link("/atlas/")}>{chinese ? "选择资源" : "Choose a resource"}<span aria-hidden="true">↗</span></a><a class="aidd-home-secondary" href={local("/labs/")}>{chinese ? "打开实验" : "Open labs"}<span aria-hidden="true">↗</span></a></div>
-    <p class="aidd-home-collection">{chinese ? `${siteOverview.curriculum.trackCount} 条学习轨道 · ${siteOverview.catalog.count} 条记录` : `${siteOverview.curriculum.trackCount} learning tracks · ${siteOverview.catalog.count} resource records`}</p>
+    <p class="aidd-home-collection">{chinese ? `${siteOverview.curriculum.trackCount} 条学习轨道 · ${siteOverview.catalog.count} 条记录 · ${siteOverview.curriculum.unitCount}/${siteOverview.curriculum.unitCount} 真实数据测评单元 · ${siteOverview.labs.guideCount} 份实验指南` : `${siteOverview.curriculum.trackCount} learning tracks · ${siteOverview.catalog.count} resource records · ${siteOverview.curriculum.unitCount}/${siteOverview.curriculum.unitCount} real-data assessed units · ${siteOverview.labs.guideCount} lab guides`}</p>
   </div>
 </section>
 
@@ -47,7 +75,38 @@ const selectedResources = ["model-boltz-2", "db-chembl-37", "tool-rdkit"].map((i
   <div class="aidd-home-case__figure"><AssayResultExplorer chinese={chinese} compact /><details class="aidd-home-case__saved-figure"><summary>{chinese ? "静态图件与 PDF" : "Static figure and PDF"}</summary><AtlasFigure id="representation-flips" /></details>{chinese && <p class="aidd-home-language-label">原始英文图、数值与下载文件保持不变。</p>}</div>
 </section>
 
-<p class="aidd-home-visual-library"><a href={local("/report/figures/")}>{chinese ? "打开科学图件阅读台 · PDF 与可编辑方法图" : "Open the scientific figure library · PDFs and editable diagrams"}<span aria-hidden="true"> ↗</span></a></p>
+<section class="aidd-home-visual-library" aria-labelledby="home-visual-library-title">
+  <div class="aidd-home-visual-library__header">
+    <div>
+      <p class="eyebrow">{chinese ? "20 张报告图件 · 18 个交互式教学视图" : "20 report figures · 18 interactive teaching views"}</p>
+      <h2 id="home-visual-library-title">{chinese ? "科学图件与可编辑机制图库" : "Scientific figure & mechanism library"}</h2>
+    </div>
+    <a class="aidd-home-visual-library__cta" href={local("/report/figures/")}>{chinese ? "打开科学图件阅读台 · PDF 与可编辑方法图" : "Open the scientific figure library · PDFs and editable diagrams"}<span aria-hidden="true"> ↗</span></a>
+  </div>
+  <div class="aidd-home-visual-library__grid">
+    {featuredFigureMeta.map(({ badgeEn, badgeZh, summaryEn, summaryZh, entry }) => (
+      <article class="aidd-home-visual-card">
+        <div class="aidd-home-visual-card__media">
+          <img
+            src={asset(entry.previews["480"])}
+            srcset={`${asset(entry.previews["480"])} 480w, ${asset(entry.previews["960"])} 960w`}
+            sizes="(max-width: 700px) 100vw, 24rem"
+            width={entry.width}
+            height={entry.height}
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="aidd-home-visual-card__body">
+          <span class="aidd-home-visual-card__badge">{chinese ? badgeZh : badgeEn}</span>
+          <h3><a class="aidd-home-visual-card__link" href={local(entry.detailHref)}><span>{entry.title}</span><span aria-hidden="true">↗</span></a></h3>
+          <p>{chinese ? summaryZh : summaryEn}</p>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
 
 <section class="aidd-home-search-section" aria-label={chinese ? "查找课程、资源与实验" : "Find lessons, resources and labs"}>
   <form class="home-search aidd-home-search" role="search" aria-label={chinese ? "搜索 AIDD Commons" : "Search AIDD Commons"} action={local("/search/")} method="get">
@@ -74,12 +133,26 @@ const selectedResources = ["model-boltz-2", "db-chembl-37", "tool-rdkit"].map((i
 <p class="aidd-home-language-note">{chinese ? `英语内容为规范版本；这里提供现有课程正文和 ${siteOverview.labs.guideCount} 个实验说明的译文。数值面板和下载文件保留原始格式，目录计数不表示已观察到学习效果。` : "English is canonical. Existing lessons and lab guides have Chinese translations. Numerical panels and downloads retain their original format; catalogue coverage is not evidence of learning outcomes."}</p>
 
 <style>
-  .aidd-home-visual-library { margin: .5rem 0 0; font-size: .875rem; }
-  .aidd-home-visual-library a { display: inline-flex; align-items: center; min-height: 44px; }
+  .aidd-home-visual-library { margin: 1.5rem 0 0; padding: 1.25rem 0 1.4rem; border-bottom: 1px solid var(--atlas-rule); }
+  .aidd-home-visual-library__header { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .aidd-home-visual-library__header .eyebrow { margin: 0 0 .35rem; font-size: .75rem; }
+  .aidd-home-visual-library__header h2 { margin: 0; font-size: clamp(1.25rem, 2vw, 1.65rem); line-height: 1.25; letter-spacing: -.03em; }
+  .aidd-home-visual-library__cta { display: inline-flex; align-items: center; min-height: 44px; font-size: .8125rem; font-weight: 650; }
+  .aidd-home-visual-library__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .85rem; }
+  .aidd-home-visual-card { position: relative; border: 1px solid var(--atlas-rule-strong); background: var(--atlas-panel); min-width: 0; transition: border-color .15s ease; display: flex; flex-direction: column; }
+  .aidd-home-visual-card:hover { border-color: var(--atlas-teal-deep); }
+  .aidd-home-visual-card__link { display: flex; align-items: center; justify-content: space-between; gap: .5rem; min-height: 44px; color: var(--atlas-ink); text-decoration: none; }
+  .aidd-home-visual-card__link::after { content: ""; position: absolute; inset: 0; }
+  .aidd-home-visual-card__media { aspect-ratio: 16 / 10; overflow: hidden; border-bottom: 1px solid var(--atlas-rule); background: var(--atlas-panel); display: flex; align-items: center; justify-content: center; padding: .35rem; }
+  .aidd-home-visual-card__media img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .aidd-home-visual-card__body { padding: .75rem .85rem .85rem; display: flex; flex-direction: column; gap: .3rem; flex: 1; }
+  .aidd-home-visual-card__badge { font-family: var(--atlas-font-mono); font-size: .7rem; color: var(--atlas-teal-deep); font-weight: 650; text-transform: uppercase; letter-spacing: .04em; }
+  .aidd-home-visual-card__body h3 { margin: 0; font-size: .92rem; line-height: 1.35; color: var(--atlas-ink); letter-spacing: -.015em; }
+  .aidd-home-visual-card__body p { margin: 0; font-size: .78rem; line-height: 1.55; color: var(--atlas-muted); }
   .aidd-home-hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3rem); padding: .5rem 0 1.5rem; align-items: end; }
   .aidd-home-hero h1 { max-width: 24ch; margin: 0; font-size: clamp(2rem, 3.1vw, 3rem); line-height: 1.12; letter-spacing: -.045em; font-weight: 650; }
   .aidd-home-hero .eyebrow { font-size: .75rem; margin: 0 0 .7rem; }
-  .aidd-home-collection { margin: .6rem 0 0; font-size: .8125rem; color: var(--atlas-muted); }
+  .aidd-home-collection { margin: .55rem 0 0; padding-top: .5rem; border-top: 1px solid var(--atlas-rule); font-family: var(--atlas-font-mono); font-size: .76rem; line-height: 1.5; color: var(--atlas-muted); font-variant-numeric: tabular-nums; }
   .aidd-home-hero__purpose { max-width: 61ch; margin: 0; color: var(--atlas-muted); font-size: 1rem; line-height: 1.65; }
   .aidd-home-hero__actions { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; margin-top: .8rem; }
   .aidd-home-primary, .aidd-home-secondary { display: inline-flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 44px; padding: .55rem .8rem; font-size: .875rem; font-weight: 650; text-decoration: none; }
@@ -149,7 +222,7 @@ const selectedResources = ["model-boltz-2", "db-chembl-37", "tool-rdkit"].map((i
     .aidd-home-desk { gap: 1.5rem; }
   }
   @media (max-width: 700px) {
-    .aidd-home-hero { grid-template-columns: 1fr; padding-top: .25rem; padding-bottom: 1.25rem; gap: .9rem; }
+    .aidd-home-hero { grid-template-columns: 1fr; padding-top: .25rem; padding-bottom: .75rem; gap: .65rem; }
     .aidd-home-hero h1 { max-width: 24ch; font-size: clamp(1.9rem, 7vw, 2.5rem); }
     .aidd-home-hero__actions { margin-top: .75rem; }
     .aidd-home-search-section { grid-template-columns: 1fr; gap: .5rem; padding-block: 1.25rem; }
@@ -166,6 +239,7 @@ const selectedResources = ["model-boltz-2", "db-chembl-37", "tool-rdkit"].map((i
     .aidd-home-case { padding-block: 1.5rem 1.25rem; }
     .aidd-home-desk { grid-template-columns: 1fr; padding-block: 1.5rem; gap: 1.5rem; }
     .aidd-home-section-heading { align-items: flex-start; }
+    .aidd-home-visual-library__grid { grid-template-columns: 1fr; }
   }
   @media (max-width: 390px) {
     .aidd-home-hero h1 { font-size: 1.9rem; }

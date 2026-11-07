@@ -15,11 +15,19 @@ const title = (lessonId: string) => { const lesson = byId.get(lessonId); return 
 const lessonHref = (lessonId: string) => { const lesson = byId.get(lessonId); return lesson ? href(chinese ? lesson.hrefZh : lesson.href) : "#"; };
 const progressRoutes = workbenchData.routes.map((route) => ({ ...route, title: chinese ? route.titleZh : route.title }));
 const progressLessons = allLessons.map((lesson) => ({ id: lesson.id, title: chinese ? lesson.titleZh : lesson.title, href: href(chinese ? lesson.hrefZh : lesson.href), prerequisiteIds: lesson.prerequisiteIds }));
+const routeScopes: Record<string, { en: string; zh: string }> = {
+  core: { en: "18 tracks · 93/93 real-data assessed · End-to-end foundation", zh: "18 轨道 · 93/93 真实数据测评 · 端到端共同基础" },
+  "small-molecules": { en: "ChEMBL 37 EGFR · FreeSolv · ADMET · Synthesis & DMTA", zh: "ChEMBL 37 EGFR · FreeSolv · ADMET · 合成与 DMTA" },
+  "structure-physics": { en: "PDB 1M17/4HJO · rMD17 · Cofolding · Docking & FEP", zh: "PDB 1M17/4HJO · rMD17 · 共折叠 · 对接与自由能" },
+  biologics: { en: "Antibodies · Peptides · PROTACs · Construct Developability", zh: "抗体 · 多肽 · PROTAC · 构建体可开发性" },
+  "targets-cells": { en: "Open Targets · ClinVar · Single-Cell & Perturbation", zh: "Open Targets · ClinVar · 单细胞与扰动泛化" },
+  "agents-workflows": { en: "PaperQA · Typed Tool Contracts · Benchmark Honesty", zh: "PaperQA · 类型化工具契约 · 基准诚实性" },
+};
 ---
 
 <section class="learning-hub-hero" aria-labelledby="learn-title">
   <div><p class="eyebrow">{chinese ? "学习 · 从科学问题到可检查的输出" : "Learn · From scientific question to inspectable output"}</p><h1 id="learn-title">{chinese ? <><span class="learning-hub-title-line">为你的下一个问题，</span><span class="learning-hub-title-line">找到学习路径。</span></> : "Find a learning route for your next question."}</h1></div>
-  <div><p class="learning-hub-intro">{chinese ? "从先修地图定位已有基础与下一步，再选择核心路径或专题路径。每一课保留先修条件、练习与来源。" : "Locate your foundations and next step in the prerequisite map, then choose a core or specialist route. Each lesson keeps its prerequisites, practice and sources."}</p><div class="learning-hub-actions"><a href={local("/learn/foundations/first-session/")}>{chinese ? "开始第一次学习" : "Start a first session"}<span aria-hidden="true">→</span></a><a href="#learning-routes">{chinese ? "选择路径" : "Choose a route"}<span aria-hidden="true">↓</span></a><a href="#learning-tracks">{chinese ? "浏览轨道地图" : "Browse the track map"}<span aria-hidden="true">↓</span></a></div><dl class="learning-hub-counts"><div><dt>{chinese ? "学习轨道" : "Tracks"}</dt><dd>{tracks.length}</dd></div><div><dt>{chinese ? "规范教学单元" : "Mapped units"}</dt><dd>{siteOverview.curriculum.unitCount}</dd></div><div><dt>{chinese ? "已声明学习路径" : "Declared routes"}</dt><dd>{workbenchData.routes.length}</dd></div></dl></div>
+  <div><p class="learning-hub-intro">{chinese ? "从先修地图定位已有基础与下一步，再选择核心路径或专题路径。每一课保留先修条件、练习与来源。" : "Locate your foundations and next step in the prerequisite map, then choose a core or specialist route. Each lesson keeps its prerequisites, practice and sources."}</p><div class="learning-hub-actions"><a href={local("/learn/foundations/first-session/")}>{chinese ? "开始第一次学习" : "Start a first session"}<span aria-hidden="true">→</span></a><a href="#learning-routes">{chinese ? "选择路径" : "Choose a route"}<span aria-hidden="true">↓</span></a><a href="#learning-tracks">{chinese ? "浏览轨道地图" : "Browse the track map"}<span aria-hidden="true">↓</span></a></div><dl class="learning-hub-counts"><div><dt>{chinese ? "学习轨道" : "Tracks"}</dt><dd>{tracks.length}</dd></div><div><dt>{chinese ? "规范教学单元" : "Mapped units"}</dt><dd>{siteOverview.curriculum.unitCount}</dd></div><div><dt>{chinese ? "真实数据测评" : "Real-data assessed"}</dt><dd>{siteOverview.curriculum.unitCount}/{siteOverview.curriculum.unitCount}</dd></div><div><dt>{chinese ? "已声明学习路径" : "Declared routes"}</dt><dd>{workbenchData.routes.length}</dd></div></dl></div>
 </section>
 
 
@@ -36,8 +44,8 @@ const progressLessons = allLessons.map((lesson) => ({ id: lesson.id, title: chin
 
 <section id="learning-routes" class="learning-routes-section" aria-labelledby="learning-routes-title">
   <div class="learning-hub-heading"><div><p class="eyebrow">{chinese ? "一条核心路径 · 五条专题路径" : "One core route · five specialist routes"}</p><h2 id="learning-routes-title">{chinese ? "按一个连贯的问题学习" : "Follow a connected question"}</h2></div><a href={local("/learn/foundations/curriculum-map/")}>{chinese ? "完整课程图谱" : "Full curriculum blueprint"}<span aria-hidden="true">↗</span></a></div>
-  <div class="learning-route-grid">{workbenchData.routes.map((route) => <details id={`route-${route.id}`} class="learning-route" data-route-outline={route.id}>
-    <summary><span class="learning-route__kind">{route.kind === "core" ? chinese ? "共同基础" : "Shared foundation" : chinese ? "专题路径" : "Specialist route"}</span><h3>{chinese ? route.titleZh : route.title}</h3><p>{chinese ? route.summaryZh : route.summary}</p><span class="learning-route__footer"><span>{route.lessonIds.length} {chinese ? "节课程" : "lessons"}</span><span>{chinese ? "展开路径" : "Open route"}<span aria-hidden="true">＋</span></span></span></summary>
+  <div class="learning-route-grid">{workbenchData.routes.map((route) => <details id={`route-${route.id}`} class:list={["learning-route", { "learning-route--core": route.kind === "core" }]} data-route-outline={route.id}>
+    <summary><span class="learning-route__kind">{route.kind === "core" ? chinese ? "共同基础 · 推荐主线" : "Shared foundation · Recommended spine" : chinese ? "专题路径" : "Specialist route"}</span><h3>{chinese ? route.titleZh : route.title}</h3><p>{chinese ? route.summaryZh : route.summary}</p>{routeScopes[route.id] && <span class="learning-route__scope">{chinese ? routeScopes[route.id].zh : routeScopes[route.id].en}</span>}<span class="learning-route__footer"><span>{route.lessonIds.length} {chinese ? "节课程" : "lessons"}</span><span>{chinese ? "展开路径" : "Open route"}<span aria-hidden="true">＋</span></span></span></summary>
     <div class="learning-route__body">{route.prerequisiteIds.length > 0 && <div class="learning-route__prerequisites"><h4>{chinese ? "路径外先修课程" : "Prerequisites outside this route"}</h4><ul>{route.prerequisiteIds.map((id) => <li><a href={lessonHref(id)}>{title(id)}</a></li>)}</ul></div>}<ol>{route.lessonIds.map((id, index) => <li><span class="learning-route__step" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span><a href={lessonHref(id)}>{title(id)}</a></li>)}</ol><a class="learning-route__start" href={`${local("/learn/")}?${new URLSearchParams({ route: route.id })}`}>{chinese ? "在工作区使用这条路径" : "Use this route in the workspace"}<span aria-hidden="true">↑</span></a></div>
   </details>)}</div>
 </section>
@@ -70,6 +78,9 @@ const progressLessons = allLessons.map((lesson) => ({ id: lesson.id, title: chin
   .learning-hub-heading > a { display: inline-flex; align-items: center; gap: .75rem; min-height: 44px; font-size: .75rem; }
   .learning-route-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; align-items: start; }
   .learning-route { border: 1px solid var(--atlas-rule-strong); background: var(--atlas-panel); scroll-margin-top: 5rem; }
+  .learning-route--core { grid-column: 1 / -1; border-left: 3px solid var(--atlas-teal-deep); background: color-mix(in srgb, var(--atlas-surface) 32%, var(--atlas-panel)); }
+  .learning-route--core h3 { font-size: 1.1rem; }
+  .learning-route__scope { display: inline-block; margin: 0 0 .65rem; padding: .16rem .48rem; border: 1px solid var(--atlas-rule); background: var(--atlas-bg); font-family: var(--atlas-font-mono); font-size: .7rem; color: var(--atlas-ink); line-height: 1.4; }
   .learning-route summary { display: block; padding: .85rem; cursor: pointer; list-style: none; }
   .learning-route summary::-webkit-details-marker { display: none; }
   .learning-route__kind { display: inline-block; padding-bottom: .4rem; color: var(--atlas-teal-deep); font-size: .75rem; font-weight: 650; text-transform: uppercase; letter-spacing: .06em; }
