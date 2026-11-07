@@ -1,4 +1,5 @@
 # ruff: noqa: E501
+# mypy: disable-error-code="no-untyped-call,attr-defined"
 """Real-data 3D conformer ensemble and graph message-passing assessment (`t05-small-molecule-representation`).
 
 Evaluates RDKit ETKDGv3 + MMFF94 3D conformer ensembles, Boltzmann-weighted

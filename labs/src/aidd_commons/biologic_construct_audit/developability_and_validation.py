@@ -196,13 +196,16 @@ def compute_delivery_and_developability_panel() -> list[dict[str, Any]]:
     evaluated: list[dict[str, Any]] = []
     for row in candidates:
         phys_ok = (
-            row["sec_monomer_fraction"] >= 0.95
-            and row["hic_retention_min"] <= 11.5
-            and row["fab_tm_celsius"] >= 65.0
+            float(str(row["sec_monomer_fraction"])) >= 0.95
+            and float(str(row["hic_retention_min"])) <= 11.5
+            and float(str(row["fab_tm_celsius"])) >= 65.0
         )
-        spec_ok = row["polyreactivity_psr_score"] <= 0.27 and row["target_neg_delta_func"] <= 10.0
-        func_ok = row["target_pos_delta_func"] >= 30.0
-        deliv_ok = row["compartment_delivery_fraction"] >= 0.015
+        spec_ok = (
+            float(str(row["polyreactivity_psr_score"])) <= 0.27
+            and float(str(row["target_neg_delta_func"])) <= 10.0
+        )
+        func_ok = float(str(row["target_pos_delta_func"])) >= 30.0
+        deliv_ok = float(str(row["compartment_delivery_fraction"])) >= 0.015
         failed_gates = [
             name
             for name, ok in (

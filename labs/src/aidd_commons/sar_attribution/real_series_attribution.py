@@ -22,7 +22,7 @@ import numpy as np
 from rdkit import Chem, RDLogger
 from rdkit.Chem import AllChem
 
-RDLogger.DisableLog("rdApp.*")
+RDLogger.DisableLog("rdApp.*")  # type: ignore[attr-defined]
 
 BITS = 1024
 RADIUS = 2
@@ -201,7 +201,7 @@ def _featurize_with_info(
     if mol is None:
         raise ValueError(f"Invalid SMILES: {smiles}")
     bit_info: dict[int, list[tuple[int, int]]] = {}
-    fp = AllChem.GetMorganFingerprintAsBitVect(mol, RADIUS, nBits=BITS, bitInfo=bit_info)
+    fp = AllChem.GetMorganFingerprintAsBitVect(mol, RADIUS, nBits=BITS, bitInfo=bit_info)  # type: ignore[attr-defined]
     return mol, np.array(fp, dtype=float), bit_info
 
 

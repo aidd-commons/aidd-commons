@@ -1,4 +1,5 @@
 # ruff: noqa: E501
+# mypy: disable-error-code="no-untyped-call,attr-defined"
 """Real-data benchmark for `t03-inductive-bias-selection`, `t03-computational-uncertainty`, and `t07-classification-formulation`.
 
 Evaluates real ChEMBL 37 human EGFR (`CHEMBL203`) bioactivity measurements and UniProt `P00533`
@@ -720,7 +721,7 @@ def _fit_eval_ridge_family(
 
 
 def _sigmoid_vec(z: np.ndarray) -> np.ndarray:
-    return 1.0 / (1.0 + np.exp(-np.clip(z, -30.0, 30.0)))
+    return np.asarray(1.0 / (1.0 + np.exp(-np.clip(z, -30.0, 30.0))), dtype=float)
 
 
 def _fit_logistic_weighted(
@@ -786,7 +787,7 @@ def _binary_metrics(y: np.ndarray, probs: np.ndarray, threshold: float = 0.5) ->
 def run_real_student_benchmark() -> dict[str, Any]:
     """Run all three real-data benchmark modules (`t03-inductive-bias-selection`, `t03-computational-uncertainty`, `t07-classification-formulation`)."""
     # 1. Inductive-bias selection across Tabular, Graph, Sequence, and Multimodal families
-    splits_mm = {"train": [], "validation": [], "test": []}
+    splits_mm: dict[str, list[dict[str, Any]]] = {"train": [], "validation": [], "test": []}
     for row in MULTIMODAL_COMPLEX_RECORDS:
         splits_mm[row["split"]].append(row)
 
@@ -830,7 +831,7 @@ def run_real_student_benchmark() -> dict[str, Any]:
     selected_family_by_val = min(family_results.items(), key=lambda kv: kv[1]["validation_mae"])[0]
 
     # 2. Imbalanced binary classification & 3. Sampling vs Optimizer Uncertainty on real EGFR data
-    imb_splits = {"train": [], "validation": [], "test": []}
+    imb_splits: dict[str, list[dict[str, Any]]] = {"train": [], "validation": [], "test": []}
     for row in IMBALANCED_EGFR_RECORDS:
         imb_splits[row["split"]].append(row)
 

@@ -9,11 +9,15 @@ from typing import Any
 import numpy as np
 from rdkit import Chem, RDLogger
 from rdkit.Chem import AllChem
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import Ridge  # type: ignore[import-untyped]
 
 from aidd_commons.retro_disconnection import SNAPSHOT_JSON
 
-RDLogger.DisableLog("rdApp.*")
+RDLogger.DisableLog("rdApp.*")  # type: ignore[attr-defined]
+
+
+def _canon(smiles: str) -> str:
+    return str(Chem.CanonSmiles(smiles))  # type: ignore[no-untyped-call]
 
 
 def load_public_snapshot() -> dict[str, Any]:
@@ -45,7 +49,7 @@ def _classify_suzuki_component(smiles: str) -> str:
         return "base_or_counterion"
     mol = Chem.MolFromSmiles(smiles)
     if mol is not None:
-        atoms = {atom.GetSymbol() for atom in mol.GetAtoms()}
+        atoms = {atom.GetSymbol() for atom in mol.GetAtoms()}  # type: ignore[no-untyped-call]
         if "P" in atoms and "O" not in atoms or ("P" in atoms and mol.GetNumHeavyAtoms() >= 10):
             return "ligand"
         if "B" in atoms:
@@ -64,7 +68,7 @@ def audit_reaction_records(snapshot: dict[str, Any]) -> dict[str, Any]:
 
     for row in suzuki_rows:
         reactant_side, product_side = row["rxn_smiles"].split(">>")
-        prod_canon = Chem.CanonSmiles(product_side)
+        prod_canon = _canon(product_side)
         products.add(prod_canon)
         roles: dict[str, list[str]] = {
             "aryl_electrophile": [],
@@ -128,7 +132,7 @@ def audit_reaction_records(snapshot: dict[str, Any]) -> dict[str, Any]:
 def _mapped_bonds(mol: Chem.Mol) -> dict[tuple[int, int], str]:
     """Return mapped-atom bond pairs (min_map, max_map) -> bond_type_name."""
     bonds: dict[tuple[int, int], str] = {}
-    for bond in mol.GetBonds():
+    for bond in mol.GetBonds():  # type: ignore[no-untyped-call]
         a1 = bond.GetBeginAtom().GetAtomMapNum()
         a2 = bond.GetEndAtom().GetAtomMapNum()
         if a1 > 0 and a2 > 0:
@@ -150,7 +154,7 @@ def analyze_mapped_reaction(mapped_rxn: str) -> dict[str, Any]:
     lhs_bonds: dict[tuple[int, int], str] = {}
     for mol in reactant_mols:
         assert mol is not None
-        for atom in mol.GetAtoms():
+        for atom in mol.GetAtoms():  # type: ignore[no-untyped-call]
             mnum = atom.GetAtomMapNum()
             if mnum > 0:
                 reactant_maps[mnum] = atom.GetSymbol()
@@ -162,7 +166,7 @@ def analyze_mapped_reaction(mapped_rxn: str) -> dict[str, Any]:
     rhs_bonds: dict[tuple[int, int], str] = {}
     for mol in product_mols:
         assert mol is not None
-        for atom in mol.GetAtoms():
+        for atom in mol.GetAtoms():  # type: ignore[no-untyped-call]
             mnum = atom.GetAtomMapNum()
             if mnum > 0:
                 product_maps[mnum] = atom.GetSymbol()
@@ -197,14 +201,14 @@ def audit_atom_mapping_and_templates(snapshot: dict[str, Any]) -> dict[str, Any]
     for idx, row in enumerate(rows):
         edit_info = analyze_mapped_reaction(row["mapped_rxn"])
         reactants_str, product_str = row["ReactionSmilesClean"].split(">>")
-        recorded_reactants = {Chem.CanonSmiles(part) for part in reactants_str.split(".")}
-        rxn = AllChem.ReactionFromSmarts(row["RetroTemplate"])
+        recorded_reactants = {_canon(part) for part in reactants_str.split(".")}
+        rxn = AllChem.ReactionFromSmarts(row["RetroTemplate"])  # type: ignore[attr-defined]
         prod_mol = Chem.MolFromSmiles(product_str)
         recovered = False
         proposed_sets: list[list[str]] = []
         for outcome in rxn.RunReactants((prod_mol,)):
             try:
-                canon_parts = sorted(Chem.CanonSmiles(Chem.MolToSmiles(m)) for m in outcome)
+                canon_parts = sorted(_canon(Chem.MolToSmiles(m)) for m in outcome)
                 if canon_parts not in proposed_sets:
                     proposed_sets.append(canon_parts)
                 if set(canon_parts) == recorded_reactants:
@@ -217,7 +221,7 @@ def audit_atom_mapping_and_templates(snapshot: dict[str, Any]) -> dict[str, Any]
                 "template_hash": row["TemplateHash"],
                 "template_hash_is_64_hex": len(row["TemplateHash"]) in (12, 64),
                 "confidence": round(float(row["confidence"]), 4),
-                "product_smiles": Chem.CanonSmiles(product_str),
+                "product_smiles": _canon(product_str),
                 "recorded_reactants": sorted(recorded_reactants),
                 "template_recovers_recorded": recovered,
                 "proposal_count": len(proposed_sets),
@@ -267,7 +271,7 @@ def _summarize_tree(tree: dict[str, Any], route_id: str) -> dict[str, Any]:
             if not children:
                 leaf_molecules.append(
                     {
-                        "smiles": Chem.CanonSmiles(node["smiles"]),
+                        "smiles": _canon(node["smiles"]),
                         "in_stock": bool(node.get("in_stock", False)),
                     }
                 )
@@ -308,7 +312,7 @@ def _summarize_tree(tree: dict[str, Any], route_id: str) -> dict[str, Any]:
 
     return {
         "route_id": route_id,
-        "target_smiles": Chem.CanonSmiles(tree["smiles"]),
+        "target_smiles": _canon(tree["smiles"]),
         "step_count": len(reaction_nodes),
         "max_depth": max_depth,
         "is_branched": any(
@@ -359,8 +363,7 @@ def audit_routes_and_feasibility(snapshot: dict[str, Any]) -> dict[str, Any]:
             "template_hash": uspto_1["TemplateHash"],
             "disconnection_class": "acyl_chloride_aniline_acylation",
             "reactants": sorted(
-                Chem.CanonSmiles(p)
-                for p in uspto_1["ReactionSmilesClean"].split(">>")[0].split(".")
+                _canon(p) for p in uspto_1["ReactionSmilesClean"].split(">>")[0].split(".")
             ),
             "competing_aryl_halide_sites_on_electrophile": 0,
             "requires_transition_metal_catalyst": False,
@@ -371,8 +374,7 @@ def audit_routes_and_feasibility(snapshot: dict[str, Any]) -> dict[str, Any]:
             "template_hash": uspto_2["TemplateHash"],
             "disconnection_class": "buchwald_hartwig_aryl_chloride_amidation",
             "reactants": sorted(
-                Chem.CanonSmiles(p)
-                for p in uspto_2["ReactionSmilesClean"].split(">>")[0].split(".")
+                _canon(p) for p in uspto_2["ReactionSmilesClean"].split(">>")[0].split(".")
             ),
             "competing_aryl_halide_sites_on_electrophile": 2,
             "requires_transition_metal_catalyst": True,

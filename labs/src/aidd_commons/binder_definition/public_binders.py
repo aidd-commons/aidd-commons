@@ -1,4 +1,5 @@
 # ruff: noqa: E501
+# mypy: disable-error-code="no-untyped-call,attr-defined"
 """Real-data EGFR binder classifier fitting and negative-class / decoy evaluation (`t09-binder-classification`).
 
 Fits a Morgan-fingerprint + physicochemical logistic classifier on real ChEMBL 37
@@ -207,19 +208,19 @@ def _featurize(smiles: str) -> np.ndarray:
         bits[b] = 1.0
     descs = np.array(
         [
-            Descriptors.MolWt(mol) / 500.0,
-            Descriptors.MolLogP(mol) / 5.0,
-            rdMolDescriptors.CalcTPSA(mol) / 100.0,
-            rdMolDescriptors.CalcNumHBD(mol) / 5.0,
-            rdMolDescriptors.CalcNumHBA(mol) / 10.0,
+            float(Descriptors.MolWt(mol)) / 500.0,
+            float(Descriptors.MolLogP(mol)) / 5.0,
+            float(rdMolDescriptors.CalcTPSA(mol)) / 100.0,
+            float(rdMolDescriptors.CalcNumHBD(mol)) / 5.0,
+            float(rdMolDescriptors.CalcNumHBA(mol)) / 10.0,
         ],
-        dtype=float,
+        dtype=np.float64,
     )
     return np.concatenate([bits, descs])
 
 
 def _sigmoid(z: np.ndarray) -> np.ndarray:
-    return 1.0 / (1.0 + np.exp(-np.clip(z, -30.0, 30.0)))
+    return np.asarray(1.0 / (1.0 + np.exp(-np.clip(z, -30.0, 30.0))), dtype=float)
 
 
 def _fit_logistic(

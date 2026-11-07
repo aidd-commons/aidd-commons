@@ -1,4 +1,5 @@
 # ruff: noqa: E501
+# mypy: disable-error-code="no-untyped-call,attr-defined"
 """Real-data EGFR generative design objective, temperature-sweep memorization, and retrosynthetic route gate (`t12-design-objective-constraints`, `t12-validity-novelty-synthetic-screen`).
 
 Evaluates a frozen target-anchored generative design contract for human EGFR (`CHEMBL203`,

@@ -13,7 +13,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 ROOT = Path(__file__).resolve().parents[4]
 TOOL_AUDIT_SUMMARY_PATH = ROOT / "labs/tool_contract_audit/summary.json"
@@ -56,7 +56,7 @@ def load_agent_atlas_contracts() -> list[dict[str, Any]]:
 
 def evaluate_action_boundary_cases() -> list[dict[str, Any]]:
     """Evaluate 4 concrete scientific-agent action traces against the 6-field action-boundary contract."""
-    cases = [
+    cases: list[dict[str, Any]] = [
         {
             "case_id": "TRACE-01-read-only-corpus-grounding",
             "task": "Retrieve and cite primary evidence from local corpus without mutating source files",

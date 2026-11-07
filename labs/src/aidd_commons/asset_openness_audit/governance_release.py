@@ -13,7 +13,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 ROOT = Path(__file__).resolve().parents[4]
 OPENNESS_SUMMARY_PATH = ROOT / "labs/asset_openness_audit/summary.json"

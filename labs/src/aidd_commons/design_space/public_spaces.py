@@ -1,4 +1,5 @@
 # ruff: noqa: E501
+# mypy: disable-error-code="no-untyped-call,attr-defined"
 """Real-data 2D fragment reaction, 1D token grammar, and 3D PDB 1M17 pocket design-space audit (`t12-candidate-design-space`).
 
 Compares reachability of 6 real ChEMBL 37 clinical and preclinical EGFR inhibitors

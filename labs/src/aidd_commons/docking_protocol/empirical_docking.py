@@ -34,7 +34,7 @@ def _rotation_matrix(rx_deg: float, ry_deg: float, rz_deg: float) -> np.ndarray:
     Rx = np.array([[1.0, 0.0, 0.0], [0.0, cx, -sx], [0.0, sx, cx]])
     Ry = np.array([[cy, 0.0, sy], [0.0, 1.0, 0.0], [-sy, 0.0, cy]])
     Rz = np.array([[cz, -sz, 0.0], [sz, cz, 0.0], [0.0, 0.0, 1.0]])
-    return Rz @ Ry @ Rx
+    return np.asarray(Rz @ Ry @ Rx, dtype=float)
 
 
 def _score_pose_in_pocket(
