@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Show per-source coverage or check the committed construct audit."""
 
 from __future__ import annotations
@@ -21,11 +22,62 @@ from aidd_commons.biologic_construct_audit.summary import (  # noqa: E402
 LAB = Path(__file__).resolve().parent
 
 
+def show_developability() -> None:
+    from aidd_commons.biologic_construct_audit.developability_and_validation import (
+        audit_developability_by_modality,
+    )
+
+    dev = audit_developability_by_modality()
+    print("1. MODALITY-SPECIFIC EXPRESSION, DEVELOPABILITY, DELIVERY & CMC CONSTRAINTS")
+    for mod in dev["modalities"]:
+        print(f"  {mod['entity_id']} ({mod['modality']}) [{', '.join(mod['source_ids'])}]")
+        print(f"    construct:      {mod['construct_summary']}")
+        print(f"    host & PTM:     {mod['expression_host']} | {mod['glycosylation_and_ptm']}")
+        print(f"    stability/agg:  {mod['stability_and_aggregation']}")
+        print(f"    specificity:    {mod['immunogenicity_and_specificity']}")
+        print(f"    delivery:       {mod['delivery_and_compartment']}")
+        print(f"    CMC gate:       {mod['primary_developability_gate']}")
+    print()
+    print("2. COMMITTED UNIPROT & DAILYMED DEVELOPABILITY SOURCE CHECKS")
+    for check_name, passed in dev["source_evidence_checks"].items():
+        print(f"  {check_name}: {'PASS' if passed else 'FAIL'}")
+    print()
+    print("3. MULTI-GATE BIOPHYSICAL DEVELOPABILITY & COMPARTMENT DELIVERY PANEL")
+    for row in dev["candidate_panel"]:
+        print(
+            f"  {row['candidate_id']:<38} SEC={row['sec_monomer_fraction']:.3f}"
+            f" HIC={row['hic_retention_min']:>4.1f}m Tm={row['fab_tm_celsius']:>4.1f}C"
+            f" PSR={row['polyreactivity_psr_score']:.2f}"
+            f" dFunc+={row['target_pos_delta_func']:>4.1f} dFunc-={row['target_neg_delta_func']:>4.1f}"
+            f" deliv={row['compartment_delivery_fraction']:.5f} -> {row['verdict']}"
+        )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("show", "check"))
+    parser.add_argument(
+        "action",
+        choices=("show", "check", "developability", "check-developability"),
+    )
     action = parser.parse_args().action
     try:
+        if action == "developability":
+            show_developability()
+            return 0
+        if action == "check-developability":
+            from aidd_commons.biologic_construct_audit.developability_and_validation import (
+                check_developability_and_validation,
+            )
+
+            failures = check_developability_and_validation()
+            for failure in failures:
+                print(f"FAIL: {failure}")
+            if failures:
+                return 1
+            print(
+                "PASS: modality developability rules, committed UniProt/DailyMed PTM/aggregation excerpts and delivery panel checks agree"
+            )
+            return 0
         if action == "check":
             failures = check_summary(LAB, LAB / "summary.json")
             for failure in failures:

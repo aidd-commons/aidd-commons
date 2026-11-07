@@ -113,4 +113,22 @@ python labs/safety_evidence/inspect_safety.py check
 同一种分离施加到结构类主张上，见
 [装在同一个文件里的五种主张](/zh-cn/labs/cofolding-claim-separation/)。
 
+## 真实数据临床安全性与游离态 hERG 暴露裕度审计（`public-safety`）
+
+在 12 个构造化合物记录之外，运行涵盖来自 ChEMBL 37（人类 hERG `CHEMBL240` 与 EGFR `CHEMBL203`）和 FDA 临床药理学审评的 `6` 个真实临床药物评估：
+
+```bash
+.venv/bin/python labs/safety_evidence/inspect_safety.py public-safety
+.venv/bin/python labs/safety_evidence/inspect_safety.py check-public-safety
+```
+
+- **`6` 个临床药物的结构警报与暴露归一化安全裕度对比**：
+  - `CHEMBL553`（`Erlotinib`，`150` mg QD，`Cmax,u = 0.19 uM`，`fu = 0.07`）：触发 `1` 条警报（`terminal_alkyne_cyp_inactivator`），EGFR `IC50 = 0.002 uM`，hERG `IC50 = 28.5 uM`，游离态 hERG 安全裕度 `150.0` 倍（`log10_herg_margin = 2.1761`），hERG/EGFR 选择性比 `14250.0` 倍；临床需监测肝毒性（DILI），无尖端扭转型室速（Torsades）黑框警告。
+  - `CHEMBL939`（`Gefitinib`，`250` mg QD，`Cmax,u = 0.035 uM`，`fu = 0.09`）：触发 `1` 条警报（`halogenated_aniline`），EGFR `IC50 = 0.033 uM`，hERG `IC50 = 1.0 uM`，游离态 hERG 裕度 `28.57` 倍（`log10_herg_margin = 1.4559`），hERG/EGFR 选择性比 `30.3` 倍。
+  - `CHEMBL1201583`（`Lapatinib`，`1250` mg QD，`Cmax,u = 0.042 uM`，`fu = 0.01`）：触发 `1` 条警报（`para_alkoxy_or_hydroxy_aniline_quinone_imine_precursor`），EGFR `IC50 = 0.011 uM`，hERG `IC50 = 1.1 uM`，游离态 hERG 裕度 `26.19` 倍（`log10_herg_margin = 1.4181`），hERG/EGFR 选择性比 `100.0` 倍；带有 FDA 肝毒性黑框警告（`HLA-DQA1*02:01` 与醌亚胺活性代谢物）。
+  - `CHEMBL24828`（`Vandetanib`，`300` mg QD，`Cmax,u = 0.18 uM`，`fu = 0.06`）：触发 `0` 条警报，EGFR `IC50 = 0.5 uM`，hERG `IC50 = 0.4 uM`，游离态 hERG 裕度 `2.22` 倍（`log10_herg_margin = 0.3468`，低于 `< 10` 倍高风险阈值），hERG/EGFR 选择性比 `0.8` 倍；带有 FDA QT 间期延长与尖端扭转型室速黑框警告及 REMS 计划。
+  - `CHEMBL3353410`（`Osimertinib`，`80` mg QD，`Cmax,u = 0.025 uM`，`fu = 0.05`）：触发 `2` 条警报（`michael_acceptor_acrylamide`、`para_alkoxy_or_hydroxy_aniline_quinone_imine_precursor`），EGFR `IC50 = 0.001 uM`，hERG `IC50 = 1.58 uM`，游离态 hERG 裕度 `63.2` 倍（`log10_herg_margin = 1.8007`，满足 `>= 30` 倍 Redfern 阈值），hERG/EGFR 选择性比 `1580.0` 倍；无 Torsades 黑框警告。
+  - `CHEMBL17157`（`Terfenadine`，`60` mg QD，`Cmax,u = 0.03 uM`，`fu = 0.03`）：触发 `0` 条警报，EGFR `IC50 = 50.0 uM`，hERG `IC50 = 0.056 uM`，游离态 hERG 裕度 `1.87` 倍（`log10_herg_margin = 0.2711`，低于 `< 10` 倍高风险阈值），hERG/EGFR 选择性比 `0.0` 倍；因致死性尖端扭转型室速撤市。
+- **Torsades 风险规则对比**：仅凭结构警报（`structural_alert_only`）得到 `tp = 0`、`fp = 4`、`fn = 2`；而关联游离暴露的 hERG 安全裕度规则（`exposure_linked_herg_margin_under_10x`，`IC50_hERG / Cmax_u < 10x`）得到 `tp = 2`、`fp = 0`、`fn = 0`。
+
 原创文字采用 CC BY 4.0，原创教学代码采用 Apache-2.0。最后复核：2026-09-11。

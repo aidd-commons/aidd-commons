@@ -141,6 +141,33 @@ The [agent evaluation task set](/labs/agent-evaluation-taskset/) checks this
 repository's own laboratories as fixed tasks, across source resolution,
 execution correctness, recovery, claim accuracy and action authorisation.
 
+## Real-data checkpointed trace recovery (`inspect_trace_recovery.py`)
+
+Run the deterministic checkpointed trace-recovery audit in `labs/paperqa_local`:
+
+```bash
+.venv/bin/python labs/paperqa_local/inspect_trace_recovery.py resume-workflow
+.venv/bin/python labs/paperqa_local/inspect_trace_recovery.py check-resume-workflow
+```
+
+Across `4` workflow steps over `labs/paperqa_local/reviewed-example.json` (`2`
+Europe PMC articles `PMC3198950` and `PMC10457661`, `5` questions with `4`
+answerable and `1` negative control, `109.368` s observed indexing/answering
+runtime, `18` loopback socket events, `17` retrieved chunks, `13` cited chunks,
+and `1` flagged summary misattribution on `openbabel-2011 chunk 5`) and `4`
+ChEMBL 37 human EGFR (`CHEMBL203`) IC50 records across `2` compounds
+(`CHEMBL553` median `2.0` nM from `1.4` and `2.6` nM; `CHEMBL939` median `22.5`
+nM from `0.015` uM and `30.0` nM):
+
+- **Attempt 1 (`run_attempt_1_faulted`)**: completes Steps `1` and `2`, writes
+  verified checkpoint Step `2`, halts at Step `3` when record `chembl37_egfr_03`
+  supplies `0.015` uM under a strict `nM` schema and `150.0` s step timeout,
+  leaves Step `4` unexecuted, and emits `0` fabricated outputs.
+- **Attempt 2 (`run_attempt_2_resumed_from_checkpoint_2`)**: resumes directly
+  from checkpoint Step `2` (`0` re-executed steps, skipping Steps `1` and `2`),
+  normalizes all `4` ChEMBL 37 EGFR records at Step `3`, and completes Step `4`
+  with `0` unverified claims.
+
 The tool payload and failure trace are constructed examples. This lesson makes
 no software-execution, autonomous-laboratory, or experimental-result claim.
 Original lesson prose is CC BY 4.0; linked software and sources retain their

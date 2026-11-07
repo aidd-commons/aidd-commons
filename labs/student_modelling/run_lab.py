@@ -4,6 +4,7 @@ import argparse
 import json
 import math
 import os
+import sys
 from pathlib import Path
 
 
@@ -374,11 +375,36 @@ def main():
     root = Path(__file__).resolve().parents[2]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
+        "action",
+        nargs="?",
+        choices=("real-benchmark", "check-real-benchmark"),
+        default=None,
+        help="Optional real-data benchmark action across ChEMBL 37 EGFR and PDB pocket records",
+    )
+    parser.add_argument(
         "--output",
         default="tmp/student-modelling/report.json",
         help="Fresh JSON path under tmp/student-modelling, relative to repository root",
     )
     args = parser.parse_args()
+    if args.action in ("real-benchmark", "check-real-benchmark"):
+        src_dir = Path(__file__).resolve().parents[1] / "src"
+        if str(src_dir) not in sys.path:
+            sys.path.insert(0, str(src_dir))
+        from aidd_commons.student_modelling.real_benchmark import (
+            check_real_student_benchmark,
+            run_real_student_benchmark,
+        )
+
+        if args.action == "real-benchmark":
+            print(json.dumps(run_real_student_benchmark(), indent=2))
+            return
+        payload = run_real_student_benchmark()
+        failures = check_real_student_benchmark(payload)
+        print(json.dumps({"ok": not failures, "failures": failures}, indent=2))
+        if failures:
+            raise SystemExit(1)
+        return
     destination = root / args.output
     try:
         write_report(run(teaching_rows()), destination, root / "tmp" / "student-modelling")

@@ -36,8 +36,7 @@ def test_nonisomeric_smiles_collapses_defined_enantiomers() -> None:
 
     assert inspections[0].canonical_isomeric_smiles != inspections[1].canonical_isomeric_smiles
     assert (
-        inspections[0].canonical_nonisomeric_smiles
-        == inspections[1].canonical_nonisomeric_smiles
+        inspections[0].canonical_nonisomeric_smiles == inspections[1].canonical_nonisomeric_smiles
     )
     assert inspections[0].inchi_key != inspections[1].inchi_key
     assert all(item.specified_stereocenters == 1 for item in inspections)
@@ -86,3 +85,21 @@ def test_duplicate_source_ids_fail_closed() -> None:
                 MoleculeInput("same", "CCN", "second"),
             )
         )
+
+
+def test_conformers_and_graphs_evaluates_real_drugs_and_chiral_enantiomers() -> None:
+    from aidd_commons.representations.conformers_and_graphs import (
+        check_conformers_and_graphs,
+        evaluate_conformers_and_graphs,
+    )
+
+    payload = evaluate_conformers_and_graphs()
+    assert check_conformers_and_graphs(payload) == []
+    diag = payload["comparative_diagnostics"]
+    assert diag["max_atom_permutation_invariance_diff"] == 0.0
+    assert diag["enantiomer_2d_topological_graph_l2_distance"] == 0.0
+    assert diag["enantiomer_3d_chiral_graph_l2_distance"] > 1.0
+    assert (
+        diag["r_thalidomide_signed_volume_angstrom3"]
+        == -diag["s_thalidomide_signed_volume_angstrom3"]
+    )

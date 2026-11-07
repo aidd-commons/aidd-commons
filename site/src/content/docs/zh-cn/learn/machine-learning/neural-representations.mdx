@@ -110,4 +110,21 @@ Softmax 对每个查询允许访问的键归一化；禁止访问的键通过掩
 将学习表示连接到概率模型。对象不止一个分子时，转到
 [复合物与细胞表示](/zh-cn/learn/representations/complex-cell-and-knowledge-graphs/)。
 
+## 跨表格、图、序列与多模态模型的真实数据归纳偏置基准
+
+在涵盖野生型（`1M17`、`4HJO`）、`T790M`（`3POZ`）与 `T790M/C797S`（源自 `1XKK` 的突变状态）的 `30` 条真实 ChEMBL 37 人类 EGFR（`CHEMBL203`）配体-口袋复合物记录（`18` 条训练、`6` 条验证、`6` 条测试）上运行归纳偏置对比：
+
+```sh
+.venv/bin/python labs/student_modelling/run_lab.py real-benchmark
+.venv/bin/python labs/student_modelling/run_lab.py check-real-benchmark
+```
+
+- **图置换不变性**：反转 `erlotinib`（`CHEMBL553`）的 RDKit 原子索引顺序后，2 层消息传递图编码器的最大特征差异为 `graph_permutation_invariance_max_diff = 0.0`。
+- **模型族对比（正则化网格 `alpha` 取 `{0.01, 0.1, 1.0, 10.0}` 下的 `validation_mae` / `test_mae` / `test_rmse`，单位 `pIC50`）**：
+  - `tabular_descriptor_ridge`（`selected_alpha = 1.0`）：`1.4691` / `1.1589` / `1.4025`。
+  - `graph_mpnn_ridge`（`selected_alpha = 1.0`）：`1.3914` / `1.1980` / `1.4260`。
+  - `sequence_kmer_attention_ridge`（`selected_alpha = 0.01`）：`0.6616` / `0.6193` / `0.7214`。
+  - `multimodal_graph_sequence_ridge`（`selected_alpha = 0.1`）：`0.3947` / `0.3861` / `0.4123`（按最低验证集 MAE 选中）。
+- **诊断结论**：仅编码配体的表格与 2D 图模型在野生型、`T790M` 与 `C797S` 口袋间给出完全相同的分子特征向量；而配体图与口袋序列交叉耦合的多模态模型能够捕捉看门残基空间位阻（`T790M` 对可逆苯胺喹唑啉的耐药）以及 `Cys797 -> Ser797` 亲核残基缺失（`C797S` 对共价丙烯酰胺的失活）。
+
 原创构造例子与文字：CC BY 4.0。来源检查：2026-09-09。

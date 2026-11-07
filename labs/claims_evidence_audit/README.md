@@ -18,9 +18,13 @@ Mode is a fresh independent computation over a frozen protocol and committed rec
 .venv/bin/python labs/claims_evidence_audit/run_lab.py check
 .venv/bin/python labs/claims_evidence_audit/inspect_claims_evidence_audit.py show
 .venv/bin/python labs/claims_evidence_audit/inspect_claims_evidence_audit.py check
+.venv/bin/python labs/claims_evidence_audit/inspect_claims_evidence_audit.py verify-source-content
+.venv/bin/python labs/claims_evidence_audit/inspect_claims_evidence_audit.py check-source-content
 .venv/bin/python labs/claims_evidence_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/claims_evidence_audit -q
 ```
+
+In addition to checking comparison-matrix cells (`show` / `check`), the `verify-source-content` and `check-source-content` subcommands perform content-level source verification over real committed scientific datasets and laboratory outputs (`labs/chembl_egfr/data/egfr_ic50.csv` with 320 ChEMBL 37 rows, `labs/freesolv/summary.json` with 642 FreeSolv molecules, `labs/skempi_affinity/summary.json` with 142/144 row-split leakage rows, and `labs/egfr_structures/summary.json` with 4 RCSB PDB EGFR coordinate entries), demonstrating all four evidence states (`direct-observation`, `bounded-inference`, `unsupported-claim`, and `unresolved-field`) on real measured scientific records.
 
 The saved computation dated 2026-10-24 found 14 direct observations, 38 unresolved fields, 0 bounded inferences and 0 unsupported claims in the selected track. The project row and independent reading agree on all 4 examined topics. This snapshot records both superlative statuses as `not_established`. Their measured numerical bounds pass, and the correction-window status is `not_recorded` in that prepublication snapshot.
 

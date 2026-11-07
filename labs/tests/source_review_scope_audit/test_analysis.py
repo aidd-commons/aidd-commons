@@ -9,6 +9,10 @@ from aidd_commons.source_review_scope_audit.analysis import (
     entry_parts,
 )
 from aidd_commons.source_review_scope_audit.protocol import EXAMINED_IDS
+from aidd_commons.source_review_scope_audit.real_passage_binding import (
+    check_real_source_passages,
+    verify_real_source_passages,
+)
 from aidd_commons.source_review_scope_audit.records import load_catalogue
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -102,3 +106,10 @@ def test_real_totals_equal_per_record_counts() -> None:
     )
     assert result["totals"]["parts"]["date"]["carried"] == 0
     assert result["totals"]["parts"]["date"]["named-in-text"] > 0
+
+
+def test_real_passage_binding_verification() -> None:
+    payload = verify_real_source_passages(ROOT)
+    assert check_real_source_passages(payload) == []
+    assert payload["verified_binding_count"] == 4
+    assert payload["all_anchors_nonempty"] is True

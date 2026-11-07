@@ -123,3 +123,35 @@ def test_a_collapsed_protocol_set_is_rejected(data, mutate, expected):
     mutate(broken)
     failures = docking.check(broken)
     assert any(expected in failure for failure in failures), failures
+
+
+def test_empirical_docking_over_real_egfr_cocrystals():
+    import json
+
+    out = subprocess.run(
+        [sys.executable, str(LAB / "inspect_protocol.py"), "empirical-docking"],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=ROOT,
+    )
+    payload = json.loads(out.stdout)
+    assert payload["receptor_pdb_id"] == "1M17"
+    assert payload["pocket_heavy_atoms_within_10A"] == 157
+    assert payload["pose_search_count"] == 28
+    assert payload["crystal_reference_pose"]["score_vdw_hbond"] == -15.6194
+    assert payload["crystal_reference_pose"]["score_vdw_only_rescored"] == -12.46
+    assert payload["top_redocked_non_crystal_pose"]["rmsd_to_crystal_angstrom"] == 0.3002
+    assert payload["decoy_enrichment_validation"]["roc_auc_vdw_hbond"] == 1.0
+    assert payload["decoy_enrichment_validation"]["ef_25pct_vdw_hbond"] == 4.0
+
+    chk = subprocess.run(
+        [sys.executable, str(LAB / "inspect_protocol.py"), "check-empirical-docking"],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=ROOT,
+    )
+    chk_payload = json.loads(chk.stdout)
+    assert chk_payload["ok"] is True
+    assert chk_payload["failures"] == []

@@ -133,3 +133,20 @@ def test_overlap_reports_conflict_only_when_stated_values_disagree(monkeypatch):
             "right_value": "tnf-receptor-interaction-blockade",
         }
     ]
+
+
+def test_developability_by_modality_verifies_committed_sources_and_delivery_gates():
+    from aidd_commons.biologic_construct_audit.developability_and_validation import (
+        audit_developability_by_modality,
+        check_developability_and_validation,
+    )
+
+    dev = audit_developability_by_modality()
+    assert dev["modality_count"] == 6
+    assert all(dev["source_evidence_checks"].values())
+    assert dev["surviving_candidates"] == [
+        "MAB-101 (well-behaved IgG1)",
+        "ERT-201 (CHO M6P-high enzyme)",
+        "SIRNA-302 (ionizable LNP siRNA)",
+    ]
+    assert check_developability_and_validation() == []

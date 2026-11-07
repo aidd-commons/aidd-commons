@@ -6,12 +6,13 @@ import type {
 
 interface Props {
   chinese?: boolean;
+  embedded?: boolean;
   providers: ComparisonProvider[];
   summaries: CoverageSummary[];
   totalTopics: number;
 }
 
-const { providers, summaries, totalTopics, chinese = false } = Astro.props;
+const { providers, summaries, totalTopics, chinese = false, embedded = false } = Astro.props;
 const t = (en: string, zh: string) => chinese ? zh : en;
 const selfId = "aidd-commons";
 const thresholdLabels = {
@@ -31,14 +32,14 @@ const summaryFor = (providerId: string, threshold: CoverageSummary["threshold"])
 const axisTicks = [0, Math.round(totalTopics / 2), totalTopics];
 ---
 
-<coverage-intervals class="coverage-bounds" aria-labelledby="coverage-bounds-title">
-  <div class="section-heading-row">
+<coverage-intervals class="coverage-bounds" aria-label={embedded ? t("Historical coverage bounds by threshold", "按深度阈值划分的历史覆盖上下界") : undefined} aria-labelledby={embedded ? undefined : "coverage-bounds-title"}>
+  {!embedded && <div class="section-heading-row">
     <div>
       <p class="eyebrow">{t("Interval audit","区间审计")}</p>
       <h2 id="coverage-bounds-title">{t("Coverage bounds, not a leaderboard","覆盖范围的上下界")}</h2>
     </div>
     <p class="audit-status"><span aria-hidden="true">●</span> {t("Claim status: not established", "主张状态：尚未确立")}</p>
-  </div>
+  </div>}
 
   <p class="bounds-intro">{t("Each interval belongs to one named provider at one teaching depth. Unknown topics widen its range. All panels use the same ", "每条区间属于一个明确的提供方和教学深度。未知主题使其区间变宽。所有面板使用相同的 ")}{totalTopics}{t("-topic scale.", " 主题尺度。")}</p>
   <div class="bounds-depth-controls" role="group" aria-label={t("Teaching depth threshold", "教学深度阈值")}>
@@ -50,7 +51,7 @@ const axisTicks = [0, Math.round(totalTopics / 2), totalTopics];
       {orderedProviders.map(provider => {
         const row = summaryFor(provider.id, threshold);
         return <article class:list={["bounds-provider", { "bounds-provider--self": provider.id === selfId }]} data-bounds-provider={provider.id} data-bounds-lower={row.lower} data-bounds-upper={row.upper}>
-          <header><h3>{provider.name}</h3><output aria-label={t(`${row.lower} to ${row.upper} of ${totalTopics} topics`, `${row.lower} 至 ${row.upper} / ${totalTopics} 个主题`)}>{row.lower}<span>–</span>{row.upper}</output></header>
+          <header><div><h3>{provider.name}</h3>{provider.provider_class && <small class="bounds-provider__class">{provider.provider_class.replaceAll("-", " ")}</small>}</div><output aria-label={t(`${row.lower} to ${row.upper} of ${totalTopics} topics`, `${row.lower} 至 ${row.upper} / ${totalTopics} 个主题`)}>{row.lower === row.upper ? row.lower : <>{row.lower}<span>–</span>{row.upper}</>}</output></header>
           <div class="bounds-provider__plot" aria-hidden="true">{axisTicks.map(tick => <i class="bounds-provider__grid" style={`left:${tick / totalTopics * 100}%`} />)}<span class="bounds-provider__interval" style={`left:${row.lower / totalTopics * 100}%;width:${(row.upper - row.lower) / totalTopics * 100}%`} /><i class="bounds-lower" style={`left:${row.lower / totalTopics * 100}%`} /><i class="bounds-upper" style={`left:${row.upper / totalTopics * 100}%`} /></div>
           <div class="bounds-provider__axis" aria-hidden="true">{axisTicks.map(tick => <span>{tick}</span>)}</div><p>{row.direct_cells} {t("direct cells", "个直接观察单元格")} · {row.default_unverified_cells} {t("unknown defaults", "个未知默认项")}</p>
         </article>;
@@ -65,7 +66,7 @@ const axisTicks = [0, Math.round(totalTopics / 2), totalTopics];
     {t('"Executable on real data" counts a runnable topic only when measured or computed records, or a genuine simulation, docking or structure-prediction run, carry it. A checker over hand-authored teaching inputs is executable but not on real data.', "真实数据可执行要求使用测量或计算记录，或实际的模拟、对接、结构预测运行。针对手工教学输入的检查器虽然可执行，但不属于真实数据执行。")}
   </p>
 
-  <details class="bounds-exact"><summary>{t("Exact counts for every provider and depth", "各提供方与深度的准确计数")}</summary>
+  {!embedded && <details class="bounds-exact"><summary>{t("Exact counts for every provider and depth", "各提供方与深度的准确计数")}</summary>
   <div
     class="bounds-table-wrap"
     role="region"
@@ -84,7 +85,7 @@ const axisTicks = [0, Math.round(totalTopics / 2), totalTopics];
       </tbody>
     </table>
   </div>
-  </details>
+  </details>}
 </coverage-intervals>
 
 <script>
@@ -106,7 +107,7 @@ const axisTicks = [0, Math.round(totalTopics / 2), totalTopics];
 <style>
   .coverage-bounds{display:block;color:var(--atlas-ink)}.coverage-bounds [hidden]{display:none!important}.coverage-bounds h2{font-size:clamp(1.4rem,2.5vw,1.8rem);margin:0}.coverage-bounds .eyebrow{font-size:.7rem;margin-bottom:.3rem}.coverage-bounds .audit-status{font-size:.72rem;padding:.4rem .6rem;border:1px dashed var(--atlas-rule-strong)}.bounds-intro{font-size:.84rem;color:var(--atlas-muted);line-height:1.6;max-width:90ch;margin:.6rem 0 1rem}
   .bounds-depth-controls{display:flex;flex-wrap:wrap;gap:3px;padding:.25rem;background:var(--atlas-surface);border:1px solid var(--atlas-rule);width:fit-content;max-width:100%}.bounds-depth-controls button{font:inherit;font-size:.75rem;min-height:44px;padding:.35rem .85rem;color:var(--atlas-ink);background:transparent;border:0;cursor:pointer}.bounds-depth-controls button[aria-pressed=true]{background:var(--atlas-teal-deep);color:var(--atlas-action-ink)}.bounds-depth-controls button:disabled{cursor:default}.bounds-key{display:flex;flex-wrap:wrap;gap:.5rem 1.3rem;font-size:.7rem;color:var(--atlas-muted);margin:.8rem 0}.bounds-key>span{display:flex;gap:.45rem;align-items:center}.bounds-key i{position:static;transform:none}.bounds-key b{display:block;width:1.8rem;height:.35rem;border-block:1px solid var(--atlas-teal-deep);background:color-mix(in srgb,var(--atlas-teal) 15%,var(--atlas-panel))}
-  .bounds-provider-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.65rem 1.5rem}.bounds-provider{min-width:0;padding:.65rem .7rem .5rem;border-top:1px solid var(--atlas-rule);background:var(--atlas-panel)}.bounds-provider--self{background:color-mix(in srgb,var(--atlas-teal) 7%,var(--atlas-panel));border-top:3px solid var(--atlas-teal-deep);padding-top:calc(.65rem - 2px)}.bounds-provider>header{display:flex;align-items:start;justify-content:space-between;gap:.7rem;min-height:2.6rem}.bounds-provider h3{font-size:.76rem;line-height:1.4;font-weight:550;margin:0;max-width:27ch}.bounds-provider output{font-size:.94rem;font-variant-numeric:tabular-nums;font-weight:650;white-space:nowrap}.bounds-provider output span{font-weight:400;color:var(--atlas-muted);padding-inline:.15rem}.bounds-provider__plot{position:relative;height:1.15rem;margin-inline:.4rem;border-bottom:1px solid var(--atlas-rule)}.bounds-provider__grid{position:absolute;top:0;bottom:0;border-left:1px solid var(--atlas-rule)}.bounds-provider__interval{position:absolute;top:.48rem;height:.28rem;border-block:1px solid var(--atlas-teal-deep);background:color-mix(in srgb,var(--atlas-teal) 18%,var(--atlas-panel))}.bounds-lower{display:block;width:.43rem;height:.43rem;border-radius:50%;background:var(--atlas-teal-deep);position:absolute;top:.62rem;transform:translate(-50%,-50%);z-index:2}.bounds-upper{display:block;width:.65rem;height:.65rem;border:2px solid var(--atlas-teal-deep);border-radius:50%;background:var(--atlas-panel);position:absolute;top:.62rem;transform:translate(-50%,-50%);z-index:1}.bounds-provider__axis{display:flex;justify-content:space-between;font-size:.6rem;font-variant-numeric:tabular-nums;color:var(--atlas-muted);margin:.15rem .2rem 0}.bounds-provider>p{font-size:.65rem;color:var(--atlas-muted);margin:.3rem 0 0}.coverage-bounds>.section-intro{font-size:.76rem;margin:.7rem 0;max-width:100ch}.bounds-exact{border-top:1px solid var(--atlas-rule);margin-top:.7rem}.bounds-exact>summary{min-height:44px;cursor:pointer;font-size:.8rem;padding-block:.7rem}.bounds-depth-controls button:focus-visible,.bounds-exact>summary:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
+  .bounds-provider-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.65rem 1.5rem}.bounds-provider{min-width:0;padding:.65rem .7rem .5rem;border-top:1px solid var(--atlas-rule);background:var(--atlas-panel)}.bounds-provider--self{background:color-mix(in srgb,var(--atlas-teal) 7%,var(--atlas-panel));border-top:3px solid var(--atlas-teal-deep);padding-top:calc(.65rem - 2px)}.bounds-provider>header{display:flex;align-items:start;justify-content:space-between;gap:.7rem;min-height:2.6rem}.bounds-provider h3{font-size:.76rem;line-height:1.4;font-weight:550;margin:0;max-width:27ch}.bounds-provider__class{display:block;font-size:.64rem;color:var(--atlas-muted);text-transform:capitalize;margin-top:.1rem}.bounds-provider output{font-size:.94rem;font-variant-numeric:tabular-nums;font-weight:650;white-space:nowrap}.bounds-provider output span{font-weight:400;color:var(--atlas-muted);padding-inline:.15rem}.bounds-provider__plot{position:relative;height:1.15rem;margin-inline:.4rem;border-bottom:1px solid var(--atlas-rule)}.bounds-provider__grid{position:absolute;top:0;bottom:0;border-left:1px solid var(--atlas-rule)}.bounds-provider__interval{position:absolute;top:.48rem;height:.28rem;border-block:1px solid var(--atlas-teal-deep);background:color-mix(in srgb,var(--atlas-teal) 18%,var(--atlas-panel))}.bounds-lower{display:block;width:.43rem;height:.43rem;border-radius:50%;background:var(--atlas-teal-deep);position:absolute;top:.62rem;transform:translate(-50%,-50%);z-index:2}.bounds-upper{display:block;width:.65rem;height:.65rem;border:2px solid var(--atlas-teal-deep);border-radius:50%;background:var(--atlas-panel);position:absolute;top:.62rem;transform:translate(-50%,-50%);z-index:1}.bounds-provider__axis{display:flex;justify-content:space-between;font-size:.6rem;font-variant-numeric:tabular-nums;color:var(--atlas-muted);margin:.15rem .2rem 0}.bounds-provider>p{font-size:.65rem;color:var(--atlas-muted);margin:.3rem 0 0}.coverage-bounds>.section-intro{font-size:.76rem;margin:.7rem 0;max-width:100ch}.bounds-exact{border-top:1px solid var(--atlas-rule);margin-top:.7rem}.bounds-exact>summary{min-height:44px;cursor:pointer;font-size:.8rem;padding-block:.7rem}.bounds-depth-controls button:focus-visible,.bounds-exact>summary:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
   @media(max-width:62rem){.bounds-provider-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem 1rem}}@media(max-width:38rem){.bounds-provider-grid{grid-template-columns:1fr}.bounds-provider>header{min-height:0;margin-bottom:.4rem}.bounds-provider h3{max-width:35ch}.bounds-depth-controls{width:100%}.bounds-depth-controls button{flex:1 1 auto}.bounds-key{gap:.5rem .8rem}}
   .coverage-bounds{min-width:0}.bounds-table-wrap{max-width:100%;overflow:auto;border:0;border-top:1px solid var(--atlas-rule)}.bounds-table{font-size:.8rem;min-width:38rem}.bounds-table-wrap:focus-visible{outline:3px solid var(--atlas-teal-deep);outline-offset:3px}
 </style>

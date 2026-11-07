@@ -8,7 +8,33 @@ results.
 ```bash
 python labs/docking_protocol/inspect_protocol.py show
 python labs/docking_protocol/inspect_protocol.py check
+python labs/docking_protocol/inspect_protocol.py empirical-docking
+python labs/docking_protocol/inspect_protocol.py check-empirical-docking
 ```
+
+## Real-structure empirical docking (`empirical-docking`)
+
+Alongside the protocol-card comparison (`show` / `check`), `empirical-docking`
+and `check-empirical-docking` execute a deterministic, offline real-structure
+scoring evaluation over the RCSB PDB EGFR co-crystal ensemble (`1M17`, `4HJO`,
+`1XKK`) in `labs/docking_protocol/data/egfr_cocrystals.json`:
+
+- **Redocking & rescoring shift (`1M17` / erlotinib `AQ4`, `157` pocket heavy
+  atoms within `10` Å)**: across `28` candidate poses, the crystal pose
+  (`pose_01_crystal`, RMSD `0.0` Å, `min_met793_n_distance_angstrom = 2.6991` Å,
+  `0` heavy-atom clashes `< 2.4` Å) scores `-15.6194` under the empirical
+  vdW + Met793 hydrogen-bond function and `-12.46` under vdW-only rescoring
+  (a scale shift of `+3.1594` on the identical atomic coordinates). The top
+  redocked non-crystal pose (`pose_00_near_native`, RMSD `0.3002` Å, Met793 N
+  distance `2.6624` Å, `0` clashes) scores `-15.961` (`-12.88` vdW-only).
+- **Cross-docking receptor-conformation penalty**: placing `4HJO` (`AQ4`, inactive-like
+  EGFR) into rigid `1M17` flips the score to `+11.8116` (`5` clashes `< 2.4` Å,
+  minimum distance `1.8836` Å), while placing DFG-out `1XKK` (`FMM` / lapatinib)
+  into rigid `1M17` produces `+261.2519` (`31` steric clashes `< 2.4` Å, Met793
+  distance `4.1362` Å).
+- **Decoy enrichment (`16` candidates: `4` active hinge-binding poses vs `12`
+  translated/rotated decoys)**: vdW + H-bond achieves `ROC-AUC = 1.0` and
+  `EF_25% = 4.0` (`4 / 4` top hits).
 
 ## The rule
 

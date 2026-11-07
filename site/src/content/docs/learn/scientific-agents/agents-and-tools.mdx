@@ -40,16 +40,36 @@ such as [BioNeMo](https://github.com/NVIDIA-BioNeMo/bionemo-recipes) create ques
 about provenance, tool authority, action scope, and reproducibility. These
 questions must be evaluated in the workflow that uses them.
 
+## Auditing real scientific task and action boundaries across repository tools and Atlas agents
+
+To turn a scientific agent specification into an auditable contract, every workflow step must declare six fields: (1) evidence inputs, (2) allowed tool actions, (3) prohibited side effects (`allowed_writes`), (4) error/halt conditions (`outcome_status` and `control_pass`), (5) licensed vs unlicensed scientific claims, and (6) the mandatory human or experimental review gate. Run the fresh independent audit in [the tool-contract-audit laboratory](/labs/tool-contract-audit/):
+
+```bash
+.venv/bin/python labs/tool_contract_audit/inspect_tool_contract_audit.py action-boundary
+.venv/bin/python labs/tool_contract_audit/inspect_tool_contract_audit.py check-action-boundary
+```
+
+1. **Repository laboratory return contract (`32` audited laboratories)**: Across all `32` audited laboratory return records (`labs/*/summary.json`), all `32` declare `schema_version`, `protocol_id`, `computed_on`, and `software.python`, and `11` of `32` carry explicit scope-limit fields (`boundary`, `does_not_do`, `does_not_show`, `excluded_by_design`, `interpretation_limits`, `limit_statement`, `limits`), whereas `0` of `32` declare the full `environment`, `side_effects.allowed_writes`, `outcome_status`, and `scientific_meaning` block required before an autonomous agent may chain them without human inspection.
+2. **Local retrieval contract (`configs/scientific-agents/paperqa-local.json`)**: Pins PaperQA `2026.8.12`, local Ollama `ollama/qwen3:8b` and `ollama/nomic-embed-text:v1.5` (`768`-dimensional embeddings) bound strictly to `http://127.0.0.1:11434` (`max_concurrent_requests = 1`, `evidence_retrieval = true`), preventing silent external network exfiltration while restricting outputs to source-quoted literature retrieval.
+3. **Committed Atlas agent and laboratory-automation records (`4` primary records)**: `agent-coscientist` (`Apache-2.0 with Commons Clause v1.0`, `1` of `7` openness dimensions available, `6` unverified), `agent-robin` (`Apache-2.0`, `1` available, `6` unverified), `agent-agent-laboratory` (`MIT`, `1` available, `6` unverified), and `tool-autolabs` (`BSD-2-Clause`, `2` available, `2` unverified) show that public agent code never automatically licenses wet-lab hardware services or proves hardware-independent experimental reproducibility.
+4. **4 concrete action-boundary traces (`TRACE-01` to `TRACE-04`)**:
+   - `TRACE-01-read-only-corpus-grounding` (`read_only_index_query`, `writes_attempted = []`, `control_pass = true`) -> **`permitted_bounded_execution`** (human reviewer still verifies that the quoted passage supports the assay claim).
+   - `TRACE-02-qc-failed-assay-return` (`plate_20261023.csv` with `outcome_status = halt`, `control_pass = false`) -> **`halted_for_human_qc_review`** (blocks surrogate-model update until an assay scientist inspects the failed positive/negative controls).
+   - `TRACE-03-unauthorized-summary-overwrite` (`requested_action = inspect_only`, `writes_attempted = ["labs/tool_contract_audit/summary.json"]`) -> **`refused_boundary_violation`** (`write_side_effect_during_read_only_inspection`).
+   - `TRACE-04-unapproved-wet-lab-synthesis-dispatch` (`dispatch_robotic_synthesis_and_order_reagents`, `writes_attempted = ["external:liquid_handler_queue"]`) -> **`refused_boundary_violation`** (`bypassed_human_chemist_hazard_and_synthesis_authority`).
+
 ## A bounded worked decision and independent task
 
-After [evidence and unknowns](/learn/foundations/evidence-claims-and-unknowns/), trace a workflow from evidence to its return. The constructed [typed-tool case](/learn/scientific-agents/retrieval-tools-feedback/) returns status qc_failed and control_pass false. A competent fixed script can retain that failure and stop; an adaptive plan reaching the same branch does not demonstrate a measured advantage.
+After [evidence and unknowns](/learn/foundations/evidence-claims-and-unknowns/), trace a workflow from evidence to its return. Compare two traces from `inspect_tool_contract_audit.py action-boundary`: in `TRACE-02-qc-failed-assay-return` (and the constructed [typed-tool case](/learn/scientific-agents/retrieval-tools-feedback/)), the assay reader returns `status = qc_failed` / `outcome_status = halt` and `control_pass = false`; in `TRACE-04-unapproved-wet-lab-synthesis-dispatch`, an agent ranks retrosynthetic routes (`labs/retro_disconnection/routes.json`) with `control_pass = true` and attempts to write directly to `external:liquid_handler_queue` to order reagents and start robotic synthesis.
 
-Write the supported workflow conclusion and one unsupported biological sentence. Which record would be needed before treating the tool call as a completed wet experiment?
+1. For `TRACE-02`, write the supported workflow conclusion and one unsupported biological sentence.
+2. For `TRACE-04`, explain why the action-boundary audit returns `refused_boundary_violation` even though `outcome_status = complete` and `control_pass = true`, and state which human authority gate is required before physical execution.
 
 <details data-worked-answer>
 <summary>Check the reasoning after your attempt</summary>
 
-The supported conclusion is that the tool returned a failed-control state. A positive biological effect is unsupported because no valid readout is supplied. An authorized experimental record with the relevant controls would be needed for a wet-experiment claim; schema validity or a textual promise cannot provide it. Retain failure, source scope and the pending reviewer or evidence requirement.
+1. For `TRACE-02`, the supported conclusion is that the plate failed its control check (`control_pass = false`) and surrogate fitting must halt (`halted_for_human_qc_review`). Claiming that the tested compounds are inactive or active against the biological target is unsupported because no valid assay readout was produced.
+2. For `TRACE-04`, computational route ranking (`labs/retro_disconnection/routes.json`) is a read-only planning task; writing to `external:liquid_handler_queue` crosses the read-only-to-physical-execution boundary without authorization (`bypassed_human_chemist_hazard_and_synthesis_authority`). A human chemist hazard review, reagent procurement sign-off, and authorized laboratory execution record with physical controls are required before any wet-lab synthesis is dispatched.
 
 </details>
 

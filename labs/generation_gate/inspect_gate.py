@@ -409,9 +409,30 @@ def check(objective: dict, candidates: dict, reference: dict[str, str]) -> list[
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "action", nargs="?", default="objective", choices=["objective", "screen", "check"]
+        "action",
+        nargs="?",
+        default="objective",
+        choices=["objective", "screen", "check", "public-series", "check-public-series"],
     )
     action = parser.parse_args().action
+    if action in ("public-series", "check-public-series"):
+        src_dir = ROOT / "labs" / "src"
+        if str(src_dir) not in sys.path:
+            sys.path.insert(0, str(src_dir))
+        from aidd_commons.generation_gate.public_series import (
+            check_public_series,
+            evaluate_public_series,
+        )
+
+        payload = evaluate_public_series()
+        if action == "public-series":
+            print(json.dumps(payload, indent=2))
+            return
+        failures = check_public_series(payload)
+        print(json.dumps({"ok": not failures, "failures": failures}, indent=2))
+        if failures:
+            sys.exit(1)
+        return
     objective, candidates, reference = load()
 
     print(f"Objective {OBJECTIVE.relative_to(ROOT)}")

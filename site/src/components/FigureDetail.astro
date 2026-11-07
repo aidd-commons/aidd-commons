@@ -25,7 +25,7 @@ const motionId=d.key==='S3'?'decision-pipeline':d.key==='S7'?'frozen-lifecycle':
  <nav class="figure-detail__section-links" aria-label={t('Figure sections','图件区块')}><a href="#web-view">{t('Readable web view','网页阅读视图')}</a><a href="#original-figure">{t('Original figure','原图')}</a><a href="#figure-source-table">{t('Source table & CSV','来源表与 CSV')}</a><a href="#source-boundary">{t('Source boundary','来源边界')}</a></nav>
  <section id="web-view" class="figure-detail__view"><h2>{t('Read the figure','阅读图件')}</h2>
  {stepConfig&&<FigureSteps {...stepConfig} chinese={chinese} checkpoints={d.key==='P10'?Object.values(d.assays as Record<string,any>)[0].checkpoints:undefined}/>}
- {entry.kind==='schematic'?<FigureSchematicView data={d} chinese={chinese}/>:d.key==='P2'?<CoverageBounds providers={d.providers} summaries={d.summaries} totalTopics={d.total} chinese={chinese}/>:<div data-figure-explorer>
+ {entry.kind==='schematic'?<FigureSchematicView data={d} chinese={chinese}/>:d.key==='P2'?<CoverageBounds providers={d.providers} summaries={d.summaries} totalTopics={d.total} chinese={chinese} embedded={true}/>:<div data-figure-explorer>
  {groups.length>1&&<label class="figure-detail__selector" data-figure-selector-control hidden>{t('Choose a view','选择视图')}<select data-figure-select><option value="all">{t('All views','所有视图')}</option>{groups.map(g=><option value={g.id}>{g.label}</option>)}</select></label>}
  {groups.map(g=><section class="figure-detail__group" data-figure-group={g.id}><h3 class="figure-detail__group-title">{g.label}</h3><div class="figure-detail__panels">{g.panels.map(panel=><FigureDataPanel panel={panel} chinese={chinese}/>)}</div></section>)}
  {common.map(panel=><FigureDataPanel panel={panel} chinese={chinese}/>)}

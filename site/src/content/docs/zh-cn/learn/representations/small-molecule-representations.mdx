@@ -212,6 +212,18 @@ env UV_CACHE_DIR=.cache/uv uv run python labs/molecule_representations/run_lab.p
 
 配套的 [ChEMBL 37 EGFR 表示基线实验](/zh-cn/labs/chembl-egfr-representation-baselines/) 随后从身份检查转向匹配的预测比较。它使用 214 个冻结 RDKit 2D 描述符、一个考虑手性的 Morgan 指纹、一个 scaffold 不相交划分、仅训练集预处理和仅验证集 Ridge 选择。其已审阅页面将历史开发数据漏斗与已完成的主要结果和另一项检测的结果分开，包括排名反转，同时不公布分子成员资格或原始 ChEMBL 数据。
 
+### 真实数据 3D 构象系综与 2D/3D 图消息传递审计（`conformers-and-graphs`）
+
+在 `5` 个真实 ChEMBL 37 临床药物（`CHEMBL553` erlotinib、`CHEMBL939` gefitinib、`CHEMBL3353410` osimertinib、`CHEMBL1431_R` `(R)-thalidomide` 与 `CHEMBL1431_S` `(S)-thalidomide`）上直接运行 3D 构象系综（RDKit ETKDGv3 + MMFF94，在 `298.15` K 下每个分子生成 `8` 个构象）与 2 层图消息传递编码评估：
+
+```sh
+.venv/bin/python labs/molecule_representations/run_lab.py conformers-and-graphs
+.venv/bin/python labs/molecule_representations/run_lab.py check-conformers-and-graphs
+```
+
+- **构象系综离散度（每个分子 `8` 个构象）**：柔性分子 `erlotinib`（`10` 个可旋转键，最大重原子 RMSD `2.304` Å，MMFF94 能量跨度 `4.2871` kcal/mol，Boltzmann `Rg = 4.8658` Å 对比最低能量构象 `4.9111` Å）、`gefitinib`（`8` 个可旋转键，最大 RMSD `2.7395` Å，能量跨度 `15.7796` kcal/mol，Boltzmann `Rg = 5.3976` Å）与 `osimertinib`（`10` 个可旋转键，最大 RMSD `3.44` Å，能量跨度 `18.3368` kcal/mol，Boltzmann `Rg = 5.5744` Å）展现出比刚性分子 `(R)-thalidomide`（`1` 个可旋转键，最大 RMSD `1.8385` Å，能量跨度 `3.7284` kcal/mol，Boltzmann `Rg = 3.1949` Å）显著更大的构象分布范围。
+- **图置换不变性与 3D 手性区分**：在全部 `5` 个药物上反转原子编号得到的 `max_atom_permutation_invariance_diff = 0.0`。无符号 3D 原子间距离（`4.1006` Å 对比 `4.1006` Å，差值 `0.0`）和 2D 拓扑图消息传递（`enantiomer_2d_topological_graph_l2_distance = 0.0`）无法区分 `(R)-thalidomide` 与 `(S)-thalidomide`；而按 CIP 优先级排序的有符号四面体手性体积（`2.4273` Å³ 对比 `-2.4273` Å³）能够分离两者的 3D 手性图嵌入（`enantiomer_3d_chiral_graph_l2_distance = 1.6755`，对比 `erlotinib` 与 `gefitinib` 在 2D 图空间的 L2 距离 `0.1515`）。
+
 ## 评估陷阱
 
 ### 1. 划分前的实体泄漏

@@ -158,6 +158,36 @@ crystallised. Using them for the resistant state is a modelling hypothesis, and 
 has to be stated as one. The lab's check says the same of itself: it verifies what
 the files say, not that any structure is the state that matters in a cell.
 
+### Runnable disease-state and gatekeeper-contact audit
+
+**Mode: reading and deterministic verification of committed public records.** Run the
+`disease-state` subcommand in [`labs/egfr_structures/inspect_state.py`](https://github.com/gxcaesar/aidd-commons/blob/main/labs/egfr_structures/inspect_state.py) to evaluate
+the six-field disease-state contract across the IPASS Phase 3 subgroup trial
+(`PMID:19692680`), the Pao acquired-resistance series (`PMID:15737014`), the Open
+Targets Platform v4 somatic versus germline associations for `EGFR` (`ENSG00000146648`),
+and the heavy-atom contact distances from the `Thr790` gatekeeper residue to the bound
+ligand in all three deposited crystal structures (`1M17`, `4HJO`, `1XKK`):
+
+```bash
+.venv/bin/python labs/egfr_structures/inspect_state.py disease-state
+.venv/bin/python labs/egfr_structures/inspect_state.py check-disease-state
+```
+
+| Deposited PDB structure | Bound ligand | Gatekeeper residue (UniProt P00533) | Minimum heavy-atom distance from `Thr790` to ligand (Å) | Inside 4.0 Å binding site? |
+| --- | --- | --- | ---: | --- |
+| `1M17` | erlotinib (`AQ4`) | `Thr790` (author `766`) | `3.41` | `True` |
+| `4HJO` | erlotinib (`AQ4`) | `Thr790` (author `766`) | `3.48` | `True` |
+| `1XKK` | lapatinib (`FMM`) | `Thr790` (author `790`) | `3.14` | `True` |
+
+In all three structures, `Thr790` sits within `3.14` to `3.48` Å of the reversible
+quinazoline inhibitor (`< 4.0` Å), and the IPASS subgroup hazard ratios (`0.48` in
+the `261` EGFR-mutant patients with `71.2%` vs `47.3%` objective response rate versus
+`2.85` in the `176` EGFR wild-type patients with `1.1%` vs `23.5%` response rate)
+reverse direction by a factor of `5.94`x when the cell-state field changes. In Open
+Targets Platform v4 (`ENSG00000146648`), `EGFR` has overall association score `0.8503`
+(somatic mutation `0.8316`, genetic association `0.6991`) in lung adenocarcinoma
+(`MONDO_0005061`: overall `0.7745`, somatic `0.8671`, genetic `0.7194`).
+
 ## Independent exercise
 
 A **constructed** target proposal reads: "Inhibiting kinase K will slow colorectal

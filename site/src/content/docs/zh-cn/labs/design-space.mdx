@@ -85,6 +85,19 @@ python labs/design_space/inspect_space.py check
 [生成闸门](/zh-cn/labs/generation-gate/)从另一侧记录了同一条边界——它把路线可行性保持为未评估；
 而[断键比较](/zh-cn/labs/retro-disconnection/)展示了"回收一条路线"确立了什么、又没确立什么。
 
+## 6. 基于真实数据的多表征 EGFR 设计空间对比（`public-spaces`）
+
+运行 `public-spaces` 与 `check-public-spaces` 可在 `6` 个 ChEMBL 37 人源 EGFR 抑制剂（`CHEMBL53711`、`CHEMBL299679`、`CHEMBL553`、`CHEMBL939`、`CHEMBL2177370`、`CHEMBL1201583`）与 `1M17` 活性态共晶口袋上对比三种真实数据设计空间表征：
+
+```bash
+python labs/design_space/inspect_space.py public-spaces
+python labs/design_space/inspect_space.py check-public-spaces
+```
+
+- **`2d_snar_fragment_space`（枚举 `16` 个分子，`2` 个 4-氯喹唑啉核心 × `8` 个商用苯胺）**：覆盖 `4` 个真实喹唑啉类 EGFR 抑制剂（`CHEMBL53711`、`CHEMBL299679`、`CHEMBL553`、`CHEMBL939`），但无法覆盖 `CHEMBL2177370`（`3-cyanoquinoline` 骨架跃迁）与 `CHEMBL1201583`（`lapatinib`）。
+- **`1d_token_grammar_space`（枚举 `16` 条 SMILES 字符串，`2` 个烷氧基头 × `2` 个铰链环语法 × `4` 个尾部词元）**：覆盖 `3` 个靶标分子（`CHEMBL939`、`CHEMBL2177370`、`CHEMBL1201583`），捕获了固定核心 2D 片段空间无法表达的 `N3 -> C-C#N` 骨架跃迁（`CHEMBL2177370`）。
+- **`3d_1m17_active_pocket_space`（在 `1M17` 活性构象口袋中评估的 `6` 个靶标）**：容纳全部 `5` 个 Type-I 活性态抑制剂（`CHEMBL53711` 距 Met793 N `2.9842` Å、`CHEMBL299679` `2.9843` Å、`CHEMBL553` `2.9862` Å、`CHEMBL939` `2.9831` Å、`CHEMBL2177370` `2.9904` Å；`< 2.4` Å 重原子碰撞均为 `0` 次），同时排斥 DFG-out 抑制剂 `CHEMBL1201583`（`lapatinib`，距 Met793 `3.3522` Å，`< 2.4` Å 重原子碰撞 `31` 次）。
+
 ## 独立练习
 
 一份平台推介说："我们的组合库覆盖 100 亿个可合成化合物，比任何筛选库都高出几个数量级。"

@@ -132,6 +132,19 @@ workups、outcomes 和 provenance
 
 </details>
 
+## 可运行的公开记录审计：HTE 条件单位、路线选择性与反馈门槛
+
+运行[逆合成断键实验](/zh-cn/labs/retro-disconnection/)中的公开记录合成审计，以检查真实的高通量实验（HTE）条件记录、多步路线选择性陷阱以及闭环反馈门槛：
+
+```bash
+python labs/retro_disconnection/inspect_disconnection.py public-records
+python labs/retro_disconnection/inspect_disconnection.py check-public
+```
+
+- **解析到条件的反应记录（`t14-reaction-record-condition-unit`）**：在 Perera 等人（*Science* `2018`，`doi:10.1126/science.aap9112`）共享 `1` 个联芳基产物（`Cc1ccc2c(cnn2C2CCCCO2)c1-c1ccc2ncccc2c1`）的 `12` 条 Suzuki-Miyaura HTE 记录中，改变催化剂、配体、碱与溶剂使实测产率从 `0.0000`（第 `5170` 与 `5566` 行，Xantphos 失败）变化到 `0.9029`（第 `2091` 行，跨度 `0.9029`），其中 `12` 条中有 `9` 条流动记录保留内标 `1,3-diethylbenzene`（`CCc1cccc(CC)c1`），而 `12` 条中有 `3` 条极性反转孔板记录省略了它。在 Ahneman 等人（*Science* `2018`，`doi:10.1126/science.aar5169`，`1536` 孔板、`60.0` °C、`16.0` h）的 `24` 条 Buchwald-Hartwig 记录中，`Brc1cccnc1` 跨度为 `0.00%` 至 `98.73%`（`n = 4`，跨度 `98.73%`），`Clc1cccnc1` 为 `0.00%` 至 `68.77%`（`n = 3`），`FC(F)(F)c1ccc(Cl)cc1` 为 `0.00%` 至 `45.05%`（`n = 3`），`COc1ccc(Cl)cc1` 为 `0.00%` 至 `44.14%`（`n = 6`），证明建模单位必须包含配体、碱、添加剂和反应条件，而不能仅使用底物到产物对。
+- **超越在库闭合的路线可行性（`t14-route-feasibility-material-safety`）**：针对 `Cc1ccc2nc3ccccc3c(Nc3ccc(NC(=S)Nc4ccccc4)cc3)c2c1` 的全部 `3` 棵 AiZynthFinder 路线树（`routes_for_clustering.json`）均终止于 `in_stock = True` 的叶节点，但只有 `acridine_route_0`（`1` 步汇聚式 SNAr）同时避开了 `acridine_route_1`（`2` 步）中未保护对苯二胺（`Nc1ccc(N)cc1`）的双芳基化陷阱与 `acridine_route_2`（`2` 步）中自反应性 `4`-溴苯胺（`Nc1ccc(Br)cc1`）的自身缩合陷阱。
+- **正向条件建模与反馈门槛（`t14-forward-reaction-lab-feedback`）**：在 `24` 条 Ahneman 记录上，留一法 Ridge 回归的 MAE 从仅用底物基线的 `27.19%` 降至引入条件特征模型的 `16.51%`。若剔除 `6` 个零产率化学失败孔（强碱促进 `1,2`-苯并异噁唑开环毒化催化剂导致的 `0.0%` 产率），模型在这些毒化反应上的平均预测产率会从 `7.47%` 虚高至 `36.37%`（`+28.90` 个百分点）。反馈台账严格区分 `well A01`（条目 `49`，产率 `10.6578%`，内标正常 -> `update_model_productive`）、`well H12`（条目 `1601`，产率 `0.0%`，内标正常 -> `update_model_negative_chemical_failure`）以及 `well P24`（条目 `1613`，内标缺失 -> `quarantine_qc_fault_repeat_dispense`）。
+
 ## 来源与下一课
 
 下列 ORD 文档与仓库于 2026-09-09 打开。它们支持 inputs、outcomes 和 provenance 之间的结构化区别，

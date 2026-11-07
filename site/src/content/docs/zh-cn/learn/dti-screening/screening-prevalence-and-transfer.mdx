@@ -66,6 +66,21 @@ PR curves 保留 precision 对 prevalence 的依赖；ROC curves 在阈值间概
 带内，扩大后的阴性类中三分之二没有测量，而六个阳性占据三个骨架。
 这个带标记对阈值敏感的标签，不能确定实际噪声，也不能证明标签错误。
 
+### 真实数据 ChEMBL 37 EGFR 结合体分类器：实测非活性物对比诱饵（`public-binders`）
+
+在 `24` 个真实 ChEMBL 37 人类 EGFR（`CHEMBL203`）化合物（跨 `15` 个 Bemis-Murcko 骨架划分为 `16` 训练与 `8` 测试，阈值 `pIC50 >= 7.0`，不确定度 `0.3` 对数单位）与 `8` 个性质匹配未测试诱饵上运行结合体分类审计（`128` 位 Morgan `radius = 2` 加理化描述符逻辑回归分类器，`alpha = 0.2`，`400` 步）：
+
+```bash
+.venv/bin/python labs/binder_definition/inspect_definition.py public-binders
+.venv/bin/python labs/binder_definition/inspect_definition.py check-public-binders
+```
+
+- **阈值网格 `{6.0, 6.5, 7.0, 7.5, 8.0}`**：阳性计数依次变化为 `18`、`14`、`12`、`9` 与 `4`，其中 `4` 个化合物（`CHEMBL1173655`、`CHEMBL24828`、`CHEMBL101253`、`CHEMBL365756`）落在 `7.0` 阈值的 `0.3` 对数单位范围内。
+- **留出测试集上的阴性类指标膨胀**：
+  - `measured_inactives_only`（`4` 活性对 `4` 实测非活性，`prevalence = 0.5`，`never_measured_negative_share = 0.0`）：`roc_auc = 0.75`，`precision_at_0_5 = 0.6667`，`recall_at_0_5 = 1.0`，`false_positive_rate_at_0_5 = 0.5`。
+  - `untested_decoys_only`（`4` 活性对 `8` 未测试诱饵，`prevalence = 0.3333`，`never_measured_negative_share = 1.0`）：`roc_auc = 0.875`，`precision_at_0_5 = 0.8`，`recall_at_0_5 = 1.0`，`false_positive_rate_at_0_5 = 0.125`。
+  - `pooled_measured_and_decoys`（`4` 活性对 `4` 实测非活性加 `8` 未测试诱饵，`prevalence = 0.25`，`never_measured_negative_share = 0.6667`）：`roc_auc = 0.8333`，`precision_at_0_5 = 0.5714`，`recall_at_0_5 = 1.0`，`false_positive_rate_at_0_5 = 0.25`。
+
 ## 去核一个真实的迁移主张
 
 [筛选迁移实验](/zh-cn/labs/screening-transport/)读取本仓库自己已完成的双测定回放，

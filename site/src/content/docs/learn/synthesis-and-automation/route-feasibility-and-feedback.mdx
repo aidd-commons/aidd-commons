@@ -169,6 +169,19 @@ label for failed or inconclusive cases. The score does not replace any of them.
 
 </details>
 
+## Runnable public-records audit: HTE condition units, route selectivity and feedback gating
+
+Run the public-records synthesis audit in the [retrosynthesis disconnection lab](/labs/retro-disconnection/) to inspect real high-throughput experimentation (HTE) condition records, multi-step route selectivity traps, and closed-loop feedback gating:
+
+```bash
+python labs/retro_disconnection/inspect_disconnection.py public-records
+python labs/retro_disconnection/inspect_disconnection.py check-public
+```
+
+- **Condition-resolved reaction records (`t14-reaction-record-condition-unit`)**: Across `12` Perera et al. (*Science* `2018`, `doi:10.1126/science.aap9112`) Suzuki-Miyaura HTE records sharing `1` biaryl product (`Cc1ccc2c(cnn2C2CCCCO2)c1-c1ccc2ncccc2c1`), varying catalyst, ligand, base and solvent shifts measured yield from `0.0000` (rows `5170` and `5566`, Xantphos failure) to `0.9029` (row `2091`, span `0.9029`), while `9` of `12` flow records retain internal standard `1,3-diethylbenzene` (`CCc1cccc(CC)c1`) and `3` of `12` reversed-polarity well-plate records omit it. Across `24` Ahneman et al. (*Science* `2018`, `doi:10.1126/science.aar5169`, `1536`-well plate at `60.0` °C for `16.0` h) Buchwald-Hartwig records, `Brc1cccnc1` spans `0.00%` to `98.73%` (`n = 4`, span `98.73%`), `Clc1cccnc1` spans `0.00%` to `68.77%` (`n = 3`), `FC(F)(F)c1ccc(Cl)cc1` spans `0.00%` to `45.05%` (`n = 3`), and `COc1ccc(Cl)cc1` spans `0.00%` to `44.14%` (`n = 6`), proving that the modelling unit must include ligand, base, additive and conditions rather than substrate-to-product pairs alone.
+- **Route feasibility beyond stock closure (`t14-route-feasibility-material-safety`)**: All `3` AiZynthFinder route trees (`routes_for_clustering.json`) for `Cc1ccc2nc3ccccc3c(Nc3ccc(NC(=S)Nc4ccccc4)cc3)c2c1` terminate in `in_stock = True` leaves, yet only `acridine_route_0` (`1` step convergent SNAr) is free of the unprotected *p*-phenylenediamine (`Nc1ccc(N)cc1`) bis-arylation trap in `acridine_route_1` (`2` steps) and the self-reactive `4`-bromoaniline (`Nc1ccc(Br)cc1`) self-condensation trap in `acridine_route_2` (`2` steps).
+- **Forward condition modelling and feedback gating (`t14-forward-reaction-lab-feedback`)**: Leave-one-out Ridge regression on the `24` Ahneman records lowers MAE from `27.19%` (substrate-only baseline) to `16.51%` (condition-aware model). Dropping the `6` zero-yield chemical-failure wells (`0.0%` yield from base-promoted `1,2`-benzisoxazole ring-opening catalyst poisoning) inflates mean predicted yield on those poisoned runs from `7.47%` to `36.37%` (`+28.90` percentage points). The feedback ledger separates `well A01` (entry `49`, yield `10.6578%`, internal standard valid -> `update_model_productive`), `well H12` (entry `1601`, yield `0.0%`, internal standard valid -> `update_model_negative_chemical_failure`), and `well P24` (entry `1613`, internal standard missing -> `quarantine_qc_fault_repeat_dispense`).
+
 ## Sources and next lesson
 
 The ORD documentation and repository below were opened on 2026-09-09. They support a

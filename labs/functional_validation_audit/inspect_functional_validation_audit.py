@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Show the record-kind counts and check them against both cached tables."""
 
 from __future__ import annotations
@@ -49,12 +50,57 @@ def check(cache_dir: Path) -> list[str]:
     return failures
 
 
+def show_progression() -> None:
+    from aidd_commons.biologic_construct_audit.developability_and_validation import (
+        audit_functional_validation_progression,
+    )
+
+    prog = audit_functional_validation_progression()
+    print("1. SIX-STAGE BIOLOGIC FUNCTIONAL VALIDATION PROGRESSION ON PUBLIC RECORDS")
+    for st in prog["stages"]:
+        print(f"  Stage {st['stage_number']}: {st['stage_id']}")
+        print(f"    question:           {st['question']}")
+        print(f"    public_evidence:    {st['public_evidence_record']}")
+        print(f"    licensed_claim:     {st['licensed_claim']}")
+        print(f"    unlicensed_upgrade: {st['unlicensed_upgrade']}")
+    print()
+    ol = prog["objective_ladder_summary"]
+    fv = prog["functional_validation_summary"]
+    print(
+        f"2. COUPLED ARCHIVE COUNTS: objective_ladder={ol['filled_cells']}/{ol['total_cells']} filled"
+        f" ({ol['binding_filled_targets']}/6 with SKEMPI SPR/ITC Kd); functional_validation="
+        f"{fv['chembl_total']} ChEMBL + {fv['pubchem_total']} PubChem records"
+        f" (binding={fv['binding_point']}+{fv['binding_bound']}, functional_response={fv['functional_response']},"
+        f" clinical_outcome={fv['clinical_outcome']})"
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["show", "check"])
+    parser.add_argument(
+        "action",
+        choices=["show", "check", "progression", "check-progression"],
+    )
     parser.add_argument("--cache-dir", type=Path, default=DEFAULT_CACHE)
     args = parser.parse_args()
     try:
+        if args.action == "progression":
+            show_progression()
+            return 0
+        if args.action == "check-progression":
+            from aidd_commons.biologic_construct_audit.developability_and_validation import (
+                check_developability_and_validation,
+            )
+
+            failures = check_developability_and_validation()
+            for failure in failures:
+                print(f"FAIL: {failure}")
+            if failures:
+                return 1
+            print(
+                "PASS: 6-stage biologic functional validation progression, SKEMPI SPR/ITC affinities, DailyMed TNF effector contrasts and ChEMBL/PubChem claim boundaries agree"
+            )
+            return 0
         load_protocol(LAB / "protocol.json")
         summary = read_summary()
         failures = validate_summary(summary)

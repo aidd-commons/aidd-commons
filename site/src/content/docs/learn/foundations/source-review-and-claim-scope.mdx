@@ -72,7 +72,11 @@ Mode is fresh independent computation over the frozen protocol and committed cat
 .venv/bin/python labs/source_review_scope_audit/run_lab.py check
 .venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py show
 .venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py check
+.venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py verify-passages
+.venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py check-passages
 ```
+
+Alongside the 4 Atlas records (`show` / `check`), `verify-passages` and `check-passages` inspect 6 primary-source passage bindings across real committed PDB structure records (`1M17`, `4HJO`, `1XKK`, `3POZ` with resolutions `2.6` Å and `2.4` Å), ChEMBL 37 EGFR bioactivity rows (`320` curated rows), Open Targets 26.03 genetic/clinical evidence snapshots (`MONDO_0005233` score `0.8503`), and FreeSolv v0.52 hydration free-energy records (`642` molecules), verifying surface, version, date, and scope fields together with content-level passage matches (`4` bound claims and `2` scope-boundary violations).
 
 ## Sources and attribution
 

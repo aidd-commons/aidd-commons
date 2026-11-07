@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Read three deposited EGFR structures as evidence, and define their binding site.
 
 A structure file is a model refined against diffraction data, recorded with the
@@ -446,12 +447,128 @@ def check(data: dict, m: dict, lab: Path = cif.LAB) -> list[str]:
     return failures
 
 
+def measure_thr790_gatekeeper(
+    entries: dict[str, cif.Entry], data: dict
+) -> dict[str, dict[str, float]]:
+    """Compute Thr790 gatekeeper heavy-atom, OG1 and CG2 minimum distances to the bound ligand."""
+    records = {record["id"]: record for record in data["entries"]}
+    out: dict[str, dict[str, float]] = {}
+    for entry_id, entry in entries.items():
+        ligand = entry.ligand(records[entry_id]["ligand"])
+        thr_atoms = [a for a in entry.protein() if entry.to_reference(a.chain, a.seq) == 790]
+        og1 = entry.atom_at(790, "OG1")
+        cg2 = entry.atom_at(790, "CG2")
+        assert og1 is not None and cg2 is not None
+        out[entry_id] = {
+            "min_heavy_angstrom": round(
+                min(cif.distance(a.xyz, lig_atom.xyz) for a in thr_atoms for lig_atom in ligand), 2
+            ),
+            "og1_min_angstrom": round(
+                min(cif.distance(og1.xyz, lig_atom.xyz) for lig_atom in ligand), 2
+            ),
+            "cg2_min_angstrom": round(
+                min(cif.distance(cg2.xyz, lig_atom.xyz) for lig_atom in ligand), 2
+            ),
+        }
+    return out
+
+
+def show_disease_state(entries: dict[str, cif.Entry], data: dict) -> None:
+    """Connect six-field clinical disease-state definitions to PDB gatekeeper coordinates."""
+    sys.path.insert(0, str(ROOT / "labs/src"))
+    from aidd_commons.mechanism_consistency.target_evidence import (
+        audit_disease_state_definition,
+        load_target_evidence_snapshot,
+    )
+
+    snap = load_target_evidence_snapshot()
+    ds = audit_disease_state_definition(snap)
+    thr = measure_thr790_gatekeeper(entries, data)
+
+    print(
+        "1. SIX-FIELD DISEASE-STATE DEFINITION & SUBGROUP REVERSAL (IPASS NCT00322452, PMID:19692680)"
+    )
+    for sg in snap["clinical_subgroup_records"]["subgroups"]:
+        print(
+            f"  {sg['subgroup_id']:<28} n={sg['sample_size']:<4}"
+            f" gefitinib_ORR={sg['gefitinib_orr_pct']:>5.1f}%"
+            f" PFS_HR={sg['pfs_hazard_ratio']} -> favours {sg['favours']}"
+        )
+        print(
+            f"    phenotype={sg['molecular_phenotype']} | tissue={sg['tissue']}"
+            f" | temporal_line={sg['temporal_line']}"
+        )
+    print(
+        f"  Subgroup interaction: PFS hazard ratio reverses from {ds['mutant_1l_hr']} (EGFR-mutant)"
+        f" to {ds['wild_type_1l_hr']} (EGFR-wild-type), ratio {ds['hr_reversal_ratio_wt_over_mut']}x"
+    )
+    print()
+
+    print(
+        "2. TEMPORAL RESISTANCE CONTEXT IN THE COMMITTED PDB STRUCTURES (Thr790 -> Met790 GATEKEEPER)"
+    )
+    for entry_id, d in thr.items():
+        print(
+            f"  {entry_id}  Thr790-to-ligand min heavy atom: {d['min_heavy_angstrom']:.2f} A"
+            f" (OG1 {d['og1_min_angstrom']:.2f} A, CG2 {d['cg2_min_angstrom']:.2f} A)"
+        )
+    print("  Every committed 1st-generation quinazoline complex places Thr790 within 3.14-3.48 A")
+    print("  of the ligand core, explaining why post-TKI relapsed 2L tumours acquiring Thr790Met")
+    print("  (T790M, PMID:15737014) require a separate temporal disease-state record.")
+    print()
+
+    print("3. OPEN TARGETS PLATFORM v4 DISEASE & GENETIC vs SOMATIC EVIDENCE")
+    for row in ds["egfr_open_targets_diseases"]:
+        print(
+            f"  EGFR  {row['disease_id']} ({row['disease_name']}): overall={row['overall_score']:.4f}"
+            f" somatic_mutation={row['somatic_mutation']:.4f}"
+            f" genetic_association={row['genetic_association']:.4f}"
+        )
+    for row in ds["braf_germline_vs_somatic_diseases"]:
+        print(
+            f"  BRAF  {row['disease_id']} ({row['disease_name']}): overall={row['overall_score']:.4f}"
+            f" genetic_association={row['genetic_association']:.4f}"
+            f" somatic_mutation={row['somatic_mutation']:.4f}"
+        )
+
+
+def check_disease_state(entries: dict[str, cif.Entry], data: dict) -> list[str]:
+    sys.path.insert(0, str(ROOT / "labs/src"))
+    from aidd_commons.mechanism_consistency.target_evidence import check_target_evidence
+
+    failures = check_target_evidence()
+    thr = measure_thr790_gatekeeper(entries, data)
+    if not all(3.0 <= d["min_heavy_angstrom"] <= 3.6 for d in thr.values()):
+        failures.append(
+            f"Thr790 gatekeeper distance must lie within 3.0-3.6 A in all 3 structures, got {thr}"
+        )
+    return failures
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", nargs="?", default="show", choices=["show", "check"])
+    parser.add_argument(
+        "action",
+        nargs="?",
+        default="show",
+        choices=["show", "check", "disease-state", "check-disease-state"],
+    )
     action = parser.parse_args().action
     data = cif.manifest()
     entries = cif.load_all()
+    if action == "disease-state":
+        show_disease_state(entries, data)
+        return
+    if action == "check-disease-state":
+        failures = check_disease_state(entries, data)
+        for failure in failures:
+            print(f"  FAIL  {failure}")
+        if failures:
+            sys.exit(1)
+        print(
+            "PASS: six-field disease-state definitions, IPASS subgroup reversal, Open Targets scores and Thr790 gatekeeper contacts agree"
+        )
+        return
     print(f"Entries {cif.MANIFEST.relative_to(ROOT)}: {', '.join(entries)}")
     print("Unmodified PDBx/mmCIF files; no structure was prepared or docked")
     print()

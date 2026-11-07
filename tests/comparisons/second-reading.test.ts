@@ -53,14 +53,20 @@ describe("independent second reading", () => {
   it("refuses a self record that claims more than the reading supports", async () => {
     const { readings, self, taxonomy } = await committed();
     const inflated = structuredClone(self);
+    const reading = structuredClone(readings[0]!.reading);
     const cell = inflated.coverage.find(
       ({ topic_id }) => topic_id === "t06-tractability-target-risk",
     )!;
+    const readingCell = reading.readings.find(
+      ({ topic_id }) => topic_id === "t06-tractability-target-risk",
+    )!;
+    readingCell.depth = "worked";
+    readingCell.run_basis = null;
     cell.depth = "assessed";
     cell.run_basis = "real-data";
     const diagnostics = checkAgainstSecondReading(
       inflated,
-      readings[0]!.reading,
+      reading,
       taxonomy,
     );
     expect(diagnostics.map(({ message }) => message)).toEqual([
@@ -71,14 +77,18 @@ describe("independent second reading", () => {
   it("refuses a real-data basis where the reading found authored inputs", async () => {
     const { readings, self, taxonomy } = await committed();
     const relabelled = structuredClone(self);
+    const reading = structuredClone(readings[0]!.reading);
     const cell = relabelled.coverage.find(
       ({ topic_id }) => topic_id === "t11-docking-scoring-protocol",
     )!;
-    expect(cell.run_basis).toBe("authored");
+    const readingCell = reading.readings.find(
+      ({ topic_id }) => topic_id === "t11-docking-scoring-protocol",
+    )!;
+    readingCell.run_basis = "authored";
     cell.run_basis = "real-data";
     const diagnostics = checkAgainstSecondReading(
       relabelled,
-      readings[0]!.reading,
+      reading,
       taxonomy,
     );
     expect(diagnostics.map(({ field }) => field)).toEqual([

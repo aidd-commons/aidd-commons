@@ -80,7 +80,11 @@ SKEMPI 的记录带两条 licence，其 scope 说明授权覆盖上游数据集�
 
 ```bash
 .venv/bin/python labs/claims_evidence_audit/inspect_claims_evidence_audit.py show
+.venv/bin/python labs/claims_evidence_audit/inspect_claims_evidence_audit.py verify-source-content
+.venv/bin/python labs/claims_evidence_audit/inspect_claims_evidence_audit.py check-source-content
 ```
+
+除了分类 52 个比较矩阵单元（`show`）之外，`verify-source-content` 与 `check-source-content` 还对 4 份已提交的真实科学数据集与实验输出（含 320 行 ChEMBL 37 记录及 272 个唯一分子的 `labs/chembl_egfr/data/egfr_ic50.csv`、含 642 个 FreeSolv 水合自由能分子的 `labs/freesolv/summary.json`、142/144 个测试行共享野生型复合物的 `labs/skempi_affinity/summary.json`，以及含 4 条 RCSB PDB EGFR 坐标条目的 `labs/egfr_structures/summary.json`）执行内容级来源核验，在真实实测科学记录上展示全部 4 种证据状态（`direct-observation`、`bounded-inference`、`unsupported-claim` 和 `unresolved-field`）。
 
 ## 来源与署名
 

@@ -38,16 +38,36 @@ import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 多模态靶点至候选项系统可能连接化学、结构和机制证据。其效用取决于这些连接以及
 下游实验反馈能否在同一个决策点获得。
 
+## 基于真实 EGFR NSCLC 与 ChEMBL 37 记录的端到端治疗决策语境
+
+在运行分子表示或生成模型之前，药物发现项目必须先明确串联以下 5 个环节的完整决策链：(1) 临床疾病未满足需求，(2) 生物学干预假说，(3) 治疗模态选择，(4) 目标产品概况（TPP）门槛阈值，以及 (5) 下一步可证伪实验。在[目标产品概况实验室](/zh-cn/labs/target-product-profile/)中运行全新独立审计：
+
+```bash
+.venv/bin/python labs/target_product_profile/inspect_target_product_profile.py decision-context
+.venv/bin/python labs/target_product_profile/inspect_target_product_profile.py check-decision-context
+```
+
+1. **临床需求与疾病状态（`MONDO_0005233`）**：针对伴中枢神经系统（CNS）脑转移的 `EGFR` 突变（`exon 19` 缺失 / `L858R`）晚期非小细胞肺癌，Open Targets 26.03 记录的综合关联分为 `0.8503`（`somatic_mutation = 0.8316`），收录 `21` 项野生型 EGFR 安全性事件（皮疹、腹泻、间质性肺病），以及 III 期 IPASS 亚组反转（`EGFR` 突变阳性 PFS `HR = 0.48` 对比野生型 `HR = 2.85`，比值 `5.94`）。一代可逆喹唑啉类抑制剂受限于获得性 `Thr790Met`（`T790M`）看门残基耐药（PDB `1M17`/`4HJO`/`1XKK` 中距离为 `3.14`–`3.48` Å）与入脑暴露不足。
+2. **4 类治疗模态对比**：
+   - **口服入脑小分子激酶抑制剂**（`selected_primary_modality`）：可到达胞内激酶结构域、穿透完整血脑屏障覆盖 CNS 转移灶、支持慢性口服给药，并可识别突变型 ATP/变构口袋；主要模态风险为 `CYP3A4` 药物相互作用（`pChEMBL <= 5.0` 门槛）、人肝微粒体清除（`<= 50 mL.min-1.g-1` 门槛）以及野生型上皮 EGFR 毒性。
+   - **胞外抗 EGFR IgG1 单克隆抗体**（`rejected_for_intracellular_cns_indication`）：约 `150` kDa 的 IgG1 单抗跨完整血脑屏障的脑脊液/血浆暴露比 `< 0.1%`，且仅结合胞外结构域（`1IVO`/`1YY9`），无法区分胞内 `L858R`/`T790M` 与野生型 EGFR。
+   - **异双功能 PROTAC 降解剂**（`backup_for_catalytic_independent_scaffolding_resistance`）：可作用于胞内激酶并消除非催化支架功能，但分子量较高（`850`–`1,100` Da）且极性表面积较大（`> 160` Å²），导致外排较高且口服/完整血脑屏障暴露受限。
+   - **脂质纳米粒（LNP）siRNA**（`rejected_due_to_extrahepatic_tumour_delivery_bottleneck`）：全身给药的可电离 LNP 主要经 ApoE 富集于肝脏肝细胞，难以有效递送至肝外肺部及脑转移实体瘤。
+3. **ChEMBL 37 TPP 漏斗（`7,908` -> `58` -> `37` -> `0`）**：在 `7,908` 个 ChEMBL 37 母体并集中（排除 `7,850` 个单类别母体），`58` 个母体至少具有 `2` 个实测终点类别。应用冻结硬性门槛（`response_ic50 <= 1000 nM`、人肝微粒体清除率 `<= 50 mL.min-1.g-1`、`CYP3A4 <= 5.0 pChEMBL`、临床客观缓解率 `>= 30%`）后，`21` 个母体发生门槛矛盾（`20` 个未通过 `CYP3A4`，`5` 个未通过人肝微粒体清除率，`1` 个未通过反应 `IC50`），`37` 个母体未观察到门槛失败，而满足完整概况的母体数为 `0`——因为 `58` 个母体中有 `57` 个缺少已纳入的 `response_ic50` 测量，且全部 `58` 个母体均未测量临床缓解率与免疫原性（`<= 5%` ADA；另有 `12` 个未达到大鼠肝细胞清除率 `<= 30 uL.min-1.(10^6cells)-1` 偏好，`19` 个未达到 `CYP2D6 <= 5.0 pChEMBL` 偏好）。
+4. **下一步可证伪实验决策**：针对 `37` 个未出现门槛矛盾的母体，第 `1` 步在突变型（`H1975` `L858R`/`T790M`）与野生型（`A431`）配对细胞中测定磷酸化 EGFR `IC50`，淘汰任何突变型 `IC50 > 100 nM` 或野生型/突变型选择性比值 `< 10` 倍的分子；第 `2` 步在体内 `Kp,uu,brain` 实验前开展双向 `MDCK-MDR1` 与 `MDCK-BCRP` 渗透及外排测定，淘汰任何 `Papp < 5e-6 cm/s` 或外排比 `ER > 2.0` 的化合物。
+
 ## 有边界的推演与独立任务
 
-先从[流水线](/zh-cn/learn/foundations/getting-started/)开始。本导读要求判断哪种证据对应发现决策。设一个构造分子降低 reporter 信号，同时在直接 reporter counterscreen 中有活性。第一项观察与生物效应、检测干扰或两者并存均相容；第二项为测量层面的竞争解释提供证据。任一观察本身都不能确定分子靶点。
+先从[流水线](/zh-cn/learn/foundations/getting-started/)开始。本导读要求判断哪种证据对应发现决策。考虑两个问题：(A) 一个构造分子降低 reporter 信号，同时在直接 reporter counterscreen 中有活性；(B) 针对伴脑转移的 `L858R`/`T790M` NSCLC，在胞外抗 EGFR IgG1 单抗与口服入脑小分子激酶抑制剂之间做模态选择，且 `58` 个 ChEMBL 37 多类别母体中有 `37` 个未观察到门槛失败。
 
-在不把该分子称为有效药物的前提下，写出下一问题。正交 assay 中应改变什么，又应保留哪些相关内容？
+1. 针对 (A)，在不把该分子称为有效药物的前提下，写出下一步正交 assay 问题。
+2. 针对 (B)，说明为何该适应症排除 IgG1 单抗、为何 `37` 个未矛盾母体中满足完整概况的分子数仍为 `0`，以及接下来哪两项定量实验用于证伪剩余候选物。
 
 <details data-worked-answer>
 <summary>完成后核对推理</summary>
 
-有边界的问题是：在保留相关生物学而改变检测方式后，响应是否仍存在。它检验检测依赖性，不建立临床疗效或完整机制。继续阅读[assay 对照与浓度响应](/zh-cn/learn/drug-discovery-foundations/assay-controls-dose-response/)，学习归一化和数值示例。
+1. 有边界的问题是：在保留相关生物学靶点与细胞语境而改变检测方式后，响应是否仍存在。它检验检测干扰，而非建立临床疗效。
+2. 约 `150` kDa 的 IgG1 单抗跨完整血脑屏障的脑脊液/血浆暴露比 `< 0.1%`，且结合胞外结构域而无法区分胞内 `L858R`/`T790M` 与野生型 EGFR（关联 `21` 项安全性事件）。`37` 个未观察到门槛失败的 ChEMBL 母体之所以满足完整概况数为 `0`，是因为 `58` 个队列母体中有 `57` 个未测量 `response_ic50`，且全部 `58` 个均未测量临床缓解率（`>= 30%` ORR）。接下来的两项可证伪实验是：`H1975`（`L858R`/`T790M`）对 `A431`（野生型）配对细胞磷酸化 EGFR `IC50` 测定（要求突变型 `IC50 <= 100 nM` 且选择性 `>= 10` 倍），以及双向 `MDCK-MDR1`/`BCRP` 渗透与外排测定（要求 `Papp >= 5e-6 cm/s` 且外排比 `ER <= 2.0`）。继续阅读[assay 对照与浓度响应](/zh-cn/learn/drug-discovery-foundations/assay-controls-dose-response/)，学习归一化和数值示例。
 
 </details>
 

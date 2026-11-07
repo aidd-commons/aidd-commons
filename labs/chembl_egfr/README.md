@@ -163,6 +163,15 @@ confirmation. No retuning followed that exposure.
    not an invitation to expand the grid after seeing validation outcomes.
 5. Keep the primary and replication results separate in interpretation.
 
+## Complete row-level provenance and versioned transformation lineage
+
+To trace every one of the 1,072 real output parent rows (`902` primary in `CHEMBL5736995` and `170` replication in `CHEMBL3705421`) back to its exact source `activity_id` tuple (`1,139` retained rows from `1,153` raw query rows), exclusion reasons, RDKit parent canonicalization, replicate median aggregation, and chirality-aware Bemis-Murcko scaffold split (`634` train, `136` validation, `132` test), run:
+
+```sh
+.venv/bin/python labs/chembl_egfr/run_lab.py trace-lineage
+.venv/bin/python labs/chembl_egfr/run_lab.py check-lineage
+```
+
 ## Source terms
 
 ChEMBL 37 database content is distributed under CC BY-SA 3.0. Cite the ChEMBL

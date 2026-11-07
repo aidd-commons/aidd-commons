@@ -23,6 +23,8 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 .venv/bin/python labs/target_product_profile/run_lab.py download
 .venv/bin/python labs/target_product_profile/inspect_target_product_profile.py show
 .venv/bin/python labs/target_product_profile/inspect_target_product_profile.py check
+.venv/bin/python labs/target_product_profile/inspect_target_product_profile.py decision-context
+.venv/bin/python labs/target_product_profile/inspect_target_product_profile.py check-decision-context
 .venv/bin/python -m pytest labs/tests/target_product_profile -q
 ```
 
@@ -37,7 +39,7 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 
 </details>
 
-`show` 命令逐一列出连接后的母体，注明通过或未通过的门槛、未达到的偏好以及未测量的要求。`check` 命令通过已验证的读取器重新计算结果。如果一个未通过门槛的母体被报告为满足产品概况，或任何其他不变量不成立，命令就以非零状态退出。
+`show` 命令逐一列出连接后的母体，注明通过或未通过的门槛、未达到的偏好以及未测量的要求。`check` 命令通过已验证的读取器重新计算结果。如果一个未通过门槛的母体被报告为满足产品概况，或任何其他不变量不成立，命令就以非零状态退出。`decision-context` 与 `check-decision-context` 命令进一步将 EGFR 突变非小细胞肺癌（`MONDO_0005233` 伴中枢神经系统脑转移；Open Targets 综合分 `0.8503`、体细胞突变分 `0.8316`、`21` 项安全性事件，以及 IPASS 风险比反转 `0.48` 对 `2.85`、比值 `5.94`）的临床未满足需求、4 类治疗模态对比（口服入脑小分子激酶抑制剂、胞外 IgG1 单克隆抗体、PROTAC 降解剂与 LNP-siRNA）、`58` 个母体的 TPP 漏斗（`7,908` 并集、`58` 队列、`21` 个门槛矛盾、`37` 个未观察到门槛失败、`0` 个满足完整概况），以及下 `2` 个可证伪实验门槛（H1975 与 A431 配对细胞突变型 `IC50 <= 100 nM` 且相对野生型选择性 `>= 10` 倍，以及 MDCK-MDR1/BCRP 血脑屏障渗透率 `>= 5e-6 cm/s` 且外排比 `<= 2.0`）串联验证。
 
 ## 声明的概况与要求
 

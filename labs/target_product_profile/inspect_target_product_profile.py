@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Show parent-level profile outcomes or audit the committed result."""
 
 from __future__ import annotations
@@ -9,6 +10,10 @@ from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from aidd_commons.target_product_profile.decision_context import (  # noqa: E402
+    audit_therapeutic_decision_context,
+    check_therapeutic_decision_context,
+)
 from aidd_commons.target_product_profile.protocol import load_protocol_document  # noqa: E402
 from aidd_commons.target_product_profile.summary import check_summary, compute  # noqa: E402
 
@@ -32,12 +37,63 @@ def show(summary: dict[str, Any], evaluations: list[dict[str, Any]]) -> None:
     print(summary["boundary_statement"])
 
 
+def show_decision_context(payload: dict[str, Any]) -> None:
+    print(
+        "THERAPEUTIC DECISION CONTEXT (CLINICAL NEED -> MODALITY -> TPP FUNNEL -> NEXT FALSIFIER)"
+    )
+    need = payload["clinical_need"]
+    print(f"indication={need['indication']}")
+    print(
+        f"open_targets_nsclc_overall={need['open_targets_nsclc_overall_score']}  "
+        f"somatic={need['open_targets_nsclc_somatic_score']}  "
+        f"safety_events={need['open_targets_safety_liability_count']}  "
+        f"ipass_hr_reversal={need['ipass_hr_reversal_ratio']}x"
+    )
+    print("\nmodality_id\tintracellular\tbbb_cns\toral\tprogramme_fit")
+    for m in payload["modality_comparison"]:
+        print(
+            f"{m['modality_id']}\t{m['reaches_intracellular_kinase']}\t"
+            f"{m['crosses_intact_bbb_for_cns_metastases']}\t"
+            f"{m['oral_convenience_for_chronic_dosing']}\t{m['programme_fit_for_cns_egfr_nsclc']}"
+        )
+    f = payload["tpp_funnel"]
+    print(
+        f"\ntpp_funnel: union={f['source_union_compounds']}  "
+        f"cohort={f['multi_family_cohort']}  "
+        f"contradicted={f['contradicted_by_measured_gates']}  "
+        f"no_observed_failure={f['no_observed_gate_failure']}  "
+        f"profile_satisfying={f['profile_satisfying_compounds']}"
+    )
+    print("\nnext_falsifiable_decisions:")
+    for step in payload["next_falsifiable_decisions"]:
+        print(
+            f"step={step['decision_step']}  experiment={step['falsifying_experiment']}  "
+            f"criterion={step['falsification_criterion']}"
+        )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["show", "check"])
+    parser.add_argument(
+        "action",
+        choices=["show", "check", "decision-context", "check-decision-context"],
+    )
     parser.add_argument("--cache-root", type=Path, default=ROOT / ".cache")
     args = parser.parse_args()
     try:
+        if args.action == "decision-context":
+            show_decision_context(audit_therapeutic_decision_context())
+            return 0
+        if args.action == "check-decision-context":
+            failures = check_therapeutic_decision_context()
+            for failure in failures:
+                print(f"FAIL: {failure}")
+            if failures:
+                return 1
+            print(
+                "PASS: clinical need, 4-modality comparison, 58-compound TPP funnel, and next falsifiers verified"
+            )
+            return 0
         load_protocol_document(LAB / "protocol.json")
         summary, evaluations = compute(args.cache_root)
         if args.action == "check":

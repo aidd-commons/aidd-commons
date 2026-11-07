@@ -127,6 +127,35 @@ discarded or promoted from that table. It receives “opportunity present; safet
 and selectivity risks unresolved.” The missing column matters as much as the
 favourable one.
 
+### Runnable perturbation, tractability, and safety separation on public records
+
+**Mode: fresh independent computation on cached L1000 profiles plus deterministic verification of committed Open Targets Platform v4 records.**
+Run `show`, `check`, `target-evidence`, and `check-target-evidence` in
+[`labs/mechanism_consistency/inspect_mechanism_consistency.py`](https://github.com/gxcaesar/aidd-commons/blob/main/labs/mechanism_consistency/inspect_mechanism_consistency.py)
+to combine the 1,721-compound L1000 cross-cell-line contrast (`678` mediator-specific,
+`123` generic-stress where mismatched Spearman rho exceeds matched rho, and `920`
+undecided) with Open Targets Platform v4 DepMap CRISPR dependency distributions,
+tractability modalities, and human safety liabilities across `EGFR`, `PCSK9`, `BRAF`,
+and `ERBB2`:
+
+```bash
+.venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py show
+.venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py check
+.venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py target-evidence
+.venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py check-target-evidence
+```
+
+| Target (Ensembl ID) | DepMap CRISPR lines (`< -1.0` / total) | Minimum / median gene effect | Tractable modalities (SM / Ab / PROTAC) | Curated safety events (Open Targets v4) | Validation & risk boundary |
+| --- | --- | --- | --- | --- | --- |
+| `EGFR` (`ENSG00000146648`) | `57` / `1,258` (`4.53%`) | `-2.7841` / `-0.1308` | `True` / `True` / `True` | `21` (rash, diarrhea, interstitial lung disease) | Selective dependency in EGFR-driven lines; epithelial on-target toxicity limits wild-type margin |
+| `PCSK9` (`ENSG00000169174`) | `0` / `1,257` (`0.00%`) | `-0.9723` / `-0.2279` | `True` / `True` / `False` | `0` | Zero cell-autonomous CRISPR proliferation phenotype despite validated clinical LDL lowering |
+| `BRAF` (`ENSG00000157764`) | `61` / `1,258` (`4.85%`) | `-2.6355` / `-0.0908` | `True` / `False` / `True` | `1` (keratoacanthoma / paradoxical RAF activation) | Selective knockout sensitivity in BRAF-mutant lines; intracellular kinase requires SM or PROTAC |
+| `ERBB2` (`ENSG00000141736`) | `47` / `1,258` (`3.74%`) | `-3.4743` / `-0.2756` | `True` / `True` / `True` | `3` (cardiotoxicity, reduced ejection fraction) | Strong amplification-dependent essentiality paired with myocardial on-target safety risk |
+
+The `PCSK9` row demonstrates why cell-autonomous CRISPR knockout screens (`0` / `1,257`
+essential lines, median gene effect `-0.2279`) cannot falsify an extracellular endocrine
+target whose disease mechanism operates through hepatocyte LDL-receptor recycling in vivo. Conversely, `EGFR` and `ERBB2` show strong selective dependency (`-2.7841` and `-3.4743` minimum DepMap gene effects) alongside `21` and `3` curated human safety liabilities that must be separated from target validity.
+
 ## Alternatives, limitations, and independent exercise
 
 An isogenic rescue, a second perturbation modality, an orthogonal protein-level

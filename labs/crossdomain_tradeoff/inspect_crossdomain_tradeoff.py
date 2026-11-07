@@ -10,6 +10,10 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from aidd_commons.crossdomain_tradeoff.protocol import load_protocol_document  # noqa: E402
+from aidd_commons.crossdomain_tradeoff.quant_tradeoff import (  # noqa: E402
+    check_quant_tradeoff,
+    evaluate_quant_tradeoff,
+)
 from aidd_commons.crossdomain_tradeoff.summary import (  # noqa: E402
     build_summary,
     check_summary,
@@ -48,9 +52,19 @@ def show(summary: dict[str, Any]) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["show", "check"])
+    parser.add_argument(
+        "action",
+        choices=["show", "check", "quant-tradeoff", "check-quant-tradeoff"],
+    )
     parser.add_argument("--cache-root", type=Path, default=ROOT / ".cache")
     args = parser.parse_args()
+    if args.action == "quant-tradeoff":
+        print(json.dumps(evaluate_quant_tradeoff(), indent=2))
+        return 0
+    if args.action == "check-quant-tradeoff":
+        failures = check_quant_tradeoff()
+        print(json.dumps({"ok": not failures, "failures": failures}, indent=2))
+        return 1 if failures else 0
     try:
         load_protocol_document(LAB / "protocol.json")
         computed = build_summary(args.cache_root)

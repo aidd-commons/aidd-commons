@@ -76,3 +76,17 @@ def test_per_assay_endpoints_and_qualifiers_count_values_and_rows_separately() -
 def test_claim_promotion_is_refused(record: AuditRecord) -> None:
     with pytest.raises(AuditError):
         audit_records((record,))
+
+
+def test_six_stage_functional_validation_progression_links_public_records() -> None:
+    from aidd_commons.biologic_construct_audit.developability_and_validation import (
+        audit_functional_validation_progression,
+        check_developability_and_validation,
+    )
+
+    prog = audit_functional_validation_progression()
+    assert prog["stage_count"] == 6
+    assert prog["objective_ladder_summary"]["filled_cells"] == 31
+    assert prog["functional_validation_summary"]["functional_response"] == 1204
+    assert prog["functional_validation_summary"]["clinical_outcome"] == 0
+    assert check_developability_and_validation() == []

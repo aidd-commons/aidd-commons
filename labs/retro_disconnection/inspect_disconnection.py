@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Compare disconnection families, and keep route recovery apart from feasibility.
 
 Rule, retrieval, template and learned disconnections are usually compared with a
@@ -265,10 +266,135 @@ def check(routes: dict, methods: dict) -> list[str]:
     return failures
 
 
+def show_public_records() -> None:
+    """Display the five real-data Track 14 synthesis audits from the committed public snapshot."""
+    sys.path.insert(0, str(ROOT / "labs/src"))
+    from aidd_commons.retro_disconnection.public_synthesis_audit import (
+        audit_atom_mapping_and_templates,
+        audit_forward_feedback_loop,
+        audit_reaction_records,
+        audit_routes_and_feasibility,
+        load_public_snapshot,
+    )
+
+    snapshot = load_public_snapshot()
+    rec = audit_reaction_records(snapshot)
+    mapping = audit_atom_mapping_and_templates(snapshot)
+    routes = audit_routes_and_feasibility(snapshot)
+    feedback = audit_forward_feedback_loop(snapshot)
+
+    print(
+        "1. REACTION RECORDS & MODELLING UNIT (Perera 2018 Suzuki-Miyaura + Ahneman 2018 Buchwald-Hartwig)"
+    )
+    print(
+        f"  Perera 2018 Suzuki-Miyaura HTE: {rec['suzuki_record_count']} records for"
+        f" {rec['suzuki_unique_products']} shared biaryl product"
+    )
+    print(
+        f"  Yield range across conditions on the same product:"
+        f" {rec['suzuki_min_yield_fraction']:.4f} to {rec['suzuki_max_yield_fraction']:.4f}"
+        f" (span {rec['suzuki_yield_span_fraction']:.4f}; zero-yield rows: {rec['suzuki_zero_yield_rows']})"
+    )
+    calibrated = sum(1 for r in rec["suzuki_parsed_records"] if r["has_internal_standard"])
+    print(
+        f"  Role completeness: {calibrated}/12 records carry internal standard 1,3-diethylbenzene;"
+        " 3/12 reversed-polarity plate records omit it"
+    )
+    print(
+        "  Ahneman 2018 Buchwald-Hartwig HTE yield spans per aryl halide across (ligand, base, additive):"
+    )
+    for halide, span in rec["ahneman_halide_condition_spans"].items():
+        if span["count"] >= 3:
+            print(
+                f"    {halide:<22} n={span['count']}  min={span['min_yield_pct']:>6.2f}%"
+                f"  max={span['max_yield_pct']:>6.2f}%  span={span['span_pct']:>6.2f}%"
+            )
+    print()
+
+    print("2. ATOM MAPPING, BOND EDITS & TEMPLATE EXTRACTION (USPTO + AiZynthFinder)")
+    for row in mapping["uspto_template_records"]:
+        print(
+            f"  USPTO[{row['index']}] hash={row['template_hash'][:12]}... conf={row['confidence']:.4f}"
+            f" recovers_recorded={row['template_recovers_recorded']}"
+        )
+        print(
+            f"    bonds_formed={row['bonds_formed']} bonds_broken={row['bonds_broken']}"
+            f" unmapped_leaving={row['unmapped_leaving_atoms']} lost_mapped={row['lost_mapped_atoms']}"
+        )
+    diag = mapping["mapping_error_diagnosis"]
+    print(
+        f"  Mapping error propagation ({diag['corrupted_swap']}):"
+        f" clean bonds_formed={diag['clean_bonds_formed']} -> corrupted={diag['corrupted_bonds_formed']}"
+    )
+    print()
+
+    print("3. MULTI-STEP ROUTE TREES & ROUTE FEASIBILITY / SAFETY (AiZynthFinder + USPTO)")
+    for tree in routes["acridine_clustering_routes"]:
+        print(
+            f"  {tree['route_id']:<18} steps={tree['step_count']} depth={tree['max_depth']}"
+            f" all_leaves_in_stock={tree['all_leaves_in_stock']}"
+            f" unprotected_diamine={tree['has_unprotected_symmetric_diamine']}"
+            f" self_reactive_haloaniline={tree['has_self_reactive_haloaniline']}"
+            f" -> {tree['feasibility_verdict']}"
+        )
+    for kind, summary in routes["linear_vs_branched_routes"].items():
+        print(
+            f"  peroxide_{kind:<9} steps={summary['step_count']} depth={summary['max_depth']}"
+            f" branched={summary['is_branched']} all_leaves_in_stock={summary['all_leaves_in_stock']}"
+            f" hydroperoxide_hazard={summary['has_hydroperoxide_motif']}"
+        )
+    for alt in routes["uspto_alternative_disconnections"]:
+        print(
+            f"  USPTO alt {alt['disconnection_class']}: competing_halide_sites="
+            f"{alt['competing_aryl_halide_sites_on_electrophile']}"
+            f" preferred_regioselectivity={alt['preferred_for_regioselectivity']}"
+        )
+    print()
+
+    print("4. FORWARD CONDITION MODELLING & CLOSED-LOOP HTE FEEDBACK (Ahneman 2018)")
+    print(
+        f"  LOOCV MAE: substrate-only={feedback['loocv_mae_substrate_only_pct']:.2f}%"
+        f" vs condition-aware={feedback['loocv_mae_condition_aware_pct']:.2f}%"
+    )
+    print(
+        f"  Survivorship-bias check on {feedback['zero_yield_well_count']} zero-yield wells:"
+        f" retaining 0% runs predicts {feedback['mean_pred_on_zero_wells_with_failures_retained_pct']:.2f}%,"
+        f" dropping 0% runs inflates prediction to {feedback['mean_pred_on_zero_wells_when_zeros_dropped_pct']:.2f}%"
+        f" (+{feedback['survivorship_bias_inflation_pct']:.2f} percentage points)"
+    )
+    for well in feedback["feedback_ledger"]:
+        print(
+            f"  Well {well['well_id']} (entry={well['entry']}): IS_ok={well['internal_standard_area_ok']}"
+            f" yield={well['measured_yield_pct']} -> {well['feedback_action']}"
+        )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", nargs="?", default="compare", choices=["compare", "check"])
+    parser.add_argument(
+        "action",
+        nargs="?",
+        default="compare",
+        choices=["compare", "check", "public-records", "check-public"],
+    )
     action = parser.parse_args().action
+    if action == "public-records":
+        show_public_records()
+        return
+    if action == "check-public":
+        sys.path.insert(0, str(ROOT / "labs/src"))
+        from aidd_commons.retro_disconnection.public_synthesis_audit import check_public_synthesis
+
+        failures = check_public_synthesis()
+        for failure in failures:
+            print(f"  FAIL  {failure}")
+        if failures:
+            sys.exit(1)
+        print(
+            "PASS: all public reaction records, atom maps, route trees, feasibility gates and HTE feedback checks agree"
+        )
+        return
+
     routes, methods = load()
 
     print(f"Routes {ROUTES.relative_to(ROOT)} ({len(routes['routes'])} constructed)")

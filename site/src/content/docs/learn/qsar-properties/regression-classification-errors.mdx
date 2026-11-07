@@ -128,4 +128,19 @@ and fresh evaluation; these four records do not establish clinical or assay util
 
 Next, [run the isolated student sandbox](/learn/machine-learning/student-modelling-sandbox/).
 For existing real-case interpretation, use [metrics and uncertainty](/learn/evaluation-and-reproducibility/metrics-and-uncertainty/).
+## Real-data imbalanced classification and multi-family regression benchmark (`real-benchmark`)
+
+Run the real-data ChEMBL 37 human EGFR (`CHEMBL203`) benchmark comparing unweighted, inverse-prevalence class-weighted (`pos_weight = 3.8`), and minority-oversampled logistic classification alongside four regression families:
+
+```sh
+.venv/bin/python labs/student_modelling/run_lab.py real-benchmark
+.venv/bin/python labs/student_modelling/run_lab.py check-real-benchmark
+```
+
+- **Imbalanced classification (`24` train with `5` positives and `19` negatives, `20.83%` prevalence; `8` validation; `8` test)**:
+  - `unweighted_logistic` (`test`): `tp = 0`, `tn = 6`, `fp = 0`, `fn = 2`, `accuracy = 0.75`, `balanced_accuracy = 0.5`, `recall = 0.0`, `mean_predicted_probability = 0.2492`, `log_loss = 0.4723`.
+  - `class_weighted_logistic` (`pos_weight = 3.8`, `test`): `tp = 2`, `tn = 3`, `fp = 3`, `fn = 0`, `accuracy = 0.625`, `balanced_accuracy = 0.75`, `recall = 1.0`, `mean_predicted_probability = 0.4779`, `log_loss = 0.5903`.
+  - `minority_oversampled_logistic` (`20` oversampled positives vs `19` negatives, `test`): `tp = 2`, `tn = 3`, `fp = 3`, `fn = 0`, `accuracy = 0.625`, `balanced_accuracy = 0.75`, `recall = 1.0`, `mean_predicted_probability = 0.4901`, `log_loss = 0.6040`.
+- **Regression family comparison (`30` complex records across WT, `T790M`, and `C797S`; `validation_mae` / `test_mae` / `test_rmse` in `pIC50`)**: `tabular_descriptor_ridge` (`1.4691` / `1.1589` / `1.4025`), `graph_mpnn_ridge` (`1.3914` / `1.1980` / `1.4260`), `sequence_kmer_attention_ridge` (`0.6616` / `0.6193` / `0.7214`), and `multimodal_graph_sequence_ridge` (`0.3947` / `0.3861` / `0.4123`).
+
 Original prose and examples: CC BY 4.0. Last reviewed: 2026-09-09.

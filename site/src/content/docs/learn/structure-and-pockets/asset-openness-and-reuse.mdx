@@ -59,7 +59,12 @@ Compare `tool-rdkit` and `db-uniprot` in the audit's per-record output. State wh
 
 ## What the material does not show
 
-The catalogue tracks declarations and cited pages, not a tested installation or a legal determination. Its evidence references resolve within each record, but this lesson does not reopen every external page or reproduce a model's results. A scope-text flag is not a permission classifier. The [laboratory](/labs/asset-openness-audit/) checks the 24 declared records and reports counts for that set and the full catalogue without treating those counts as reader outcomes.
+The catalogue tracks declarations and cited pages, not a tested installation or a legal determination. Its evidence references resolve within each record, but this lesson does not reopen every external page or reproduce a model's results. A scope-text flag is not a permission classifier. The [laboratory](/labs/asset-openness-audit/) checks the 24 declared records and reports counts for that set and the full catalogue without treating those counts as reader outcomes. Running `verify-reproducibility` and `check-reproducibility` pairs the catalogue's 7 openness dimensions with empirical reproduction artifacts across 5 committed real-data laboratories (`chembl_egfr` with 320 rows, `egfr_structures` with 4 PDB entries, `skempi_affinity` with 416 mutations, `freesolv` with 642 molecules, and `rmd17_system_state` with 1000 aspirin frames), verifying that all 5 local laboratories achieve `7/7` artifact completeness while contrasting upstream model records (`model-boltz-1` at `6/7`, `model-boltz-2` at `5/7`, `model-chai-1` at `3/7`, and `model-alphafold-3-inference` at `1/7`).
+
+```bash
+.venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py verify-reproducibility
+.venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py check-reproducibility
+```
 
 ## Sources and review date
 

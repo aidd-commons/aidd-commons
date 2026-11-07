@@ -158,4 +158,16 @@ for a fresh confirmatory coverage claim.
 Continue to [acquisition under delayed feedback](/learn/active-learning/acquisition-delays-and-stopping/)
 to distinguish immediate predicted utility from the value of learning.
 
+## Real-data optimizer vs bootstrap sampling uncertainty (`real-benchmark`)
+
+Run the real-data ChEMBL 37 human EGFR (`CHEMBL203`) uncertainty audit (`24` train compounds with `5` positives and `19` negatives, `8` validation, `8` test):
+
+```sh
+.venv/bin/python labs/student_modelling/run_lab.py real-benchmark
+.venv/bin/python labs/student_modelling/run_lab.py check-real-benchmark
+```
+
+- **Optimizer budget variability (`3` starting points)**: Maximum test probability spread drops from `0.3064` (`50` steps, `1200` gradient evaluations, `decisions_agree_across_starts = false`) to `0.0239` (`200` steps, `4800` gradient evaluations) and `0.0003` (`500` steps, `12000` gradient evaluations, `decisions_agree_across_starts = true`).
+- **Finite-sample bootstrap uncertainty (`40` stratified resamples at `500` steps)**: Even when optimizer variability is `0.0003`, finite-data resampling produces `mean_test_90pct_interval_width = 0.3836`, `max_test_90pct_interval_width = 0.4684`, and `7` of `8` test compounds flipping their binary classification decision (`p >= 0.5`).
+
 Original examples and prose: CC BY 4.0. Sources reviewed: 2026-09-09.

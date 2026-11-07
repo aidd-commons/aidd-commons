@@ -43,7 +43,8 @@ import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 [生成资源指南](/zh-cn/learn/molecular-generation/generation-resource-guide/)
 区分 REINVENT 4 与已归档的 3.2 实现、分布学习与目标驱动任务，并通过手算说明
-候选有效率、唯一性和新颖性的分母。
+候选有效率、唯一性和新颖性的分母。在配套的
+[生成闸门实验](/zh-cn/labs/generation-gate/)（`python labs/generation_gate/inspect_gate.py public-series`）中，针对 `7` 个真实 ChEMBL 37 人源 EGFR（`CHEMBL203`）抑制剂及商用 4-氯喹唑啉 + 苯胺 SNAr（`80` °C）砌块库（`4` 个核心 × `8` 个苯胺），对 `3` 个采样温度（`T = 0.2`、`0.8`、`1.5`，各 `10` 个，共 `30` 个候选物）进行筛选，展示了采样温度如何在有效率与记忆复现之间权衡：`T = 0.2` 产出 `10` 个有效、`5` 个唯一、`1` 个新颖（`4` 个 `train` 记忆复现、`0` 个留出碰撞）与 `1` 个路线核验幸存者（`0.1`）；`T = 0.8` 产出 `10` 个有效、`10` 个唯一、`8` 个新颖（`1` 个 `train` 记忆、`1` 个 `test` 碰撞）与 `5` 个路线核验幸存者（`0.5`）；`T = 1.5` 产出 `6` 个有效（`0.6`）、`6` 个唯一（占有效分子 `1.0`）、`6` 个新颖（`0` 个记忆）与 `1` 个路线核验幸存者（`0.1`）。
 
 ## 有边界的推演与独立任务
 

@@ -13,7 +13,7 @@
       "file": "plot-2-coverage-bounds.png",
       "pdf": "plot-2-coverage-bounds.pdf",
       "source_stem": "plot_2_coverage_bounds",
-      "width": 2125,
+      "width": 2124,
       "height": 2340,
       "previews": {
         "480": "plot-2-coverage-bounds-480.webp",
@@ -23,7 +23,7 @@
       "chapterAnchor": "reproducibility-evaluation-and-failure-modes",
       "detailHref": "/report/figures/plot-2-coverage-bounds/",
       "alt": "The audit reports an interval rather than a leaderboard: all 93 AIDD Commons cells are direct observations, so this project's own row is an exact count at every threshold, while an external interval can remain open where depth or run basis is unverified, including in material that has been read.",
-      "caption": "Coverage bounds for thirteen providers across five thresholds, each bound a lower and an upper count out of 93 topics. AIDD Commons is the first row and its bounds are equal at every threshold, 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed, because all 93 of its cells are direct observations. Every external row is an interval, because unobserved cells contribute to an upper bound and nothing to a lower one. The bounds are not confidence intervals and no probability attaches to them.",
+      "caption": "Coverage bounds for thirteen providers across five thresholds, each bound a lower and an upper count out of 93 topics. AIDD Commons is the first row and its bounds are equal at every threshold, 93 explained, 93 worked, 93 executable, 93 executable on real data and 93 assessed, because all 93 of its cells are direct observations. Every external row is an interval, because unobserved cells contribute to an upper bound and nothing to a lower one. The bounds are not confidence intervals and no probability attaches to them.",
       "pages": [
         "/audit/",
         "/zh-cn/audit/"
@@ -34,7 +34,7 @@
       "file": "plot-5-self-record-vs-reading.png",
       "pdf": "plot-5-self-record-vs-reading.pdf",
       "source_stem": "plot_5_self_record_vs_reading",
-      "width": 2125,
+      "width": 2124,
       "height": 1500,
       "previews": {
         "480": "plot-5-self-record-vs-reading-480.webp",
@@ -44,7 +44,7 @@
       "chapterAnchor": "reproducibility-evaluation-and-failure-modes",
       "detailHref": "/report/figures/plot-5-self-record-vs-reading/",
       "alt": "The retained topic readings agree with the current self record on 93 of 93 topics, with 0 deeper and 0 shallower, in the comparison projection dated 2026-10-24. The series began on 2026-09-11 and documents re-readings through 2026-10-24. These latest retained rows include reviewer authored material and constrained shallower outcomes, so they are not independent replication or evidence of reader learning.",
-      "caption": "The current self record against the retained automated readings of 93 topics in the comparison.v1 projection dated 2026-10-24. The compact upper strip gives the three outcome counts, and the lower markers pair the five threshold counts. The series began on 2026-09-11, and its description documents re-readings through 2026-10-24. These totals aggregate the latest retained topic scores rather than a single pass. The current aggregate agrees on 93 topics, reads 0 deeper and 0 shallower. At the thresholds the retained readings give 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed against the current record's 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed. The reviewer also authored parts of the course, so this is not an independent replication or evidence of reader learning. The shallower count is constrained by the audit's rule against inflated self scores.",
+      "caption": "The current self record against the retained automated readings of 93 topics in the comparison.v1 projection dated 2026-10-24. The compact upper strip gives the three outcome counts, and the lower markers pair the five threshold counts. The series began on 2026-09-11, and its description documents re-readings through 2026-10-24. These totals aggregate the latest retained topic scores rather than a single pass. The current aggregate agrees on 93 topics, reads 0 deeper and 0 shallower. At the thresholds the retained readings give 93 explained, 93 worked, 93 executable, 93 executable on real data and 93 assessed against the current record's 93 explained, 93 worked, 93 executable, 93 executable on real data and 93 assessed. The reviewer also authored parts of the course, so this is not an independent replication or evidence of reader learning. The shallower count is constrained by the audit's rule against inflated self scores.",
       "pages": [
         "/audit/",
         "/zh-cn/audit/"
@@ -55,7 +55,7 @@
       "file": "plot-9-representation-ranking-flips.png",
       "pdf": "plot-9-representation-ranking-flips.pdf",
       "source_stem": "plot_9_representation_ranking_flips",
-      "width": 2125,
+      "width": 2124,
       "height": 1890,
       "previews": {
         "480": "plot-9-representation-ranking-flips-480.webp",
@@ -232,7 +232,7 @@
       "file": "plot-1-registry-composition.png",
       "pdf": "plot-1-registry-composition.pdf",
       "source_stem": "plot_1_registry_composition",
-      "width": 2125,
+      "width": 2124,
       "height": 1275,
       "previews": {
         "480": "plot-1-registry-composition-480.webp",
@@ -259,7 +259,7 @@
       "file": "plot-3-curriculum-units-per-track.png",
       "pdf": "plot-3-curriculum-units-per-track.pdf",
       "source_stem": "plot_3_curriculum_units_per_track",
-      "width": 2125,
+      "width": 2124,
       "height": 2220,
       "previews": {
         "480": "plot-3-curriculum-units-per-track-480.webp",
@@ -311,7 +311,7 @@
       "file": "plot-6-openness-matrix.png",
       "pdf": "plot-6-openness-matrix.pdf",
       "source_stem": "plot_6_openness_matrix",
-      "width": 2125,
+      "width": 2124,
       "height": 2280,
       "previews": {
         "480": "plot-6-openness-matrix-480.webp",
@@ -338,7 +338,7 @@
       "file": "plot-7-access-and-licence.png",
       "pdf": "plot-7-access-and-licence.pdf",
       "source_stem": "plot_7_access_and_licence",
-      "width": 2125,
+      "width": 2124,
       "height": 2160,
       "previews": {
         "480": "plot-7-access-and-licence-480.webp",
@@ -391,7 +391,7 @@
       "file": "plot-2-coverage-bounds.png",
       "pdf": "plot-2-coverage-bounds.pdf",
       "source_stem": "plot_2_coverage_bounds",
-      "width": 2125,
+      "width": 2124,
       "height": 2340,
       "previews": {
         "480": "plot-2-coverage-bounds-480.webp",
@@ -403,7 +403,7 @@
       "sourceDate": "2026-10-24",
       "visualRevision": "2026-11-07",
       "alt": "The audit reports an interval rather than a leaderboard: all 93 AIDD Commons cells are direct observations, so this project's own row is an exact count at every threshold, while an external interval can remain open where depth or run basis is unverified, including in material that has been read.",
-      "caption": "Coverage bounds for thirteen providers across five thresholds, each bound a lower and an upper count out of 93 topics. AIDD Commons is the first row and its bounds are equal at every threshold, 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed, because all 93 of its cells are direct observations. Every external row is an interval, because unobserved cells contribute to an upper bound and nothing to a lower one. The bounds are not confidence intervals and no probability attaches to them.",
+      "caption": "Coverage bounds for thirteen providers across five thresholds, each bound a lower and an upper count out of 93 topics. AIDD Commons is the first row and its bounds are equal at every threshold, 93 explained, 93 worked, 93 executable, 93 executable on real data and 93 assessed, because all 93 of its cells are direct observations. Every external row is an interval, because unobserved cells contribute to an upper bound and nothing to a lower one. The bounds are not confidence intervals and no probability attaches to them.",
       "source_dates": [
         "2026-10-24"
       ],
@@ -417,7 +417,7 @@
       "file": "plot-5-self-record-vs-reading.png",
       "pdf": "plot-5-self-record-vs-reading.pdf",
       "source_stem": "plot_5_self_record_vs_reading",
-      "width": 2125,
+      "width": 2124,
       "height": 1500,
       "previews": {
         "480": "plot-5-self-record-vs-reading-480.webp",
@@ -429,7 +429,7 @@
       "sourceDate": "2026-10-24",
       "visualRevision": "2026-11-07",
       "alt": "The retained topic readings agree with the current self record on 93 of 93 topics, with 0 deeper and 0 shallower, in the comparison projection dated 2026-10-24. The series began on 2026-09-11 and documents re-readings through 2026-10-24. These latest retained rows include reviewer authored material and constrained shallower outcomes, so they are not independent replication or evidence of reader learning.",
-      "caption": "The current self record against the retained automated readings of 93 topics in the comparison.v1 projection dated 2026-10-24. The compact upper strip gives the three outcome counts, and the lower markers pair the five threshold counts. The series began on 2026-09-11, and its description documents re-readings through 2026-10-24. These totals aggregate the latest retained topic scores rather than a single pass. The current aggregate agrees on 93 topics, reads 0 deeper and 0 shallower. At the thresholds the retained readings give 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed against the current record's 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed. The reviewer also authored parts of the course, so this is not an independent replication or evidence of reader learning. The shallower count is constrained by the audit's rule against inflated self scores.",
+      "caption": "The current self record against the retained automated readings of 93 topics in the comparison.v1 projection dated 2026-10-24. The compact upper strip gives the three outcome counts, and the lower markers pair the five threshold counts. The series began on 2026-09-11, and its description documents re-readings through 2026-10-24. These totals aggregate the latest retained topic scores rather than a single pass. The current aggregate agrees on 93 topics, reads 0 deeper and 0 shallower. At the thresholds the retained readings give 93 explained, 93 worked, 93 executable, 93 executable on real data and 93 assessed against the current record's 93 explained, 93 worked, 93 executable, 93 executable on real data and 93 assessed. The reviewer also authored parts of the course, so this is not an independent replication or evidence of reader learning. The shallower count is constrained by the audit's rule against inflated self scores.",
       "source_dates": [
         "2026-09-11",
         "2026-10-24"
@@ -444,7 +444,7 @@
       "file": "plot-4-depth-distribution-per-track.png",
       "pdf": "plot-4-depth-distribution-per-track.pdf",
       "source_stem": "plot_4_depth_distribution_per_track",
-      "width": 2125,
+      "width": 2124,
       "height": 2220,
       "previews": {
         "480": "plot-4-depth-distribution-per-track-480.webp",
@@ -456,7 +456,7 @@
       "sourceDate": "2026-10-24",
       "visualRevision": "2026-11-07",
       "alt": "Source-recorded topic depths and real-data versus authored run bases are kept separate for every track; a runnable task is not evidence of learner achievement.",
-      "caption": "Highest observed depth per track for this project's 93 audited topics, beside the basis each track's runnable topics rest on. 12 worked, 0 executable and 81 assessed, and of the 81 runnable topics 62 rest on real data and 19 rest on authored inputs. Each topic appears once in the highest-depth stack; the separate run-basis stack partitions runnable topics. Depth records what a reviewer observed in the material, not what a learner achieved.",
+      "caption": "Highest observed depth per track for this project's 93 audited topics, beside the basis each track's runnable topics rest on. 0 worked, 0 executable and 93 assessed, and of the 93 runnable topics 93 rest on real data and 0 rest on authored inputs. Each topic appears once in the highest-depth stack; the separate run-basis stack partitions runnable topics. Depth records what a reviewer observed in the material, not what a learner achieved.",
       "source_dates": [
         "2026-10-24"
       ],
@@ -496,7 +496,7 @@
       "file": "plot-8-freesolv-split-calibration.png",
       "pdf": "plot-8-freesolv-split-calibration.pdf",
       "source_stem": "plot_8_freesolv_split_calibration",
-      "width": 2125,
+      "width": 2124,
       "height": 1920,
       "previews": {
         "480": "plot-8-freesolv-split-calibration-480.webp",
@@ -522,7 +522,7 @@
       "file": "plot-9-representation-ranking-flips.png",
       "pdf": "plot-9-representation-ranking-flips.pdf",
       "source_stem": "plot_9_representation_ranking_flips",
-      "width": 2125,
+      "width": 2124,
       "height": 1890,
       "previews": {
         "480": "plot-9-representation-ranking-flips-480.webp",
@@ -548,7 +548,7 @@
       "file": "plot-11-correlated-frames-error-bars.png",
       "pdf": "plot-11-correlated-frames-error-bars.pdf",
       "source_stem": "plot_11_correlated_frames_error_bars",
-      "width": 2125,
+      "width": 2124,
       "height": 1890,
       "previews": {
         "480": "plot-11-correlated-frames-error-bars-480.webp",
@@ -574,7 +574,7 @@
       "file": "plot-12-trajectory-convergence.png",
       "pdf": "plot-12-trajectory-convergence.pdf",
       "source_stem": "plot_12_trajectory_convergence",
-      "width": 2125,
+      "width": 2124,
       "height": 1890,
       "previews": {
         "480": "plot-12-trajectory-convergence-480.webp",
@@ -600,7 +600,7 @@
       "file": "plot-10-acquisition-policy-recovery.png",
       "pdf": "plot-10-acquisition-policy-recovery.pdf",
       "source_stem": "plot_10_acquisition_policy_recovery",
-      "width": 2125,
+      "width": 2124,
       "height": 2310,
       "previews": {
         "480": "plot-10-acquisition-policy-recovery-480.webp",
@@ -627,7 +627,7 @@
       "file": "plot-13-two-assay-systems-disagree.png",
       "pdf": "plot-13-two-assay-systems-disagree.pdf",
       "source_stem": "plot_13_two_assay_systems_disagree",
-      "width": 2125,
+      "width": 2124,
       "height": 2250,
       "previews": {
         "480": "plot-13-two-assay-systems-disagree-480.webp",

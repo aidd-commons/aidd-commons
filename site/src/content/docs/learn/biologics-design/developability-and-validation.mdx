@@ -143,6 +143,40 @@ orthogonal functional measurement. K cannot be advanced by its larger `Δ_func`
 without changing the declared rule. L cannot be rescued by averaging 27 with its
 other attractive columns.
 
+## Runnable modality-specific developability and 6-stage validation audit on public records
+
+**Mode: reading and deterministic verification of committed UniProt, DailyMed, PDB/SKEMPI 2.0, and ChEMBL/PubChem records.**
+Run `developability` / `check-developability` in
+[`labs/biologic_construct_audit/inspect_biologic_construct_audit.py`](https://github.com/gxcaesar/aidd-commons/blob/main/labs/biologic_construct_audit/inspect_biologic_construct_audit.py)
+and `progression` / `check-progression` in
+[`labs/functional_validation_audit/inspect_functional_validation_audit.py`](https://github.com/gxcaesar/aidd-commons/blob/main/labs/functional_validation_audit/inspect_functional_validation_audit.py)
+to evaluate expression host, glycosylation, self-association/aggregation, immunogenicity,
+delivery, and manufacturing constraints across all `6` biologic/conjugate modalities alongside
+the `6`-stage functional validation progression:
+
+```bash
+.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py developability
+.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py check-developability
+.venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py progression
+.venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py check-progression
+```
+
+| Entity / Modality (`Source`) | Expression host & PTM | Stability, aggregation & delivery bottleneck | Primary CMC / validation gate |
+| --- | --- | --- | --- |
+| `adalimumab` (`IgG1 mAb`, `1330` aa, `148` kDa, DailyMed `v6`) | `CHO`; Fc N-glycan required for FcRn & C1q | High-concentration SC formulation requires SEC monomer `>= 0.95` and low HIC (`<= 11.5` min) | Dedicated viral inactivation/removal; binds TNF-alpha (not TNF-beta) and lyses surface-TNF cells with complement |
+| `etanercept` (`p75 TNFR-Fc dimer`, `934` aa, `150` kDa, `P20333`, DailyMed `v218`) | `CHO`; heavily O- and N-glycosylated, lacks IgG1 `CH1` | Hinge disulphide pairing and sialylation control clearance | Binds both TNF-alpha and TNF-beta (`LT-alpha`) without forming large complexes or complement lysis |
+| `agalsidase-beta` (`homodimeric ERT`, `2 x 398` aa, `100` kDa, `P06280`, DailyMed `v35`) | `CHO` (vs human cell line for `agalsidase-alpha`); `3` N-linked sites/subunit | Must stay soluble at plasma pH `7.4` and traffic via mannose-6-phosphate (`M6P`) to lysosomes (pH `4.5`) | Specific catalytic activity `70` U/mg (`1` umol/min substrate hydrolysis) + lysosomal GL-3 cleavage |
+| `insulin-lispro` (`peptide analog`, `P01308`, UniProt `v284`) | Microbial proinsulin expression; non-glycosylated (`3` disulphides) | Native `52-Pro-Lys-53` self-associates into hexamers; `52-Lys-Pro-53` inversion destabilizes dimers for rapid monomer absorption | Hexamer-to-monomer dissociation kinetics and fibrillation resistance |
+| `reteplase` (`kringle-2 + protease`, `BM 06.022`, `P00750`, UniProt `v282`) | *E. coli* inclusion bodies + oxidative in vitro refolding (unglycosylated) | Refolding yield from insoluble inclusion bodies without autoproteolysis | Intravascular bolus fibrinolysis potency and monomer integrity |
+| `LNP-siRNA / ADC` (`PMID:29988049`, `PMID:31825569`, `P04626`) | Solid-phase oligo + microfluidic LNP; `CHO` mAb + thiol linker conjugation (`DAR ~ 8`) | High `DAR` (`4` to `8`) drives HIC hydrophobicity and aggregation; naked siRNA has `0.08` uptake x `0.005` escape = `0.00040` delivery vs LNP `0.85` x `0.024` = `0.0204` | Productive compartment delivery `>= 0.015` (`ERT-201`: `0.42` x `0.65` = `0.2730`; `SIRNA-302`: `0.0204`) and unconjugated payload `< 1%` |
+
+Across the `6`-candidate multi-gate panel (`SEC >= 0.95`, `HIC <= 11.5` min, `Fab T_m >= 65.0` °C,
+`PSR <= 0.27`, `Δ_func+ >= 30.0`, `Δ_func- <= 10.0`, and compartment delivery `>= 0.015`), only `3`
+candidates survive all gates (`MAB-101` with SEC `0.972`, HIC `9.1` min, `T_m` `74.5` °C, PSR `0.14`;
+`ERT-201` with delivery `0.2730`; and `SIRNA-302` with delivery `0.0204`), whereas `MAB-102` fails
+physical developability (SEC `0.785`, HIC `13.8` min, `T_m` `61.0` °C), `MAB-103` fails specificity
+(PSR `0.49`, `Δ_func-` `18.5`), and unformulated `SIRNA-301` fails compartment delivery (`0.00040`).
+
 ## Alternatives, limitations, and independent exercise
 
 A Pareto front can retain several candidates for further evidence when gates do

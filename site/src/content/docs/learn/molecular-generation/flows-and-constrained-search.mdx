@@ -103,7 +103,18 @@ The lesson argues that objectives must be frozen and gates visible. The
 [generation gate lab](/labs/generation-gate/) makes both runnable offline: it
 refuses to screen against an objective whose properties carry no bounds or whose
 motifs carry no pattern, then applies six gates whose denominators chain, so the
-headline valid figure and the survivor count can be compared directly.
+headline valid figure and the survivor count can be compared directly. Running
+`python labs/generation_gate/inspect_gate.py public-series` extends the funnel to
+`30` candidates across `3` sampling regimes (`T = 0.2`, `0.8`, `1.5`, `10` each)
+against `7` real ChEMBL 37 EGFR (`CHEMBL203`) inhibitors and a commercial `4` ×
+`8` SNAr (`80` °C) building-block deck (`1`, `5`, and `1` route-verified
+survivors, net yields `0.1`, `0.5`, and `0.1`), while the companion
+[design space lab](/labs/design-space/) (`python labs/design_space/inspect_space.py public-spaces`)
+compares `16` 2D SNAr fragment products (`4` of `6` real ChEMBL 37 EGFR targets
+reached), `16` 1D SMILES grammar strings (`3` of `6` reached, capturing the
+`CHEMBL2177370` `3-cyanoquinoline` core hop), and the 3D `1M17` active pocket
+(`5` Type-I inhibitors admitted with `0` clashes `< 2.4` Å and Met793 distances
+`2.9831`–`2.9904` Å, versus `31` clashes and `3.3522` Å for DFG-out `CHEMBL1201583`).
 
 ## Worked case: a transparent constructed shortlist
 

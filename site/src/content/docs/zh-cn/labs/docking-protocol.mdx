@@ -72,6 +72,21 @@ python labs/docking_protocol/inspect_protocol.py check
 共十一项检查。**一个没有被完整声明的协议会在任何比较被尝试之前就中止运行**，
 因为对着一个未声明的协议做比较，不是比较。
 
+## 5. 基于 RCSB PDB EGFR 共晶结构的实证对接审计（`empirical-docking`）
+
+除协议卡比较外，`empirical-docking` 与 `check-empirical-docking` 在
+`labs/docking_protocol/data/egfr_cocrystals.json` 收录的 `3` 个 RCSB PDB 人源 EGFR
+激酶共晶复合物（`1M17`、`4HJO`、`1XKK`）上执行确定性离线真实结构打分审计：
+
+```bash
+python labs/docking_protocol/inspect_protocol.py empirical-docking
+python labs/docking_protocol/inspect_protocol.py check-empirical-docking
+```
+
+- **回对接与重打分标度偏移（`1M17` / 厄洛替尼 `AQ4`，距配体 `10` Å 内 `157` 个口袋重原子）**：在 `28` 个候选位姿中，晶体位姿（`pose_01_crystal`，RMSD `0.0` Å，距 Met793 主链 N `2.6991` Å，`< 2.4` Å 重原子碰撞 `0` 次）在经验 vdW + Met793 氢键函数下得分为 `-15.6194`，在仅 vdW 重打分下得分为 `-12.46`（同一组原子坐标上的标度偏移达 `+3.1594`）。最优非晶体回对接位姿（`pose_00_near_native`，RMSD `0.3002` Å，距 Met793 N `2.6624` Å，`0` 次碰撞）得分为 `-15.961`（仅 vdW 下为 `-12.88`）。
+- **交叉对接的受体构象惩罚**：将 `4HJO`（非活性样 EGFR 构象中的 `AQ4`）放入刚性 `1M17` 口袋会使分数翻转为 `+11.8116`（`< 2.4` Å 碰撞 `5` 次，最小距离 `1.8836` Å）；将 DFG-out 构象的 `1XKK`（`FMM` / 拉帕替尼）放入刚性 `1M17` 则产生 `+261.2519`（`< 2.4` Å 空间碰撞 `31` 次，距 Met793 距离 `4.1362` Å）。
+- **诱饵富集（`16` 个候选物：`4` 个铰链区结合活性位姿对比 `12` 个平移/旋转诱饵）**：vdW + 氢键打分实现 `ROC-AUC = 1.0` 与 `EF_25% = 4.0`（前 `4` 命中 `4 / 4`）。
+
 ## 独立练习
 
 一张幻灯片比较两个系列："系列 A 对接分数 -9.4，系列 B 是 -7.1。我们推进 A。"

@@ -72,6 +72,34 @@ CRISPR 按选定系统改变基因座或表达，但它本身不命名分子中�
 
 团队预测 `H`：X 经中介 M 降低分数，并登记恢复 M 的 rescue 比较。构造 rescue 平均为 `−0.16`，更接近对照；一般应激扰动为 `−0.55`。rescue 与 H 一致，stress 结果令 `H_alt` 仍合理。诚实结论应为：“观察到的分数可能与 M 相关但对 M 仍不特异；需要正交靶点近端测量和第二相关语境。”若同一表中有可接近口袋、非目标组织高表达、却未评估同源家族选择性，则应记为“机会存在；安全性和选择性风险未解决”，而非推进或否决。
 
+### 在公开记录上可运行的扰动、可成药性与安全性分离审计
+
+**模式：在缓存的 L1000 谱上进行全新独立计算，并对已提交的 Open Targets Platform v4 记录进行确定性核验。**
+运行 [`labs/mechanism_consistency/inspect_mechanism_consistency.py`](https://github.com/gxcaesar/aidd-commons/blob/main/labs/mechanism_consistency/inspect_mechanism_consistency.py)
+中的 `show`、`check`、`target-evidence` 与 `check-target-evidence`，将 1,721 个化合物的 L1000 跨细胞系
+对照（`678` 个呈中介特异模式、`123` 个因错配 Spearman rho 高于匹配 rho 而呈一般应激模式、`920` 个未决）
+与 Open Targets Platform v4 中 `EGFR`、`PCSK9`、`BRAF` 和 `ERBB2` 的 DepMap CRISPR 依赖性分布、可成药性
+模态及人类安全性风险结合起来：
+
+```bash
+.venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py show
+.venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py check
+.venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py target-evidence
+.venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py check-target-evidence
+```
+
+| 靶点（Ensembl ID） | DepMap CRISPR 细胞系（`< -1.0` / 总数） | 最小 / 中位基因效应 | 可成药模态（SM / Ab / PROTAC） | 已审编安全性事件（Open Targets v4） | 验证与风险边界 |
+| --- | --- | --- | --- | --- | --- |
+| `EGFR` (`ENSG00000146648`) | `57` / `1,258` (`4.53%`) | `-2.7841` / `-0.1308` | `True` / `True` / `True` | `21`（皮疹、腹泻、间质性肺病） | 在 EGFR 驱动细胞系中具选择性依赖；上皮在靶毒性限制野生型安全窗 |
+| `PCSK9` (`ENSG00000169174`) | `0` / `1,257` (`0.00%`) | `-0.9723` / `-0.2279` | `True` / `True` / `False` | `0` | 尽管临床降 LDL 机制已获验证，细胞自主 CRISPR 增殖表型为 `0` |
+| `BRAF` (`ENSG00000157764`) | `61` / `1,258` (`4.85%`) | `-2.6355` / `-0.0908` | `True` / `False` / `True` | `1`（角化棘皮瘤 / 反常 RAF 激活） | 在 BRAF 突变细胞系中具选择性敲除敏感性；胞内激酶需小分子或 PROTAC |
+| `ERBB2` (`ENSG00000141736`) | `47` / `1,258` (`3.74%`) | `-3.4743` / `-0.2756` | `True` / `True` / `True` | `3`（心脏毒性、射血分数降低） | 强扩增依赖性必需性与心肌在靶安全性风险并存 |
+
+`PCSK9` 行说明了为什么细胞自主的 CRISPR 敲除筛选（`0` / `1,257` 个必需细胞系，中位基因效应 `-0.2279`）
+不能证伪一个通过体内肝细胞 LDL 受体再循环发挥作用的胞外内分泌靶点；反过来，`EGFR` 与 `ERBB2` 则展示了
+强选择性依赖（最小 DepMap 基因效应分别为 `-2.7841` 与 `-3.4743`）如何与 `21` 项和 `3` 项人类安全性风险并存，
+必须与靶点有效性分开记录。
+
 ## 替代方法、局限与独立练习
 
 isogenic rescue、第二扰动模态、正交蛋白层读数或另一疾病相关语境各改变因果链中的不同一环。它们都不是万能：rescue 可错表达，第二 guide 可共享系统性伪影，蛋白读数仍可能是下游。因果证据来自能按预测区分 H 与可信替代解释的对照，而不是累积相关测定。

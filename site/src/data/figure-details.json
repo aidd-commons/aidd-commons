@@ -11,7 +11,7 @@
       "key": "S1",
       "caption": "Four artifacts, one system. (a) Learn provides ordered lessons, the Atlas stores source records, Labs implement executable procedures, and Report combines reviewed prose and figures. (b) Shared resource identifiers connect the four forms. Dashed correction routes denote the editorial rule that a source-backed correction should reach every affected surface. The figure reports no measured propagation result or reader outcome. The separate data and computation illustrations are AI-generated concepts rather than scientific image data.",
       "native_contract": {
-        "scene_revision": "2026-11-07.1",
+        "scene_revision": "2026-11-07.2",
         "native_texts": {
           "master-title": "Four artifacts, one system",
           "artifact-name-0": "Learn",
@@ -161,7 +161,7 @@
       "key": "S2",
       "caption": "Four classes of statement. The four quadrants make statement authority and status explicit. (a) An observed source fact requires an opened source and a sentence-level citation. (b) A project decision records a choice with its rationale and version. (c) An open question preserves missing, conflicting or inaccessible evidence as unverified. (d) Future work is planned before implementation, review or measurement. Solid and dashed boundaries distinguish asserting and unresolved or intended classes. These classes are not an evidence ranking. The source-record illustration is AI-generated and conceptual.",
       "native_contract": {
-        "scene_revision": "2026-11-07.1",
+        "scene_revision": "2026-11-07.2",
         "native_texts": {
           "master-title": "Authority is visible in the statement",
           "class-title-0": "(a)  Observed source fact",
@@ -345,7 +345,7 @@
       "key": "S3",
       "caption": "Target to candidate. Nine numbered stages follow the active v0.2 decision table in three horizontal rows, each read from left to right. Edge-wrapped connectors carry stage order from the last stage of one row to the first stage of the next. Every stage pairs a conceptual object with a decision and an explicitly labelled frequent failure. Arrows denote order, not causality or advancement success. Illustrations are AI-generated concepts rather than candidate counts, measured binding or biological effects. Complete evidence contracts and strong cheap baselines remain in the adjacent source table.",
       "native_contract": {
-        "scene_revision": "2026-11-07.1",
+        "scene_revision": "2026-11-07.2",
         "native_texts": {
           "master-title": "From a disease question to a candidate decision",
           "stage-title-0": "Disease and\nmechanism",
@@ -1096,7 +1096,7 @@
       "key": "S4",
       "caption": "Stage evidence contracts. Nine rows retain every minimum required field from the active v0.2 stage table, grouped into mechanism and target, assay and hit, and lead and candidate bands. Hollow squares mark required records. They do not indicate completed measurements or that a candidate is ready to advance. Stage identity and field labels are native editable objects. Baselines and frequent failures remain separate in the adjacent table.",
       "native_contract": {
-        "scene_revision": "2026-11-07.1",
+        "scene_revision": "2026-11-07.2",
         "native_texts": {
           "master-title": "Evidence changes with the stage",
           "contract-title-0": "Disease and\nmechanism",
@@ -2480,7 +2480,7 @@
       "key": "S6",
       "caption": "Seven-dimensional openness. Two canonical source records give separate availability states for inference code, training code, weights, architecture, data recipe, training data and evaluation code. Redundant symbols and labels distinguish available, not available, not applicable and unverified. Actual access and lifecycle values are shown separately for each record, rather than inferred from these seven states. Both records were last verified 2026-10-21. Available does not establish unrestricted use, and unverified does not mean unavailable. The model and dataset illustrations are AI-generated concepts.",
       "native_contract": {
-        "scene_revision": "2026-11-07.1",
+        "scene_revision": "2026-11-07.2",
         "native_texts": {
           "master-title": "Openness is a seven-part record",
           "openness-record-name-0": "Img2Mol",
@@ -5043,7 +5043,7 @@
       "key": "S5",
       "caption": "Prerequisites across six learning paths. The current curriculum YAML names 10 shared prerequisite lessons and 21 prerequisite relations across five specialist routes. Filled circles denote stated prerequisites. The separate core column uses dashed hollow squares for the 8 shared lessons also listed in the core route. Row badges count routes requiring each lesson; header counts give the listed lessons in each route. The core route states no prerequisites. These counts describe the map, not difficulty, coverage or observed learning. Route illustrations are AI-generated concepts.",
       "native_contract": {
-        "scene_revision": "2026-11-07.1",
+        "scene_revision": "2026-11-07.2",
         "native_texts": {
           "master-title": "Shared prerequisites connect the learning paths",
           "route-name-0": "Core",
@@ -5824,16 +5824,16 @@
           93
         ],
         "executable": [
-          81,
-          81
+          93,
+          93
         ],
         "executable-on-real-data": [
-          62,
-          62
+          93,
+          93
         ],
         "assessed": [
-          81,
-          81
+          93,
+          93
         ]
       },
       "build-ai-drug-discovery-pipelines": {
@@ -6328,8 +6328,8 @@
           "executable",
           "AIDD Commons",
           "curriculum",
-          81,
-          81,
+          93,
+          93,
           93
         ],
         [
@@ -6432,8 +6432,8 @@
           "executable-on-real-data",
           "AIDD Commons",
           "curriculum",
-          62,
-          62,
+          93,
+          93,
           93
         ],
         [
@@ -6536,8 +6536,8 @@
           "assessed",
           "AIDD Commons",
           "curriculum",
-          81,
-          81,
+          93,
+          93,
           93
         ],
         [
@@ -11289,31 +11289,31 @@
         "absent_cells": 0,
         "default_unverified_cells": 0,
         "direct_cells": 93,
-        "lower": 81,
+        "lower": 93,
         "provider_id": "aidd-commons",
         "threshold": "executable",
         "total_topics": 93,
-        "upper": 81
+        "upper": 93
       },
       {
         "absent_cells": 0,
         "default_unverified_cells": 0,
         "direct_cells": 93,
-        "lower": 62,
+        "lower": 93,
         "provider_id": "aidd-commons",
         "threshold": "executable-on-real-data",
         "total_topics": 93,
-        "upper": 62
+        "upper": 93
       },
       {
         "absent_cells": 0,
         "default_unverified_cells": 0,
         "direct_cells": 93,
-        "lower": 81,
+        "lower": 93,
         "provider_id": "aidd-commons",
         "threshold": "assessed",
         "total_topics": 93,
-        "upper": 81
+        "upper": 93
       },
       {
         "absent_cells": 42,
@@ -11884,18 +11884,18 @@
           "threshold": "worked"
         },
         {
-          "reading": 81,
-          "recorded": 81,
+          "reading": 93,
+          "recorded": 93,
           "threshold": "executable"
         },
         {
-          "reading": 62,
-          "recorded": 62,
+          "reading": 93,
+          "recorded": 93,
           "threshold": "executable-on-real-data"
         },
         {
-          "reading": 81,
-          "recorded": 81,
+          "reading": 93,
+          "recorded": 93,
           "threshold": "assessed"
         }
       ]
@@ -11958,20 +11958,20 @@
         [
           "threshold",
           "executable",
-          81,
-          81
+          93,
+          93
         ],
         [
           "threshold",
           "executable-on-real-data",
-          62,
-          62
+          93,
+          93
         ],
         [
           "threshold",
           "assessed",
-          81,
-          81
+          93,
+          93
         ]
       ]
     }
@@ -12004,9 +12004,9 @@
         "assessed": 4
       },
       "drug-discovery-foundations": {
-        "worked": 1,
+        "worked": 0,
         "executable": 0,
-        "assessed": 3
+        "assessed": 4
       },
       "machine-learning": {
         "worked": 0,
@@ -12024,9 +12024,9 @@
         "assessed": 5
       },
       "mechanism-targets": {
-        "worked": 3,
+        "worked": 0,
         "executable": 0,
-        "assessed": 2
+        "assessed": 5
       },
       "qsar-properties": {
         "worked": 0,
@@ -12059,14 +12059,14 @@
         "assessed": 5
       },
       "biologics-design": {
-        "worked": 2,
+        "worked": 0,
         "executable": 0,
-        "assessed": 3
+        "assessed": 5
       },
       "synthesis-and-automation": {
-        "worked": 3,
+        "worked": 0,
         "executable": 0,
-        "assessed": 2
+        "assessed": 5
       },
       "active-learning": {
         "worked": 0,
@@ -12074,9 +12074,9 @@
         "assessed": 5
       },
       "scientific-agents": {
-        "worked": 1,
+        "worked": 0,
         "executable": 0,
-        "assessed": 4
+        "assessed": 5
       },
       "evaluation-and-reproducibility": {
         "worked": 0,
@@ -12084,82 +12084,82 @@
         "assessed": 6
       },
       "candidate-nomination": {
-        "worked": 2,
+        "worked": 0,
         "executable": 0,
-        "assessed": 3
+        "assessed": 5
       }
     },
     "base_by_track": {
       "foundations": {
-        "real-data": 2,
-        "authored": 2
+        "real-data": 4,
+        "authored": 0
       },
       "drug-discovery-foundations": {
-        "real-data": 2,
-        "authored": 1
+        "real-data": 4,
+        "authored": 0
       },
       "machine-learning": {
-        "real-data": 2,
-        "authored": 2
+        "real-data": 4,
+        "authored": 0
       },
       "data-governance": {
-        "real-data": 4,
-        "authored": 1
+        "real-data": 5,
+        "authored": 0
       },
       "representations": {
-        "real-data": 4,
-        "authored": 1
+        "real-data": 5,
+        "authored": 0
       },
       "mechanism-targets": {
-        "real-data": 2,
+        "real-data": 5,
         "authored": 0
       },
       "qsar-properties": {
-        "real-data": 8,
-        "authored": 2
+        "real-data": 10,
+        "authored": 0
       },
       "admet-pk": {
-        "real-data": 4,
-        "authored": 1
+        "real-data": 5,
+        "authored": 0
       },
       "dti-screening": {
-        "real-data": 4,
-        "authored": 1
+        "real-data": 5,
+        "authored": 0
       },
       "structure-and-pockets": {
-        "real-data": 4,
-        "authored": 1
+        "real-data": 5,
+        "authored": 0
       },
       "physics-based-modeling": {
-        "real-data": 4,
-        "authored": 1
+        "real-data": 5,
+        "authored": 0
       },
       "molecular-generation": {
-        "real-data": 2,
-        "authored": 3
+        "real-data": 5,
+        "authored": 0
       },
       "biologics-design": {
-        "real-data": 3,
+        "real-data": 5,
         "authored": 0
       },
       "synthesis-and-automation": {
-        "real-data": 0,
-        "authored": 2
+        "real-data": 5,
+        "authored": 0
       },
       "active-learning": {
         "real-data": 5,
         "authored": 0
       },
       "scientific-agents": {
-        "real-data": 3,
-        "authored": 1
+        "real-data": 5,
+        "authored": 0
       },
       "evaluation-and-reproducibility": {
         "real-data": 6,
         "authored": 0
       },
       "candidate-nomination": {
-        "real-data": 3,
+        "real-data": 5,
         "authored": 0
       }
     },
@@ -12189,47 +12189,47 @@
           0,
           0,
           4,
-          2,
-          2
+          4,
+          0
         ],
         [
           "drug-discovery-foundations",
-          1,
           0,
-          3,
-          2,
-          1
+          0,
+          4,
+          4,
+          0
         ],
         [
           "machine-learning",
           0,
           0,
           4,
-          2,
-          2
+          4,
+          0
         ],
         [
           "data-governance",
           0,
           0,
           5,
-          4,
-          1
+          5,
+          0
         ],
         [
           "representations",
           0,
           0,
           5,
-          4,
-          1
+          5,
+          0
         ],
         [
           "mechanism-targets",
-          3,
           0,
-          2,
-          2,
+          0,
+          5,
+          5,
           0
         ],
         [
@@ -12237,64 +12237,64 @@
           0,
           0,
           10,
-          8,
-          2
+          10,
+          0
         ],
         [
           "admet-pk",
           0,
           0,
           5,
-          4,
-          1
+          5,
+          0
         ],
         [
           "dti-screening",
           0,
           0,
           5,
-          4,
-          1
+          5,
+          0
         ],
         [
           "structure-and-pockets",
           0,
           0,
           5,
-          4,
-          1
+          5,
+          0
         ],
         [
           "physics-based-modeling",
           0,
           0,
           5,
-          4,
-          1
+          5,
+          0
         ],
         [
           "molecular-generation",
           0,
           0,
           5,
-          2,
-          3
+          5,
+          0
         ],
         [
           "biologics-design",
-          2,
           0,
-          3,
-          3,
+          0,
+          5,
+          5,
           0
         ],
         [
           "synthesis-and-automation",
-          3,
           0,
-          2,
           0,
-          2
+          5,
+          5,
+          0
         ],
         [
           "active-learning",
@@ -12306,11 +12306,11 @@
         ],
         [
           "scientific-agents",
-          1,
           0,
-          4,
-          3,
-          1
+          0,
+          5,
+          5,
+          0
         ],
         [
           "evaluation-and-reproducibility",
@@ -12322,10 +12322,10 @@
         ],
         [
           "candidate-nomination",
-          2,
           0,
-          3,
-          3,
+          0,
+          5,
+          5,
           0
         ]
       ]
@@ -12343,7 +12343,7 @@
       "key": "S7",
       "caption": "Frozen evaluation lifecycle. The written protocol is frozen before structural and finite-output pretests on training and validation data. A prominent boundary separates these pretests from the one-time held-out test opening and reviewed summary. The dashed development return applies only before test opening. A separate post-test error branch records a protocol-invalidating bug and prohibits result-driven retuning. The summary retains observed values and limitations. The figure asserts no measured output or universally successful pretest. The computation illustration is AI-generated and conceptual.",
       "native_contract": {
-        "scene_revision": "2026-11-07.1",
+        "scene_revision": "2026-11-07.2",
         "native_texts": {
           "master-title": "Freeze the procedure before opening the test",
           "lifecycle-name-0": "Protocol freeze",

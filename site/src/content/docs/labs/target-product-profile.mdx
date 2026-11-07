@@ -21,6 +21,8 @@ For reader reproduction, run the following commands in your own checkout with it
 .venv/bin/python labs/target_product_profile/run_lab.py download
 .venv/bin/python labs/target_product_profile/inspect_target_product_profile.py show
 .venv/bin/python labs/target_product_profile/inspect_target_product_profile.py check
+.venv/bin/python labs/target_product_profile/inspect_target_product_profile.py decision-context
+.venv/bin/python labs/target_product_profile/inspect_target_product_profile.py check-decision-context
 .venv/bin/python -m pytest labs/tests/target_product_profile -q
 ```
 
@@ -35,7 +37,7 @@ The exporter has no custom output option and replaces `labs/target_product_profi
 
 </details>
 
-The `show` command lists every joined parent with gates passed or failed, preferences missed, and requirements left unmeasured. The `check` command recomputes the outcomes from the validated readers and exits non-zero if a gate-failing parent is reported as profile-satisfying or if any other invariant fails.
+The `show` command lists every joined parent with gates passed or failed, preferences missed, and requirements left unmeasured. The `check` command recomputes the outcomes from the validated readers and exits non-zero if a gate-failing parent is reported as profile-satisfying or if any other invariant fails. The `decision-context` and `check-decision-context` commands connect the clinical unmet need in EGFR-mutant non-small-cell lung cancer (`MONDO_0005233` with central nervous system metastases; Open Targets overall score `0.8503`, somatic score `0.8316`, `21` curated safety liabilities, and IPASS hazard-ratio reversal `0.48` vs `2.85`, ratio `5.94`), a 4-modality comparison (oral brain-penetrant small-molecule TKI vs extracellular IgG1 monoclonal antibody vs heterobifunctional PROTAC degrader vs LNP-siRNA), the `58`-parent TPP funnel (`7,908` union, `58` cohort, `21` contradicted, `37` without observed gate failure, `0` profile-satisfying), and the next `2` falsifiable experiments (`<= 100 nM` mutant cellular `IC50` with `>= 10`-fold selectivity over wild-type EGFR in H1975 vs A431, and MDCK-MDR1/BCRP permeability `>= 5e-6 cm/s` with efflux ratio `<= 2.0`).
 
 ## Declared profile and requirements
 

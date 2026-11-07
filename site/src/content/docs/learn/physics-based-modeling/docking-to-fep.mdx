@@ -68,7 +68,17 @@ The [docking protocol lab](/labs/docking-protocol/) separates the seven componen
 a score comes out of and works out which reported numbers are on one scale. Two
 protocols differing in a single component report -8.2 and -10.7 for the same
 ligand on the same structure, no pair supports a controlled ligand ranking under its declared rule, and a protocol
-declaring no validation still produces a full column of numbers.
+declaring no validation still produces a full column of numbers. Running
+`python labs/docking_protocol/inspect_protocol.py empirical-docking` extends this
+to `3` real RCSB PDB EGFR co-crystals (`1M17`, `4HJO`, `1XKK`, `157` pocket heavy
+atoms within `10` Å of `AQ4`): across `28` poses, the crystal pose (`0.0` Å RMSD,
+Met793 N distance `2.6991` Å, `0` clashes `< 2.4` Å) shifts from `-15.6194` (vdW +
+H-bond) to `-12.46` (vdW-only rescoring, gap `+3.1594`), the top redocked pose
+(`0.3002` Å RMSD, Met793 N distance `2.6624` Å) scores `-15.961` (`-12.88`
+vdW-only), cross-docking `4HJO` (`+11.8116`, `5` clashes, `1.8836` Å) or DFG-out
+`1XKK` (`+261.2519`, `31` clashes, `4.1362` Å) into rigid `1M17` exposes receptor-state
+incompatibility, and decoy enrichment across `16` candidates (`4` active poses vs
+`12` decoys) reaches `ROC-AUC = 1.0` and `EF_25% = 4.0`.
 
 ## Core-source path
 

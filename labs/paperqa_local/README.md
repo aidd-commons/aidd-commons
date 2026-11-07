@@ -139,3 +139,31 @@ To rebuild the two editions after an editorial change, run
 `python labs/paperqa_local/build_notebooks.py` with `nbformat` available. The builder
 uses only the curated example and shared source-visible helpers, not private run
 folders. Both editions have identical executable cells and distinct translated prose.
+
+## Checkpointed trace recovery and state resumption (`inspect_trace_recovery.py`)
+
+To inspect how a multi-step agent workflow records step receipts, halts cleanly
+on a mid-run tool schema/timeout fault, and resumes from the last verified
+checkpoint without re-executing completed steps or fabricating outputs, run:
+
+```bash
+.venv/bin/python labs/paperqa_local/inspect_trace_recovery.py resume-workflow
+.venv/bin/python labs/paperqa_local/inspect_trace_recovery.py check-resume-workflow
+```
+
+Across `4` workflow steps over `reviewed-example.json` (`2` Europe PMC articles,
+`5` questions, `4` answerable, `1` negative control, `109.368` s observed runtime,
+`18` loopback socket events, `17` retrieved chunks, `13` cited chunks, `1`
+flagged summary misattribution on `openbabel-2011 chunk 5`) and `4` ChEMBL 37
+EGFR (`CHEMBL203`) IC50 records across `2` compounds (`CHEMBL553` median `2.0` nM
+from `1.4` and `2.6` nM; `CHEMBL939` median `22.5` nM from `0.015` uM / `15.0` nM
+and `30.0` nM):
+
+- **Attempt 1 (`run_attempt_1_faulted`)**: completes Steps `1` and `2`, saves
+  checkpoint Step `2`, halts at Step `3` (`UNIT_SCHEMA_AND_TIMEOUT_FAULT` on
+  `chembl37_egfr_03` with `raw_units = "uM"` under the `150.0` s step budget),
+  leaves Step `4` unexecuted, and records `0` fabricated outputs.
+- **Attempt 2 (`run_attempt_2_resumed_from_checkpoint_2`)**: resumes from
+  checkpoint Step `2` (`skipped_completed_steps = [1, 2]`, `0` re-executed
+  steps), normalizes the `4` ChEMBL 37 EGFR records at Step `3`, and completes
+  Step `4` (`4` completed steps total, `0` unverified claims).

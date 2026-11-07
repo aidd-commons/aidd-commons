@@ -204,3 +204,30 @@ def test_the_committed_artifacts_are_frozen_json_beside_the_lab():
     objective = json.loads(gate.OBJECTIVE.read_text(encoding="utf-8"))
     reference = ROOT / objective["target_context"]["reference_set"]
     assert reference.is_file() and reference.suffix == ".csv"
+
+
+def test_public_series_temperature_audit_and_check():
+    out = subprocess.run(
+        [sys.executable, str(LAB / "inspect_gate.py"), "public-series"],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=ROOT,
+    )
+    payload = json.loads(out.stdout)
+    assert payload["target_context"]["reference_compound_count"] == 7
+    regimes = payload["temperature_sweep"]
+    assert regimes["T_0.2_low_temperature"]["retrosynthetic_route_verified_survivors"] == 1
+    assert regimes["T_0.8_balanced_temperature"]["retrosynthetic_route_verified_survivors"] == 5
+    assert regimes["T_1.5_high_temperature"]["retrosynthetic_route_verified_survivors"] == 1
+
+    chk = subprocess.run(
+        [sys.executable, str(LAB / "inspect_gate.py"), "check-public-series"],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=ROOT,
+    )
+    chk_payload = json.loads(chk.stdout)
+    assert chk_payload["ok"] is True
+    assert chk_payload["failures"] == []

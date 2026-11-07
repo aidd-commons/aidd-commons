@@ -306,6 +306,7 @@ export const fileAllowlist = [
   "labs/paperqa_local/README.md",
   "labs/paperqa_local/corpus.json",
   "labs/paperqa_local/run_smoke.py",
+  "labs/paperqa_local/inspect_trace_recovery.py",
   "labs/paperqa_local/build_notebooks.py",
   "labs/paperqa_local/reviewed-example.json",
   "labs/paperqa_local/paperqa_local_tutorial.ipynb",

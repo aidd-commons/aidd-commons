@@ -85,6 +85,60 @@ python labs/retro_disconnection/inspect_disconnection.py check
 这与[生成闸门](/zh-cn/labs/generation-gate/)把结构过滤器称作代理、
 并把 `route_feasibility` 保持为未评估，是同一条边界。
 
+## 6. 真实公开反应记录、原子映射、路线树与 HTE 反馈
+
+要在已发表的合成数据而非仅在 `10` 条构造路线上检验这些区分，可对
+`labs/src/aidd_commons/retro_disconnection/__init__.py` 中已提交的快照运行公开记录审计：
+
+```bash
+python labs/retro_disconnection/inspect_disconnection.py public-records
+python labs/retro_disconnection/inspect_disconnection.py check-public
+```
+
+已提交的快照结合了四类开源数据：
+
+- **解析到条件的 HTE 反应记录（`t14-reaction-record-condition-unit`）**：来自
+  Perera 等人（*Science* `2018`，`doi:10.1126/science.aap9112`）的 `12` 条纳摩尔级
+  Suzuki-Miyaura 记录共享 `1` 个完全相同的吲唑-喹啉联芳基产物
+  （`Cc1ccc2c(cnn2C2CCCCO2)c1-c1ccc2ncccc2c1`），实测产率跨度从 `0.0000`（第 `5170` 与
+  `5566` 行，Xantphos 失败）到 `0.9029`（第 `2091` 行，跨度 `0.9029`），且 `12` 条中有
+  `9` 条流动记录包含内标 `1,3-diethylbenzene`（`CCc1cccc(CC)c1`），而 `12` 条中有 `3` 条
+  极性反转孔板记录省略了该内标。同时，来自 Ahneman 等人（*Science* `2018`，
+  `doi:10.1126/science.aar5169`，`1536` 孔板、`60.0` °C、DMSO 中反应 `16.0` h）的 `24`
+  条 Buchwald-Hartwig HTE 记录显示：固定底物而改变配体、碱与异噁唑添加剂时，
+  `Brc1cccnc1` 的产率跨度为 `0.00%` 至 `98.73%`（`n = 4`，跨度 `98.73%`），`Clc1cccnc1`
+  为 `0.00%` 至 `68.77%`（`n = 3`，跨度 `68.77%`），`FC(F)(F)c1ccc(Cl)cc1` 为 `0.00%` 至
+  `45.05%`（`n = 3`，跨度 `45.05%`），`COc1ccc(Cl)cc1` 为 `0.00%` 至 `44.14%`（`n = 6`，
+  跨度 `44.14%`）。
+- **USPTO 原子映射、键编辑与模板回收（`t14-atom-mapping-transformation-class`）**：
+  来自 `MolecularAI/aizynthfinder`（`test_reactions_template.csv`）的 `3` 条 USPTO
+  原子映射反应与抽取出的 `RetroTemplate` SMARTS（携带 `64` 字符哈希 `23f00a3c507e...`、
+  `dadfa1075f08...` 与 `01ba54afaa6c...`，置信度分别为 `0.9425`、`0.9855` 与
+  `0.9708`）。RDKit 执行可回收全部 `3`/`3` 组记录反应物，并将酰胺键编辑 `(8, 9)` 与
+  芳基氯酰胺化键编辑 `(7, 8)` 区分开。将产物芳环碳原子映射编号 `:7` 与 `:18` 互换会使
+  `bonds_formed` 从 `[(8, 9)]` 恶化为 `[(3, 7), (6, 18), (7, 19), (8, 9), (8, 18)]`，
+  直观展示映射错误如何传播到抽取出的模板中。
+- **多步路线树、选择性与安全门槛（`t14-retrosynthetic-disconnection` 与 `t14-route-feasibility-material-safety`）**：
+  针对吖啶-硫脲目标分子 `Cc1ccc2nc3ccccc3c(Nc3ccc(NC(=S)Nc4ccccc4)cc3)c2c1` 的 `3` 棵
+  AiZynthFinder 路线树（`routes_for_clustering.json`）均终止于 `in_stock = True` 的叶节点，
+  但只有 `acridine_route_0`（`1` 步，深度 `1`，使用预组装硫脲苯胺直接做 SNAr）避开了
+  `acridine_route_1`（`2` 步，深度 `2`）中未保护对苯二胺（`Nc1ccc(N)cc1`）的双芳基化陷阱，
+  以及 `acridine_route_2`（`2` 步，深度 `2`）中自反应性 `4`-溴苯胺（`Nc1ccc(Br)cc1`）的
+  自身偶联陷阱。对比 `linear_route.json`（`2` 步，深度 `2`，`3` 个在库叶节点）与
+  `branched_route.json`（`4` 步，深度 `3`，`5` 个叶节点且其中 `O` 不在库）还能标记出
+  芳基氢过氧化物基团（`OOc1...`）。在 USPTO 苯甲酰苯胺中间体
+  `N#Cc1cccc(NC(=O)c2ccc(F)cc2)c1F` 上，酰氯酰化（`0` 个竞争芳基卤位点）与
+  `Fc1c(Cl)cccc1C#N` 上的 Buchwald-Hartwig 酰胺化（`2` 个邻位活化卤素竞争位点）被明确区分。
+- **正向条件建模与 HTE 反馈（`t14-forward-reaction-lab-feedback`）**：在 `24` 条
+  Ahneman Buchwald-Hartwig 记录上，引入条件特征（`[aryl_halide, additive, base, ligand]`）
+  的留一法 Ridge 回归将 MAE 从仅用底物基线的 `27.19%` 降至 `16.51%`。若在反馈更新前剔除
+  `6` 个零产率化学失败孔（因强碱诱导异噁唑开环毒化催化剂导致的 `0.0%` 产率），模型在这些
+  毒化条件上的平均预测产率会从 `7.47%` 虚高至 `36.37%`（偏高 `+28.90` 个百分点）。因此，
+  反馈台账严格区分 `well A01`（条目 `49`，产率 `10.6578%`，内标正常 ->
+  `update_model_productive`）、`well H12`（条目 `1601`，产率 `0.0%`，内标正常 ->
+  `update_model_negative_chemical_failure`）以及 `well P24`（条目 `1613`，内标缺失 ->
+  `quarantine_qc_fault_repeat_dispense`）。
+
 ## 独立练习
 
 一篇逆合成论文报告："我们的模型在 USPTO-50K 上达到 92% 的 top-1 路线回收率，

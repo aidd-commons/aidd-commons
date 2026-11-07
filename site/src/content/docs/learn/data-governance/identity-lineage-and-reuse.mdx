@@ -153,6 +153,11 @@ scientific data do not exist.
 </details>
 
 Continue to [complex biological representations](/learn/representations/complex-cell-and-knowledge-graphs/)
-to see how resolved entities become features without losing their measurement context.
+to see how resolved entities become features without losing their measurement context. To trace all 1,072 real ChEMBL 37 EGFR output parent rows (`902` primary in `CHEMBL5736995` and `170` replication in `CHEMBL3705421`) back to their 1,139 retained source `activity_id` records through the 5 versioned transformation stages (`634` train, `136` validation, and `132` test scaffolds) and verify provenance completeness across manually typed and image-recovered structures, run:
+
+```bash
+.venv/bin/python labs/chembl_egfr/run_lab.py trace-lineage
+.venv/bin/python labs/chembl_egfr/run_lab.py check-lineage
+```
 
 Original examples and prose: CC BY 4.0. Sources reviewed: 2026-09-09.

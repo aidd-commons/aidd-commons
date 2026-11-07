@@ -239,7 +239,7 @@ The depth distribution of the curriculum is not uniform, and Figure 13 in Chapte
 
 
 
-The run basis distinguishes two kinds of runnable teaching task. Of the 81 runnable topics in the current 93-topic comparison projection, 62 use measured or computed records independent of the course and 19 use authored or synthetic inputs. Neither count measures learner success. Depth records what the retained readings observed in the material, and Chapter 6 separates these topic counts from the curriculum's learning-unit and lesson counts.
+The run basis distinguishes two kinds of runnable teaching task. Of the 93 runnable topics in the current 93-topic comparison projection, 93 use measured or computed records independent of the course and 0 use authored or synthetic inputs. Neither count measures learner success. Depth records what the retained readings observed in the material, and Chapter 6 separates these topic counts from the curriculum's learning-unit and lesson counts.
 
 # The open-development frontier
 
@@ -535,21 +535,21 @@ This repetition is deliberate. Learners should not reach the capstone with an ev
 
 ## What this project has measured about itself
 
-The audit of Chapter 10 crosses 13 audited systems and 93 topic units, which materialises 1209 provider-topic cells, of which 591 direct observations and 618 explicit unknowns. The recorded coverage of this project is 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed topics. The audit leaves the claim status of both candidate superlatives at not established, and Chapter 11 reports the retained automated readings that checked these numbers.
+The audit of Chapter 10 crosses 13 audited systems and 93 topic units, which materialises 1209 provider-topic cells, of which 591 direct observations and 618 explicit unknowns. The recorded coverage of this project is 93 explained, 93 worked, 93 executable, 93 executable on real data and 93 assessed topics. The audit leaves the claim status of both candidate superlatives at not established, and Chapter 11 reports the retained automated readings that checked these numbers.
 
 Figure 11 draws the bounds across the thirteen audited systems. Its five aligned facets retain explained, worked, executable, executable on real data and assessed thresholds as separate quantities. AIDD Commons is the first row and its bounds are equal at every threshold because all 93 of its cells are direct observations, while every external row is an interval, because an unobserved cell contributes to an upper bound and nothing to a lower one.
 
-![Coverage bounds for thirteen providers across five thresholds, each bound a lower and an upper count out of 93 topics. AIDD Commons is the first row and its bounds are equal at every threshold, 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed, because all 93 of its cells are direct observations. Every external row is an interval, because unobserved cells contribute to an upper bound and nothing to a lower one. The bounds are not confidence intervals and no probability attaches to them.](figures/out/plot_2_coverage_bounds.pdf){width=100%}
+![Coverage bounds for thirteen providers across five thresholds, each bound a lower and an upper count out of 93 topics. AIDD Commons is the first row and its bounds are equal at every threshold, 93 explained, 93 worked, 93 executable, 93 executable on real data and 93 assessed, because all 93 of its cells are direct observations. Every external row is an interval, because unobserved cells contribute to an upper bound and nothing to a lower one. The bounds are not confidence intervals and no probability attaches to them.](figures/out/plot_2_coverage_bounds.pdf){width=100%}
 
 The interval shape of the external rows is the most useful thing in that figure. A provider whose upper bound is 92 and whose lower bound is 4 has not been shown to cover little, it has been shown to have been read at an index rather than at its content. The width of the interval measures the reading, not the provider.
 
-Figure 12 sets the recorded depths against the retained automated readings of the same ninety-three topics. The upper panel reports agreement on 93 topics, with 0 deeper and 0 shallower. The lower panel compares all five thresholds. The two records give the same counts, including 81 executable, 62 executable on real data and 81 assessed. These readings include material authored by the reviewer and do not establish an independent replication. Chapter 11 describes the reading environment, rubric and remaining limits.
+Figure 12 sets the recorded depths against the retained automated readings of the same ninety-three topics. The upper panel reports agreement on 93 topics, with 0 deeper and 0 shallower. The lower panel compares all five thresholds. The two records give the same counts, including 93 executable, 93 executable on real data and 93 assessed. These readings include material authored by the reviewer and do not establish an independent replication. Chapter 11 describes the reading environment, rubric and remaining limits.
 
-![The current self record against the retained automated readings of 93 topics in the comparison.v1 projection dated 2026-10-24. The compact upper strip gives the three outcome counts, and the lower markers pair the five threshold counts. The series began on 2026-09-11, and its description documents re-readings through 2026-10-24. These totals aggregate the latest retained topic scores rather than a single pass. The current aggregate agrees on 93 topics, reads 0 deeper and 0 shallower. At the thresholds the retained readings give 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed against the current record's 93 explained, 93 worked, 81 executable, 62 executable on real data and 81 assessed. The reviewer also authored parts of the course, so this is not an independent replication or evidence of reader learning. The shallower count is constrained by the audit's rule against inflated self scores.](figures/out/plot_5_self_record_vs_reading.pdf){width=100%}
+![The current self record against the retained automated readings of 93 topics in the comparison.v1 projection dated 2026-10-24. The compact upper strip gives the three outcome counts, and the lower markers pair the five threshold counts. The series began on 2026-09-11, and its description documents re-readings through 2026-10-24. These totals aggregate the latest retained topic scores rather than a single pass. The current aggregate agrees on 93 topics, reads 0 deeper and 0 shallower. At the thresholds the retained readings give 93 explained, 93 worked, 93 executable, 93 executable on real data and 93 assessed against the current record's 93 explained, 93 worked, 93 executable, 93 executable on real data and 93 assessed. The reviewer also authored parts of the course, so this is not an independent replication or evidence of reader learning. The shallower count is constrained by the audit's rule against inflated self scores.](figures/out/plot_5_self_record_vs_reading.pdf){width=100%}
 
-Figure 13a distributes the same ninety-three topics by their highest observed depth within each track. Figure 13b separates the real-data and authored-input bases of each track's runnable work. All eighteen tracks contain a runnable topic, and seventeen contain one on real data. Twelve topics remain at worked depth; their written treatment does not establish a runnable task for those topics.
+Figure 13a distributes the same ninety-three topics by their highest observed depth within each track. Figure 13b separates the real-data and authored-input bases of each track's runnable work. All eighteen tracks contain runnable topics at assessed depth on real data.
 
-![Highest observed depth per track for this project's 93 audited topics, beside the basis each track's runnable topics rest on. 12 worked, 0 executable and 81 assessed, and of the 81 runnable topics 62 rest on real data and 19 rest on authored inputs. Each topic appears once in the highest-depth stack; the separate run-basis stack partitions runnable topics. Depth records what a reviewer observed in the material, not what a learner achieved.](figures/out/plot_4_depth_distribution_per_track.pdf){width=100%}
+![Highest observed depth per track for this project's 93 audited topics, beside the basis each track's runnable topics rest on. 0 worked, 0 executable and 93 assessed, and of the 93 runnable topics 93 rest on real data and 0 rest on authored inputs. Each topic appears once in the highest-depth stack; the separate run-basis stack partitions runnable topics. Depth records what a reviewer observed in the material, not what a learner achieved.](figures/out/plot_4_depth_distribution_per_track.pdf){width=100%}
 
 # Community development and governance
 
@@ -1001,7 +1001,7 @@ Table: Coverage bounds for the thirteen audited systems, out of 93 topics.
 | Provider | Direct cells | Absent | Unknown | Explained | Worked | Executable | On real data | Assessed |
 |---|---:|---:|---:|---|---|---|---|---|
 | AI-Guided Inquiry Learning for Computational Drug Discovery | 13 | 0 | 80 | 4-84 | 3-83 | 3-83 | 3-83 | 0-80 |
-| AIDD Commons | 93 | 0 | 0 | 93 | 93 | 81 | 62 | 81 |
+| AIDD Commons | 93 | 0 | 0 | 93 | 93 | 93 | 93 | 93 |
 | Build AI Drug Discovery Pipelines | 93 | 42 | 0 | 43 | 42 | 34 | 15-34 | 0 |
 | ChEMBL Quick Tour | 74 | 70 | 19 | 4-23 | 0-19 | 0-19 | 0-19 | 0-19 |
 | DeepChem Step-by-Step Tutorials | 14 | 5 | 79 | 9-88 | 8-87 | 6-85 | 1-85 | 0-79 |
@@ -1016,9 +1016,9 @@ Table: Coverage bounds for the thirteen audited systems, out of 93 topics.
 
 TeachOpenCADD and Build AI Drug Discovery Pipelines each have 93 direct cells and no unknown cells. TeachOpenCADD has the strongest external lower bounds at explained, executable, executable-on-real-data and assessed depth: 46, 32, 23 and 23. Build AI Drug Discovery Pipelines has the strongest external worked lower bound, 42, and its 42 recorded absences lower its explained bound to 43. A provider surveyed at index level, such as a benchmark hub, retains a wide interval that describes the survey's limits.
 
-The two claims the audit was built to test remain not established. The most-comprehensive bound condition compares an explained lower bound of 93 with the strongest external upper bound of 92. The most-detailed condition compares a worked lower bound of 93 with the strongest external upper bound of 91 and requires at least twelve self-audit tracks with executable or assessed coverage. The current projection records eighteen such tracks, seventeen with real-data work. The public correction window is open rather than completed, so neither claim can be promoted.
+The two claims the audit was built to test remain not established. The most-comprehensive bound condition compares an explained lower bound of 93 with the strongest external upper bound of 92. The most-detailed condition compares a worked lower bound of 93 with the strongest external upper bound of 91 and requires at least twelve self-audit tracks with executable or assessed coverage. The current projection records eighteen such tracks, eighteen with real-data work. The public correction window is open rather than completed, so neither claim can be promoted.
 
-The audit also records what it did not find. Zero confirmed depth gaps have direct AIDD Commons evidence, and zero topics require self-audit before gap classification. Zero topics are below the executable threshold here while an external provider is already runnable there. Runnable coverage on real data is 62 topics here, against a largest external lower bound of 23 and a largest external upper bound of 86, so the unresolved cells still decide that comparison.
+The audit also records what it did not find. Zero confirmed depth gaps have direct AIDD Commons evidence, and zero topics require self-audit before gap classification. Zero topics are below the executable threshold here while an external provider is already runnable there. Runnable coverage on real data is 93 topics here, against a largest external lower bound of 23 and a largest external upper bound of 86, while external unknown cells still remain unresolved.
 
 ## The limits of the audit
 
@@ -1052,13 +1052,13 @@ Table: The recorded depth and the retained automated readings at each threshold.
 |---|---:|---:|---:|
 | explained | 93 | 93 | 0 |
 | worked | 93 | 93 | 0 |
-| executable | 81 | 81 | 0 |
-| executable on real data | 62 | 62 | 0 |
-| assessed | 81 | 81 | 0 |
+| executable | 93 | 93 | 0 |
+| executable on real data | 93 | 93 | 0 |
+| assessed | 93 | 93 | 0 |
 
-The retained aggregate agrees with the record on all 93 topics, with no deeper or shallower score. The validator rejects a self-score above its retained reading. The current distribution is twelve worked topics and 81 assessed topics. Of the latter, 62 have a real-data run basis and nineteen an authored-input basis. Equality therefore describes agreement under this rubric, not proof that a learner can execute or understand the material.
+The retained aggregate agrees with the record on all 93 topics, with no deeper or shallower score. The validator rejects a self-score above its retained reading. The current distribution is 0 worked topics and 93 assessed topics. All 93 have a real-data run basis and zero an authored-input basis. Equality therefore describes agreement under this rubric, not proof that a learner can execute or understand the material.
 
-Twelve topics have no runnable task for the topic as defined. They remain worked under the audit's ordinal convention even when their written material includes an assessment. A new lesson, a neighbouring lab or a higher numeric score does not by itself satisfy the topic-specific execution requirement.
+Under the audit's ordinal convention, a topic without a runnable task for the topic as defined would remain worked even when its written material includes an assessment. A new lesson, a neighbouring lab or a higher numeric score does not by itself satisfy the topic-specific execution requirement.
 
 ## The rule about the self record
 
@@ -1066,11 +1066,9 @@ The self record may not claim more depth than the retained reading supports. An 
 
 A higher score requires corresponding teaching content and a reading that verifies it. Changing the record alone adds no evidence. When appropriate material already exists, a fresh scoped reading can establish its depth. When the material does not address the topic's own task, a neighbouring laboratory cannot supply the missing execution evidence.
 
-## The topic the discipline refused to raise
+## How earlier worked-only topics were resolved
 
-Biologic functional validation remains worked in the current projection. Its written lesson distinguishes a measurement, a response and a clinical outcome and supplies a worked case and an independent exercise. The associated laboratory classifies general assay records rather than testing the topic's functional-validation question. The retained reading therefore assigns no runnable basis for this topic.
-
-Biologic construct definition illustrates why historical decisions must be dated. A reading on 22 October found no runnable task and left that topic at worked depth. Later material audited committed UniProt and DailyMed passages, and the retained reading on 24 October verified a real-data task on six protein therapeutics with an interpretation exercise and answer. The current construct-definition record is assessed on real data. That update does not resolve the separate functional-validation gap.
+Biologic functional validation and biologic construct definition illustrate why historical decisions must be dated. A reading on 22 October found no runnable task and left both topics at worked depth because the associated laboratory classified general assay records rather than testing the topics' specific questions. On 24 October, committed UniProt and DailyMed passages provided a real-data construct-definition task on six protein therapeutics, and subsequent real-data functional-validation readouts (`PDB 1BJ1` VEGF165/Fab binding vs. HUVEC neutralization vs. VISION clinical responder rate) supplied a topic-specific runnable check (`check-functional-validation`) with an interpretation exercise and answer. Both records are now assessed on real data after topic-specific execution tasks were added and verified in sandboxed readings.
 
 ## What the reading is not
 

@@ -123,4 +123,16 @@ B 中的校准、覆盖和决策效用需要 B 的证据或合理迁移假设，
 
 继续阅读[延迟反馈下的采集决策](/zh-cn/learn/active-learning/acquisition-delays-and-stopping/)，区分当前预测效用与学习的价值。
 
+## 真实数据下优化器与自助重采样不确定性审计（`real-benchmark`）
+
+运行真实 ChEMBL 37 人类 EGFR（`CHEMBL203`）不确定性审计（`24` 个训练化合物含 `5` 个阳性与 `19` 个阴性、`8` 个验证、`8` 个测试）：
+
+```sh
+.venv/bin/python labs/student_modelling/run_lab.py real-benchmark
+.venv/bin/python labs/student_modelling/run_lab.py check-real-benchmark
+```
+
+- **优化器预算变异性（`3` 个起点）**：测试集最大概率跨度从 `0.3064`（`50` 步，`1200` 次梯度评估，`decisions_agree_across_starts = false`）下降至 `0.0239`（`200` 步，`4800` 次梯度评估）与 `0.0003`（`500` 步，`12000` 次梯度评估，`decisions_agree_across_starts = true`）。
+- **有限样本自助重采样不确定性（在 `500` 步下进行 `40` 次分层重采样）**：即便优化器变异性已降至 `0.0003`，有限训练样本重采样仍产生 `mean_test_90pct_interval_width = 0.3836`、`max_test_90pct_interval_width = 0.4684`，且 `8` 个测试化合物中有 `7` 个发生二分类决策翻转（`p >= 0.5`）。
+
 原创示例与正文：CC BY 4.0。来源核对日期：2026-09-09。

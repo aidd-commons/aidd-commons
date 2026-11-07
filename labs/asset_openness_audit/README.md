@@ -16,6 +16,10 @@ Mode is a fresh independent computation under the frozen protocol. Use the proje
 .venv/bin/python labs/asset_openness_audit/run_lab.py check
 .venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py show
 .venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py check
+.venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py governance-release
+.venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py check-governance-release
+.venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py verify-reproducibility
+.venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py check-reproducibility
 .venv/bin/python labs/asset_openness_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/asset_openness_audit -q
 ```

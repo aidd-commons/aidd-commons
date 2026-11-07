@@ -100,18 +100,32 @@ def build() -> dict[str, Path]:
         "not_applicable": style.fill_colours()["slate"],
     }
     hatches = {"available": "", "unverified": "..", "not_available": "xx", "not_applicable": "//"}
+    for x in range(1, len(DIMENSIONS)):
+        ax.axvline(x, color=tokens["rule"], lw=0.45, ls=":", zorder=0)
     for y, kind in enumerate(kinds):
+        if y % 2 == 0:
+            ax.add_patch(
+                Rectangle(
+                    (0, y),
+                    len(DIMENSIONS),
+                    1.0,
+                    facecolor="#f7f9fa",
+                    edgecolor="none",
+                    zorder=0,
+                )
+            )
         for x, (dim, _) in enumerate(DIMENSIONS):
             cell = data["cells"][kind][dim]
             states, applicable = cell["states"], cell["applicable"]
             ax.text(
                 x + 0.5,
-                y + 0.24,
+                y + 0.25,
                 f"{states['available']}/{applicable}" if applicable else "n/a",
                 ha="center",
                 va="center",
                 fontsize=10.0,
-                fontweight="bold",
+                fontweight="bold" if applicable and states["available"] > 0 else "normal",
+                color=tokens["ink"] if applicable else tokens["muted"],
             )
             left = x + 0.08
             for state in states_order:
@@ -119,13 +133,14 @@ def build() -> dict[str, Path]:
                 if width:
                     ax.add_patch(
                         Rectangle(
-                            (left, y + 0.48),
+                            (left, y + 0.49),
                             width,
-                            0.32,
+                            0.31,
                             facecolor=fills[state],
                             edgecolor=tokens["muted"],
                             lw=0.4,
                             hatch=hatches[state],
+                            zorder=2,
                         )
                     )
                 left += width

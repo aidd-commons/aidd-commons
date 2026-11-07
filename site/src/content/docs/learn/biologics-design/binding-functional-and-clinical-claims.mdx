@@ -119,7 +119,22 @@ and response is not outcome.
 
 The [laboratory guide](/labs/functional-validation-audit/) states the fresh
 independent computation mode before its commands. It gives the source-cache
-prerequisites, checks and the small committed summary.
+prerequisites, checks and the small committed summary. To inspect the `6`-stage
+biologic functional validation progression coupling PDB/AlphaFold structural
+plausibility (`1IVO` `1244`/`1244` positions, `pLDDT = 75.94`, `7,903` entity atoms, `0` clashes;
+`3MZW` `624`/`624` positions, `pLDDT = 74.00`, `4,387` entity atoms, `0` clashes), DailyMed CHO
+construct and host expression (`adalimumab` `1,330` aa, `148` kDa; `etanercept` `934` aa,
+`150` kDa; `agalsidase-beta` `2 x 398` aa, `100` kDa, `70` U/mg), SKEMPI 2.0 SPR/ITC dissociation
+constants (`1YY9` `Kd_wt = 1.31e-09` M vs `Kd_mut = 1.38e-09` M; `1N8Z` `Kd_wt = 1.31e-09` M vs
+`Kd_mut = 1.26e-09` M; `1YCS` `Kd_wt = 2.2e-06` M vs `Kd_mut = 1.8e-06` M; `31` of `36` objective
+cells filled across `6` targets, with `3` of `6` carrying linked SKEMPI binding records),
+TNF-alpha versus lymphotoxin (`TNF-beta`) paralog specificity, complement-dependent cellular lysis,
+and the explicit DailyMed psoriasis pharmacodynamic-to-clinical boundary, run:
+
+```bash
+.venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py progression
+.venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py check-progression
+```
 
 ## Sources and attribution
 

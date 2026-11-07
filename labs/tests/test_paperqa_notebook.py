@@ -256,3 +256,34 @@ def test_live_cells_take_their_limits_from_the_selected_profile(
     assert recorded == [document_timeout, document_timeout, question_timeout]
     report = json.loads((namespace["OUTPUT_DIR"] / "student_execution.json").read_text())
     assert report["outcome"] == "stage_finished"
+
+
+def test_checkpointed_trace_recovery_over_real_paperqa_and_chembl():
+    import subprocess
+    import sys
+
+    root = LAB.parents[1]
+    out = subprocess.run(
+        [sys.executable, str(LAB / "inspect_trace_recovery.py"), "resume-workflow"],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=root,
+    )
+    payload = json.loads(out.stdout)
+    assert payload["total_steps"] == 4
+    assert payload["attempt_1_faulted"]["last_verified_checkpoint_step"] == 2
+    assert payload["attempt_1_faulted"]["failed_step_index"] == 3
+    assert payload["attempt_2_resumed"]["reexecuted_step_count"] == 0
+    assert payload["attempt_2_resumed"]["completed_steps_after_resume"] == 4
+
+    chk = subprocess.run(
+        [sys.executable, str(LAB / "inspect_trace_recovery.py"), "check-resume-workflow"],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=root,
+    )
+    chk_payload = json.loads(chk.stdout)
+    assert chk_payload["ok"] is True
+    assert chk_payload["failures"] == []

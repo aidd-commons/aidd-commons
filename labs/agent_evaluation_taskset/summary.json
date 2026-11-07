@@ -1,7 +1,7 @@
 {
   "schema_version": "aidd-commons.agent-evaluation-taskset-summary.v1",
   "protocol_id": "aidd-commons-agent-evaluation-taskset-v1",
-  "computed_on": "2026-10-24",
+  "computed_on": "2026-11-07",
   "software": {
     "python": "3.11.15",
     "aidd-commons-labs": "0.2.0rc1"

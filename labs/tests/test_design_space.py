@@ -130,3 +130,32 @@ def test_a_misleading_space_comparison_is_rejected(data, mutate, expected):
     mutate(broken)
     failures = design.check(broken)
     assert any(expected in failure for failure in failures), failures
+
+
+def test_public_spaces_multi_representation_audit_and_check():
+    import json
+
+    out = subprocess.run(
+        [sys.executable, str(LAB / "inspect_space.py"), "public-spaces"],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=ROOT,
+    )
+    payload = json.loads(out.stdout)
+    assert payload["space_sizes"]["2d_snar_fragment_space"] == 16
+    assert payload["space_sizes"]["1d_token_grammar_space"] == 16
+    assert payload["summary_counts"]["reachable_2d_count"] == 4
+    assert payload["summary_counts"]["reachable_1d_count"] == 3
+    assert payload["summary_counts"]["admissible_3d_count"] == 5
+
+    chk = subprocess.run(
+        [sys.executable, str(LAB / "inspect_space.py"), "check-public-spaces"],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=ROOT,
+    )
+    chk_payload = json.loads(chk.stdout)
+    assert chk_payload["ok"] is True
+    assert chk_payload["failures"] == []

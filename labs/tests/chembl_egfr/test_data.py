@@ -309,3 +309,19 @@ def test_activity_pagination_rejects_repeated_pages_and_excess_rows() -> None:
 
     with pytest.raises(DataDownloadError, match="exceeded its declared total"):
         _fetch_activity_rows(PRIMARY_ASSAY_ID, excess_fetcher)
+
+
+def test_complete_row_lineage_and_provenance_audit() -> None:
+    from aidd_commons.chembl_egfr.lineage import (
+        DEFAULT_CACHE_DIR,
+        check_complete_lineage,
+        trace_complete_lineage,
+    )
+
+    if not DEFAULT_CACHE_DIR.is_dir():
+        pytest.skip("ChEMBL 37 cache directory not present")
+    payload = trace_complete_lineage(DEFAULT_CACHE_DIR)
+    assert check_complete_lineage(payload, DEFAULT_CACHE_DIR) == []
+    assert payload["traced_output_row_totals"]["total_output_parent_rows"] == 1072
+    assert payload["traced_output_row_totals"]["primary_output_parent_rows"] == 902
+    assert payload["traced_output_row_totals"]["replication_output_parent_rows"] == 170

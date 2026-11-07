@@ -107,7 +107,12 @@ T(Q,B) = 3/4 = 0.75
 [SAR 归因实验](/zh-cn/labs/sar-attribution/)在生成规则写明于文件中的数据上拟合模型，
 因此成因是已知的而不是推断出来的。一个与该成因相关的混杂因子，
 在 8 个活跃分子里有 7 个拿走了更大份额的原子功劳，
-而打破该相关的那对匹配分子被排成了相反的顺序。构造案例的生成规则提供了直接参照。真实活性数据的因果核对需要独立干预与对照，归因本身并不足够。
+而打破该相关的那对匹配分子被排成了相反的顺序。构造案例的生成规则提供了直接参照。真实活性数据的因果核对需要独立干预与对照，归因本身并不足够。运行 `chembl-series` 与 `check-chembl-series` 可在跨越 3 轮优化的 12 个真实 ChEMBL 37 人源 EGFR 抑制剂上对比 3 种解释方法（`linear_bit_provenance`、`counterfactual_loso_ablation` 与 `matched_molecular_pair_delta`）及 4 对实测类似物（从吉非替尼到阿法替尼的 `+2.50` 对数单位 T790M 增益，以及从阿法替尼到奥希替尼的 `+3.11` 对数单位选择性翻转）。
+
+```bash
+.venv/bin/python labs/sar_attribution/inspect_attribution.py chembl-series
+.venv/bin/python labs/sar_attribution/inspect_attribution.py check-chembl-series
+```
 
 ## 独立练习
 

@@ -98,6 +98,33 @@ sizes against the file they are declared from, every candidate being stopped by
 the gate its label names, the funnel's chained denominators, and the frozen
 selection rule filling the batch from survivors only.
 
+## 5. Real-data ChEMBL 37 EGFR & USPTO SNAr series funnel (`public-series`)
+
+Alongside the authored 20-candidate teaching set, `public-series` and
+`check-public-series` screen `30` generated candidates (`10` each at sampling
+temperatures `T = 0.2`, `T = 0.8`, and `T = 1.5`) against `7` real ChEMBL 37
+human EGFR (`CHEMBL203`) inhibitors and a commercial 4-chloroquinazoline +
+aniline nucleophilic aromatic substitution (`80` °C) building-block deck (`4`
+cores × `8` anilines):
+
+```bash
+python labs/generation_gate/inspect_gate.py public-series
+python labs/generation_gate/inspect_gate.py check-public-series
+```
+
+- **`T_0.2_low_temperature` (`10` sampled)**: `10` syntactic valid (`1.0`), `5`
+  unique (`0.5`), `1` novel (`4` `train` split memorized, `0` held-out test
+  collisions), `1` property pass, `1` motif pass, and `1` retrosynthetic
+  route-verified survivor (`t02_09`, net yield `0.1`).
+- **`T_0.8_balanced_temperature` (`10` sampled)**: `10` syntactic valid (`1.0`),
+  `10` unique (`1.0`), `8` novel (`1` `train` split memorized, `1` `test` split
+  collision), `6` property pass, `5` motif pass, and `5` retrosynthetic
+  route-verified survivors (`t08_01` to `t08_05`, net yield `0.5`).
+- **`T_1.5_high_temperature` (`10` sampled)**: `6` syntactic valid (`0.6`), `6`
+  unique (`1.0` of valid), `6` novel (`0` memorized), `4` property pass, `3`
+  motif pass, and `1` retrosynthetic route-verified survivor (`t15_10`, net
+  yield `0.1`).
+
 ## Independent exercise
 
 A report says: "Our model generated 10,000 molecules. 94% were valid, 91% were

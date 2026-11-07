@@ -16,9 +16,13 @@ Mode is fresh independent computation over the frozen protocol and committed rec
 .venv/bin/python labs/source_review_scope_audit/run_lab.py check
 .venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py show
 .venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py check
+.venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py verify-passages
+.venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py check-passages
 .venv/bin/python labs/source_review_scope_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/source_review_scope_audit -q
 ```
+
+In addition to auditing the 4 Atlas records (`show` / `check`), the `verify-passages` and `check-passages` subcommands inspect 6 primary-source passage bindings across real committed PDB structure records (`1M17`, `4HJO`, `1XKK`, `3POZ`), ChEMBL 37 EGFR bioactivity rows (`320` curated rows), Open Targets 26.03 genetic/clinical evidence snapshots (`MONDO_0005233` score `0.8503`), and FreeSolv v0.52 hydration free-energy records (`642` molecules), checking surface, version, date, and scope fields alongside content-level passage matches and scope-boundary violations.
 
 The inspector prints every entry's four states, claim references, per-record counts, totals, the independent reading and the routes it cannot measure. A malformed record, unresolved claim reference or changed protocol makes `check` fail. The exporter writes no summary when validation fails.
 

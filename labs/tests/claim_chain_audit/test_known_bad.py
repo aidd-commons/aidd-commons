@@ -73,7 +73,10 @@ def test_known_bad_refused_without_output(
                 elif mutation == "biological_claim":
                     chain["claim_scope"] = "target-validated"
                 else:
-                    chain["weakest_link"] = {"topic_id": first_id, "depth": "assessed"}
+                    wrong_depth = (
+                        "worked" if chain["weakest_link"]["depth"] == "assessed" else "assessed"
+                    )
+                    chain["weakest_link"] = {"topic_id": first_id, "depth": wrong_depth}
                 return result
 
             monkeypatch.setattr(summary, "analyze", bad_result)

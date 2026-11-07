@@ -7,6 +7,8 @@ prepared, protonated, minimised or docked, and no pocket-prediction method is ru
 ```bash
 python labs/egfr_structures/inspect_state.py show     # what each file says, and how a site is defined
 python labs/egfr_structures/inspect_state.py check
+python labs/egfr_structures/inspect_state.py disease-state        # 6-field disease-state contract + Thr790 gatekeeper contacts
+python labs/egfr_structures/inspect_state.py check-disease-state
 python labs/egfr_structures/inspect_complex.py show   # contacts, interactions and poses
 python labs/egfr_structures/inspect_complex.py check
 ```

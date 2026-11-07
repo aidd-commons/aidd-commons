@@ -162,3 +162,18 @@ def test_a_collapsed_record_is_rejected(data, mutate, expected):
     mutate(broken)
     failures = safety.check(broken)
     assert any(expected in failure for failure in failures), failures
+
+
+def test_public_safety_evaluates_real_clinical_herg_margins_and_alerts():
+    from aidd_commons.safety_evidence.public_safety import (
+        check_public_safety,
+        evaluate_public_safety,
+    )
+
+    payload = evaluate_public_safety()
+    assert check_public_safety(payload) == []
+    assert payload["drug_count"] == 6
+    comp = payload["rule_comparison_for_torsades_liability"]
+    assert comp["exposure_linked_herg_margin_under_10x"]["tp"] == 2
+    assert comp["exposure_linked_herg_margin_under_10x"]["fp"] == 0
+    assert comp["exposure_linked_herg_margin_under_10x"]["fn"] == 0

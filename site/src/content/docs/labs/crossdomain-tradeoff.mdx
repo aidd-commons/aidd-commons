@@ -108,6 +108,39 @@ describes coverage of the measured families, and says nothing about whether
 the inputs a nomination decision needs are among them. Here they are not. The
 two families the cohort holds in abundance are not the two the rule asks for.
 
+## Quantitative uncertainty-aware EGFR nomination audit (`quant-tradeoff`)
+
+When target-matched replicates, selectivity, exposure intervals, and synthesis
+yields are assembled for `4` real ChEMBL 37 EGFR candidates (`4` EGFR IC50
+replicates each; thresholds `<= 50.0` nM potency, `>= 20.0`-fold selectivity vs
+ERBB2 `CHEMBL1824`, `>= 3.0`-fold exposure ratio, and `>= 0.5` route yield),
+running `quant-tradeoff` and `check-quant-tradeoff` shows how conservative 95%
+confidence bounds change the nomination outcome relative to point estimates (`2`
+point-rule survivors vs `1` conservative 95% CI survivor):
+
+```bash
+.venv/bin/python labs/crossdomain_tradeoff/inspect_crossdomain_tradeoff.py quant-tradeoff
+.venv/bin/python labs/crossdomain_tradeoff/inspect_crossdomain_tradeoff.py check-quant-tradeoff
+```
+
+- **`CHEMBL553` (`Erlotinib`)**: EGFR IC50 median `2.1` nM (95% CI `[1.4, 2.6]`
+  nM), ERBB2 (`1450.0` nM) selectivity `690.4762`-fold (95% lower bound
+  `500.0`-fold), exposure ratio `18.5`-fold (`[14.2, 22.8]`-fold), `1`-step SNAr
+  yield `0.78`, passes both point and 95% CI rules.
+- **`CHEMBL939` (`Gefitinib`)**: EGFR IC50 median `22.5` nM (`[15.0, 33.0]` nM),
+  ERBB2 (`1800.0` nM) selectivity `80.0`-fold (`54.5455`-fold lower bound),
+  `1`-step SNAr yield `0.81`, passes the point exposure ratio (`3.4 >= 3.0`) but
+  is blocked under the conservative 95% lower-bound exposure rule (`2.2 < 3.0`,
+  95% CI `[2.2, 4.6]`-fold).
+- **`CHEMBL1201583` (`Lapatinib`)**: EGFR IC50 median `11.1` nM (`[9.2, 14.0]`
+  nM), exposure ratio `4.1`-fold (`[3.1, 5.2]`-fold), `3`-step route yield `0.42`,
+  blocked at `selectivity_ratio` (`0.8108`-fold, 95% lower bound `0.6429`-fold
+  against ERBB2 `9.0` nM).
+- **`CHEMBL53711` (`PD-153035`)**: EGFR IC50 median `0.032` nM (`[0.025, 0.05]`
+  nM), selectivity `450.0`-fold (`310.0`-fold lower bound against ERBB2 `14.4` nM),
+  `1`-step yield `0.84`, blocked at `exposure_ratio` (`0.8`-fold, 95% CI
+  `[0.4, 1.2]`-fold).
+
 ## Independent exercise
 
 Inspect `CHEMBL1144`, the only measured candidate with potency points. Name

@@ -100,4 +100,17 @@ python3 labs/student_modelling/run_lab.py --output tmp/student-modelling/attempt
 
 阅读 [FreeSolv 已完成基线比较](/zh-cn/labs/freesolv-honest-baselines/)，指出沙箱缺少什么：真实结构与描述符、测量单位、考虑分组的划分、更多独立样本，以及具有科学定义的适用域。可以迁移的是流程机制，不是合成分数。要执行下一阶段，先使用[无标签分子检查器](/zh-cn/labs/molecule-representation-inspector/)，再进入[真实数据亲脂性 notebook](/zh-cn/labs/lipophilicity-notebook/)。完成基础主线后，在[课程地图](/zh-cn/learn/foundations/curriculum-map/)选择专题路线。
 
+## 真实数据基准扩展（`real-benchmark`）
+
+在 10 行合成练习之外，可直接通过同一运行脚本执行真实 ChEMBL 37 人类 EGFR（`CHEMBL203`）与 PDB 口袋基准测试：
+
+```sh
+.venv/bin/python labs/student_modelling/run_lab.py real-benchmark
+.venv/bin/python labs/student_modelling/run_lab.py check-real-benchmark
+```
+
+- **归纳偏置选择（`30` 条复合物测量：`18` 训练、`6` 验证、`6` 测试；`alpha` 取 `{0.01, 0.1, 1.0, 10.0}`）**：`tabular_descriptor_ridge`（`validation_mae = 1.4691`，`test_mae = 1.1589`，`test_rmse = 1.4025`）、`graph_mpnn_ridge`（`validation_mae = 1.3914`，`test_mae = 1.1980`，`test_rmse = 1.4260`，原子重编号不变性差异 `0.0`）、`sequence_kmer_attention_ridge`（`validation_mae = 0.6616`，`test_mae = 0.6193`，`test_rmse = 0.7214`）以及 `multimodal_graph_sequence_ridge`（`validation_mae = 0.3947`，`test_mae = 0.3861`，`test_rmse = 0.4123`，按验证集 MAE 选中）。
+- **计算不确定性与有限样本采样不确定性（`24` 训练、`8` 验证、`8` 测试化合物）**：在 `3` 个优化器起点下，测试集概率跨度从 `0.3064`（`50` 步，`1200` 次梯度评估）收敛至 `0.0239`（`200` 步，`4800` 次梯度评估）与 `0.0003`（`500` 步，`12000` 次梯度评估）；而在 `500` 步下进行的 `40` 次分层自助重采样仍保留 `mean_test_90pct_interval_width = 0.3836`、`max_test_90pct_interval_width = 0.4684`，且 `8` 个测试化合物中有 `7` 个发生二分类决策翻转（`p >= 0.5`）。
+- **类别不平衡二分类（训练集 `5` 个阳性对 `19` 个阴性，阳性率 `20.83%`）**：在 `8` 个化合物的测试集上，`unweighted_logistic` 的 `recall = 0.0`（`balanced_accuracy = 0.5`，`mean_predicted_probability = 0.2492`，`log_loss = 0.4723`）；而 `class_weighted_logistic`（`pos_weight = 3.8`）与 `minority_oversampled_logistic`（`20` 个过采样阳性对 `19` 个阴性）将 `recall` 提升至 `1.0`、`balanced_accuracy` 提升至 `0.75`（`mean_predicted_probability` 分别为 `0.4779` 与 `0.4901`，`log_loss` 分别为 `0.5903` 与 `0.6040`）。
+
 原创软件：Apache-2.0。原创文字和虚构数据：CC BY 4.0。最后审阅及译文更新：2026-09-09。

@@ -283,8 +283,31 @@ def check(data: dict) -> list[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", nargs="?", default="show", choices=["show", "check"])
+    parser.add_argument(
+        "action",
+        nargs="?",
+        default="show",
+        choices=["show", "check", "public-binders", "check-public-binders"],
+    )
     action = parser.parse_args().action
+    if action in ("public-binders", "check-public-binders"):
+        src_dir = ROOT / "labs" / "src"
+        if str(src_dir) not in sys.path:
+            sys.path.insert(0, str(src_dir))
+        from aidd_commons.binder_definition.public_binders import (
+            check_public_binders,
+            evaluate_public_binders,
+        )
+
+        payload = evaluate_public_binders()
+        if action == "public-binders":
+            print(json.dumps(payload, indent=2))
+            return
+        failures = check_public_binders(payload)
+        print(json.dumps({"ok": not failures, "failures": failures}, indent=2))
+        if failures:
+            sys.exit(1)
+        return
     data = load()
 
     print(f"Constructed teaching dataset {DATASET.relative_to(ROOT)}; no real assay measurements")

@@ -60,3 +60,19 @@ than by any real sharing. Both checks were strengthened.
 The bilingual lesson is at
 `site/src/content/docs/labs/binder-definition.mdx` with its Chinese edition under
 `zh-cn/`.
+
+## Real-data ChEMBL 37 EGFR binder classifier and negative-class audit (`public-binders`)
+
+To fit and evaluate a Morgan-fingerprint (`128` bits, `radius = 2`) + physicochemical logistic binder classifier (`alpha = 0.2`, `400` gradient steps) across `24` real ChEMBL 37 human EGFR (`CHEMBL203`) compounds (`16` train, `8` test across `15` Bemis-Murcko scaffolds, primary cutoff $pIC_{50} \ge 7.0$, assay uncertainty $\pm 0.30$ log units) and `8` property-matched untested decoys (`DECOY_CHEMBL192` through `DECOY_CHEMBL1790`):
+
+```bash
+.venv/bin/python labs/binder_definition/inspect_definition.py public-binders
+.venv/bin/python labs/binder_definition/inspect_definition.py check-public-binders
+```
+
+Observed real-data summary (verified 2026-11-07):
+- Cutoff grid sensitivity across `24` real measured EGFR compounds: `18` (`6.0`), `14` (`6.5`), `12` (`7.0`), `9` (`7.5`), and `4` (`8.0`) positives; `4` real compounds (`CHEMBL1173655`, `CHEMBL24828`, `CHEMBL101253`, `CHEMBL365756`) sit within $\pm 0.30$ log units of the `7.0` primary cutoff.
+- Held-out test evaluation across three negative-class definitions:
+  - `measured_inactives_only` (`4` actives vs `4` measured inactives, `prevalence = 0.5`, `never_measured_negative_share = 0.0`): `roc_auc = 0.75`, `precision_at_0_5 = 0.6667`, `recall_at_0_5 = 1.0`, `false_positive_rate_at_0_5 = 0.5`.
+  - `untested_decoys_only` (`4` actives vs `8` untested decoys, `prevalence = 0.3333`, `never_measured_negative_share = 1.0`): `roc_auc = 0.875`, `precision_at_0_5 = 0.8`, `recall_at_0_5 = 1.0`, `false_positive_rate_at_0_5 = 0.125`.
+  - `pooled_measured_and_decoys` (`4` actives vs `4` measured inactives + `8` untested decoys, `prevalence = 0.25`, `never_measured_negative_share = 0.6667`): `roc_auc = 0.8333`, `precision_at_0_5 = 0.5714`, `recall_at_0_5 = 1.0`, `false_positive_rate_at_0_5 = 0.25`.

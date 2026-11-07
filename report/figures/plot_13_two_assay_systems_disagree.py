@@ -70,8 +70,8 @@ def build() -> dict[str, Path]:
         "Assay-system agreement is an empirical question",
         "System-pair correlations above · selected CYP molecule extremes below",
     )
-    ax = fig.add_axes((0.42, 0.56, 0.30, 0.26))
-    ex = fig.add_axes((0.23, 0.16, 0.50, 0.26))
+    ax = fig.add_axes((0.38, 0.59, 0.36, 0.23))
+    ex = fig.add_axes((0.38, 0.15, 0.36, 0.24))
     names = [
         r[0]
         .replace(" against ", " / ")
@@ -79,12 +79,14 @@ def build() -> dict[str, Path]:
         .replace(", clean pairs", " · clean")
         for r in rows
     ]
+    ax.yaxis.grid(True, color=tokens["rule"], linestyle=":", linewidth=0.55, alpha=0.8)
+    ax.set_axisbelow(True)
     for y, (_label, n, r, rho) in zip(list(range(len(rows)))[::-1], rows, strict=True):
-        ax.plot([r, rho], [y, y], color=tokens["rule"], lw=1.7)
-        ax.plot(r, y, "o", ms=6, mfc=colours["slate"], mec=tokens["ink"], mew=0.5)
-        ax.plot(rho, y, "s", ms=6, mfc="none", mec=colours["coral"], mew=1)
+        ax.plot([r, rho], [y, y], color=tokens["rule"], lw=1.7, zorder=2)
+        ax.plot(r, y, "o", ms=6, mfc=colours["slate"], mec=tokens["ink"], mew=0.5, zorder=3)
+        ax.plot(rho, y, "s", ms=6, mfc="none", mec=colours["coral"], mew=1.1, zorder=3)
         ax.text(
-            1.08,
+            1.05,
             y,
             f"{r:.3f} / {rho:.3f}",
             transform=ax.get_yaxis_transform(),
@@ -93,7 +95,7 @@ def build() -> dict[str, Path]:
             fontsize=10.0,
         )
         ax.text(
-            1.60,
+            1.50,
             y,
             f"{n:,}",
             transform=ax.get_yaxis_transform(),
@@ -108,14 +110,31 @@ def build() -> dict[str, Path]:
     ax.set_xlabel("Correlation coefficient")
     style.clean_axis(ax)
     style.title(ax, "(a) System-pair correlations")
-    ax.text(1.08, 1.03, "r / ρ", transform=ax.transAxes, fontsize=10.0, color=tokens["muted"])
-    ax.text(1.60, 1.03, "Shared n", transform=ax.transAxes, fontsize=10.0, color=tokens["muted"])
+    ax.text(1.05, 1.04, "r / ρ", transform=ax.transAxes, fontsize=10.0, color=tokens["muted"])
+    ax.text(1.50, 1.04, "Shared n", transform=ax.transAxes, fontsize=10.0, color=tokens["muted"])
+    from matplotlib.lines import Line2D
+
+    ax.legend(
+        [
+            Line2D([], [], marker="o", mfc=colours["slate"], mec=tokens["ink"], ls="none"),
+            Line2D([], [], marker="s", mfc="none", mec=colours["coral"], ls="none"),
+        ],
+        ["Pearson r", "Spearman ρ"],
+        ncol=2,
+        loc="upper center",
+        bbox_to_anchor=(0.50, -0.28),
+        fontsize=9.6,
+        handletextpad=0.35,
+        columnspacing=1.2,
+    )
+    ex.yaxis.grid(True, color=tokens["rule"], linestyle=":", linewidth=0.55, alpha=0.8)
+    ex.set_axisbelow(True)
     for y, (_identifier, a, b) in zip(list(range(len(examples)))[::-1], examples, strict=True):
-        ex.plot([a, b], [y, y], color=tokens["rule"], lw=1.7)
-        ex.plot(a, y, "o", ms=6, mfc=colours["teal"], mec=tokens["ink"], mew=0.5)
-        ex.plot(b, y, "s", ms=6, mfc="none", mec=colours["coral"], mew=1)
+        ex.plot([a, b], [y, y], color=tokens["rule"], lw=1.7, zorder=2)
+        ex.plot(a, y, "o", ms=6, mfc=colours["teal"], mec=tokens["ink"], mew=0.5, zorder=3)
+        ex.plot(b, y, "s", ms=6, mfc="none", mec=colours["coral"], mew=1.1, zorder=3)
         ex.text(
-            1.04,
+            1.05,
             y,
             f"{a:.2f} / {b:.2f}",
             transform=ex.get_yaxis_transform(),
@@ -124,7 +143,7 @@ def build() -> dict[str, Path]:
             fontsize=10.0,
         )
         ex.text(
-            1.37,
+            1.44,
             y,
             f"{a - b:+.2f}",
             transform=ex.get_yaxis_transform(),
@@ -138,21 +157,20 @@ def build() -> dict[str, Path]:
     ex.set_xlim(0, 8.6)
     ex.set_xlabel("pChEMBL in each system")
     style.clean_axis(ex)
-    style.title(ex, "(b) Largest CYP disagreements · selected extremes")
-    ex.text(1.04, 1.02, "2D6 / 3A4", transform=ex.transAxes, fontsize=10.0, color=tokens["muted"])
-    ex.text(1.37, 1.02, "Δ", transform=ex.transAxes, fontsize=10.0, color=tokens["muted"])
-    from matplotlib.lines import Line2D
+    style.title(ex, "(b) Largest CYP disagreements")
+    ex.text(1.05, 1.04, "2D6 / 3A4", transform=ex.transAxes, fontsize=10.0, color=tokens["muted"])
+    ex.text(1.44, 1.04, "Δ", transform=ex.transAxes, fontsize=10.0, color=tokens["muted"])
 
     fig.legend(
         [
-            Line2D([], [], marker="o", mfc=colours["slate"], mec=tokens["ink"], ls="none"),
+            Line2D([], [], marker="o", mfc=colours["teal"], mec=tokens["ink"], ls="none"),
             Line2D([], [], marker="s", mfc="none", mec=colours["coral"], ls="none"),
         ],
-        ["(a) Pearson r · (b) CYP2D6", "(a) Spearman ρ · (b) CYP3A4"],
+        ["CYP2D6 pChEMBL", "CYP3A4 pChEMBL"],
         ncol=2,
         loc="lower center",
-        bbox_to_anchor=(0.55, 0.065),
-        fontsize=10.0,
+        bbox_to_anchor=(0.56, 0.058),
+        fontsize=9.6,
     )
     style.footnote(
         fig,

@@ -124,4 +124,19 @@ python labs/binder_definition/inspect_definition.py check
 一个结果在不同测定语境之间会发生什么，见
 [重复不等于迁移](/zh-cn/labs/screening-transport/)。
 
+## 真实数据 ChEMBL 37 EGFR 结合体分类器与阴性类审计（`public-binders`）
+
+在 `24` 个真实 ChEMBL 37 人类 EGFR（`CHEMBL203`）实测化合物（跨 `15` 个 Bemis-Murcko 骨架划分为 `16` 个训练与 `8` 个测试，主阈值 `pIC50 >= 7.0`，测定不确定度 `0.3` 对数单位）与 `8` 个性质匹配的未测试诱饵上拟合与评估 Morgan 指纹（`128` 位，`radius = 2`）加理化描述符逻辑回归结合体分类器（`alpha = 0.2`，`400` 步梯度下降）：
+
+```bash
+.venv/bin/python labs/binder_definition/inspect_definition.py public-binders
+.venv/bin/python labs/binder_definition/inspect_definition.py check-public-binders
+```
+
+- **阈值网格与边界敏感性**：在 `{6.0, 6.5, 7.0, 7.5, 8.0}` 网格下的阳性数分别为 `18`、`14`、`12`、`9` 与 `4`，其中 `4` 个真实化合物（`CHEMBL1173655`、`CHEMBL24828`、`CHEMBL101253`、`CHEMBL365756`）落在主阈值 `7.0` 的 `0.3` 对数单位不确定度范围内。
+- **不同阴性类定义下的留出测试集表现**：
+  - `measured_inactives_only`（`4` 个活性物对 `4` 个实测非活性物，`prevalence = 0.5`，`never_measured_negative_share = 0.0`）：`roc_auc = 0.75`，`precision_at_0_5 = 0.6667`，`recall_at_0_5 = 1.0`，`false_positive_rate_at_0_5 = 0.5`。
+  - `untested_decoys_only`（`4` 个活性物对 `8` 个未测试诱饵，`prevalence = 0.3333`，`never_measured_negative_share = 1.0`）：`roc_auc = 0.875`，`precision_at_0_5 = 0.8`，`recall_at_0_5 = 1.0`，`false_positive_rate_at_0_5 = 0.125`。
+  - `pooled_measured_and_decoys`（`4` 个活性物对 `4` 个实测非活性物加 `8` 个未测试诱饵，`prevalence = 0.25`，`never_measured_negative_share = 0.6667`）：`roc_auc = 0.8333`，`precision_at_0_5 = 0.5714`，`recall_at_0_5 = 1.0`，`false_positive_rate_at_0_5 = 0.25`。
+
 原创文字采用 CC BY 4.0，原创教学代码采用 Apache-2.0。最后复核：2026-09-11。

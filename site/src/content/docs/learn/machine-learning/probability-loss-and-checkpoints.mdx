@@ -145,4 +145,24 @@ Continue to [uncertainty and decisions](/learn/qsar-properties/uncertainty-to-de
 for calibration and to [acquisition under delayed feedback](/learn/active-learning/acquisition-delays-and-stopping/)
 for using a predictive distribution to choose an experiment.
 
+## Real-data optimizer convergence vs finite-sample bootstrap uncertainty (`real-benchmark`)
+
+Run the real-data comparison between optimizer starting-point/budget variability and finite-sample bootstrap resampling across `40` real ChEMBL 37 human EGFR (`CHEMBL203`) inhibitors (`24` train with `5` positives and `19` negatives, `8` validation, `8` test):
+
+```sh
+.venv/bin/python labs/student_modelling/run_lab.py real-benchmark
+.venv/bin/python labs/student_modelling/run_lab.py check-real-benchmark
+```
+
+- **Optimizer step-budget sweep (`3` starting points `(0.0, 0.0)`, `(-1.5, 0.5)`, `(1.5, -0.5)`)**:
+  - `50` steps (`1200` gradient evaluations): `decisions_agree_across_starts = false`, `max_test_probability_spread = 0.3064`.
+  - `200` steps (`4800` gradient evaluations): `decisions_agree_across_starts = true`, `max_test_probability_spread = 0.0239`.
+  - `500` steps (`12000` gradient evaluations): `decisions_agree_across_starts = true`, `max_test_probability_spread = 0.0003`.
+- **Finite-sample bootstrap uncertainty (`40` stratified resamples of the `24` training compounds at `500` steps)**:
+  - `mean_test_90pct_interval_width = 0.3836`, `max_test_90pct_interval_width = 0.4684`, with `7` of `8` test compounds flipping their binary classification decision (`p >= 0.5`) across bootstrap training sets.
+- **Imbalanced classification formulations (`20.83%` minority positive prevalence, `pos_weight = 3.8`)**:
+  - `unweighted_logistic` (`test`): `recall = 0.0`, `balanced_accuracy = 0.5`, `mean_predicted_probability = 0.2492`, `log_loss = 0.4723`.
+  - `class_weighted_logistic` (`pos_weight = 3.8`, `test`): `recall = 1.0`, `balanced_accuracy = 0.75`, `mean_predicted_probability = 0.4779`, `log_loss = 0.5903`.
+  - `minority_oversampled_logistic` (`20` oversampled positives vs `19` negatives, `test`): `recall = 1.0`, `balanced_accuracy = 0.75`, `mean_predicted_probability = 0.4901`, `log_loss = 0.6040`.
+
 Original examples and prose: CC BY 4.0. Sources reviewed: 2026-09-09.

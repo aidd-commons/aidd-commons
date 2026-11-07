@@ -1,9 +1,13 @@
+# ruff: noqa: E501
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from collections.abc import Sequence
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from aidd_commons.chembl_egfr.data import (
     DataContractError,
@@ -61,6 +65,18 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="confirm the one-time paired evaluation after external approval",
     )
+
+    trace_lin = subparsers.add_parser(
+        "trace-lineage",
+        help="trace all 1,072 real output parent rows through the 5 versioned transformation stages",
+    )
+    _add_cache_argument(trace_lin)
+
+    check_lin = subparsers.add_parser(
+        "check-lineage",
+        help="verify row-level provenance and versioned transformation invariants across all 1,072 output rows",
+    )
+    _add_cache_argument(check_lin)
     return parser.parse_args(argv)
 
 
@@ -72,6 +88,30 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "paired primary-test and replication evaluation requires explicit confirmation"
             )
         cache_dir = _resolve_repository_path(args.cache_dir)
+        if args.action in ("trace-lineage", "check-lineage"):
+            from aidd_commons.chembl_egfr.lineage import (
+                check_complete_lineage,
+                trace_complete_lineage,
+            )
+
+            payload = trace_complete_lineage(cache_dir)
+            failures = check_complete_lineage(payload, cache_dir)
+            if args.action == "trace-lineage":
+                print(json.dumps(payload, indent=2))
+                return 1 if failures else 0
+            if failures:
+                for item in failures:
+                    print(f"FAIL: {item}", file=sys.stderr)
+                return 1
+            totals = payload["traced_output_row_totals"]
+            print(
+                f"PASS: traced {totals['total_output_parent_rows']} real ChEMBL 37 output rows "
+                f"({totals['primary_output_parent_rows']} primary + {totals['replication_output_parent_rows']} replication) "
+                f"across {totals['total_traced_source_activity_ids']} retained activity_ids "
+                f"(prefix={totals['lineage_chain_content_prefix']})"
+            )
+            return 0
+
         if args.action == "download":
             datasets = download_frozen_snapshot(cache_dir)
             print(

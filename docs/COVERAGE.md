@@ -1,7 +1,7 @@
 # AIDD Commons measured coverage
 
 This page is generated from `catalog/resources/`,
-`catalog/curriculum/tracks.yaml`, and `catalog/comparisons/` on 2026-10-25. It
+`catalog/curriculum/tracks.yaml`, and `catalog/comparisons/` on 2026-11-08. It
 reports current measured coverage, not an exhaustive survey of AI drug discovery.
 
 ## Overall registry

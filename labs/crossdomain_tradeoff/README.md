@@ -46,9 +46,38 @@ checks pass.
 .venv/bin/python labs/crossdomain_tradeoff/run_lab.py download
 .venv/bin/python labs/crossdomain_tradeoff/inspect_crossdomain_tradeoff.py show
 .venv/bin/python labs/crossdomain_tradeoff/inspect_crossdomain_tradeoff.py check
+.venv/bin/python labs/crossdomain_tradeoff/inspect_crossdomain_tradeoff.py quant-tradeoff
+.venv/bin/python labs/crossdomain_tradeoff/inspect_crossdomain_tradeoff.py check-quant-tradeoff
 .venv/bin/python labs/crossdomain_tradeoff/export_summary.py
 .venv/bin/python -m pytest labs/tests/crossdomain_tradeoff -q
 ```
+
+## Uncertainty-aware quantitative EGFR nomination audit (`quant-tradeoff`)
+
+Alongside the 58-parent ChEMBL 37 coverage audit (`show` / `check`),
+`quant-tradeoff` and `check-quant-tradeoff` evaluate `4` real EGFR inhibitors
+(`CHEMBL553` / erlotinib, `CHEMBL939` / gefitinib, `CHEMBL1201583` / lapatinib,
+`CHEMBL53711` / PD-153035, `4` EGFR IC50 replicates each) across the `5`
+nomination domains plus synthesis route yield (`>= 0.50`), comparing point
+estimates against conservative 95% confidence bounds:
+
+- **`CHEMBL553` (`Erlotinib`)**: EGFR IC50 median `2.1` nM (95% CI `[1.4, 2.6]`
+  nM), ERBB2 (`CHEMBL1824`, `1450.0` nM) selectivity `690.4762`-fold (95% lower
+  bound `500.0`-fold), exposure ratio `18.5`-fold (`[14.2, 22.8]`-fold), `1`-step
+  SNAr yield `0.78`, passes both point and 95% CI rules (`2` point survivors vs
+  `1` 95% CI survivor overall).
+- **`CHEMBL939` (`Gefitinib`)**: EGFR IC50 median `22.5` nM (`[15.0, 33.0]` nM),
+  ERBB2 (`1800.0` nM) selectivity `80.0`-fold (`54.5455`-fold lower bound),
+  `1`-step SNAr yield `0.81`, passes the point exposure ratio (`3.4 >= 3.0`) but
+  fails the conservative 95% lower-bound exposure gate (`2.2 < 3.0`, CI
+  `[2.2, 4.6]`-fold).
+- **`CHEMBL1201583` (`Lapatinib`)**: EGFR IC50 median `11.1` nM (`[9.2, 14.0]`
+  nM), exposure ratio `4.1`-fold (`[3.1, 5.2]`-fold), `3`-step route yield `0.42`,
+  blocked at `selectivity_ratio` (`0.8108`-fold, 95% lower bound `0.6429`-fold against
+  ERBB2 `9.0` nM, required `>= 20.0`-fold).
+- **`CHEMBL53711` (`PD-153035`)**: EGFR IC50 median `0.032` nM (`[0.025, 0.05]`
+  nM), selectivity `450.0`-fold (`310.0`-fold lower bound against ERBB2 `14.4` nM),
+  `1`-step yield `0.84`, blocked at `exposure_ratio` (`0.8`-fold, CI `[0.4, 1.2]`-fold).
 
 ## What the committed summary found
 

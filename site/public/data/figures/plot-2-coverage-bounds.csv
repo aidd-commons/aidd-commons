@@ -25,7 +25,7 @@ worked,Practical Cheminformatics Tutorials,tutorial-collection,8,78,93
 worked,RDKit Cookbook,specialist-reference,3,47,93
 worked,TeachOpenCADD,tutorial-collection,40,40,93
 worked,Therapeutics Data Commons,benchmark-hub,7,85,93
-executable,AIDD Commons,curriculum,81,81,93
+executable,AIDD Commons,curriculum,93,93,93
 executable,AI-Guided Inquiry Learning for Computational Drug Discovery,curriculum,3,83,93
 executable,Advanced Machine Learning for Innovative Drug Discovery,curriculum,0,73,93
 executable,Build AI Drug Discovery Pipelines,curriculum,34,34,93
@@ -38,7 +38,7 @@ executable,Practical Cheminformatics Tutorials,tutorial-collection,6,76,93
 executable,RDKit Cookbook,specialist-reference,0,44,93
 executable,TeachOpenCADD,tutorial-collection,32,32,93
 executable,Therapeutics Data Commons,benchmark-hub,6,84,93
-executable-on-real-data,AIDD Commons,curriculum,62,62,93
+executable-on-real-data,AIDD Commons,curriculum,93,93,93
 executable-on-real-data,AI-Guided Inquiry Learning for Computational Drug Discovery,curriculum,3,83,93
 executable-on-real-data,Advanced Machine Learning for Innovative Drug Discovery,curriculum,0,73,93
 executable-on-real-data,Build AI Drug Discovery Pipelines,curriculum,15,34,93
@@ -51,7 +51,7 @@ executable-on-real-data,Practical Cheminformatics Tutorials,tutorial-collection,
 executable-on-real-data,RDKit Cookbook,specialist-reference,0,44,93
 executable-on-real-data,TeachOpenCADD,tutorial-collection,23,32,93
 executable-on-real-data,Therapeutics Data Commons,benchmark-hub,5,84,93
-assessed,AIDD Commons,curriculum,81,81,93
+assessed,AIDD Commons,curriculum,93,93,93
 assessed,AI-Guided Inquiry Learning for Computational Drug Discovery,curriculum,0,80,93
 assessed,Advanced Machine Learning for Innovative Drug Discovery,curriculum,0,73,93
 assessed,Build AI Drug Discovery Pipelines,curriculum,0,0,93

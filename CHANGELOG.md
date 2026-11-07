@@ -2,9 +2,17 @@
 
 ## Unreleased
 
+- Upgrade all 93 curriculum topics across the 18 tracks to `assessed` depth and
+  `real-data` executable commands (`93, 93, 93, 93, 93` across `explained`,
+  `worked`, `executable`, `assessed` and `real-data executable`), verified inside
+  an isolated blind sandbox (`problems = 0`) and synchronized across the
+  comparison audit, five dependent audit laboratories, living report, website
+  and manuscript package.
 - Deliver the complete cumulative v0.2 Report in PDF and HTML: thirteen chapters,
-  twenty embedded figures and source-backed text/table/caption checks. Keep the
-  dated addendum separate and preserve the historical v0.1 PDF.
+  twenty embedded figures, forty bilingual web figure detail routes, four step
+  demonstrations, sixteen bilingual motion media files, and source-backed
+  text/table/caption checks. Keep the dated addendum separate and preserve the
+  historical v0.1 PDF.
 
 - Compact bilingual Home, Learn and track pages around their scientific views.
 - Add Chinese Atlas, Audit, Report and Contribute interfaces while identifying

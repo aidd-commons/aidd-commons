@@ -2,10 +2,16 @@
 
 from __future__ import annotations
 
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 from aidd_commons.multi_endpoint_integration.summary import build_summary as joined_summary
+from aidd_commons.target_product_profile.decision_context import (
+    audit_therapeutic_decision_context,
+    check_therapeutic_decision_context,
+)
 from aidd_commons.target_product_profile.summary import compute
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -41,3 +47,22 @@ def test_clearance_bases_remain_separate() -> None:
     assert evaluated["outcomes"]["human_microsome_clearance"] == "pass"
     assert evaluated["outcomes"]["rat_hepatocyte_clearance"] == "met"
     assert "fold_change" not in str(summary)
+
+
+def test_therapeutic_decision_context_and_cli() -> None:
+    payload = audit_therapeutic_decision_context()
+    assert check_therapeutic_decision_context(payload) == []
+    assert payload["clinical_need"]["open_targets_nsclc_overall_score"] == 0.8503
+    assert payload["clinical_need"]["ipass_hr_reversal_ratio"] == 5.94
+    assert payload["tpp_funnel"]["multi_family_cohort"] == 58
+    assert payload["tpp_funnel"]["no_observed_gate_failure"] == 37
+    assert payload["tpp_funnel"]["profile_satisfying_compounds"] == 0
+
+    script = ROOT / "labs/target_product_profile/inspect_target_product_profile.py"
+    proc = subprocess.run(
+        [sys.executable, str(script), "check-decision-context"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert "PASS:" in proc.stdout

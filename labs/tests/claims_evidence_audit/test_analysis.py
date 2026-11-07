@@ -3,6 +3,10 @@
 from pathlib import Path
 
 from aidd_commons.claims_evidence_audit.analysis import classify_cell
+from aidd_commons.claims_evidence_audit.source_content_verification import (
+    check_real_source_content,
+    verify_real_source_content,
+)
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -10,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[3]
 def test_four_states_and_missing_repository_file() -> None:
     record = {
         "evidence": [
-            {"id": "present", "repository_path": "README.md"},
+            {"id": "present", "repository_path": "labs/claims_evidence_audit/README.md"},
             {"id": "missing", "repository_path": "no-such-comparison-evidence.txt"},
         ]
     }
@@ -28,7 +32,16 @@ def test_four_states_and_missing_repository_file() -> None:
 
 
 def test_undeclared_evidence_is_unsupported() -> None:
-    record = {"evidence": [{"id": "present", "repository_path": "README.md"}]}
+    record = {
+        "evidence": [{"id": "present", "repository_path": "labs/claims_evidence_audit/README.md"}]
+    }
     state, reason = classify_cell(record, {"depth": "worked", "evidence": ["other"]}, ROOT)
     assert state == "unsupported-claim"
     assert reason == "undeclared evidence: other"
+
+
+def test_real_source_content_verification() -> None:
+    payload = verify_real_source_content(ROOT)
+    assert check_real_source_content(payload) == []
+    assert payload["verified_artifact_count"] == 6
+    assert payload["verified_statement_count"] == 6

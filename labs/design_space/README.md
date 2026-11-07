@@ -8,7 +8,33 @@ screening library.
 ```bash
 python labs/design_space/inspect_space.py show
 python labs/design_space/inspect_space.py check
+python labs/design_space/inspect_space.py public-spaces
+python labs/design_space/inspect_space.py check-public-spaces
 ```
+
+## Real-data multi-representation design spaces (`public-spaces`)
+
+Alongside the three-core enumeration comparison (`show` / `check`),
+`public-spaces` and `check-public-spaces` compare three real-data design space
+formulations over `6` ChEMBL 37 EGFR inhibitors (`CHEMBL53711`, `CHEMBL299679`,
+`CHEMBL553`, `CHEMBL939`, `CHEMBL2177370`, `CHEMBL1201583`) and the `1M17`
+crystal pocket:
+
+- **`2d_snar_fragment_space` (`16` enumerated molecules, `2` 4-chloroquinazoline
+  cores × `8` commercial anilines)**: reaches `4` real quinazoline EGFR
+  inhibitors (`CHEMBL53711`, `CHEMBL299679`, `CHEMBL553` / erlotinib,
+  `CHEMBL939` / gefitinib) but misses `CHEMBL2177370` (`3-cyanoquinoline` core
+  hop) and `CHEMBL1201583` (`lapatinib`).
+- **`1d_token_grammar_space` (`16` enumerated SMILES strings, `2` alkoxy heads ×
+  `2` hinge ring grammars × `4` tail tokens)**: reaches `3` targets (`CHEMBL939`,
+  `CHEMBL2177370`, `CHEMBL1201583`), capturing the `N3 -> C-C#N` core hop
+  (`CHEMBL2177370`) that the fixed-core 2D fragment space cannot express.
+- **`3d_1m17_active_pocket_space` (`6` targets evaluated in the `1M17` active
+  conformation)**: admits all `5` Type-I active-state inhibitors (`CHEMBL53711`
+  Met793 N distance `2.9842` Å, `CHEMBL299679` `2.9843` Å, `CHEMBL553` `2.9862` Å,
+  `CHEMBL939` `2.9831` Å, `CHEMBL2177370` `2.9904` Å; `0` heavy-atom clashes
+  `< 2.4` Å) while rejecting the DFG-out inhibitor `CHEMBL1201583` (`lapatinib`,
+  Met793 distance `3.3522` Å, `31` heavy-atom clashes `< 2.4` Å).
 
 ## Size and reach are different properties
 

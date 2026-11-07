@@ -139,4 +139,21 @@ to connect a learned representation to a fitted probability model. Return to
 [complex and cell representations](/learn/representations/complex-cell-and-knowledge-graphs/)
 when the object being encoded is larger than one molecule.
 
+## Real-data inductive-bias benchmark across tabular, graph, sequence, and multimodal models
+
+Run the real-data inductive-bias comparison across `30` real ChEMBL 37 human EGFR (`CHEMBL203`) ligand-pocket complex records (`18` train, `6` validation, `6` test) spanning wild-type (`1M17`, `4HJO`), `T790M` (`3POZ`), and `T790M/C797S` (`1XKK`-derived mutant state):
+
+```sh
+.venv/bin/python labs/student_modelling/run_lab.py real-benchmark
+.venv/bin/python labs/student_modelling/run_lab.py check-real-benchmark
+```
+
+- **Graph permutation invariance**: Reversing the RDKit atom index order of `erlotinib` (`CHEMBL553`) produces `graph_permutation_invariance_max_diff = 0.0` for the 2-layer message-passing graph encoder.
+- **Model-family comparison (`validation_mae` / `test_mae` / `test_rmse` in `pIC50`, regularization grid `alpha` in `{0.01, 0.1, 1.0, 10.0}`)**:
+  - `tabular_descriptor_ridge` (`selected_alpha = 1.0`): `1.4691` / `1.1589` / `1.4025`.
+  - `graph_mpnn_ridge` (`selected_alpha = 1.0`): `1.3914` / `1.1980` / `1.4260`.
+  - `sequence_kmer_attention_ridge` (`selected_alpha = 0.01`): `0.6616` / `0.6193` / `0.7214`.
+  - `multimodal_graph_sequence_ridge` (`selected_alpha = 0.1`): `0.3947` / `0.3861` / `0.4123` (selected by lowest validation MAE).
+- **Diagnostic**: Ligand-only tabular and 2D graph representations assign identical feature vectors to the same drug across wild-type, `T790M`, and `C797S` pockets, whereas the multimodal ligand-graph + pocket-sequence cross-interaction family captures the gatekeeper steric clash (`T790M` vs reversible anilinoquinazolines) and `Cys797 -> Ser797` nucleophile loss (`C797S` vs covalent acrylamides).
+
 Original constructed examples and prose: CC BY 4.0. Sources reviewed: 2026-09-09.

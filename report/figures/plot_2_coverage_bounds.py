@@ -113,11 +113,15 @@ def build() -> dict[str, Path]:
     axes = style.axes_grid(fig, 1, 5, left=0.31, right=0.978, bottom=0.14, top=0.82, wspace=0.16)
     ys = list(range(len(order)))[::-1]
     for col, (ax, threshold) in enumerate(zip(axes, thresholds, strict=True)):
-        for y, p in zip(ys, order, strict=True):
+        for idx, (y, p) in enumerate(zip(ys, order, strict=True)):
             lo, hi = bounds[p][threshold]
             own = p == SELF_ID
+            if own:
+                ax.axhspan(y - 0.44, y + 0.44, color="#eef6f7", zorder=0)
+            elif idx % 2 == 1:
+                ax.axhspan(y - 0.44, y + 0.44, color="#f7f9fa", zorder=0)
             colour = colours["teal"] if own else colours["slate"]
-            ax.plot([0, total], [y, y], color=tokens["rule"], lw=0.5, zorder=0)
+            ax.plot([0, total], [y, y], color=tokens["rule"], lw=0.5, zorder=1)
             if own:
                 ax.plot(lo, y, marker="D", ms=6, color=colour, mec=tokens["ink"], mew=0.5, zorder=4)
             else:
@@ -145,13 +149,13 @@ def build() -> dict[str, Path]:
             ax.annotate(
                 str(lo) if lo == hi else f"{lo}–{hi}",
                 (total / 2, y),
-                xytext=(0, -12),
+                xytext=(0, -9.8),
                 textcoords="offset points",
                 ha="center",
                 va="center",
-                fontsize=10.0,
+                fontsize=9.4,
                 fontweight="bold" if own else "normal",
-                color=tokens["ink"],
+                color=tokens["ink"] if own else tokens["muted"],
             )
         ax.set_xlim(-5, total + 5)
         ax.set_ylim(-0.9, len(order) - 0.1)

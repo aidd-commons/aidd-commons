@@ -318,7 +318,25 @@ candidate there is blocked at the potency input and none completes a
 nomination. That is a different statement from the one the [endpoint coverage
 laboratory](/labs/multi-endpoint-tradeoff/) makes: a census of which families
 exist is not a decision, and the inputs a decision needs may be absent while
-the families it does not need are plentiful.
+the families it does not need are plentiful. Running
+`.venv/bin/python labs/crossdomain_tradeoff/inspect_crossdomain_tradeoff.py quant-tradeoff`
+further evaluates `4` real ChEMBL 37 EGFR candidates (`4` EGFR IC50 replicates
+each; thresholds `<= 50.0` nM potency, `>= 20.0`-fold selectivity vs ERBB2
+`CHEMBL1824`, `>= 3.0`-fold exposure ratio, and `>= 0.5` route yield), showing
+that `2` candidates pass under point estimates (`CHEMBL553` median `2.1` nM, CI
+`[1.4, 2.6]` nM, selectivity `690.4762`-fold against ERBB2 `1450.0` nM with
+lower bound `500.0`-fold, exposure `18.5`-fold with CI `[14.2, 22.8]`-fold,
+`1`-step yield `0.78`; and `CHEMBL939` median `22.5` nM, CI `[15.0, 33.0]` nM,
+selectivity `80.0`-fold against ERBB2 `1800.0` nM with lower bound
+`54.5455`-fold, `1`-step yield `0.81`, point exposure `3.4`-fold), whereas only
+`1` (`CHEMBL553`) survives the conservative 95% confidence-bound rule because
+`CHEMBL939`'s 95% exposure lower bound drops to `2.2` (`< 3.0`, CI `[2.2, 4.6]`),
+while `CHEMBL1201583` (`11.1` nM, CI `[9.2, 14.0]` nM, exposure `4.1`-fold with
+CI `[3.1, 5.2]`, `3`-step yield `0.42`) is blocked by ERBB2 (`9.0` nM)
+selectivity (`0.8108`-fold, lower bound `0.6429`-fold) and `CHEMBL53711`
+(`0.032` nM, CI `[0.025, 0.05]` nM, selectivity `450.0`-fold against ERBB2
+`14.4` nM with lower bound `310.0`-fold, `1`-step yield `0.84`) is blocked by
+exposure (`0.8`-fold, CI `[0.4, 1.2]`-fold).
 
 ## Governance and the handoff
 
@@ -342,6 +360,13 @@ do not convert the tutorial into an operational instruction set. Safe documentar
 reasoning and ordinary source reading can continue independently. For data reuse,
 follow [identity, lineage and reuse](/learn/data-governance/identity-lineage-and-reuse/)
 and inspect the actual terms, not merely the public visibility of a repository.
+
+Run the deterministic 5-axis governance and release audit (`GOV-01` through `GOV-06` across `232` catalogue records and `24` examined assets) in [the asset-openness-audit laboratory](/labs/asset-openness-audit/) to verify how 7-field reproducibility (`57` available, `26` not_applicable, `83` unverified, `2` not_available cells), licence scope (`22` licensed, `9` scope-limited), chemical/biological safety, dual-use biosecurity escalation (`model-rfdiffusion` de novo design + gene-synthesis screening; `agent-coscientist` Commons Clause + chemist safety gate), and human clinical dosing authority (`model-boltz-2`) are decided independently:
+
+```bash
+.venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py governance-release
+.venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py check-governance-release
+```
 
 ## Assessment rubric and your final artifact
 

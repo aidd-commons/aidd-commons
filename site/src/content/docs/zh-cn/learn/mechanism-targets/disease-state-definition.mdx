@@ -134,6 +134,32 @@ Pao 及其同事（2005 年）发现，在 5 名对吉非替尼或厄洛替尼�
 的检查对自己也是这样说的：它验证的是文件说了什么，而不是任何一份结构就是细胞中真正
 起作用的那个状态。
 
+### 可运行的疾病状态与守门残基接触审计
+
+**模式：对已提交公开记录的读取与确定性核验。** 运行 [`labs/egfr_structures/inspect_state.py`](https://github.com/gxcaesar/aidd-commons/blob/main/labs/egfr_structures/inspect_state.py)
+中的 `disease-state` 子命令，在 IPASS 3 期亚组试验（`PMID:19692680`）、Pao 获得性耐药病例系列
+（`PMID:15737014`）、Open Targets Platform v4 中 `EGFR`（`ENSG00000146648`）的体细胞与胚系关联
+记录，以及三份已沉积晶体结构（`1M17`、`4HJO`、`1XKK`）中守门残基 `Thr790` 到结合配体的重原子接触
+距离上，核验六字段疾病状态契约：
+
+```bash
+.venv/bin/python labs/egfr_structures/inspect_state.py disease-state
+.venv/bin/python labs/egfr_structures/inspect_state.py check-disease-state
+```
+
+| 已沉积 PDB 结构 | 结合配体 | 守门残基（UniProt P00533） | `Thr790` 到配体的最小重原子距离（Å） | 是否位于 4.0 Å 结合位点内？ |
+| --- | --- | --- | ---: | --- |
+| `1M17` | erlotinib (`AQ4`) | `Thr790`（作者编号 `766`） | `3.41` | `True` |
+| `4HJO` | erlotinib (`AQ4`) | `Thr790`（作者编号 `766`） | `3.48` | `True` |
+| `1XKK` | lapatinib (`FMM`) | `Thr790`（作者编号 `790`） | `3.14` | `True` |
+
+在全部三份结构中，`Thr790` 与可逆喹唑啉抑制剂的距离均在 `3.14` 至 `3.48` Å 之间（`< 4.0` Å）；而在
+IPASS 亚组中，当细胞状态字段改变时，风险比在 `261` 名 EGFR 突变阳性患者中的 `0.48`（客观缓解率 `71.2%` 对
+`47.3%`）与 `176` 名 EGFR 野生型患者中的 `2.85`（客观缓解率 `1.1%` 对 `23.5%`）之间发生方向逆转，比值达
+`5.94` 倍。在 Open Targets Platform v4（`ENSG00000146648`）中，`EGFR` 在非小细胞肺癌中的总体关联得分为
+`0.8503`（体细胞突变 `0.8316`，遗传关联 `0.6991`），在肺腺癌（`MONDO_0005061`）中的总体关联得分为
+`0.7745`（体细胞突变 `0.8671`，遗传关联 `0.7194`）。
+
 ## 独立练习
 
 一份**构造的**靶点提案写道："抑制激酶 K 将减缓结直肠癌。在一组 30 个结直肠癌细胞系的

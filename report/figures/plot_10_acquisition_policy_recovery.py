@@ -86,12 +86,14 @@ def build() -> dict[str, Path]:
         3,
         left=0.08,
         right=0.905,
-        bottom=0.20,
-        top=0.80,
+        bottom=0.19,
+        top=0.79,
         wspace=0.66,
-        hspace=0.82,
+        hspace=0.88,
         width_ratios=[1.25, 1.25, 0.72],
     )
+    import matplotlib.patheffects as pe
+
     summary_parts = []
     for row, assay in enumerate(ASSAYS):
         recovery_ax, mae_ax, auc_ax = axes[3 * row : 3 * row + 3]
@@ -111,28 +113,35 @@ def build() -> dict[str, Path]:
                 values = policy[metric]
                 if len(values) != len(checkpoints):
                     raise ValueError(f"{assay} {name} missing {metric} checkpoint")
-                axis.plot(
+                (line,) = axis.plot(
                     checkpoints,
                     values,
                     color=colours[colour],
                     marker=marker,
-                    ms=5 if filled else 4,
+                    ms=5.4 if filled else 3.8,
                     mfc=colours[colour] if filled else tokens["panel"],
-                    mec=colours[colour],
-                    mew=0.8,
-                    lw=1.8 if filled else 1.0,
+                    mec=tokens["ink"] if filled else colours[colour],
+                    mew=0.6 if filled else 0.75,
+                    lw=2.0 if filled else 0.85,
                     ls=dash,
-                    zorder=4 if filled else 2,
+                    alpha=1.0 if filled else 0.55,
+                    zorder=5 if filled else 2,
                 )
+                if filled:
+                    line.set_path_effects(
+                        [pe.Stroke(linewidth=3.2, foreground=tokens["panel"]), pe.Normal()]
+                    )
             y = 6 - names.index(name)
             auc_ax.plot(
                 policy["normalized_auc"],
                 y,
                 marker=marker,
-                ms=5,
+                ms=5.4 if filled else 4.4,
                 mfc=colours[colour] if filled else tokens["panel"],
-                mec=colours[colour],
+                mec=tokens["ink"] if filled else colours[colour],
+                mew=0.6 if filled else 0.8,
                 ls="none",
+                zorder=4 if filled else 3,
             )
             auc_ax.text(
                 1.04,
@@ -142,6 +151,7 @@ def build() -> dict[str, Path]:
                 ha="left",
                 va="center",
                 fontsize=10.0,
+                fontweight="bold" if filled else "normal",
             )
         for axis in [recovery_ax, mae_ax]:
             axis.set_xticks(checkpoints)
@@ -154,6 +164,8 @@ def build() -> dict[str, Path]:
         auc_ax.set_yticks(
             range(7), ["R4", "R3", "R2", "R1", "R0", "Variance", "Maxmin"], fontsize=10.0
         )
+        auc_ax.yaxis.grid(True, color=tokens["rule"], linestyle=":", linewidth=0.5, alpha=0.8)
+        auc_ax.set_axisbelow(True)
         auc_ax.set_xlabel("Recovery AUC", fontsize=10.0)
         auc_ax.set_xlim(-0.012, 0.20)
         auc_ax.set_xticks([0, 0.1, 0.2])
@@ -161,7 +173,7 @@ def build() -> dict[str, Path]:
         style.title(recovery_ax, f"({chr(97 + row * 3)}) Recovery")
         style.title(mae_ax, f"({chr(98 + row * 3)}) Evaluation error")
         style.title(auc_ax, f"({chr(99 + row * 3)}) AUC")
-        fig.text(0.08, 0.855 - row * 0.365, assay, fontsize=10.2, fontweight="bold")
+        fig.text(0.08, 0.852 - row * 0.372, assay, fontsize=10.2, fontweight="bold")
         budget = real["assays"][assay]["budget"]
         maxmin = policies["maxmin"]
         ensemble = policies["ensemble-variance-uncertainty"]

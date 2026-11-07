@@ -32,11 +32,13 @@ The mode is a fresh independent computation over the frozen profile and the owni
 .venv/bin/python labs/target_product_profile/run_lab.py download
 .venv/bin/python labs/target_product_profile/inspect_target_product_profile.py show
 .venv/bin/python labs/target_product_profile/inspect_target_product_profile.py check
+.venv/bin/python labs/target_product_profile/inspect_target_product_profile.py decision-context
+.venv/bin/python labs/target_product_profile/inspect_target_product_profile.py check-decision-context
 .venv/bin/python labs/target_product_profile/export_summary.py
 .venv/bin/python -m pytest labs/tests/target_product_profile -q
 ```
 
-`show` prints the declared requirements and, for each parent in the joined cohort, the gates passed or failed, preferences missed and requirements unmeasured. `check` recomputes the results from the owning readers and the integration join, then audits the committed summary. It exits non-zero if the frozen contract, cache, counts or satisfaction rule fails.
+`show` prints the declared requirements and, for each parent in the joined cohort, the gates passed or failed, preferences missed and requirements unmeasured. `check` recomputes the results from the owning readers and the integration join, then audits the committed summary. `decision-context` and `check-decision-context` connect the clinical unmet need in EGFR-mutant non-small-cell lung cancer (`MONDO_0005233`, Open Targets overall score `0.8503`, somatic score `0.8316`, `21` curated safety events, and IPASS PFS hazard-ratio reversal `0.48` vs `2.85`, ratio `5.94`) across four therapeutic modalities (oral brain-penetrant small-molecule kinase inhibitor, extracellular anti-EGFR IgG1 monoclonal antibody, heterobifunctional PROTAC degrader, and lipid-nanoparticle siRNA), the `58`-parent ChEMBL 37 TPP funnel (`7,908` union -> `58` multi-family cohort -> `21` contradicted -> `37` with no observed failure -> `0` profile-satisfying), and the next two falsifiable experimental gates (paired H1975 L858R/T790M vs A431 wild-type cellular phospho-EGFR `IC50 <= 100 nM` with `>= 10`-fold mutant selectivity, followed by bidirectional MDCK-MDR1/BCRP blood-brain barrier permeability `P_app >= 5e-6 cm/s` and efflux ratio `ER <= 2.0`).
 
 ## Observed contradictions
 

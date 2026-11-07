@@ -178,6 +178,24 @@ U 失败于效力（`5.95 < 6.00`），V 失败于存活（`72% < 75%`）。在�
 其中五个没有测量记录；一些没有警报的化合物有阳性发现；十二个中只有一个带有
 整体动物层面的证据。这些计数用于说明证据层次，并非真实化合物的安全性测量结果。
 
+### 真实数据临床安全性与游离态 hERG 暴露裕度审计（`public-safety`）
+
+在 `6` 个真实临床药物上评估来自 ChEMBL 37 的人类 hERG（`CHEMBL240`）与 EGFR（`CHEMBL203`）实测 `IC50`、结构警报、临床游离态峰值血药浓度（`Cmax,u`）及 FDA 黑框警告/撤市结局：
+
+```bash
+.venv/bin/python labs/safety_evidence/inspect_safety.py public-safety
+.venv/bin/python labs/safety_evidence/inspect_safety.py check-public-safety
+```
+
+- **暴露归一化的 hERG 安全裕度（`IC50_hERG / Cmax_u`，Redfern 阈值 `30.0` 倍，高风险阈值 `10.0` 倍）**：
+  - `CHEMBL553`（`Erlotinib`，`150` mg QD，`Cmax,u = 0.19 uM`，`fu = 0.07`）：`1` 条警报（`terminal_alkyne_cyp_inactivator`），EGFR `IC50 = 0.002 uM`，hERG `IC50 = 28.5 uM`，hERG 裕度 `150.0` 倍（`log10_herg_margin = 2.1761`），hERG/EGFR 选择性比 `14250.0` 倍。
+  - `CHEMBL939`（`Gefitinib`，`250` mg QD，`Cmax,u = 0.035 uM`，`fu = 0.09`）：`1` 条警报（`halogenated_aniline`），EGFR `IC50 = 0.033 uM`，hERG `IC50 = 1.0 uM`，hERG 裕度 `28.57` 倍（`log10_herg_margin = 1.4559`），hERG/EGFR 选择性比 `30.3` 倍。
+  - `CHEMBL1201583`（`Lapatinib`，`1250` mg QD，`Cmax,u = 0.042 uM`，`fu = 0.01`）：`1` 条警报（`para_alkoxy_or_hydroxy_aniline_quinone_imine_precursor`），EGFR `IC50 = 0.011 uM`，hERG `IC50 = 1.1 uM`，hERG 裕度 `26.19` 倍（`log10_herg_margin = 1.4181`），hERG/EGFR 选择性比 `100.0` 倍，带 FDA 肝毒性黑框警告（`HLA-DQA1*02:01` 与醌亚胺代谢物）。
+  - `CHEMBL24828`（`Vandetanib`，`300` mg QD，`Cmax,u = 0.18 uM`，`fu = 0.06`）：`0` 条警报，EGFR `IC50 = 0.5 uM`，hERG `IC50 = 0.4 uM`，hERG 裕度 `2.22` 倍（`log10_herg_margin = 0.3468`），hERG/EGFR 选择性比 `0.8` 倍，带 FDA 尖端扭转型室速黑框警告与 REMS 计划。
+  - `CHEMBL3353410`（`Osimertinib`，`80` mg QD，`Cmax,u = 0.025 uM`，`fu = 0.05`）：`2` 条警报（`michael_acceptor_acrylamide`、`para_alkoxy_or_hydroxy_aniline_quinone_imine_precursor`），EGFR `IC50 = 0.001 uM`，hERG `IC50 = 1.58 uM`，hERG 裕度 `63.2` 倍（`log10_herg_margin = 1.8007`），hERG/EGFR 选择性比 `1580.0` 倍。
+  - `CHEMBL17157`（`Terfenadine`，`60` mg QD，`Cmax,u = 0.03 uM`，`fu = 0.03`）：`0` 条警报，EGFR `IC50 = 50.0 uM`，hERG `IC50 = 0.056 uM`，hERG 裕度 `1.87` 倍（`log10_herg_margin = 0.2711`），hERG/EGFR 选择性比 `0.0` 倍，因尖端扭转型室速撤市。
+- **临床 Torsades 风险判别**：`structural_alert_only` 得到 `tp = 0`、`fp = 4`、`fn = 2`；而 `exposure_linked_herg_margin_under_10x` 得到 `tp = 2`、`fp = 0`、`fn = 0`。
+
 ## 来源与下一课
 
 监管类来源于 2026-09-09 打开，支持机制与监管边界，不支持构造表格数值。ChEMBL CYP

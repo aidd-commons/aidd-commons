@@ -112,6 +112,21 @@ R1 并不会仅因短且终端节点已记录而“可行”。它是一项具�
 而且成因各不相同。整个路线集始终把实验室可行性保持为未评估，
 因为回收到一条被记录的路线，只是关于一次图编辑的陈述。
 
+要检查真实的 USPTO 原子映射反应、抽取的 `RetroTemplate` SMARTS、映射误差传播以及多步
+AiZynthFinder 路线树（`routes_for_clustering.json`、`linear_route.json` 与
+`branched_route.json`），请运行：
+
+```bash
+python labs/retro_disconnection/inspect_disconnection.py public-records
+python labs/retro_disconnection/inspect_disconnection.py check-public
+```
+
+在 `3` 条已提交的 USPTO 反应（置信度分别为 `0.9425`、`0.9855` 与 `0.9708`）上，RDKit
+回收了全部 `3`/`3` 组记录反应物，在同一苯甲酰苯胺目标分子
+`N#Cc1cccc(NC(=O)c2ccc(F)cc2)c1F` 上将酰胺键编辑 `(8, 9)` 与芳基氯酰胺化键编辑
+`(7, 8)` 区分开，并展示交换产物芳环原子映射编号 `:7` 与 `:18` 如何把 `bonds_formed`
+从 `[(8, 9)]` 破坏为 `[(3, 7), (6, 18), (7, 19), (8, 9), (8, 18)]`。
+
 ## 来源与下一课
 
 下列项目来源于 2026-09-09 打开。它们支持软件和搜索/映射边界，不支持构造路线或合成转化的执行。

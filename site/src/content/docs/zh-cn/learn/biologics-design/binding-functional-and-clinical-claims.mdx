@@ -91,7 +91,20 @@ ChEMBL 的关系符只许可结合界限，不能许可精确点值。点值主�
 ## 运行审核
 
 [实验指南](/zh-cn/labs/functional-validation-audit/)在命令之前说明全新独立计算模式，
-并列出源缓存准备、检查以及已提交的小型摘要。
+并列出源缓存准备、检查以及已提交的小型摘要。若要进一步检查将 PDB/AlphaFold 结构合理性
+（`1IVO` `1244`/`1244` 个位点匹配，`pLDDT = 75.94`，`7,903` 个实体原子，`0` 个冲突；`3MZW` `624`/`624` 个
+位点匹配，`pLDDT = 74.00`，`4,387` 个实体原子，`0` 个冲突）、DailyMed CHO 构建体与宿主表达（`adalimumab`
+`1,330` aa，`148` kDa；`etanercept` `934` aa，`150` kDa；`agalsidase-beta` `2 x 398` aa，`100` kDa，
+`70` U/mg）、SKEMPI 2.0 SPR/ITC 解离常数（`1YY9` `Kd_wt = 1.31e-09` M 对 `Kd_mut = 1.38e-09` M；`1N8Z`
+`Kd_wt = 1.31e-09` M 对 `Kd_mut = 1.26e-09` M；`1YCS` `Kd_wt = 2.2e-06` M 对 `Kd_mut = 1.8e-06` M；`6` 个
+靶点的 `36` 个目标单元格中有 `31` 个有记录、其中 `3` 个靶点有 SKEMPI 结合记录）、TNF-alpha 对淋巴毒素
+（`TNF-beta`）同源物特异性、补体依赖性细胞裂解，以及 DailyMed 银屑病药效学到临床机制边界串联起来的 `6` 阶段
+生物药功能验证递进，请运行：
+
+```bash
+.venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py progression
+.venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py check-progression
+```
 
 ## 来源与署名
 

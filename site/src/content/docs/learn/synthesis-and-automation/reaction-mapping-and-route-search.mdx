@@ -150,6 +150,22 @@ precedent set and separate completely outside it, for three different reasons.
 The route set keeps laboratory feasibility unassessed throughout, because
 recovering a recorded route is a statement about a graph edit.
 
+To inspect real USPTO atom-mapped reactions, extracted `RetroTemplate` SMARTS,
+mapping-error propagation, and multi-step AiZynthFinder route trees (`routes_for_clustering.json`,
+`linear_route.json`, and `branched_route.json`), run:
+
+```bash
+python labs/retro_disconnection/inspect_disconnection.py public-records
+python labs/retro_disconnection/inspect_disconnection.py check-public
+```
+
+On the `3` committed USPTO reactions (`confidences` `0.9425`, `0.9855`, and
+`0.9708`), RDKit recovers `3` of `3` recorded reactant sets while separating the
+amide bond edit `(8, 9)` from the aryl-Cl amidation bond edit `(7, 8)` on the
+same benzanilide target `N#Cc1cccc(NC(=O)c2ccc(F)cc2)c1F`, and shows how
+swapping product aromatic atom-map numbers `:7` and `:18` corrupts
+`bonds_formed` from `[(8, 9)]` to `[(3, 7), (6, 18), (7, 19), (8, 9), (8, 18)]`.
+
 ## Sources and next lesson
 
 The following project sources were opened on 2026-09-09. They support the

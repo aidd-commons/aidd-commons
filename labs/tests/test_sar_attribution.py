@@ -143,3 +143,24 @@ def test_a_broken_construction_is_rejected(data, mutate, expected):
     mutate(broken)
     failures = sar.check(broken)
     assert any(expected in failure for failure in failures), failures
+
+
+def test_real_chembl_series_feedback_and_multi_method_attribution():
+    from aidd_commons.sar_attribution.real_series_attribution import (
+        analyze_real_chembl_series,
+        check_real_chembl_series,
+    )
+
+    payload = analyze_real_chembl_series()
+    assert check_real_chembl_series(payload) == []
+    assert payload["compound_count"] == 12
+    assert len(payload["matched_molecular_pairs"]) == 4
+
+    result = subprocess.run(
+        [sys.executable, str(LAB / "inspect_attribution.py"), "check-chembl-series"],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=ROOT,
+    )
+    assert "PASS:" in result.stdout

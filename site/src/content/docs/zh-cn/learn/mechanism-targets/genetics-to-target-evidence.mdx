@@ -111,6 +111,31 @@ MR 使用遗传变异 `G` 作为暴露 `X` 的工具变量，以估计它与结�
 改变一种蛋白会产生相同表型。相互收敛的遗传学、分子证据和语境匹配的扰动，使一个假设更可检验，
 而非得到证明。
 
+## 在公开记录上可运行的遗传到靶点与共定位审计
+
+**模式：对已提交公开记录的读取与确定性核验。** 运行
+[`labs/mechanism_consistency/inspect_mechanism_consistency.py`](https://github.com/gxcaesar/aidd-commons/blob/main/labs/mechanism_consistency/inspect_mechanism_consistency.py)
+中的 `target-evidence` 与 `check-target-evidence`，检查 Open Targets Platform v4 中四个靶点
+（`PCSK9` `ENSG00000169174`、`EGFR` `ENSG00000146648`、`BRAF` `ENSG00000157764` 与
+`ERBB2` `ENSG00000141736`）的真实遗传与体细胞疾病关联，并对比 `PCSK9` `R46L`（`rs11591147`，
+Cohen et al. *N. Engl. J. Med.* 2006，`PMID:16554528`）功能缺失孟德尔随机化与共定位记录：
+
+```bash
+.venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py target-evidence
+.venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py check-target-evidence
+```
+
+| 工具变量 / 靶点记录 | 暴露效应 `beta_ZX`（`SE`） | 结局效应 `beta_ZY`（`SE`） | Wald 比值（`SE`） | 工具变量 `F` 统计量 | 共定位 `PP.H4` 对 `PP.H3` | 结论 |
+| --- | --- | --- | --- | ---: | --- | --- |
+| `PCSK9` `rs11591147`（`R46L`，`ENSG00000169174`） | `-0.35` (`0.03`) SD LDL-C | `-0.33` (`0.09`) log-odds CHD | `0.9429` (`0.2695`) | `136.11` | `0.94` 对 `0.03` | 共享因果变异 + 功能缺失保护效应（`inhibitor` 方向） |
+| 连锁不平衡混杂的非编码位点（`rs_confounded_ld`） | `0.25` (`0.04`) SD eQTL | `0.10` (`0.03`) log-odds 疾病 | `0.4000` (`0.1360`) | `39.06` | `0.12` 对 `0.81` | 处于 LD 中的两个不同因果变异（`H3 > H4`）；拒绝将 MR 比值作为靶点主张 |
+
+在四个 Open Targets Platform v4 靶点上，该命令还对比了胚系与体细胞证据：`PCSK9`（`ENSG00000169174`）
+由人类遗传关联驱动（高胆固醇血症 `EFO_0004611` 遗传得分 `0.8698`，家族性高胆固醇血症 `MONDO_0007750`
+遗传得分 `0.8548`，体细胞突变得分 `0.0000`），而 `BRAF`（`ENSG00000157764`）则随疾病状态在胚系心面皮肤
+综合征（`MONDO_0015280`，遗传得分 `0.9442`，体细胞得分 `0.0000`）与体细胞黑色素瘤（`MONDO_0005105`，
+体细胞得分 `0.7964`）之间清晰分离。
+
 ## 独立练习
 
 一个不同的**构造**位点在相同的“候选集内一个因果变异”假设下被分析。其 PIP 为 `u1 = 0.51`、

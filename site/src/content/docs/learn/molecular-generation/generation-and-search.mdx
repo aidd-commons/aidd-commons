@@ -45,7 +45,18 @@ questions should be reported before comparing generated lists.
 The [generation resource guide](/learn/molecular-generation/generation-resource-guide/)
 distinguishes REINVENT 4 from the archived 3.2 implementation, separates
 distribution-learning and goal-directed tasks, and works through candidate
-validity, uniqueness and novelty denominators.
+validity, uniqueness and novelty denominators. In the companion
+[generation gate lab](/labs/generation-gate/) (`python labs/generation_gate/inspect_gate.py public-series`),
+screening `30` candidates across `3` sampling temperatures (`T = 0.2`, `0.8`,
+`1.5`, `10` each) against `7` real ChEMBL 37 human EGFR (`CHEMBL203`) inhibitors
+and a commercial 4-chloroquinazoline + aniline SNAr (`80` °C) building-block deck
+(`4` cores × `8` anilines) shows how temperature trades validity against
+memorization: `T = 0.2` yields `10` valid, `5` unique, `1` novel (`4` `train`
+memorized, `0` held-out collisions), and `1` route-verified survivor (`0.1`),
+`T = 0.8` yields `10` valid, `10` unique, `8` novel (`1` `train` memorized, `1`
+`test` collision), and `5` route-verified survivors (`0.5`), and `T = 1.5`
+yields `6` valid (`0.6`), `6` unique (`1.0` of valid), `6` novel (`0` memorized),
+and `1` route-verified survivor (`0.1`).
 
 ## A bounded worked decision and independent task
 

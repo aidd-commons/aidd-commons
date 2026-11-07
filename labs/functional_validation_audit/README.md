@@ -18,6 +18,8 @@ source bytes remain separate from the committed summary.
 .venv/bin/python labs/functional_validation_audit/run_lab.py download
 .venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py show
 .venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py check
+.venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py progression
+.venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py check-progression
 .venv/bin/python labs/functional_validation_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/functional_validation_audit -q
 ```

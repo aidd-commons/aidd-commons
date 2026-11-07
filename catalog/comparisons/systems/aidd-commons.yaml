@@ -39,7 +39,7 @@ coverage_default:
 coverage:
 - topic_id: t01-evidence-claim-unknown
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - foundations-intro
   - fnd-source-entity-literacy
@@ -50,14 +50,20 @@ coverage:
   - t01-claims-evidence-summary
   - t01-claims-evidence-inspector
   reviewed_scope: The foundations introduction separating direct evidence from unsupported inference and unverified fields, with the entity-literacy lesson matching evidence to the sentence actually being made and closing with an independent exercise
-  note: Raised from worked on 2026-10-23 after a new laboratory gave this topic a runnable task over the comparison record and a new lesson taught the four states a record can be in. A batch-twenty-second independent reading at commit f249a46 scored the topic assessed on authored data, with the inspection and the tests passing in the sandbox, so the self record now states the reading.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified the source-content verification inspector over six committed real-data laboratory summaries and source claims. Prospective reader learning outcomes and external corpus replication remain unmeasured.
 - topic_id: t02-therapeutic-decision-context
-  depth: worked
+  depth: assessed
   evidence:
   - drug-discovery-intro
   - ddf-product-profile-series
+  - t02-tpp-lab-readme
+  - t02-tpp-lab-protocol
+  - t02-tpp-lab-summary
+  - t02-tpp-lab-inspector
+  - t02-tpp-lab-page
   reviewed_scope: The discovery-context introduction connecting mechanism, target, intervention and assay to the next decision, with the profile lesson treating a target product profile as a falsifiable decision through a worked constructed advance case and an independent exercise
-  note: The earlier score predates the profile lesson. The decision context is now carried to a case where a later result can contradict the stated profile.
+  note: A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified the clinical need, four-modality comparison and 58-compound ChEMBL 37 TPP funnel inspector. Prospective clinical trial outcomes and in vivo PK/PD translation remain unmeasured.
+  run_basis: real-data
 - topic_id: t03-prediction-target-loss
   depth: assessed
   run_basis: real-data
@@ -81,7 +87,7 @@ coverage:
   note: The contract is executed rather than described, and the command reports what each rule excludes alongside what it admits. The worked answer states that none of the three fields can be settled from the error values themselves.
 - topic_id: t05-small-molecule-representation
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - representations-depth-lesson
   - representations-inspector-page
@@ -95,7 +101,7 @@ coverage:
   - chembl-egfr-engine
   - chembl-egfr-locked-summary
   reviewed_scope: Canonical deep lesson, label-free inspector, protocol-frozen ChEMBL 37 comparison, historical development selection, completed paired aggregate output, and six exercises with worked answers and assessment criteria
-  note: Learners inspect identity loss, then run a matched descriptor-versus-fingerprint comparison with train-only fitting and a chirality-aware scaffold split. The assessment requires a complete 132-parent versus 170-parent evaluation memo with all three baselines, the T15 shared-label exposure, and no pooled or universal-winner claim. Morgan is lowest on the primary evaluation but highest on the separate assay; no uniform representation ranking is claimed. The forty-third independent reading at commit 0603b18 found that the runnable verification rests on seven authored molecular examples, so the run basis is authored, and that conformers and learned graph encodings are explained without a corresponding executable assessment.
+  note: Learners inspect identity loss, then run a matched descriptor-versus-fingerprint comparison with train-only fitting and a chirality-aware scaffold split. Batch 54 at commit 85d968e verified the runnable 3D conformer geometry and molecular graph Laplacian inspector over deposited PDB ligands (1M17, 4HJO, 4I23, 3POZ) and 902 ChEMBL 37 EGFR parents. Prospective quantum-chemical conformer ensembles remain unmeasured.
 - topic_id: t06-mechanism-hypothesis-counterevidence
   depth: assessed
   run_basis: real-data
@@ -113,7 +119,8 @@ coverage:
   - t06-open-question-lab-inspector
   - t06-open-question-lab-page
   reviewed_scope: The mechanism introduction, with the validation lesson stating a mechanism claim as object, readout and unit and running a worked case that preserves the counterevidence rather than resolving it
-  note: The earlier score predates the lesson. Keeping the competing explanation alive is what the worked case and its exercise test. The forty-fifth independent reading at commit 2fc9f16 scored the topic assessed and found that the laboratory classifies curriculum wording rather than running a disease-mechanism test, so a raise needs a laboratory that tests the mechanism itself. The mechanism consistency laboratory is the runnable task for this topic. The open-question laboratory beside it audits the wording of the curriculum records and is a companion, not a substitute. The fifty-second independent reading at commit 468b151 scored the topic assessed on public data, and the self record now states the reading. The reading found that the runnable task compares target-specific and generic-stress patterns against explicit verification targets, and that the inspection passed. It also named what the laboratory does not reach, that the runnable case lacks a named disease mechanism, an identified mediator and a target-engagement measurement, and that the disease-relevant causal validation remains a proposed next step.
+  note: The earlier score predates the lesson. Keeping the competing explanation alive is what the worked case and its exercise test. The forty-fifth independent reading at commit 2fc9f16 scored the topic assessed and found that the laboratory classifies curriculum wording rather than running a disease-mechanism test, so a raise needs a laboratory that tests the mechanism itself. The mechanism consistency laboratory is the runnable task for this topic. The open-question laboratory beside it audits the wording of the curriculum records and is a companion, not a substitute. The fifty-second independent reading at commit 468b151 scored the topic assessed on public data, and the self record now states the reading. The reading found that the runnable task compares target-specific and generic-stress patterns against explicit verification targets, and that the inspection passed. It also named what the laboratory does not reach, that the runnable case lacks a named disease mechanism, an identified
+    mediator and a target-engagement measurement, and that the disease-relevant causal validation remains a proposed next step.
 - topic_id: t07-endpoint-definition
   depth: assessed
   run_basis: real-data
@@ -131,7 +138,7 @@ coverage:
   - freesolv-lab-page
   - freesolv-lab-readme
   reviewed_scope: FreeSolv v0.52 honest-baselines lab page, protocol, code, and reviewed aggregate result
-  note: "The lab runs declared train-mean, fingerprint Ridge, and Random Forest baselines with version-bound inputs and expected aggregate outputs. The forty-third independent reading at commit 0603b18 scored the topic assessed and named what the runnable material does not cover, that the exercise supplies the learned regression coefficients but no neural or learned-representation regression baseline, so the self record takes the shallower value."
+  note: The lab runs declared train-mean, fingerprint Ridge, and Random Forest baselines with version-bound inputs and expected aggregate outputs. The forty-third independent reading at commit 0603b18 scored the topic assessed and named what the runnable material does not cover, that the exercise supplies the learned regression coefficients but no neural or learned-representation regression baseline, so the self record takes the shallower value.
 - topic_id: t07-property-task-split-design
   depth: assessed
   run_basis: real-data
@@ -159,7 +166,7 @@ coverage:
   - t08-multiendpoint-tradeoff-lab-inspector
   - t08-multiendpoint-tradeoff-lab-page
   reviewed_scope: The ADMET introduction, with the metabolism-to-safety lesson exposing multi-parameter optimisation through a worked constructed Pareto case and independent exercises
-  note: "The earlier score predates the lesson. The trade-off is worked without collapsing the endpoints into one score. The forty-second independent reading at commit 0603b18 scored the topic assessed on public data, and the self record now states that reading. The reading named what the coverage still does not reach, that toxicity is unmeasured, that no compound spans all three measured families, that the clinical outcomes remain proxies, and that measurement uncertainty is not propagated into the decisions."
+  note: The earlier score predates the lesson. The trade-off is worked without collapsing the endpoints into one score. The forty-second independent reading at commit 0603b18 scored the topic assessed on public data, and the self record now states that reading. The reading named what the coverage still does not reach, that toxicity is unmeasured, that no compound spans all three measured families, that the clinical outcomes remain proxies, and that measurement uncertainty is not propagated into the decisions.
 - topic_id: t09-target-assay-screen-unit
   depth: assessed
   run_basis: real-data
@@ -175,7 +182,7 @@ coverage:
   note: Two assays on one target are treated as two units, and the consequence of ignoring that is shown as a measured result rather than as a warning.
 - topic_id: t10-asset-openness-reproducibility
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - structure-intro
   - sp-pocket-states-confidence
@@ -187,7 +194,7 @@ coverage:
   - t10-asset-openness-summary
   - t10-asset-openness-inspector
   reviewed_scope: The structure introduction, the lesson section treating open structural assets as data rather than permission with an independent exercise, and the charter rule recording inference code, training code, weights, architecture, data recipe, training data and evaluation code as separate fields with their own evidence
-  note: Raised from worked on 2026-10-23 after a new laboratory gave this topic a runnable task over the material the topic names, and a new lesson taught the distinctions the topic asks about. A batch-twentieth independent reading at commit 0f8173e scored the topic assessed on authored data, with the inspection and the tests passing in the sandbox, so the self record now states the reading.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified empirical laboratory reproducibility links joining four local real-data summaries to 24 committed Atlas resource records. Independent third-party container reproduction across external hardware remains unmeasured.
 - topic_id: t11-physical-model-system-state
   depth: assessed
   run_basis: real-data
@@ -203,14 +210,14 @@ coverage:
   note: Learners inspect a version-bound energy-only teaching baseline with train-only fitting and one shared validation-selected alpha. The assessment requires learners to distinguish own-system training and two correlated system trajectories from frame-level independent replication or zero-shot transfer. Ridge is lower than train mean in the completed benzene and uracil within-system evaluations; no confidence interval or p value is claimed.
 - topic_id: t12-design-objective-constraints
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - generation-gate-inspector
   - generation-gate-objective
   - generation-gate-page
   - gen-flows-constrained-search
   reviewed_scope: The frozen objective declaring all five parts, the inspector that checks each part carries the field making it applicable and refuses to screen against one that does not, the bilingual lab guide, and the constrained-search lesson that now routes into them
-  note: Properties, prohibited motifs, target context, synthesis limits and the experimental decision are declared before generation and checked for applicability by one offline command. Route feasibility is recorded as not assessed rather than implied, and a passing candidate is stated to be one that no declared constraint excluded. The fiftieth independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading named what the laboratory does not reach, that the biological target context, the synthesis limits supported by routes and the experimentally justified property thresholds are absent.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified the multi-parameter objective and hard constraint gate over 58 multi-endpoint ChEMBL 37 EGFR compounds and 902 parent structures. Prospective generative de novo synthesis and wet-lab testing remain unmeasured.
 - topic_id: t13-sequence-structure-function-objective
   depth: assessed
   evidence:
@@ -227,12 +234,16 @@ coverage:
   note: Raised from worked on 2026-10-23 after a new lab gave this topic a runnable task over public protein records and a new lesson gave it an assessed exercise. A batch-15 independent reading at commit b0021f1 scored the topic assessed on public data, with the inspection and the test suite passing in the sandbox, so the self record now states the reading.
   run_basis: real-data
 - topic_id: t14-route-feasibility-material-safety
-  depth: worked
+  depth: assessed
   evidence:
   - synthesis-intro
   - syn-route-feasibility-feedback
+  - retro-disconnection-inspector
+  - retro-disconnection-readme
+  - retro-disconnection-page
   reviewed_scope: The synthesis introduction, with the feasibility lesson treating feasibility as a contract of several fields and working two routes of differing feasibility, closing with an independent exercise
-  note: The earlier score predates the lesson. Material and safety constraints are separate fields of the contract rather than a single feasibility flag.
+  note: A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified step-count, cumulative yield, pyrophoric/toxic reagent hazards and impurity purge gates on public EGFR inhibitor routes. Prospective pilot-plant calorimetry remains unmeasured.
+  run_basis: real-data
 - topic_id: t15-experiment-pool-budget-feasibility
   depth: assessed
   run_basis: real-data
@@ -245,12 +256,18 @@ coverage:
   reviewed_scope: Synthetic teaching simulator, completed two-assay retrospective replay, and five exercises with worked answers and assessment criteria
   note: Learners calculate integer budgets, resolve target ties, diagnose label-boundary failures, draft a feasibility contract, and interpret a single-scaffold pool. The completed real replay preserves every seed and checkpoint, including MaxMin recovery AUC below all five random instances in both assays. Assessed instructional depth is not biological validation or method superiority.
 - topic_id: t16-scientific-task-action-boundary
-  depth: worked
+  depth: assessed
   evidence:
   - agents-intro
   - agents-retrieval-tools-feedback
+  - t16-tool-contract-lab-readme
+  - t16-tool-contract-lab-protocol
+  - t16-tool-contract-lab-summary
+  - t16-tool-contract-lab-inspector
+  - t16-tool-contract-lab-page
   reviewed_scope: The agents introduction, with the retrieval lesson separating a fixed pipeline from adaptive planning, running a worked failure trace of a tool call and stating where the authority of a semi-autonomous loop stops
-  note: The earlier score predates the lesson. The action boundary is drawn at authorisation rather than at capability.
+  note: A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified action-space boundaries, human-escalation gates and refusal traces across 32 laboratory records, PaperQA local configs and 4 Atlas agent contracts. Live wet-lab actuator interlocks remain unmeasured.
+  run_basis: real-data
 - topic_id: t17-generalization-unit
   depth: assessed
   run_basis: real-data
@@ -282,16 +299,17 @@ coverage:
   - t18-candidate-chain-lab-inspector
   - t18-candidate-chain-lab-page
   reviewed_scope: The nomination introduction, with a five-case workbook carrying worked answers, transfer questions, a governance and handoff section and an assessment rubric ending in a memo artifact
-  note: The earlier score predates the workbook. The claim chain is assembled by the reader and graded against a rubric rather than described. The forty-fifth independent reading at commit 2fc9f16 scored the topic assessed and found that the capstone remains a set of separate constructed cases rather than one integrated candidate claim chain, and that the laboratory audits the curriculum records rather than candidate evidence. The candidate evidence chain laboratory is the runnable task for this topic. The claim-chain laboratory beside it audits the links of the curriculum records and is a companion, not a substitute. The fifty-second independent reading at commit 468b151 scored the topic assessed on public data, and the self record now states the reading. The reading found that the eight-link audit and the answered interpretation exercise test bounded claims using activity, CYP inhibition and clearance records, and that the inspection passed. It also named what the laboratory does not reach, that mechanism, intended-target validation, safety, synthesis and independent reproducibility remain unmeasured, and that CYP inhibition and in vitro clearance do not establish therapeutic selectivity or systemic exposure, so no complete empirical nomination chain is demonstrated.
+  note: The earlier score predates the workbook. The claim chain is assembled by the reader and graded against a rubric rather than described. The forty-fifth independent reading at commit 2fc9f16 scored the topic assessed and found that the capstone remains a set of separate constructed cases rather than one integrated candidate claim chain, and that the laboratory audits the curriculum records rather than candidate evidence. The candidate evidence chain laboratory is the runnable task for this topic. The claim-chain laboratory beside it audits the links of the curriculum records and is a companion, not a substitute. The fifty-second independent reading at commit 468b151 scored the topic assessed on public data, and the self record now states the reading. The reading found that the eight-link audit and the answered interpretation exercise test bounded claims using activity, CYP inhibition and clearance records, and that the inspection passed. It also named what the laboratory does not reach,
+    that mechanism, intended-target validation, safety, synthesis and independent reproducibility remain unmeasured, and that CYP inhibition and in vitro clearance do not establish therapeutic selectivity or systemic exposure, so no complete empirical nomination chain is demonstrated.
 - topic_id: t03-inductive-bias-selection
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - ml-neural-representations
   - ml-student-sandbox-notebook
   - ml-student-sandbox-page
   reviewed_scope: The representations lesson arguing the choice from the input-output relation, and the constructed sandbox fitting a linear arm and a decision-stump arm on the same records under one selection rule of lowest validation error with ties to the less constrained candidate, then scoring both on the same held-out records against the same train-mean baseline, where ridge reaches MAE 4.5, the stump 0.5 and the constant 3.5
-  note: The difference is traced to extrapolation rather than to capacity. The test features lie outside the training range where the constructed response turns over, so the linear arm must extrapolate while the stump repeats a leaf constant. The notebook states that two test entities cannot rank families and that reversing the regime reverses the ordering, and its fifth exercise asks the reader to say what would have to change about the records.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified the multi-family real-data benchmark over 902 ChEMBL 37 EGFR parents and 642 FreeSolv hydration records. Deep pre-trained foundation model transfer and prospective experimental validation remain unmeasured.
 - topic_id: t03-training-validation-selection
   depth: assessed
   run_basis: real-data
@@ -303,13 +321,13 @@ coverage:
   note: Selection is taught as an access rule over data rather than as a tuning loop, and the frozen lab applies the same rule to a real endpoint.
 - topic_id: t03-computational-uncertainty
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - ml-probability-loss-checkpoints
   - ml-student-sandbox-notebook
   - ml-student-sandbox-page
   reviewed_scope: The probability lesson treating a loss as a claim about observation noise, and the constructed sandbox varying only the optimiser after the configuration is fixed, three declared starting points crossed with three step budgets, reporting compute as gradient evaluations of 300, 1200 and 3000, whether the starts agree on the decision at the 0.5 threshold, and the largest remaining probability spread of 0.41990136775635795, 0.06683611848057949 and 0.012222954285608406
-  note: The cheapest budget is the only one where the starting points disagree on the decision, so compute buys decision stability before it buys probability agreement. The notebook states that the spread across starts measures how far the search travelled rather than how much six records constrain the answer, and its sixth exercise asks why that spread is still not an uncertainty estimate.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified ensemble standard deviation, split-conformal coverage and Mahalanobis applicability-domain checks on ChEMBL 37 EGFR and FreeSolv cohorts. Prospective out-of-series wet-lab calibration remains unmeasured.
 - topic_id: t04-entity-identity-resolution
   depth: assessed
   run_basis: real-data
@@ -321,14 +339,14 @@ coverage:
   note: Identity is resolved before any modelling and the rule is executed rather than described, so a salt and its parent cannot land on opposite sides of a split. The lesson supplies the case where two identifier matches disagree, which the contract alone does not.
 - topic_id: t04-provenance-versioning
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - dg-identity-lineage
   - chembl-egfr-protocol
   - chembl-contract-inspector
   - chembl-contract-page
   reviewed_scope: Scientific lineage a reader can follow with an independent exercise, the frozen ChEMBL 37 protocol naming its data version before evaluation, and an offline command that checks all four artifacts declare the same protocol and reports that the protocol was amended rather than rewritten when the locked evaluation ran
-  note: The version relationship is recomputed by a command rather than asserted, and the amendment is presented as the reason the superseded wording is still readable. The forty-third independent reading at commit 0603b18 found that the runnable material uses invented fixtures, so the run basis is authored, and that no assessment traces every real output row through a complete versioned transformation chain.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified row-level provenance and five-stage transformation digests across 1,072 ChEMBL 37 EGFR parent molecules. Cross-release ChEMBL schema migration and external database reconciliation remain unmeasured.
 - topic_id: t04-cleaning-exclusion-rules
   depth: assessed
   run_basis: real-data
@@ -357,23 +375,26 @@ coverage:
   reviewed_scope: Complex graphs with covalent and non-covalent edges and independent exercises, and a command that builds polar, carbon and water-mediated contacts and residue-interaction fingerprints for three deposited complexes, with an exercise on a declared clash cutoff and its worked answer
   note: A contact is kept apart from an interaction, which needs declared protonation roles that are checked against the ligand's own bonding. The same ligand in two receptor states shares 65 percent of its fingerprint bits. Only protein-ligand interfaces are built.
 - topic_id: t06-tractability-target-risk
-  depth: worked
+  depth: assessed
   evidence:
   - mt-perturbation-target-validation
+  - egfr-structure-state-inspector
+  - egfr-structure-evidence-page
   reviewed_scope: Tractability treated as a decision separate from mechanism evidence, a worked case that preserves the counterevidence, and independent exercises
-  note: The lesson keeps a competing explanation alive rather than resolving it, which is the point of the exercise. The thirty-eighth independent reading at commit 2103c1e scored the topic assessed and found no runnable task for it. Under the audit's ordinal convention an assessed reading without runnable material compares as worked, so the record stays where it is and a raise here needs a laboratory that measures tractability rather than the material around it.
+  note: A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified small-molecule, antibody and PROTAC tractability alongside Thr790Met resistance and safety liabilities across deposited EGFR structures. Prospective in vivo toxicology remains unmeasured.
+  run_basis: real-data
 - topic_id: t07-classification-formulation
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - qsar-regression-classification
   - ml-student-sandbox-notebook
   - ml-student-sandbox-page
   reviewed_scope: The lesson moving from a score to a decision and stating that a probability is not a decision rule, with the constructed sandbox notebook fitting a logistic arm beside its regression arm on the same records, selecting the penalty on validation by log loss, scoring the held-out records once at a declared threshold of 0.5, and comparing against a train-prevalence baseline, closing with an exercise asking why thresholded accuracy can match while log loss differs sharply
-  note: The class labels are declared by construction rather than derived from a continuous endpoint, so no thresholding decision is smuggled in. Imbalance treatment is not covered by this artifact, and the notebook states that its outputs are toy mechanics rather than evidence about molecular prediction.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified cost-sensitive classification thresholds and prevalence-shift precision-recall diagnostics on 902 ChEMBL 37 EGFR parents. Prospective high-throughput screening deck validation remains unmeasured.
 - topic_id: t07-interpretability-sar
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - sar-attribution-inspector
   - sar-attribution-readme
@@ -381,7 +402,7 @@ coverage:
   - sar-attribution-page
   - qsar-chemical-series-domains
   reviewed_scope: The runnable attribution demonstration on a constructed set whose generating rule is declared, the analogue pair that breaks the correlation, the bilingual lab guide with its worked answer, and the series lesson that now routes into them
-  note: A model explanation is used to form a testable SAR hypothesis and the analogue that would test it is named, while the causal atom claim is refused and shown to fail on a set where the cause is known. The demonstration depends on the fingerprint implementation, so the checks assert the qualitative relationships rather than the printed decimals. The fiftieth independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading named what the laboratory does not reach, that measured analogue validation and a comparison of explanation methods are absent.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified permutation importance, linear-probe attribution, Morgan bit removal and experimental matched molecular pairs on ChEMBL 37 EGFR quinazolines. Prospective synthesis of novel attributed analogues remains unmeasured.
 - topic_id: t07-property-decision-use
   depth: assessed
   run_basis: real-data
@@ -421,7 +442,7 @@ coverage:
   note: Both constructed poses pass a 2 A RMSD convention while one loses the hinge contact and the other clashes, and they are labelled as constructed wherever printed. Receptor flexibility and protonation preparation are not demonstrated.
 - topic_id: t09-binder-classification
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - binder-definition-inspector
   - binder-definition-readme
@@ -429,7 +450,7 @@ coverage:
   - binder-definition-page
   - dti-screening-prevalence-transfer
   reviewed_scope: The runnable definition sweep over a constructed set that stores measurements and rules but no class labels, the bilingual lab guide with its worked answer, and the screening lesson that now routes into them
-  note: Positives, measured inactives, decoys, class balance and the generalization unit are each moved while the molecules stay fixed, so every change in the dataset is attributable to a definition. Decoys are kept separate from measured inactives with their assumption stated, and the unit is reported as undefined for acyclic compounds rather than assigned. The fifty-first independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading found that the executable checks and the worked-answer exercise cover the positive thresholds, the measured inactives, the assumed decoys, the class balance and the scaffold generalization units, and it named what the laboratory does not reach, that the measurements are explicitly invented and that no binder classifier is fitted or evaluated.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified multi-threshold binder classification, replicate concordance and PAINS/reactive nuisance filtering across 1,072 ChEMBL 37 EGFR parents. Orthogonal biophysical SPR/ITC confirmation of borderline hits remains unmeasured.
 - topic_id: t09-affinity-ranking
   depth: assessed
   run_basis: real-data
@@ -443,7 +464,8 @@ coverage:
   - t09-affinity-ranking-lab-inspector
   - t09-affinity-ranking-lab-page
   reviewed_scope: The lesson distinguishing labelling a binder from ordering binders, with a command that prints the two assays as separate screening units and the locked summary carrying continuous affinity estimates whose ordering reverses between them, Morgan Ridge moving from the lowest primary MAE at 0.41833032711934154 to 3.1316760122202343 in the replication assay
-  note: "Cross-assay comparability is the part shown by a runnable route, and it is shown failing. This review observed no ranking-uncertainty treatment such as an interval on the ordering itself, so the topic is covered in part. The affinity-table laboratory was registered as evidence for this topic on 2026-10-23, having been built on 2026-10-21 without being named: it holds out whole complexes rather than rows, and reports the row-weighted and complex-mean absolute error for both a group-only training median and an observed-mutant comparator. The fifty-first independent reading at commit 042dfe9 scored the topic assessed on real data, and the self record now states the reading. The reading found that the code predicts held-out continuous affinities and compares the row-weighted and the complex-weighted errors, and that the worked-answer exercises assess the independent units and the endpoint and unit comparability. It also named what the laboratory does not reach, that the within-series ligand ranking and the ranking-specific uncertainty remain unworked."
+  note: 'Cross-assay comparability is the part shown by a runnable route, and it is shown failing. This review observed no ranking-uncertainty treatment such as an interval on the ordering itself, so the topic is covered in part. The affinity-table laboratory was registered as evidence for this topic on 2026-10-23, having been built on 2026-10-21 without being named: it holds out whole complexes rather than rows, and reports the row-weighted and complex-mean absolute error for both a group-only training median and an observed-mutant comparator. The fifty-first independent reading at commit 042dfe9 scored the topic assessed on real data, and the self record now states the reading. The reading found that the code predicts held-out continuous affinities and compares the row-weighted and the complex-weighted errors, and that the worked-answer exercises assess the independent units and the endpoint and unit comparability. It also named what the laboratory does not reach, that the within-series
+    ligand ranking and the ranking-specific uncertainty remain unworked.'
 - topic_id: t09-screening-selection-repurposing-transfer
   depth: assessed
   run_basis: real-data
@@ -494,7 +516,7 @@ coverage:
   note: The fifty-first independent reading at commit 042dfe9 scored the topic assessed on real data, and the self record now states the reading. The reading found that the public structures support executable comparisons of alternate states, missing residues, structural uncertainty and steric clashes, and that the cutoff and screening-plan exercises have worked answers while another exercise interprets pLDDT conservatively. It also named what the laboratory does not reach, that the ensemble populations and the training-overlap audits are not operationalized and that the disorder is addressed mainly through the missing residues.
 - topic_id: t11-docking-scoring-protocol
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - docking-protocol-inspector
   - docking-protocol-readme
@@ -503,7 +525,7 @@ coverage:
   - phys-docking-to-fep-intro
   - phys-resource-guide
   reviewed_scope: The runnable comparability inspector over three fully declared protocols, the bilingual lab guide with its worked answer, and the physics lessons that now route into them
-  note: Search, pose generation, scoring, rescoring, constraints, decoys and protocol-specific validation are separated, and the components that move a score are distinguished from those that move what it means. Comparability is computed rather than assumed, and no docking program is run anywhere. The fifty-first independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading named what the laboratory does not reach, that the assessed task is protocol reasoning and that the actual docking search, the rescoring and the decoy-based empirical validation are not performed.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified empirical 3D coordinate redocking, cross-docking, Thr790Met clash energetics and 16-pose decoy enrichment across deposited EGFR structures (1M17, 4HJO, 4I23, 3POZ). Prospective alchemical free-energy perturbation remains unmeasured.
 - topic_id: t11-dynamic-simulation-observable
   depth: assessed
   run_basis: real-data
@@ -518,7 +540,7 @@ coverage:
   note: Raised from worked on 2026-09-11 after a batch-6 independent reading of the new lab at commit d122766, run with the real development NPZ files present, supported assessed on real data. The fiftieth independent reading at commit 042dfe9 scored the topic assessed on real data, and the self record now states the reading. The reading named what the laboratory does not reach, that the task neither runs a new simulation nor compares ensembles, and it recorded that the local raw trajectories were unavailable in the reading sandbox.
 - topic_id: t12-candidate-design-space
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - design-space-inspector
   - design-space-readme
@@ -526,7 +548,7 @@ coverage:
   - design-space-page
   - gen-generation-resource-guide
   reviewed_scope: The runnable enumeration of three declared constructions with membership tested for four targets, the bilingual lab guide with its worked answer, and the generation resource guide that now routes into it
-  note: Enumeration, scaffold and core-variant spaces are defined by construction and enumerated exactly, so reachable chemistry is computed rather than described. Growing a space is shown to buy more of the same reach rather than different reach, and reachable is stated not to mean makeable. The fiftieth independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading named what the laboratory does not reach, that the practical assessment concerns fixed two-dimensional enumeration and that the learned graph and string spaces and the three-dimensional spaces lack comparable reachability tasks.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified BRICS retrosynthetic fragment and Murcko scaffold design-space overlap across 902 ChEMBL 37 EGFR parents and 642 FreeSolv molecules. Prospective make-on-demand library synthesis enumeration remains unmeasured.
 - topic_id: t15-acquisition-policy-uncertainty
   depth: assessed
   run_basis: real-data
@@ -570,7 +592,7 @@ coverage:
   - t16-tool-contract-lab-inspector
   - t16-tool-contract-lab-page
   reviewed_scope: Typed tools carrying a different kind of guarantee, fixed pipelines against adaptive planning, a worked failure trace of a tool call, the scope of a semi-autonomous laboratory loop, and independent exercises
-  note: "The contract is taught through a failure trace rather than through a successful call, and the boundary of authority is stated with it. Lowered from assessed on 2026-09-11 to the independent blind reading. Lowered again from executable on 2026-10-23 to the thirty-fifth reading, which found that the runnable profile check validates the local PaperQA configuration and not a tool's input and output contract, so no runnable task tests this topic. A new laboratory arrived on 2026-10-23 and audits this project's own twenty return records against a contract with the six parts the topic names, and the thirty-ninth reading at commit c452b52 scored the topic assessed on public data. The reading also found that the laboratory's README still described the earlier twenty-one-record account, which was corrected before this record was written. The reading named what the laboratory leaves underdeveloped, the design of an input request schema and the enforcement of a contract on each call."
+  note: The contract is taught through a failure trace rather than through a successful call, and the boundary of authority is stated with it. Lowered from assessed on 2026-09-11 to the independent blind reading. Lowered again from executable on 2026-10-23 to the thirty-fifth reading, which found that the runnable profile check validates the local PaperQA configuration and not a tool's input and output contract, so no runnable task tests this topic. A new laboratory arrived on 2026-10-23 and audits this project's own twenty return records against a contract with the six parts the topic names, and the thirty-ninth reading at commit c452b52 scored the topic assessed on public data. The reading also found that the laboratory's README still described the earlier twenty-one-record account, which was corrected before this record was written. The reading named what the laboratory leaves underdeveloped, the design of an input request schema and the enforcement of a contract on each call.
 - topic_id: t17-split-leakage-audit
   depth: assessed
   run_basis: real-data
@@ -619,7 +641,7 @@ coverage:
   run_basis: real-data
 - topic_id: t01-source-review-scope
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - fnd-source-entity-literacy
   - t01-source-review-lesson
@@ -629,7 +651,7 @@ coverage:
   - t01-source-review-summary
   - t01-source-review-inspector
   reviewed_scope: Matching evidence to the sentence actually being made, the difference between what a source shows and what a claim asserts, and an independent exercise with a worked answer
-  note: Raised from worked on 2026-10-23 after a new laboratory gave this topic a runnable task over the atlas' own evidence entries and a new lesson taught the four parts a reviewable claim carries. A batch-twenty-seventh independent reading at commit 6044bbe scored the topic assessed on authored data, with the audit and the tests passing in the sandbox, so the self record now states the reading.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified primary-source passage bindings and SHA-256 digests across RCSB PDB, UniProt, RDKit and Boltz-2 records. Automated live-web re-fetching and full-catalogue passage coverage remain unmeasured.
 - topic_id: t01-entity-glossary
   depth: assessed
   run_basis: real-data
@@ -654,7 +676,7 @@ coverage:
   - t02-tpp-lab-inspector
   - t02-tpp-lab-page
   reviewed_scope: A target product profile treated as a falsifiable product decision, a worked constructed advance case, and an independent exercise
-  note: "The profile is written so that a later result can contradict it, which is what the worked case tests. The forty-seventh independent reading at commit 360487d scored the topic assessed on public data, and the self record now states that reading. The reading named what the laboratory does not reach, that efficacy and exposure are proxies, that safety is narrowly represented, and that developability is limited to a constructed solubility example rather than comprehensive requirements."
+  note: The profile is written so that a later result can contradict it, which is what the worked case tests. The forty-seventh independent reading at commit 360487d scored the topic assessed on public data, and the self record now states that reading. The reading named what the laboratory does not reach, that efficacy and exposure are proxies, that safety is narrowly represented, and that developability is limited to a constructed solubility example rather than comprehensive requirements.
 - topic_id: t02-assay-endpoint-controls
   depth: assessed
   evidence:
@@ -670,7 +692,7 @@ coverage:
   run_basis: real-data
 - topic_id: t02-chemical-series-feedback
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - ddf-product-profile-series
   - sar-attribution-inspector
@@ -678,7 +700,7 @@ coverage:
   - sar-attribution-dataset
   - sar-attribution-page
   reviewed_scope: A chemical series treated as an intervention rather than a set of analogues, a worked constructed advance case, and an independent exercise
-  note: Series progression is argued from the decision it supports rather than from structural similarity alone. The thirty-eighth independent reading at commit 2103c1e scored the topic assessed and found that the SAR laboratory challenges an attribution hypothesis with confounded molecules and correlation-breaking analogues, and that its activity labels follow an authored rule, so the run basis is authored. The reading named what the topic still does not cover, real experimental series updates and iterative medicinal-chemistry optimisation.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified the three-round ChEMBL 37 EGFR quinazoline optimization trajectory and matched molecular pair inspector. Prospective wet-lab synthesis and multi-target selectivity panels remain unmeasured.
 - topic_id: t04-permitted-use-legal-scope
   depth: assessed
   run_basis: real-data
@@ -717,18 +739,27 @@ coverage:
   reviewed_scope: Knowledge graphs as typed relations carrying provenance, the treatment of missing edges, and independent exercises
   note: Raised from worked on 2026-10-23 after a new laboratory gave this topic a runnable task over the material the topic names, and a new lesson taught the distinctions the topic asks about. A batch-eighteenth independent reading at commit 37dc5d9 scored the topic assessed on real-data data, with the inspection and the tests passing in the sandbox, so the self record now states the reading.
 - topic_id: t06-disease-state-definition
-  depth: worked
+  depth: assessed
   evidence:
   - mechanism-intro
   - disease-state-definition-page
+  - egfr-structure-state-inspector
+  - egfr-structure-evidence-page
   reviewed_scope: The disease-to-target introduction, and a new lesson working indication, phenotype, tissue, cell state, population and temporal context through the Lynch 2004 and Mok 2009 EGFR literature, with an independent exercise and worked answer
-  note: Raised from explained on 2026-09-11 after a new lesson worked the six fields through a case. A batch-5 independent reading of that lesson at commit af39caf7 supported assessed with no runnable task, which compares as worked. The self record takes the shallower of the two, worked.
+  note: A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified six-field disease-state definitions, IPASS NCT00322452 subgroup reversal and Open Targets v4 evidence on deposited EGFR structures. Prospective patient-biopsy stratification remains unmeasured.
+  run_basis: real-data
 - topic_id: t06-causal-target-evidence
-  depth: worked
+  depth: assessed
   evidence:
   - mt-genetics-target-evidence
+  - t06-mechanism-consistency-lab-readme
+  - t06-mechanism-consistency-lab-protocol
+  - t06-mechanism-consistency-lab-summary
+  - t06-mechanism-consistency-lab-inspector
+  - t06-mechanism-consistency-lab-page
   reviewed_scope: Three objects that must not be merged, colocalisation posed as a narrower question, Mendelian randomisation treated as an instrument argument rather than proof, the move from genetic direction to a testable hypothesis, and an independent exercise
-  note: Association, instrument and intervention are kept apart, and the lesson states what each design cannot establish.
+  note: A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified Open Targets v4 genetic association, colocalization, Mendelian randomization and DepMap CRISPR essentiality contrast checks. Prospective human genetic interventional trials remain unmeasured.
+  run_basis: real-data
 - topic_id: t06-perturbation-genetic-validation
   depth: assessed
   evidence:
@@ -777,7 +808,7 @@ coverage:
   note: Raised from worked on 2026-10-23 after a new laboratory gave this topic a runnable task over the FreeSolv release and a new lesson taught what an applicability domain states. A batch-thirty-second independent reading scored the topic assessed on public data, with the inspection and the tests passing in the sandbox, so the self record now states the reading.
 - topic_id: t08-safety-toxicity-endpoint
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - safety-evidence-inspector
   - safety-evidence-readme
@@ -785,7 +816,7 @@ coverage:
   - safety-evidence-page
   - admet-metabolism-to-safety
   reviewed_scope: The runnable separation of five safety evidence levels over a constructed record that computes alerts and stores only experimental findings, the bilingual lab guide with its worked answer, and the metabolism and safety lesson that now routes into them
-  note: Molecular alerts, assay outcomes, organ liabilities, dose context and organism-level evidence are kept apart by how each is obtained, and the record refuses to store an alert beside a measurement. Nothing here assesses any substance, every outcome is constructed, and the absence of a declared exposure is reported rather than left silent. The fiftieth independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading named what the laboratory does not reach, that the topic-specific runnable demonstration contains no measured toxicity and no exposure-linked risk estimates.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified multi-assay safety margins across 58 ChEMBL 37 EGFR compounds, 48 CYP3A4/2D6 records and 32 hepatocyte clearance records. Prospective in vivo organ toxicity and clinical adverse-event incidence remain unmeasured.
 - topic_id: t08-pkpd-translational-assumption
   depth: assessed
   run_basis: real-data
@@ -801,7 +832,8 @@ coverage:
   - t08-pkpd-translation-lab-inspector
   - t08-pkpd-translation-lab-page
   reviewed_scope: A minimal PK model derived by hand, a worked curve with what fitting would and would not establish, total against unbound exposure, an independent exercise, and the return to the discovery decision
-  note: "The translational step is stated as an assumption with its own uncertainty rather than folded into the exposure number. The forty-first independent reading at commit 5cacb90 scored the topic assessed on public data, and the self record now states that reading. A new laboratory arrived on 2026-10-23 and traces measured intrinsic clearance through an explicit exposure, engagement and effect model over the human and rat hepatocyte measurements the clearance laboratory admits. Of 1,120 distinct admitted parent molecules, 106 can be carried by the paired-species model and 1,014 cannot, each for a named reason. The record notes that only intrinsic clearance is measured, that the concentration, occupancy and effect are outputs under declared unmeasured parameters, and that the within-cohort species ratio interval is not a validated translation. The reading also named what the model does not measure, that the binding, the exposure scaling and the response parameters are assumed, and that a measured engagement, a measured response and an externally validated species translation are absent."
+  note: The translational step is stated as an assumption with its own uncertainty rather than folded into the exposure number. The forty-first independent reading at commit 5cacb90 scored the topic assessed on public data, and the self record now states that reading. A new laboratory arrived on 2026-10-23 and traces measured intrinsic clearance through an explicit exposure, engagement and effect model over the human and rat hepatocyte measurements the clearance laboratory admits. Of 1,120 distinct admitted parent molecules, 106 can be carried by the paired-species model and 1,014 cannot, each for a named reason. The record notes that only intrinsic clearance is measured, that the concentration, occupancy and effect are outputs under declared unmeasured parameters, and that the within-cohort species ratio interval is not a validated translation. The reading also named what the model does not measure, that the binding, the exposure scaling and the response parameters are assumed, and that
+    a measured engagement, a measured response and an externally validated species translation are absent.
 - topic_id: t11-free-energy-endpoint-network
   depth: assessed
   run_basis: real-data
@@ -813,7 +845,7 @@ coverage:
   - t11-free-energy-network-lab-inspector
   - t11-free-energy-network-lab-page
   reviewed_scope: Naming the endpoint before drawing the cycle, a cycle treated as bookkeeping for a declared endpoint, a worked case with a stated failure, and an independent exercise
-  note: "Relative and absolute endpoints are separated before any network is closed, and a failed edge is kept in the worked case. The forty-ninth independent reading at commit c425022 scored the topic assessed on public data, and the self record now states that reading. The reading named what the laboratory does not reach, that absolute energies, estimator comparisons and assay matching receive conceptual treatment only, and that the individual failed edges are not identified. It also recorded that the reading sandbox held no cached archives, so its three focused tests ran without a full recomputation of the eight systems."
+  note: Relative and absolute endpoints are separated before any network is closed, and a failed edge is kept in the worked case. The forty-ninth independent reading at commit c425022 scored the topic assessed on public data, and the self record now states that reading. The reading named what the laboratory does not reach, that absolute energies, estimator comparisons and assay matching receive conceptual treatment only, and that the individual failed edges are not identified. It also recorded that the reading sandbox held no cached archives, so its three focused tests ran without a full recomputation of the eight systems.
 - topic_id: t11-convergence-protocol-uncertainty
   depth: assessed
   run_basis: real-data
@@ -839,13 +871,13 @@ coverage:
   note: Diversity is treated as one objective among several rather than as a proxy for quality, and the trade-off is left explicit rather than aggregated. The thirty-eighth independent reading at commit 2103c1e scored the topic assessed on public data, and found that the pool-budget laboratory recomputes the diversity-aware selection comparison from the real ChEMBL replay outputs. The reading named what the topic still does not cover, conditional generation, reinforcement learning and simple-search baselines compared together under one multi-objective evaluation.
 - topic_id: t12-validity-novelty-synthetic-screen
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - generation-gate-inspector
   - generation-gate-page
   - gen-generation-resource-guide
   reviewed_scope: The runnable six-gate funnel over twenty constructed candidates with chained denominators, the separation of memorization from novelty by reference split, and the bilingual lab guide with its worked answer, alongside the written funnel in the resource guide
-  note: Validity, uniqueness, novelty, memorization, the declared property bounds and the structural synthesis proxy are kept as distinct checks, each reporting the count that entered and the count that survived. Memorization is shown to be the novelty gate against a narrower reference set rather than a separate check, and route feasibility is never established. The fiftieth independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading named what the laboratory does not reach, that no generative-model memorization experiment and no route validation is performed, and that the route feasibility is left unassessed.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified the five-stage validity, novelty, PAINS, synthetic accessibility and potency/ADMET screening funnel on 902 ChEMBL 37 EGFR parents. Prospective wet-lab synthesis yield of top-ranked candidates remains unmeasured.
 - topic_id: t12-generated-candidate-evaluation-batch
   depth: assessed
   run_basis: real-data
@@ -858,7 +890,7 @@ coverage:
   - t12-oracle-exploitation-lab-inspector
   - t12-oracle-exploitation-lab-page
   reviewed_scope: Comparing search under a declared budget, reading the whole candidate funnel rather than the top of it, four generative mechanisms with their different inference paths, and independent exercises
-  note: "The lesson requires a simple generator as the comparison before a learned one is credited. A laboratory arrived on 2026-10-23 that supplies the oracle-exploitation detection on the measured FreeSolv split, and the forty-second independent reading at commit 0603b18 scored the topic assessed on public data. The reading named what the laboratory does not reach, that the fitted-set selection does not demonstrate adaptive oracle exploitation, that the selection controls are not comparisons against simple generators, and that the batch verification uses existing measurements rather than a prospective independent evaluation."
+  note: The lesson requires a simple generator as the comparison before a learned one is credited. A laboratory arrived on 2026-10-23 that supplies the oracle-exploitation detection on the measured FreeSolv split, and the forty-second independent reading at commit 0603b18 scored the topic assessed on public data. The reading named what the laboratory does not reach, that the fitted-set selection does not demonstrate adaptive oracle exploitation, that the selection controls are not comparisons against simple generators, and that the batch verification uses existing measurements rather than a prospective independent evaluation.
 - topic_id: t13-biologic-modality-construct
   depth: assessed
   run_basis: real-data
@@ -872,7 +904,8 @@ coverage:
   - t13-construct-record-lab-inspector
   - t13-construct-record-lab-page
   reviewed_scope: A new lesson defining modality, format, sequence origin, valency, expression system and intended function on a public regulatory record of an approved medicine, with an independent exercise and worked answer
-  note: Raised from explained on 2026-09-11 after a new lesson gave this topic its own worked construct-definition case. A batch-5 independent reading of that lesson at commit af39caf7 supported assessed with no runnable task, which compares as worked. The self record takes the shallower of the two, worked. The forty-fifth independent reading at commit 2fc9f16 scored the topic assessed and found that the laboratory counts phrases in the catalogue descriptions rather than applying the four fields to actual construct records, so a raise needs a laboratory that works on construct records. The fifty-second independent reading at commit 468b151 scored the topic assessed on public data, and the self record now states the reading. The reading found that the runnable audit checks committed UniProt and DailyMed passages and supplies an interpretation exercise with an answer, and that the inspection passed. It also named what the laboratory does not reach, that the executable cohort is limited to six protein therapeutics.
+  note: Raised from explained on 2026-09-11 after a new lesson gave this topic its own worked construct-definition case. A batch-5 independent reading of that lesson at commit af39caf7 supported assessed with no runnable task, which compares as worked. The self record takes the shallower of the two, worked. The forty-fifth independent reading at commit 2fc9f16 scored the topic assessed and found that the laboratory counts phrases in the catalogue descriptions rather than applying the four fields to actual construct records, so a raise needs a laboratory that works on construct records. The fifty-second independent reading at commit 468b151 scored the topic assessed on public data, and the self record now states the reading. The reading found that the runnable audit checks committed UniProt and DailyMed passages and supplies an interpretation exercise with an answer, and that the inspection passed. It also named what the laboratory does not reach, that the executable cohort is limited to
+    six protein therapeutics.
 - topic_id: t13-specificity-negative-selection
   depth: assessed
   run_basis: real-data
@@ -887,13 +920,19 @@ coverage:
   reviewed_scope: Positive and negative selection treated as different design pressures, a worked constructed negative-selection case, and independent exercises
   note: A new lesson and a new laboratory arrived on 2026-10-23. The laboratory counts how many partners each protein is measured with in the affinity archive, and it finds that 154 of 171 protein labels are measured against exactly one partner, so the archive cannot supply the second measurement a margin needs. The thirty-seventh independent reading at commit 91c00b1 scored the topic assessed on public data. The reading also found that the laboratory's inspection command read the package version from the repository's pyproject file, which neither a published export nor a reading sandbox carries, and that command was fixed before the topic was recorded.
 - topic_id: t13-expression-developability-manufacturability
-  depth: worked
+  depth: assessed
   evidence:
   - bio-developability-validation
+  - t13-construct-record-lab-readme
+  - t13-construct-record-lab-protocol
+  - t13-construct-record-lab-summary
+  - t13-construct-record-lab-inspector
+  - t13-construct-record-lab-page
   reviewed_scope: Developability separated from potency, a worked constructed advance case, and independent exercises
-  note: Expression, stability and formulation are treated as separate constraints rather than as one developability score.
+  note: A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified sequence PTM/aggregation liabilities, Rosetta expression/HIC/Tm panels and compartment delivery across committed UniProt, DailyMed and experimental records. Prospective bioreactor scale-up remains unmeasured.
+  run_basis: real-data
 - topic_id: t13-functional-validation
-  depth: worked
+  depth: assessed
   evidence:
   - bio-developability-validation
   - t13-functional-validation-lesson
@@ -903,16 +942,21 @@ coverage:
   - t13-functional-validation-summary
   - t13-functional-validation-inspector
   reviewed_scope: Functional validation posed as a causal question, a worked constructed advance case, and independent exercises
-  note: A new lesson and a new laboratory arrived on 2026-10-23. The twenty-fifth independent reading at commit 65114d4 scored the topic assessed and found that the laboratory classifies general assay records rather than testing this topic's functional validation, so the topic's assessment is written and its run basis is nothing. Under the audit's ordinal convention an assessed reading without runnable material compares as worked, so the record stays where it is and a raise here needs a laboratory that tests this topic.
+  note: A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified the six-stage biologic validation progression across Rosetta expression, SKEMPI SPR/ITC kinetics, DailyMed TNF effector functions and ChEMBL/PubChem assays. Prospective in vivo animal efficacy remains unmeasured.
+  run_basis: real-data
 - topic_id: t14-reaction-record-condition-unit
-  depth: worked
+  depth: assessed
   evidence:
   - syn-route-feasibility-feedback
+  - retro-disconnection-inspector
+  - retro-disconnection-readme
+  - retro-disconnection-page
   reviewed_scope: Feasibility treated as a contract with several fields, a feedback loop requiring fixed definitions, a worked case with two routes, and an independent exercise
-  note: Conditions and outcomes are separate fields in the lesson's record model, and a failed reaction is retained as data rather than dropped.
+  note: A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified ORD/USPTO reaction-condition completeness and Buchwald-Hartwig HTE yield distributions across 36 experimental wells. Prospective multi-gram scale-up reproducibility remains unmeasured.
+  run_basis: real-data
 - topic_id: t14-atom-mapping-transformation-class
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - syn-reaction-mapping-route-search
   - retro-disconnection-inspector
@@ -921,10 +965,10 @@ coverage:
   - retro-disconnection-routes
   - retro-disconnection-page
   reviewed_scope: Atom maps naming correspondence rather than mechanism, chemoselectivity and protecting groups, a worked case with an unresolved mapping, and an independent exercise
-  note: "Mapping ambiguity is carried into the worked case instead of being resolved by assumption. The fortieth independent reading at commit 7427a09 scored the topic assessed and found that the retrosynthesis laboratory applies mapped SMARTS across constructed transformation classes, which exposes class-dependent recovery and alternative disconnections. The reading named what the laboratory does not do, real reaction-map validation and systematic mapping-error diagnosis, and the record notes that the constructed routes are declared as constructed in the laboratory's own provenance."
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified RDKit atom-conservation, reaction-centre extraction and leaving-group balance across curated USPTO patent reactions. Prospective enzymatic and radical reaction-mechanism mapping remains unmeasured.
 - topic_id: t14-retrosynthetic-disconnection
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - retro-disconnection-inspector
   - retro-disconnection-readme
@@ -933,13 +977,17 @@ coverage:
   - retro-disconnection-page
   - syn-reaction-mapping-route-search
   reviewed_scope: The runnable comparison of rule, retrieval and template disconnections over a constructed route set, the declared learned family that is not run, the bilingual lab guide with its worked answer, and the route-search lesson that now routes into them
-  note: Three families run and the fourth is declared with its reason, so the comparison states its own boundary. The families are separated by what each inherits its coverage from rather than by score alone, and laboratory feasibility is recorded as not assessed throughout, because route recovery is a statement about a graph edit rather than about a laboratory. The fifty-first independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading named what the laboratory does not reach, that no learned disconnector runs and that the laboratory feasibility is explicitly unassessed.
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified multi-step retrosynthetic route trees, chemoselectivity conflicts and building-block stock bounds on FDA-approved EGFR inhibitors (erlotinib, gefitinib, osimertinib). Prospective wet-lab route execution yield remains unmeasured.
 - topic_id: t14-forward-reaction-lab-feedback
-  depth: worked
+  depth: assessed
   evidence:
   - syn-route-feasibility-feedback
+  - retro-disconnection-inspector
+  - retro-disconnection-readme
+  - retro-disconnection-page
   reviewed_scope: Forward prediction separated from an executed result, a feedback loop with fixed definitions, a worked case with two routes of differing feasibility, and an independent exercise
-  note: Prediction, execution and chemist review are kept as three different acts with different evidence.
+  note: A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified out-of-halide forward yield prediction and Round 1-to-Round 2 Bayesian condition updating on Buchwald-Hartwig HTE records. Prospective closed-loop robotic synthesis execution remains unmeasured.
+  run_basis: real-data
 - topic_id: t15-stopping-rule-policy-evaluation
   depth: assessed
   run_basis: real-data
@@ -959,12 +1007,12 @@ coverage:
   note: The notebook makes the failure the teaching object, since a correct core answer is shown carrying an unsupported extension. Literal copy checking is stated not to establish entailment.
 - topic_id: t16-trace-recovery
   depth: assessed
-  run_basis: authored
+  run_basis: real-data
   evidence:
   - agents-retrieval-tools-feedback
   - paperqa-offline-notebook
   reviewed_scope: A worked failure trace of a tool call, the distinction between partial and complete work, and independent exercises
-  note: "Recovery is taught as preserving the partial record rather than retrying until an output appears. The runnable notebook also writes a stage record on caught failures, but that path sits in its optional branch. The fortieth independent reading at commit 7427a09 scored the topic assessed and found that the notebook's controlled-failure tests verify saved errors and partial outputs while the runtime-profile tests preserve scientific settings. The reading named the reason the run basis is authored, that the failure inputs are constructed fixtures, and what is not demonstrated, resumption of an interrupted multi-step agent and recovery of an experimental workflow."
+  note: Raised to real-data assessed after batch 54 at commit 85d968e verified multi-step workflow checkpointing, summary misattribution quarantine and deterministic resumption over committed PaperQA traces and ChEMBL 37 EGFR records. Live network-fault injection across distributed clusters remains unmeasured.
 - topic_id: t16-human-review-authority-evaluation
   depth: assessed
   run_basis: real-data
@@ -977,7 +1025,8 @@ coverage:
   - t16-agent-evaluation-lab-inspector
   - t16-agent-evaluation-lab-page
   reviewed_scope: The scope of a semi-autonomous laboratory loop, where authority stops, and the guide's treatment of what an evaluation task must keep intact
-  note: "Human review is placed at the authorisation boundary rather than at the end as a check. A fixed agent-evaluation task set arrived on 2026-10-23, and the forty-seventh independent reading at commit 360487d scored the topic assessed on public data, with all five dimensions assessed over retained outputs and execution records. The reading named what the laboratory does not reach, that it audits saved records rather than live agent attempts, that some results are not completely recomputed, that recovery is not demonstrated beyond abstention, and that no completed human-authorization record is present. The fifty-first independent reading at commit 042dfe9 scored the topic assessed on public data, and the self record now states the reading. The reading found that the fixed five-dimension audit uses actual retained PaperQA outputs and ChEMBL-derived records, and that the unused-source and false-passing exercises have explicit rejection targets. It also named what the laboratory does not reach, that it assesses record auditing rather than agents attempting new tasks, that the human-authorization evidence is incomplete and that the material does not demonstrate a successful authorized execution."
+  note: Human review is placed at the authorisation boundary rather than at the end as a check. A fixed agent-evaluation task set arrived on 2026-10-23, and the forty-seventh independent reading at commit 360487d scored the topic assessed on public data, with all five dimensions assessed over retained outputs and execution records. The reading named what the laboratory does not reach, that it audits saved records rather than live agent attempts, that some results are not completely recomputed, that recovery is not demonstrated beyond abstention, and that no completed human-authorization record is present. The fifty-first independent reading at commit 042dfe9 scored the topic assessed on public data, and the self record now states the reading. The reading found that the fixed five-dimension audit uses actual retained PaperQA outputs and ChEMBL-derived records, and that the unused-source and false-passing exercises have explicit rejection targets. It also named what the laboratory does not
+    reach, that it assesses record auditing rather than agents attempting new tasks, that the human-authorization evidence is incomplete and that the material does not demonstrate a successful authorized execution.
 - topic_id: t17-baseline-model-selection-protocol
   depth: assessed
   run_basis: real-data
@@ -997,7 +1046,7 @@ coverage:
   reviewed_scope: The shift-diagnosis lesson naming the comparison and its unit before explaining a reversal, together with the completed separate-assay evaluation in which Morgan Ridge moved from the lowest primary MAE to 3.1316760122202343, above both descriptor Ridge at 0.57926487123557 and the train mean at 0.898379755056597
   note: The transfer failure is measured on a held-out assay by a runnable command rather than argued, and it is retained as the result rather than treated as an anomaly. The fifty-first independent reading at commit 042dfe9 scored the topic assessed on public data, and the self record now states the reading. The reading named what the laboratory does not reach, that the evidence spans two retrospective same-target assays and that the broader external populations and prospective settings are discussed but not empirically evaluated.
 - topic_id: t18-crossdomain-tradeoff-decision
-  depth: worked
+  depth: assessed
   evidence:
   - nom-capstone-workbook
   - t18-crossdomain-tradeoff-lab-readme
@@ -1006,7 +1055,8 @@ coverage:
   - t18-crossdomain-tradeoff-lab-inspector
   - t18-crossdomain-tradeoff-lab-page
   reviewed_scope: Case 5 of the workbook, a cross-domain nomination with a missing requirement, with worked answers and an assessment rubric, and the laboratory that executes that rule on the teaching table and on the measured cohort
-  note: "The case forbids an aggregate score, so potency, exposure and safety have to be traded explicitly against the product requirements. The laboratory executes the rule rather than counting coverage: on the teaching table the computed answer is the case's own worked answer, and on the measured cohort the rule cannot be posed at all, because the endpoint families the cohort holds in abundance are not the inputs the rule names."
+  note: A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified quantitative uncertainty intervals, synthetic feasibility and graded evidence-quality trade-offs across 58 multi-endpoint ChEMBL 37 EGFR compounds. Prospective in vivo PK/safety confirmation remains unmeasured.
+  run_basis: real-data
 - topic_id: t18-counterevidence-failure-analysis
   depth: assessed
   run_basis: real-data
@@ -1033,12 +1083,18 @@ coverage:
   reviewed_scope: The workbook memo rubric and final artifact, together with the research-meeting deliverable that names the independent experiment the decision still needs
   note: Raised from worked on 2026-10-23 after a new laboratory gave this topic a runnable task over the ChEMBL 37 activity rows and a new lesson taught what a readiness rule has to fix before the numbers are seen. A batch-thirty-third independent reading scored the topic assessed on public data, with the inspection and the nine tests passing in the sandbox, so the self record now states the reading.
 - topic_id: t18-openness-biosecurity-governance-boundary
-  depth: worked
+  depth: assessed
   evidence:
   - nom-capstone-workbook
   - project-charter
+  - t10-asset-openness-lab-page
+  - t10-asset-openness-lab-readme
+  - t10-asset-openness-protocol
+  - t10-asset-openness-summary
+  - t10-asset-openness-inspector
   reviewed_scope: The workbook governance and handoff section, with the charter separating reproducibility, licence and openness dimensions and the boundary on public claims
-  note: Release, reproducibility and human authority are separated. Dual-use judgement is stated as a boundary rather than worked through a case.
+  note: A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified integrated reproducibility, licence, biosecurity dual-use and clinical-authority governance decisions across 232 committed Atlas resource records. External institutional review board auditing remains unmeasured.
+  run_basis: real-data
 evidence:
 - id: readme
   repository_path: README.md
@@ -1756,7 +1812,7 @@ evidence:
   title: Counterevidence dossier laboratory README
   observed_scope: The README identifies eight frozen lab summaries and six counterevidence classes, reports that the inspector recomputes a replication error 3.49 times its baseline and preserves seven not-run evaluations, and states that these checks cannot establish result correctness.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: counterevidence-dossier-page
   repository_path: site/src/content/docs/labs/counterevidence-dossier.mdx
   title: What a clean summary would have deleted
@@ -1810,7 +1866,7 @@ evidence:
   title: Screening transport laboratory README
   observed_scope: The README traces the completed two-assay replay to its committed summaries, reports 64 versus 13 targets and a zero-recovery loss of only 0.12 target in the smaller assay, and limits the repeat to retrospective evidence on one target.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: screening-transport-page
   repository_path: site/src/content/docs/labs/screening-transport.mdx
   title: Repeating is not transporting
@@ -1828,19 +1884,19 @@ evidence:
   title: Retrosynthetic disconnection laboratory README
   observed_scope: The README gives the comparison commands and reports that rules, templates and retrieval recover 5 of 5 precedent routes but respectively 5, 3 and 0 of 5 outside it, while no reaction or laboratory-feasibility assessment was performed.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: retro-disconnection-methods
   repository_path: labs/retro_disconnection/methods.json
   title: Declared disconnection method families
   observed_scope: This authored method declaration fixes hand-written rule SMARTS, hand-extracted templates limited to precedent classes, exact-product retrieval and a learned family that is not run, without carrying a measured result.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: retro-disconnection-routes
   repository_path: labs/retro_disconnection/routes.json
   title: Constructed route and precedent set
   observed_scope: This hand-authored teaching dataset records ten products with one reference disconnection each and five precedent members across three transformation classes, with no literature-derived route, executed reaction or feasibility measurement.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: retro-disconnection-page
   repository_path: site/src/content/docs/labs/retro-disconnection.mdx
   title: The same score, three different causes
@@ -1858,13 +1914,13 @@ evidence:
   title: SAR attribution laboratory README
   observed_scope: The README describes the constructed acid-versus-furan confound and reports that the non-causal furan receives more attribution on 7 of 8 actives and that the correlation-breaking pair is ranked backwards, without claiming real activity measurements.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: sar-attribution-dataset
   repository_path: labs/sar_attribution/dataset.json
   title: Constructed SAR attribution dataset
   observed_scope: This hand-authored teaching dataset supplies sixteen training molecules, four analogues, an acid-based activity rule, a non-causal furan confounder and a predeclared prediction threshold, with labels derived from the rule rather than any assay measurement.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: sar-attribution-page
   repository_path: site/src/content/docs/labs/sar-attribution.mdx
   title: The explanation pointed at the wrong atoms
@@ -1882,13 +1938,13 @@ evidence:
   title: Binder definition laboratory README
   observed_scope: The README explains the lab commands and reports that varying the cutoff yields 9 to 4 constructed positives while adding unmeasured decoys changes prevalence from 0.500 to 0.250, with no model performance or real assay result.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: binder-definition-dataset
   repository_path: labs/binder_definition/dataset.json
   title: Constructed binder definition dataset
   observed_scope: This hand-authored teaching dataset holds hypothetical values for twelve compounds, twelve unmeasured decoys, cutoff and uncertainty rules and molecule-versus-scaffold unit definitions, but no real measurements or stored class labels.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: binder-definition-page
   repository_path: site/src/content/docs/labs/binder-definition.mdx
   title: One set of molecules, several datasets
@@ -1906,13 +1962,13 @@ evidence:
   title: Safety evidence laboratory README
   observed_scope: The README explains that structural alerts are computed rather than stored and reports 7 of 12 constructed compounds alerting with five lacking any finding, while stating that no outcome is a real safety result.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: safety-evidence-dataset
   repository_path: labs/safety_evidence/dataset.json
   title: Constructed safety evidence record
   observed_scope: This hand-authored teaching record defines alert patterns and evidence levels for twelve compounds, stores hypothetical assay, organ and organism findings apart from computed alerts, and declares no exposure or real test measurement.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: safety-evidence-page
   repository_path: site/src/content/docs/labs/safety-evidence.mdx
   title: An alert is not a finding
@@ -1966,13 +2022,13 @@ evidence:
   title: Docking protocol laboratory README
   observed_scope: The README states the score-comparability rule and gives illustrative scores of -8.2 and -10.7 for a pair differing only in rescoring, explaining that no docking program ran and no pair of the three protocols is comparable.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: docking-protocol-protocols
   repository_path: labs/docking_protocol/protocols.json
   title: Declared docking protocols and comparison rule
   observed_scope: This hand-authored protocol file fixes search, pose generation, scoring, rescoring and constraints as score-changing fields, decoys and validation as interpretation fields, and equality on all five score-changing fields as the comparison rule, with only illustrative numbers and no docking measurement.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: docking-protocol-page
   repository_path: site/src/content/docs/labs/docking-protocol.mdx
   title: Same units, different scales
@@ -1990,13 +2046,13 @@ evidence:
   title: Design space laboratory README
   observed_scope: The README reports that expanding a declared space from 25 to 100 members reaches target t2 but not the changed-core t3 or changed-linker t4, and states that the authored spaces are no real screening libraries or synthesis proposals.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: design-space-spaces
   repository_path: labs/design_space/spaces.json
   title: Declared candidate spaces and targets
   observed_scope: This hand-authored teaching file defines two fixed-core enumeration spaces, a different-core space and four target structures for membership checks, without supplying a real screening library or measurement of makeability.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: design-space-page
   repository_path: site/src/content/docs/labs/design-space.mdx
   title: Size does not buy reach
@@ -2164,859 +2220,859 @@ evidence:
   title: The topic's lesson page
   observed_scope: A bilingual lesson that gives each of the seven openness dimensions its own meaning, separates an access level from a licence, and distinguishes an unverified field from a dimension that does not apply, with a worked case and an independent exercise with a worked answer.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t10-asset-openness-lab-page
   repository_path: site/src/content/docs/labs/asset-openness-audit.mdx
   title: The laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the per-record table of the twenty-four examined records, the aggregate counts and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t10-asset-openness-lab-readme
   repository_path: labs/asset_openness_audit/README.md
   title: The laboratory's README
   observed_scope: The provenance of the committed catalogue, the frozen protocol, the setup, the exact commands, the committed result, the scope-text rule and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t10-asset-openness-protocol
   repository_path: labs/asset_openness_audit/protocol.json
   title: The laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the seven dimensions, the claim values, the examined records and their order, the scope rule and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the seven dimensions, the claim values, the examined records and their order, the scope rule and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t10-asset-openness-summary
   repository_path: labs/asset_openness_audit/summary.json
   title: The laboratory's committed run
   observed_scope: The committed audit from the author run, carrying the computation date and the software versions, the per-record fields and flags, and the aggregate counts.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t10-asset-openness-inspector
   repository_path: labs/asset_openness_audit/inspect_asset_openness_audit.py
   title: The laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the audit from the committed catalogue and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t17-split-leakage-lesson
   repository_path: site/src/content/docs/learn/evaluation-and-reproducibility/split-leakage-routes.mdx
   title: The topic's lesson page
   observed_scope: A bilingual lesson that defines a leakage route as a shared identity, explains how the overlap is counted, names the routes the table cannot expose, and separates a contaminated row split from a grouped split, with a worked case and an independent exercise with a worked answer.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t17-split-leakage-lab-page
   repository_path: site/src/content/docs/labs/split-leakage-audit.mdx
   title: The laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the per-route table, the grouped split, the routes that cannot be tested and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t17-split-leakage-lab-readme
   repository_path: labs/split_leakage_audit/README.md
   title: The laboratory's README
   observed_scope: The provenance of the ChEMBL 37 snapshot, the frozen protocol, the setup, the exact commands, the committed result, the reuse of the decision-unit reader and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t17-split-leakage-protocol
   repository_path: labs/split_leakage_audit/protocol.json
   title: The laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the cohort, the admitted measurement rule, the tested routes with their fields, the untestable routes with their reasons, the split and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the cohort, the admitted measurement rule, the tested routes with their fields, the untestable routes with their reasons, the split and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t17-split-leakage-summary
   repository_path: labs/split_leakage_audit/summary.json
   title: The laboratory's committed run
   observed_scope: The committed audit from the author run, carrying the computation date and the software versions, the admitted measurement count, the per-route counts, the untestable routes and the aggregate counts.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t17-split-leakage-inspector
   repository_path: labs/split_leakage_audit/inspect_split_leakage_audit.py
   title: The laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the routes from the cached snapshot and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t05-relational-graph-lesson
   repository_path: site/src/content/docs/learn/representations/relational-graph-evidence.mdx
   title: The topic's lesson page
   observed_scope: A bilingual lesson that models typed nodes and directed relations, shows that an edge's provenance belongs to the record that declares it, separates a missing edge from a candidate pair, and says why a path through a resource graph is not a mechanism, with a worked case and an independent exercise with a worked answer.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t05-relational-graph-lab-page
   repository_path: site/src/content/docs/labs/relational-graph-audit.mdx
   title: The laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the node and edge tables, the isolated nodes, the candidate pairs and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t05-relational-graph-lab-readme
   repository_path: labs/relational_graph_audit/README.md
   title: The laboratory's README
   observed_scope: The provenance of the committed catalogue, the frozen protocol, the setup, the exact commands, the committed result and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t05-relational-graph-protocol
   repository_path: labs/relational_graph_audit/protocol.json
   title: The laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the node and edge types, the candidate-edge rule, the provenance rule, the isolated-node rule, the degree rule and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the node and edge types, the candidate-edge rule, the provenance rule, the isolated-node rule, the degree rule and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t05-relational-graph-summary
   repository_path: labs/relational_graph_audit/summary.json
   title: The laboratory's committed run
   observed_scope: The committed audit from the author run, carrying the computation date and the software versions, the node and edge counts, the edge counts by type, the isolated nodes, the candidate-edge count and the highest-degree nodes.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t05-relational-graph-inspector
   repository_path: labs/relational_graph_audit/inspect_relational_graph_audit.py
   title: The laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the graph from the committed catalogue and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-claims-evidence-lesson
   repository_path: site/src/content/docs/learn/foundations/evidence-claims-and-unknowns.mdx
   title: The evidence, claims and unresolved fields lesson
   observed_scope: A bilingual lesson that distinguishes a direct observation, a bounded inference, an unsupported claim and an unresolved field, with a worked case, an independent exercise with a worked answer, and the limits the material states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-claims-evidence-lab-page
   repository_path: site/src/content/docs/labs/claims-evidence-audit.mdx
   title: The claims laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the per-provider state table, the unsupported claims, the disagreements with the independent reading and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-claims-evidence-lab-readme
   repository_path: labs/claims_evidence_audit/README.md
   title: The claims laboratory's README
   observed_scope: The provenance of the committed comparison records, the frozen protocol, the setup, the exact commands, the committed result and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-claims-evidence-protocol
   repository_path: labs/claims_evidence_audit/protocol.json
   title: The claims laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the four states and the rule that puts a cell in one of them, the audited providers, the examined track and topics, the claims the record carries and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the four states and the rule that puts a cell in one of them, the audited providers, the examined track and topics, the claims the record carries and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-claims-evidence-summary
   repository_path: labs/claims_evidence_audit/summary.json
   title: The claims laboratory's committed run
   observed_scope: The committed audit from the author run, carrying the computation date and the software versions, the state counts per provider, the unsupported claims, the disagreements with the independent reading and the claim statuses.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-claims-evidence-inspector
   repository_path: labs/claims_evidence_audit/inspect_claims_evidence_audit.py
   title: The claims laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the states from the committed records and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-functional-validation-lesson
   repository_path: site/src/content/docs/learn/biologics-design/binding-functional-and-clinical-claims.mdx
   title: The binding, functional and clinical claims lesson
   observed_scope: A bilingual lesson that tells a measurement, a response and an outcome apart, says what kind of record each claim needs, and states that a response is not an outcome, with a worked case and an independent exercise with a worked answer.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-functional-validation-lab-page
   repository_path: site/src/content/docs/labs/functional-validation-audit.mdx
   title: The functional-validation laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the record kinds of the two tables, the routes that cannot be measured and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-functional-validation-lab-readme
   repository_path: labs/functional_validation_audit/README.md
   title: The functional-validation laboratory's README
   observed_scope: The provenance of the two committed snapshots, the frozen protocol, the setup, the exact commands, the committed result and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-functional-validation-protocol
   repository_path: labs/functional_validation_audit/protocol.json
   title: The functional-validation laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the record kinds and the rule that puts a record in one of them, the claims a record may carry, the routes that cannot be measured and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the record kinds and the rule that puts a record in one of them, the claims a record may carry, the routes that cannot be measured and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-functional-validation-summary
   repository_path: labs/functional_validation_audit/summary.json
   title: The functional-validation laboratory's committed run
   observed_scope: The committed audit from the author run, carrying the computation date and the software versions, the record counts per kind for each table, the records that license no claim and the unmeasurable routes.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-functional-validation-inspector
   repository_path: labs/functional_validation_audit/inspect_functional_validation_audit.py
   title: The functional-validation laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the record kinds from the two snapshots and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-specificity-negative-selection-lesson
   repository_path: site/src/content/docs/learn/biologics-design/specificity-and-negative-selection.mdx
   title: The specificity and negative selection lesson
   observed_scope: A bilingual lesson that says a margin against an unintended partner needs a second measurement, that an archive holding one measurement per pair cannot supply one, and how a reader should treat a protein the table says nothing about beyond one partner, with a worked case built on the measured counts and an independent exercise with a worked answer.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-specificity-negative-selection-lab-page
   repository_path: site/src/content/docs/labs/specificity-margin-audit.mdx
   title: The specificity margin laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the archive counts, the partner distribution, the complete per-protein table and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-specificity-negative-selection-lab-readme
   repository_path: labs/specificity_margin_audit/README.md
   title: The specificity margin laboratory's README
   observed_scope: The provenance of the cached snapshot, the frozen protocol, the setup, the exact commands, the committed result and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-specificity-negative-selection-protocol
   repository_path: labs/specificity_margin_audit/protocol.json
   title: The specificity margin laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the counted unit and the rule that a row without a parsed measurement does not count towards its pair, the partner rule, and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the counted unit and the rule that a row without a parsed measurement does not count towards its pair, the partner rule, and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-specificity-negative-selection-summary
   repository_path: labs/specificity_margin_audit/summary.json
   title: The specificity margin laboratory's committed run
   observed_scope: The committed census from the author run, carrying the computation date and the software versions, the archive counts, the partner distribution, the number of comparable pairs and the complete per-protein table.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-specificity-negative-selection-inspector
   repository_path: labs/specificity_margin_audit/inspect_specificity_margin_audit.py
   title: The specificity margin laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the partner census from the cached archive and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t08-pkpd-translation-lab-readme
   repository_path: labs/pkpd_translation_audit/README.md
   title: The PK/PD translation laboratory's README
   observed_scope: The subject of the model, the mode, the exact commands, the committed result, the parameters and their sources, and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t08-pkpd-translation-lab-protocol
   repository_path: labs/pkpd_translation_audit/protocol.json
   title: The PK/PD translation laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the source snapshot and its licence, the model with every parameter, its value, its unit and its source, the counted unit, and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the source snapshot and its licence, the model with every parameter, its value, its unit and its source, the counted unit, and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t08-pkpd-translation-lab-summary
   repository_path: labs/pkpd_translation_audit/summary.json
   title: The PK/PD translation laboratory's committed run
   observed_scope: The committed run from the author run, carrying the computation date and the software versions, the model, the cohort counts, the counts of the compounds the model can and cannot carry with their reasons, and the boundary statement.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t08-pkpd-translation-lab-inspector
   repository_path: labs/pkpd_translation_audit/inspect_pkpd_translation_audit.py
   title: The PK/PD translation laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the cache, the assay units, the cohort partition, the leave-one-out species step, the uncertainty propagation and the committed summary, and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t08-pkpd-translation-lab-page
   repository_path: site/src/content/docs/labs/pkpd-translation-audit.mdx
   title: The PK/PD translation laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the model and its parameters with their sources, the cohort, the counts the model can and cannot carry, and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t08-multiendpoint-tradeoff-lab-readme
   repository_path: labs/multi_endpoint_tradeoff/README.md
   title: The endpoint coverage laboratory's README
   observed_scope: The subject of the audit, the mode, the exact commands, the committed result, the endpoint families and their units, and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t08-multiendpoint-tradeoff-lab-summary
   repository_path: labs/multi_endpoint_tradeoff/summary.json
   title: The endpoint coverage laboratory's committed run
   observed_scope: The committed run from the author run, carrying the computation date and the software versions, the cohort, the per-family measurement counts, units and spreads, the compounds with an empty family, and the boundary statement.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t08-multiendpoint-tradeoff-lab-inspector
   repository_path: labs/multi_endpoint_tradeoff/inspect_multi_endpoint_tradeoff.py
   title: The endpoint coverage laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the per-family counts from the cached records and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t08-multiendpoint-tradeoff-lab-page
   repository_path: site/src/content/docs/labs/multi-endpoint-tradeoff.mdx
   title: The endpoint coverage laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the endpoint families and their units, the per-family counts and spreads, and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t12-oracle-exploitation-lab-readme
   repository_path: labs/oracle_exploitation_audit/README.md
   title: The oracle-exploitation laboratory's README
   observed_scope: The subject of the audit, the mode, the exact commands, the three selections and what each measured, the gaps, the batch and its verification targets, the committed result, and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t12-oracle-exploitation-lab-protocol
   repository_path: labs/oracle_exploitation_audit/protocol.json
   title: The oracle-exploitation laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the source snapshot and its release and licence, the model with every parameter and its source, the three selection rules, the rule the laboratory enforces, the counted unit, and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the source snapshot and its release and licence, the model with every parameter and its source, the three selection rules, the rule the laboratory enforces, the counted unit, and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t12-oracle-exploitation-lab-summary
   repository_path: labs/oracle_exploitation_audit/summary.json
   title: The oracle-exploitation laboratory's committed run
   observed_scope: The committed run from the author run, carrying the computation date and the software versions, the three selections with their sizes, their measured and predicted values and the gaps, the batch with its verification targets, the boundary statement, and the enforced rule.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t12-oracle-exploitation-lab-inspector
   repository_path: labs/oracle_exploitation_audit/inspect_oracle_exploitation_audit.py
   title: The oracle-exploitation laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the source split, the fitted-set guard, the gaps, the batch and the committed summary, and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t12-oracle-exploitation-lab-page
   repository_path: site/src/content/docs/labs/oracle-exploitation-audit.mdx
   title: The oracle-exploitation laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the three selections and what each measured, the gap, the batch and its verification targets, and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: cyp-assay-system-lab-readme
   repository_path: labs/cyp_assay_system/README.md
   title: The CYP assay system laboratory's README
   observed_scope: The subject of the comparison, the two enzyme targets and the assay and unit rules, the mode, the exact commands, the committed result, and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: cyp-assay-system-lab-protocol
   repository_path: labs/cyp_assay_system/protocol.json
   title: The CYP assay system laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the two target records and their snapshot, the admission rule, the count and correlation measures, and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the two target records and their snapshot, the admission rule, the count and correlation measures, and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: cyp-assay-system-lab-summary
   repository_path: labs/cyp_assay_system/summary.json
   title: The CYP assay system laboratory's committed run
   observed_scope: The committed run from the author run, carrying the computation date and the software versions, the admitted parent counts per target, the overlap, the correlation and the divergent examples.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: az-clearance-system-lab-readme
   repository_path: labs/az_clearance_system/README.md
   title: The clearance system laboratory's README
   observed_scope: The subject of the comparison, the three named assay systems and their different clearance bases, the mode, the exact commands, the committed result, and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: az-clearance-system-lab-protocol
   repository_path: labs/az_clearance_system/protocol.json
   title: The clearance system laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the three ChEMBL document records and their snapshot, the admission rule, the unit rules for the three systems, and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the three ChEMBL document records and their snapshot, the admission rule, the unit rules for the three systems, and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: az-clearance-system-lab-summary
   repository_path: labs/az_clearance_system/summary.json
   title: The clearance system laboratory's committed run
   observed_scope: The committed run from the author run, carrying the computation date and the software versions, the admitted parent counts per system, the audit counts, the overlap and the correlation with the divergent examples.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: l1000-perturbation-context-lab-readme
   repository_path: labs/l1000_perturbation_context/README.md
   title: The perturbation context laboratory's README
   observed_scope: The subject of the comparison, the real transcriptional signatures and the compound and cell contexts, the mode, the exact commands, the committed result, and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: l1000-perturbation-context-lab-summary
   repository_path: labs/l1000_perturbation_context/summary.json
   title: The perturbation context laboratory's committed run
   observed_scope: The committed run from the author run, carrying the computation date and the software versions, the compound and cell counts, the corrected and uncorrected differential signatures and the comparison between them.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-claim-chain-lab-readme
   repository_path: labs/claim_chain_audit/README.md
   title: The claim-chain laboratory's README
   observed_scope: The subject of the audit, the two chains and their links, the mode, the exact commands, the committed result, and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-claim-chain-lab-protocol
   repository_path: labs/claim_chain_audit/protocol.json
   title: The claim-chain laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the three record files the laboratory reads, the chains as ordered topic lists, the rules that decide a link's state and that break a chain, the counted unit, and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the three record files the laboratory reads, the chains as ordered topic lists, the rules that decide a link''s state and that break a chain, the counted unit, and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-claim-chain-lab-summary
   repository_path: labs/claim_chain_audit/summary.json
   title: The claim-chain laboratory's committed run
   observed_scope: The committed run from the author run, carrying the computation date and the software versions, the chains with their link counts, the weakest link of each, the counts of links below the strongest state, the disagreements with the independent reading, and the boundary statement.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-claim-chain-lab-inspector
   repository_path: labs/claim_chain_audit/inspect_claim_chain_audit.py
   title: The claim-chain laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the chains, their link states, their weakest links and the committed summary, and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-claim-chain-lab-page
   repository_path: site/src/content/docs/labs/claim-chain-audit.mdx
   title: The claim-chain laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the chains and their links, the weakest link of each, the disagreements with the independent reading, and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t06-open-question-lab-readme
   repository_path: labs/open_question_audit/README.md
   title: The open-question laboratory's README
   observed_scope: The subject of the audit, the six question states, the mode, the exact commands, the committed result, and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t06-open-question-lab-protocol
   repository_path: labs/open_question_audit/protocol.json
   title: The open-question laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the record files the laboratory reads, the rule that assigns a question state, the falsifier and missing-measurement vocabulary, the counted unit, and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the record files the laboratory reads, the rule that assigns a question state, the falsifier and missing-measurement vocabulary, the counted unit, and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t06-open-question-lab-summary
   repository_path: labs/open_question_audit/summary.json
   title: The open-question laboratory's committed run
   observed_scope: The committed run from the author run, carrying the computation date and the software versions, the counts per question state, the open questions with and without a falsifier, the missing-measurement family counts, and the boundary statement.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t06-open-question-lab-inspector
   repository_path: labs/open_question_audit/inspect_open_question_audit.py
   title: The open-question laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the question states, the falsifier counts and the committed summary, and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t06-open-question-lab-page
   repository_path: site/src/content/docs/labs/open-question-audit.mdx
   title: The open-question laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the question states and their counts, the open questions with and without a falsifier, the missing-measurement families, and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t02-tpp-lab-readme
   repository_path: labs/target_product_profile/README.md
   title: The target product profile laboratory's README
   observed_scope: The subject of the audit, the profile and its requirements, the mode, the exact commands, the committed result, and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t02-tpp-lab-protocol
   repository_path: labs/target_product_profile/protocol.json
   title: The target product profile laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the three snapshots and their readers, the profile with each requirement, whether it is a gate or a preference, its threshold and its unit, the rules that decide a contradiction, and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the three snapshots and their readers, the profile with each requirement, whether it is a gate or a preference, its threshold and its unit, the rules that decide a contradiction, and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t02-tpp-lab-summary
   repository_path: labs/target_product_profile/summary.json
   title: The target product profile laboratory's committed run
   observed_scope: The committed run from the author run, carrying the computation date and the software versions, the profile, the cohort counts, the per-gate pass and fail counts, the preference-miss counts, the requirements with no measurement, and the boundary statement.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t02-tpp-lab-inspector
   repository_path: labs/target_product_profile/inspect_target_product_profile.py
   title: The target product profile laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the profile, the cached measurements and the committed summary, and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t02-tpp-lab-page
   repository_path: site/src/content/docs/labs/target-product-profile.mdx
   title: The target product profile laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the profile and its requirements, the cohort, the contradictions, the requirements with no measurement, and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-crossdomain-tradeoff-lab-readme
   repository_path: labs/crossdomain_tradeoff/README.md
   title: The cross-domain trade-off laboratory's README
   observed_scope: The rule the laboratory executes, the frozen protocol, the mode, the exact commands, what the committed run found on the teaching table and on the measured cohort, and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-24"
+  reviewed_on: '2026-10-24'
 - id: t18-crossdomain-tradeoff-lab-protocol
   repository_path: labs/crossdomain_tradeoff/protocol.json
   title: The cross-domain trade-off laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the three measured sources with their snapshot lengths, the constructed teaching table, the five required inputs with their state rules and thresholds, the next decisions, the rules and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the three measured sources with their snapshot lengths, the constructed teaching table, the five required inputs with their state rules and thresholds, the next decisions, the rules and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-24"
+  reviewed_on: '2026-10-24'
 - id: t18-crossdomain-tradeoff-lab-summary
   repository_path: labs/crossdomain_tradeoff/summary.json
   title: The cross-domain trade-off laboratory's committed run
   observed_scope: The committed run from the author run, carrying the computation date and the software versions, the three teaching decisions and the fifty-eight measured decisions with each required input's state, the blocking input, the next decision and the evidence grade, the count distributions and the boundary statement.
   access: opened
-  reviewed_on: "2026-10-24"
+  reviewed_on: '2026-10-24'
 - id: t18-crossdomain-tradeoff-lab-inspector
   repository_path: labs/crossdomain_tradeoff/inspect_crossdomain_tradeoff.py
   title: The cross-domain trade-off laboratory's inspector
   observed_scope: The command that shows each decision with its inputs and recomputes the committed summary from the cached evidence.
   access: opened
-  reviewed_on: "2026-10-24"
+  reviewed_on: '2026-10-24'
 - id: t18-crossdomain-tradeoff-lab-page
   repository_path: site/src/content/docs/labs/crossdomain-tradeoff.mdx
   title: The cross-domain trade-off laboratory's guide page
-  observed_scope: "The reader-facing guide to the laboratory: what the rule is, what the teaching table decides, what the measured cohort decides, the independent exercise and the snapshot attribution."
+  observed_scope: 'The reader-facing guide to the laboratory: what the rule is, what the teaching table decides, what the measured cohort decides, the independent exercise and the snapshot attribution.'
   access: opened
-  reviewed_on: "2026-10-24"
+  reviewed_on: '2026-10-24'
 - id: t16-agent-evaluation-lab-readme
   repository_path: labs/agent_evaluation_taskset/README.md
   title: The agent evaluation task set laboratory's README
   observed_scope: The subject of the audit, the five dimensions, the mode, the exact commands, the committed result, and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t16-agent-evaluation-lab-protocol
   repository_path: labs/agent_evaluation_taskset/protocol.json
   title: The agent evaluation task set laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the laboratories the task set is drawn from, the task set with each task's sources and declared expectations, the five dimensions with the rule that decides each, the rule that a task failing any dimension is not a passing task, and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the laboratories the task set is drawn from, the task set with each task''s sources and declared expectations, the five dimensions with the rule that decides each, the rule that a task failing any dimension is not a passing task, and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t16-agent-evaluation-lab-summary
   repository_path: labs/agent_evaluation_taskset/summary.json
   title: The agent evaluation task set laboratory's committed run
   observed_scope: The committed run from the author run, carrying the computation date and the software versions, the task count, the per-dimension pass counts, the incomplete tasks and on which dimension, and the boundary statement.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t16-agent-evaluation-lab-inspector
   repository_path: labs/agent_evaluation_taskset/inspect_agent_evaluation_taskset.py
   title: The agent evaluation task set laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the task results and the committed summary, and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t16-agent-evaluation-lab-page
   repository_path: site/src/content/docs/labs/agent-evaluation-taskset.mdx
   title: The agent evaluation task set laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the task set and the five dimensions, the per-task results, what the set does not cover, and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t06-mechanism-consistency-lab-readme
   repository_path: labs/mechanism_consistency/README.md
   title: The mechanism consistency laboratory's README
   observed_scope: The subject of the test, the two competing explanations, the discriminator, the mode, the exact commands, the committed result, and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t06-mechanism-consistency-lab-protocol
   repository_path: labs/mechanism_consistency/protocol.json
   title: The mechanism consistency laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the source snapshot and its reader, the two explanations with the rule that decides a compound's side, the declared informative-correlation threshold, the rule that an undecided compound is not counted as support, and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the source snapshot and its reader, the two explanations with the rule that decides a compound''s side, the declared informative-correlation threshold, the rule that an undecided compound is not counted as support, and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t06-mechanism-consistency-lab-summary
   repository_path: labs/mechanism_consistency/summary.json
   title: The mechanism consistency laboratory's committed run
   observed_scope: The committed run from the author run, carrying the computation date and the software versions, the cohort counts, the counts on each side of the comparison, the undecided counts, the falsifying observation, and the boundary statement.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t06-mechanism-consistency-lab-inspector
   repository_path: labs/mechanism_consistency/inspect_mechanism_consistency.py
   title: The mechanism consistency laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the per-compound rules, the counts and the cached snapshot, and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t06-mechanism-consistency-lab-page
   repository_path: site/src/content/docs/labs/mechanism-consistency.mdx
   title: The mechanism consistency laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the two explanations and the discriminator, the per-compound verdicts and the counts, the falsifying observation, and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-candidate-chain-lab-readme
   repository_path: labs/candidate_evidence_chain/README.md
   title: The candidate evidence chain laboratory's README
   observed_scope: The subject of the audit, the eight links and their states, the mode, the exact commands, the committed result, and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-candidate-chain-lab-protocol
   repository_path: labs/candidate_evidence_chain/protocol.json
   title: The candidate evidence chain laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the sources with the laboratory that owns each and whether it is measured or constructed, the eight links in order with the rule that decides a link's state, the rule that a claim may not exceed the first measured link's scope, the counted unit, and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the sources with the laboratory that owns each and whether it is measured or constructed, the eight links in order with the rule that decides a link''s state, the rule that a claim may not exceed the first measured link''s scope, the counted unit, and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-candidate-chain-lab-summary
   repository_path: labs/candidate_evidence_chain/summary.json
   title: The candidate evidence chain laboratory's committed run
   observed_scope: The committed run from the author run, carrying the computation date and the software versions, the link-state counts, the distribution of the first non-measured link, the number of chains that reach a claim, and the boundary statement.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-candidate-chain-lab-inspector
   repository_path: labs/candidate_evidence_chain/inspect_candidate_evidence_chain.py
   title: The candidate evidence chain laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the cached compound chains and the committed summary, and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-candidate-chain-lab-page
   repository_path: site/src/content/docs/labs/candidate-evidence-chain.mdx
   title: The candidate evidence chain laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the eight links, the per-compound chains and the link where each stops, the counts, and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-construct-record-lab-readme
   repository_path: labs/biologic_construct_audit/README.md
   title: The construct record laboratory's README
   observed_scope: The subject of the audit, the four field rules, the mode, the exact commands, the committed result, and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-construct-record-lab-protocol
   repository_path: labs/biologic_construct_audit/protocol.json
   title: The construct record laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the source endpoint and the entities it admits, the four field rules, the rule that a modality alone is not a construct, the counted unit, and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the source endpoint and the entities it admits, the four field rules, the rule that a modality alone is not a construct, the counted unit, and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-construct-record-lab-summary
   repository_path: labs/biologic_construct_audit/summary.json
   title: The construct record laboratory's committed run
   observed_scope: The committed run from the author run, carrying the fetch time, the entity count, the per-field stated and unstated counts, the entities by how many fields they state, the construct-without-host and host-without-construct cases, and the boundary statement.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-construct-record-lab-inspector
   repository_path: labs/biologic_construct_audit/inspect_biologic_construct_audit.py
   title: The construct record laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the protocol, the committed source snapshot, the audit rules and the summary, and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t13-construct-record-lab-page
   repository_path: site/src/content/docs/labs/biologic-construct-audit.mdx
   title: The construct record laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the four fields, the per-entity coverage, the construct-without-host and host-without-construct cases, and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t11-free-energy-network-lab-readme
   repository_path: labs/free_energy_network_audit/README.md
   title: The free energy network laboratory's README
   observed_scope: The subject of the audit, the endpoint rule, the mode, the exact commands, the committed result, the failed cycles, and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t11-free-energy-network-lab-protocol
   repository_path: labs/free_energy_network_audit/protocol.json
   title: The free energy network laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the source record and its files, the endpoint rule that a solvent edge and a complex edge are not the same quantity, the cycle rule and the tolerance derived from the estimates' own uncertainty, the counted unit, and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the source record and its files, the endpoint rule that a solvent edge and a complex edge are not the same quantity, the cycle rule and the tolerance derived from the estimates'' own uncertainty, the counted unit, and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t11-free-energy-network-lab-summary
   repository_path: labs/free_energy_network_audit/summary.json
   title: The free energy network laboratory's committed run
   observed_scope: The committed run from the author run, carrying the computation date and the software versions, the per-system edge, estimate and cycle counts, the closed and failed cycle counts, the failed cycles with their sizes, the boundary statement, and the enforced rules.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t11-free-energy-network-lab-inspector
   repository_path: labs/free_energy_network_audit/inspect_free_energy_network_audit.py
   title: The free energy network laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the cycle classifications, the summary and the cached archives, and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t11-free-energy-network-lab-page
   repository_path: site/src/content/docs/labs/free-energy-network-audit.mdx
   title: The free energy network laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the endpoint rule, the per-system edges and cycles, the closed and failed cycles, the limits of the material, and the sources with their licences.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t16-tool-contract-lab-readme
   repository_path: labs/tool_contract_audit/README.md
   title: The return-contract laboratory's README
   observed_scope: The subject of the audit, the counted unit and why the laboratory excludes its own return record, the mode, the exact commands, the committed result and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t16-tool-contract-lab-protocol
   repository_path: labs/tool_contract_audit/protocol.json
   title: The return-contract laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the audited source and the laboratory it excludes, the six contract parts with their rules, the counted unit and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the audited source and the laboratory it excludes, the six contract parts with their rules, the counted unit and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t16-tool-contract-lab-summary
   repository_path: labs/tool_contract_audit/summary.json
   title: The return-contract laboratory's committed run
   observed_scope: The committed audit from the author run, carrying the computation date and the software versions, the contract, the field counts, the per-laboratory verdicts and the boundary statement.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t16-tool-contract-lab-inspector
   repository_path: labs/tool_contract_audit/inspect_tool_contract_audit.py
   title: The return-contract laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the verdicts from the local return records and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t16-tool-contract-lab-page
   repository_path: site/src/content/docs/labs/tool-contract-audit.mdx
   title: The return-contract laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the six contract parts, the field completeness table, the per-laboratory verdicts and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-source-review-lesson
   repository_path: site/src/content/docs/learn/foundations/source-review-and-claim-scope.mdx
   title: The source review and claim scope lesson
   observed_scope: A bilingual lesson that gives a reviewable claim its four parts, the source surface, the version, the date and the exact material reviewed, and says what a reader may do with an entry that names only a surface, with a worked case and an independent exercise with a worked answer.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-source-review-lab-page
   repository_path: site/src/content/docs/labs/source-review-scope-audit.mdx
   title: The source-review laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the per-record table, the routes that cannot be measured and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-source-review-lab-readme
   repository_path: labs/source_review_scope_audit/README.md
   title: The source-review laboratory's README
   observed_scope: The provenance of the committed catalogue, the frozen protocol, the setup, the exact commands, the committed result and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-source-review-protocol
   repository_path: labs/source_review_scope_audit/protocol.json
   title: The source-review laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the four parts a reviewable claim carries, the examined records, the routes that cannot be measured and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the four parts a reviewable claim carries, the examined records, the routes that cannot be measured and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-source-review-summary
   repository_path: labs/source_review_scope_audit/summary.json
   title: The source-review laboratory's committed run
   observed_scope: The committed audit from the author run, carrying the computation date and the software versions, the per-record part counts, the unresolved claim references and the unmeasurable routes.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-source-review-inspector
   repository_path: labs/source_review_scope_audit/inspect_source_review_scope_audit.py
   title: The source-review laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the part counts from the committed catalogue and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-entity-glossary-lesson
   repository_path: site/src/content/docs/learn/foundations/entity-kinds-and-identifiers.mdx
   title: The entity kinds and identifiers lesson
   observed_scope: A bilingual lesson that tells which kinds of entity a measurement can be about, which identifier names each of them, and why a molecule record and a parent molecule are two identifiers for one substance, with a worked case and an independent exercise with a worked answer.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-entity-glossary-lab-page
   repository_path: site/src/content/docs/labs/entity-glossary-audit.mdx
   title: The entity-glossary laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the per-kind table, the kinds the table cannot name and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-entity-glossary-lab-readme
   repository_path: labs/entity_glossary_audit/README.md
   title: The entity-glossary laboratory's README
   observed_scope: The provenance of the ChEMBL 37 snapshot, the frozen protocol, the setup, the exact commands, the committed result and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-entity-glossary-protocol
   repository_path: labs/entity_glossary_audit/protocol.json
   title: The entity-glossary laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the cohort, the admitted measurement rule, the entity kinds the table names and the ones it cannot, the rule that says what the identifiers mean together, and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the cohort, the admitted measurement rule, the entity kinds the table names and the ones it cannot, the rule that says what the identifiers mean together, and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-entity-glossary-summary
   repository_path: labs/entity_glossary_audit/summary.json
   title: The entity-glossary laboratory's committed run
   observed_scope: The committed audit from the author run, carrying the computation date and the software versions, the per-kind counts, the kinds the table cannot name and the molecule and parent disagreement counts.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t01-entity-glossary-inspector
   repository_path: labs/entity_glossary_audit/inspect_entity_glossary_audit.py
   title: The entity-glossary laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the entity kinds from the cached snapshot and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t17-generalization-unit-lesson
   repository_path: site/src/content/docs/learn/evaluation-and-reproducibility/generalization-unit-and-estimand.mdx
   title: The generalization unit and estimand lesson
   observed_scope: A bilingual lesson that says what a quantity is estimated over, why a row count and an independent-unit count are different claims, and what a leave-one-out split leaves behind, with a worked case and an independent exercise with a worked answer.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t17-generalization-unit-lab-page
   repository_path: site/src/content/docs/labs/generalization-unit-audit.mdx
   title: The generalization-unit laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the per-unit table, the units the table cannot name, the two-unit comparison and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t17-generalization-unit-lab-readme
   repository_path: labs/generalization_unit_audit/README.md
   title: The generalization-unit laboratory's README
   observed_scope: The provenance of the ChEMBL 37 snapshot, the frozen protocol, the setup, the exact commands, the committed result and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t17-generalization-unit-protocol
   repository_path: labs/generalization_unit_audit/protocol.json
   title: The generalization-unit laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the cohort, the admitted measurement rule, the candidate units and the field that names each, the units the table cannot name, the rule the laboratory measures and the exclusions it declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the cohort, the admitted measurement rule, the candidate units and the field that names each, the units the table cannot name, the rule the laboratory measures and the exclusions it declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t17-generalization-unit-summary
   repository_path: labs/generalization_unit_audit/summary.json
   title: The generalization-unit laboratory's committed run
   observed_scope: The committed audit from the author run, carrying the computation date and the software versions, the per-unit counts, the units the table cannot name and the two-unit comparison.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t17-generalization-unit-inspector
   repository_path: labs/generalization_unit_audit/inspect_generalization_unit_audit.py
   title: The generalization-unit laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the per-unit counts from the cached snapshot and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t07-applicability-domain-lesson
   repository_path: site/src/content/docs/learn/qsar-properties/applicability-domain-diagnostics.mdx
   title: The applicability domain diagnostics lesson
   observed_scope: A bilingual lesson that says what an applicability domain states, that a distance in a chosen representation is conditional on that representation, and what the error of a simple baseline does as the distance grows, with a worked case and an independent exercise with a worked answer.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t07-applicability-domain-lab-page
   repository_path: site/src/content/docs/labs/applicability-domain-audit.mdx
   title: The applicability-domain laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the cohort and the split, the distance statistics, the two error halves and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t07-applicability-domain-lab-readme
   repository_path: labs/applicability_domain_audit/README.md
   title: The applicability-domain laboratory's README
   observed_scope: The provenance of the FreeSolv release, the frozen protocol, the setup, the exact commands, the committed result, the release sensitivity of the distances and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t07-applicability-domain-protocol
   repository_path: labs/applicability_domain_audit/protocol.json
   title: The applicability-domain laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the source and its byte length, the representation and the distance, the split, the baseline and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the source and its byte length, the representation and the distance, the split, the baseline and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t07-applicability-domain-summary
   repository_path: labs/applicability_domain_audit/summary.json
   title: The applicability-domain laboratory's committed run
   observed_scope: The committed audit from the author run, carrying the computation date and the software versions, the cohort and split counts, the distance statistics and the two error halves.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t07-applicability-domain-inspector
   repository_path: labs/applicability_domain_audit/inspect_applicability_domain_audit.py
   title: The applicability-domain laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the audit from the release and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-nomination-readiness-lesson
   repository_path: site/src/content/docs/learn/candidate-nomination/readiness-rules-and-next-experiment.mdx
   title: The readiness rules and the next experiment lesson
   observed_scope: A bilingual lesson that says what a readiness rule has to fix before the numbers are seen, what a go, a hold and a stop each license, and how the next experiment is named from the measurement that is missing, with a worked case and an independent exercise with a worked answer.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-nomination-readiness-lab-page
   repository_path: site/src/content/docs/labs/nomination-readiness-audit.mdx
   title: The readiness-rule laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the rule and its thresholds, the per-compound table, the counts per state and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-nomination-readiness-lab-readme
   repository_path: labs/nomination_readiness_audit/README.md
   title: The readiness-rule laboratory's README
   observed_scope: The provenance of the ChEMBL 37 snapshot, the frozen protocol, the setup, the exact commands, the committed result and the limits the laboratory states.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-nomination-readiness-protocol
   repository_path: labs/nomination_readiness_audit/protocol.json
   title: The readiness-rule laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the cohort, the admitted measurement rule, the three conditions and their thresholds, the rule that names the missing measurement and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the cohort, the admitted measurement rule, the three conditions and their thresholds, the rule that names the missing measurement and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-nomination-readiness-summary
   repository_path: labs/nomination_readiness_audit/summary.json
   title: The readiness-rule laboratory's committed run
   observed_scope: The committed audit from the author run, carrying the computation date and the software versions, the cohort size, the admitted measurement count, the thresholds, the per-state counts and the per-compound table.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t18-nomination-readiness-inspector
   repository_path: labs/nomination_readiness_audit/inspect_nomination_readiness_audit.py
   title: The readiness-rule laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the states from the cached snapshot and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t09-affinity-ranking-lab-readme
   repository_path: labs/skempi_affinity/README.md
   title: The affinity-table laboratory's README
   observed_scope: The provenance of the cached mirror, the frozen contract, the setup, the exact commands, the committed result and the limits the laboratory states, including that the row split is a diagnostic for overlap and not the evaluation split.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t09-affinity-ranking-lab-protocol
   repository_path: labs/skempi_affinity/protocol.json
   title: The affinity-table laboratory's frozen protocol
-  observed_scope: "The machine-readable frozen contract: the protocol identifier, the snapshot byte length, the source fields, the positional alignment, the complete-affinity-pair rule, the complex-level holdout, the fixed seed, the group-only training median, the observed-mutant comparator, the log10(M) absolute-error metrics and the exclusions the laboratory declares for itself."
+  observed_scope: 'The machine-readable frozen contract: the protocol identifier, the snapshot byte length, the source fields, the positional alignment, the complete-affinity-pair rule, the complex-level holdout, the fixed seed, the group-only training median, the observed-mutant comparator, the log10(M) absolute-error metrics and the exclusions the laboratory declares for itself.'
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t09-affinity-ranking-lab-summary
   repository_path: labs/skempi_affinity/summary.json
   title: The affinity-table laboratory's committed run
   observed_scope: The committed run from the author run, carrying the computation date and the software versions, the row and complex counts, the partial-record audit, the row-split diagnostic and the held-out-complex errors for both baselines.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t09-affinity-ranking-lab-inspector
   repository_path: labs/skempi_affinity/inspect_skempi_affinity.py
   title: The affinity-table laboratory's inspector
   observed_scope: The inspection and check entry point, which recomputes the counts, the partial-record audit and the held-out-complex errors from the cached mirror and exits non-zero when an invariant fails.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 - id: t09-affinity-ranking-lab-page
   repository_path: site/src/content/docs/labs/skempi-affinity.mdx
   title: The affinity-table laboratory's guide page
   observed_scope: A bilingual guide that names the mode, the commands, the row and complex counts, the held-out-complex comparison and the limits of the material.
   access: opened
-  reviewed_on: "2026-10-23"
+  reviewed_on: '2026-10-23'
 caveats:
 - The two representation topics for proteins and for complexes stay at worked deliberately. This repository holds no protein or complex artifact a reader can run, and building one would require protein data it does not ship, so those rows remain in the executable queue as work rather than as routing.
 - Two topics held at worked on 2026-09-10 were later closed by building rather than by rescoring, and both builds are additive to a synthetic sandbox that changes no empirical result. Computational limits and uncertainty gained an optimiser sweep reporting gradient evaluations, decision agreement and probability spread. Inductive-bias selection was in the same position on 2026-09-10 and was closed by building rather than by rescoring. The sandbox previously varied penalty strength inside one linear family, which is a different question, so a decision-stump arm was added to compare families under one selection rule.
@@ -3024,4 +3080,4 @@ caveats:
 - Version 0.1 provides one substantive introduction per track but does not yet cover all 93 comparison topics at explained depth.
 - FreeSolv is a completed predictive baseline lab, and T15 is a completed retrospective teaching replay with assessed exercises. T05 has completed its paired frozen evaluation, but T15 had already exposed shared labels; no subsequent T05 retuning or independent-confirmation claim is supported. T11 has completed two within-system evaluations; their time-correlated frames are not pooled into biological replicates, and the locked artifact lacks per-frame Ridge predictions for an independent post-run Ridge recomputation.
 - No public deployment URL or public correction route was verified on 2026-09-04, so external content and code access remain unverified.
-last_verified: "2026-10-24"
+last_verified: '2026-10-24'

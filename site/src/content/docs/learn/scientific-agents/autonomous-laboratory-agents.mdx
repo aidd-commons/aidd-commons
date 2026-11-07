@@ -358,6 +358,23 @@ Answer the following using only the Atlas records for this family.
 
 </details>
 
+## Executable governance and biosecurity release audit (`governance-release`)
+
+To decide what can be released or acted upon across software, weights, de novo protein design, autonomous synthesis, and clinical candidates, run the 5-axis governance audit in [the asset-openness-audit laboratory](/labs/asset-openness-audit/):
+
+```bash
+.venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py governance-release
+.venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py check-governance-release
+```
+
+Across the `232` catalogue records (`24` examined records with `57` available, `26` not_applicable, `83` unverified, and `2` not_available cells; `22` with a licence and `9` with limiting scope text), the audit evaluates `6` concrete release and action governance cases (`GOV-01` through `GOV-06`):
+- `GOV-01-rdkit-open-cheminformatics` (`tool-rdkit`, `BSD-3-Clause`, `1/7` available) -> **`approved_for_public_release`** for standard educational cheminformatics scripts.
+- `GOV-02-protenix-commercial-weights-check` (`model-protenix`, `6/7` available, `Apache-2.0` code + `Proprietary, no open-source licence` scope) -> **`blocked_by_licence_scope_restriction`** for bundling weights into a commercial SaaS product without separate weight-licence clearance.
+- `GOV-03-ai-researcher-unlicensed-benchmark` (`benchmark-ai-researcher`, `1/7` available, `0` licences, `access_level = unverified`) -> **`blocked_by_unverified_licence`** against republishing repository files as MIT-licensed open source.
+- `GOV-04-rfdiffusion-de-novo-toxin-binder-screen` (`model-rfdiffusion`, `BSD-3-Clause`, `5/7` available) -> **`escalate_to_biosecurity_and_gene_synthesis_screening_gate`** because open-source software permission (`BSD-3-Clause`) never bypasses dual-use de novo protein biosecurity review or mandatory customer and sequence screening before gene synthesis.
+- `GOV-05-coscientist-autonomous-synthesis` (`agent-coscientist`, `1/7` available, `Apache-2.0 with Commons Clause v1.0`) -> **`blocked_by_commons_clause_and_escalated_to_chemist_safety_gate`** for both commercial sale (`Commons Clause` prohibition) and unsupervised robotic chemical synthesis (chemist hazard containment gate).
+- `GOV-06-candidate-nomination-vs-patient-dosing` (`model-boltz-2`, `MIT`, `5/7` available) -> **`blocked_by_human_clinical_authority_and_nonclinical_safety_gate`** because neither an MIT model licence nor a sub-micromolar predicted/in vitro score authorizes human patient dosing without GLP toxicology, regulatory IND review, and clinical investigator authority.
+
 ## Sources and attribution
 
 <div data-case-sources>

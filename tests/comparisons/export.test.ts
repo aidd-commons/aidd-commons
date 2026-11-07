@@ -493,17 +493,21 @@ describe("most detailed bound condition", () => {
 
   function atWorked(self: ComparisonSystem, count: number) {
     // Raise every self cell below 'worked' to 'worked', then lower `count`
-    // worked cells back to 'explained'. Evidence is kept, so only depth moves.
+    // worked-or-deeper cells back to 'explained'. Evidence is kept, so only depth moves.
     for (const cell of self.coverage) {
       if (depthOrder.indexOf(cell.depth) < depthOrder.indexOf("worked")) {
         cell.depth = "worked";
       }
     }
     self.coverage
-      .filter(({ depth }) => depth === "worked")
+      .filter(
+        ({ depth }) =>
+          depthOrder.indexOf(depth) >= depthOrder.indexOf("worked"),
+      )
       .slice(0, count)
       .forEach((cell) => {
         cell.depth = "explained";
+        delete cell.run_basis;
       });
   }
 

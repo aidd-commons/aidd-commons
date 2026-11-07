@@ -16,6 +16,8 @@ Use the project Python 3.11 environment and CPU. The first command verifies that
 .venv/bin/python labs/mechanism_consistency/run_lab.py download
 .venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py show
 .venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py check
+.venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py target-evidence
+.venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py check-target-evidence
 .venv/bin/python labs/mechanism_consistency/export_summary.py
 .venv/bin/python -m pytest labs/tests/mechanism_consistency -q
 ```

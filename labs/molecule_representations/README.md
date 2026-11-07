@@ -77,3 +77,17 @@ ending a temporary runtime; delete the generated directory yourself when it is n
 longer needed. It never reads or changes author
 caches, result directories, or frozen protocol artifacts. Restarting a notebook
 runtime removes in-memory state; run the cells again in order after a reset.
+
+## Real-data 3D conformer ensemble and 2D/3D graph message-passing assessment (`conformers-and-graphs`)
+
+To evaluate RDKit ETKDGv3 + MMFF94 3D conformer ensembles (`8` conformers per drug at `298.15 K`, `RT = 0.5925 kcal/mol`), Boltzmann-weighted 3D descriptors (`RadiusOfGyration`, `Asphericity`), unsigned 3D distance-matrix reflection collapse versus signed chiral tetrahedral volume, and 2-layer 2D topological versus 3D chiral graph message-passing encodings across `5` real clinical drug records from ChEMBL 37 (`CHEMBL553` erlotinib, `CHEMBL939` gefitinib, `CHEMBL3353410` osimertinib, `CHEMBL1431_R` `(R)-thalidomide`, `CHEMBL1431_S` `(S)-thalidomide`):
+
+```sh
+.venv/bin/python labs/molecule_representations/run_lab.py conformers-and-graphs
+.venv/bin/python labs/molecule_representations/run_lab.py check-conformers-and-graphs
+```
+
+Observed real-data summary (verified 2026-11-07):
+- **3D conformer ensemble flexibility**: Flexible EGFR inhibitors `erlotinib` (`10` rotatable bonds, `2.304` Å max heavy-atom RMSD, `4.2871` kcal/mol MMFF94 energy span, Boltzmann $R_g = 4.8658$ Å vs lowest-energy $4.9111$ Å) and `osimertinib` (`10` rotatable bonds, `3.4400` Å max RMSD, `18.3368` kcal/mol span, Boltzmann $R_g = 5.5744$ Å) exhibit substantially broader 3D conformational diversity than rigid chiral `(R)-thalidomide` (`1` rotatable bond, `1.8385` Å max RMSD, `3.7284` kcal/mol span, Boltzmann $R_g = 3.1949$ Å).
+- **3D distance-matrix reflection collapse vs signed chiral volume**: `(R)-thalidomide` and `(S)-thalidomide` have identical unsigned mean 3D interatomic distances (`4.1006` Å, difference `0.0` Å) and identical 2D topological graph embeddings (`enantiomer_2d_topological_graph_l2_distance = 0.0`), whereas their CIP-ordered signed tetrahedral volumes have opposite signs (`+2.4273` Å³ vs `-2.4273` Å³), separating their 3D chiral graph encodings (`enantiomer_3d_chiral_graph_l2_distance = 1.6755`).
+- **Graph permutation invariance**: Reversing atom numbering across all `5` drugs yields `max_atom_permutation_invariance_diff = 0.0`.

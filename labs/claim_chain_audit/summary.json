@@ -1,7 +1,7 @@
 {
   "schema_version": "aidd-commons.claim-chain-audit-summary.v1",
   "protocol_id": "aidd-commons.claim-chain-audit-v1",
-  "computed_on": "2026-10-24",
+  "computed_on": "2026-11-07",
   "software": {
     "python": "3.11.15",
     "pyyaml": "6.0.3",
@@ -16,16 +16,16 @@
         "absent": 0,
         "mentioned": 0,
         "explained": 0,
-        "worked": 2,
+        "worked": 0,
         "executable": 0,
-        "assessed": 6,
+        "assessed": 8,
         "unresolved": 0
       },
       "weakest_link": {
-        "topic_id": "t06-causal-target-evidence",
-        "depth": "worked"
+        "topic_id": "t06-mechanism-hypothesis-counterevidence",
+        "depth": "assessed"
       },
-      "below_strongest_count": 2,
+      "below_strongest_count": 0,
       "comparison_counts": {
         "agree": 8,
         "reading_shallower": 0,
@@ -42,16 +42,16 @@
         "absent": 0,
         "mentioned": 0,
         "explained": 0,
-        "worked": 1,
+        "worked": 0,
         "executable": 0,
-        "assessed": 7,
+        "assessed": 8,
         "unresolved": 0
       },
       "weakest_link": {
-        "topic_id": "t06-tractability-target-risk",
-        "depth": "worked"
+        "topic_id": "t06-perturbation-genetic-validation",
+        "depth": "assessed"
       },
-      "below_strongest_count": 1,
+      "below_strongest_count": 0,
       "comparison_counts": {
         "agree": 8,
         "reading_shallower": 0,

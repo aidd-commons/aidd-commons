@@ -34,7 +34,7 @@ header-includes:
     \usepackage{float}
     \floatplacement{figure}{H}
     \usepackage{caption}
-    \captionsetup{font=small,labelfont=bf}
+    \captionsetup{font=small,labelfont=bf,justification=raggedright,singlelinecheck=false}
     \makeatletter
     \@removefromreset{figure}{chapter}
     \@removefromreset{table}{chapter}

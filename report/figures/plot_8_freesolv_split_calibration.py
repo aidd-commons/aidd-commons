@@ -114,20 +114,28 @@ def build() -> dict[str, Path]:
                 )
                 continue
             a, b = [splits[s][source][key][metric] for s in SPLITS]
-            ax.plot([a, b], [y, y], color=colours[colour], lw=1.2)
-            ax.plot(a, y, "o", ms=6.5, mfc=colours[colour], mec=tokens["ink"], mew=0.5)
-            ax.plot(b, y, "s", ms=6.5, mfc=tokens["panel"], mec=colours[colour], mew=1)
-            for value, offset in [(a, 10), (b, -10)]:
+            ax.plot([a, b], [y, y], color=colours[colour], lw=1.5, zorder=2)
+            ax.plot(a, y, "o", ms=6.5, mfc=colours[colour], mec=tokens["ink"], mew=0.5, zorder=3)
+            ax.plot(b, y, "s", ms=6.5, mfc=tokens["panel"], mec=colours[colour], mew=1.1, zorder=3)
+            close = abs(a - b) < 0.12 * maximum
+            offsets = (
+                [(a, (-4 if a <= b else 4, 10)), (b, (4 if a <= b else -4, -10.5))]
+                if close
+                else [(a, (0, 10)), (b, (0, -10.5))]
+            )
+            for value, xy_offset in offsets:
                 ax.annotate(
                     fmt.format(value),
                     (value, y),
-                    xytext=(0, offset),
+                    xytext=xy_offset,
                     textcoords="offset points",
                     ha="center",
                     va="center",
                     fontsize=10.0,
                 )
         ax.set_yticks([2, 1, 0], ["Mean", "Ridge", "Forest"])
+        ax.yaxis.grid(True, color=tokens["rule"], linestyle=":", linewidth=0.6, alpha=0.8)
+        ax.set_axisbelow(True)
         ax.set_ylim(-0.65, 2.65)
         ax.set_xlim(0, 1.05 if metric == "coverage" else maximum * 1.18)
         ax.set_xlabel(unit)

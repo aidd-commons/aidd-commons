@@ -131,4 +131,23 @@ These mutations are debugging exercises, not permission to tune a research test.
 
 Read the bilingual website lesson at
 `/learn/machine-learning/student-modelling-sandbox/` for the wider learning route.
+
+## Real-data inductive-bias, sampling-uncertainty, and imbalanced-classification benchmark (`real-benchmark`)
+
+To extend the synthetic sandbox with an executable real-data evaluation across:
+- **`t03-inductive-bias-selection`**: comparing `tabular_descriptor_ridge`, 2-layer atom-permutation-invariant `graph_mpnn_ridge`, `sequence_kmer_attention_ridge`, and `multimodal_graph_sequence_ridge` across `30` real ChEMBL 37 human EGFR (`CHEMBL203`) ligand-pocket complex measurements (`18` train, `6` validation, `6` test) spanning wild-type (`1M17`, `4HJO`), `T790M` (`3POZ`), and `T790M/C797S` (`1XKK`-derived mutant state),
+- **`t03-computational-uncertainty`**: comparing optimizer starting-point/budget variability (`50`, `200`, `500` gradient steps across `3` initializations) against `40` stratified finite-data bootstrap resamples of `24` real ChEMBL 37 EGFR training compounds (`5` positives, `19` negatives),
+- **`t07-classification-formulation`**: comparing `unweighted_logistic`, inverse-prevalence `class_weighted_logistic` (`pos_weight = 3.8`), and `minority_oversampled_logistic` (`20` oversampled positives vs `19` negatives) across `40` real ChEMBL 37 EGFR compounds (`24` train, `8` validation, `8` test at `20.83%` minority positive prevalence):
+
+```sh
+.venv/bin/python labs/student_modelling/run_lab.py real-benchmark
+.venv/bin/python labs/student_modelling/run_lab.py check-real-benchmark
+```
+
+Observed real-data summary (verified 2026-11-07):
+- Atom-renumbering invariance check on `erlotinib`: `graph_permutation_invariance_max_diff = 0.0`.
+- Inductive-bias family selection (`validation_mae` / `test_mae` / `test_rmse` in `pIC50`): `tabular_descriptor_ridge` (`1.4691` / `1.1589` / `1.4025`), `graph_mpnn_ridge` (`1.3914` / `1.1980` / `1.4260`), `sequence_kmer_attention_ridge` (`0.6616` / `0.6193` / `0.7214`), and `multimodal_graph_sequence_ridge` (`0.3947` / `0.3861` / `0.4123`, selected by validation MAE).
+- Optimizer vs sampling uncertainty: optimizer spread across `3` starting points shrinks from `0.3064` (`50` steps, `1200` gradient evaluations) to `0.0239` (`200` steps, `4800` gradient evaluations) and `0.0003` (`500` steps, `12000` gradient evaluations), whereas `40` bootstrap resamples of the `24` training compounds produce `mean_test_90pct_interval_width = 0.3836`, `max_test_90pct_interval_width = 0.4684`, and `7` of `8` test compounds flipping binary classification decision (`p >= 0.5`).
+- Imbalanced binary classification (`test` split): `unweighted_logistic` achieves `recall = 0.0` (`balanced_accuracy = 0.5`, `mean_predicted_probability = 0.2492`, `log_loss = 0.4723`), whereas `class_weighted_logistic` (`pos_weight = 3.8`) and `minority_oversampled_logistic` restore `recall = 1.0` and `balanced_accuracy = 0.75` while shifting `mean_predicted_probability` to `0.4779` and `0.4901` (`log_loss = 0.5903` and `0.6040`).
+
 Original software: Apache-2.0. Original prose and invented teaching data: CC BY 4.0.

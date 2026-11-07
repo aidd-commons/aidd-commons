@@ -132,6 +132,35 @@ exposure, and magnitude can differ. Genetic direction is not dose equivalence
 or proof that one protein change gives the same phenotype. Convergent evidence
 makes a hypothesis more testable, not proven.
 
+## Runnable genetic-to-target and colocalisation audit on public records
+
+**Mode: reading and deterministic verification of committed public records.** Run
+`target-evidence` and `check-target-evidence` in
+[`labs/mechanism_consistency/inspect_mechanism_consistency.py`](https://github.com/gxcaesar/aidd-commons/blob/main/labs/mechanism_consistency/inspect_mechanism_consistency.py)
+to inspect real Open Targets Platform v4 genetic versus somatic disease associations
+(`PCSK9` `ENSG00000169174`, `EGFR` `ENSG00000146648`, `BRAF` `ENSG00000157764`,
+and `ERBB2` `ENSG00000141736`) alongside the `PCSK9` `R46L` (`rs11591147`, Cohen et al.
+*N. Engl. J. Med.* 2006, `PMID:16554528`) loss-of-function Mendelian randomization
+and colocalisation contrast:
+
+```bash
+.venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py target-evidence
+.venv/bin/python labs/mechanism_consistency/inspect_mechanism_consistency.py check-target-evidence
+```
+
+| Instrument / Target Record | Exposure effect `beta_ZX` (`SE`) | Outcome effect `beta_ZY` (`SE`) | Wald ratio (`SE`) | Instrument `F`-statistic | Colocalisation `PP.H4` vs `PP.H3` | Verdict |
+| --- | --- | --- | --- | ---: | --- | --- |
+| `PCSK9` `rs11591147` (`R46L`, `ENSG00000169174`) | `-0.35` (`0.03`) SD LDL-C | `-0.33` (`0.09`) log-odds CHD | `0.9429` (`0.2695`) | `136.11` | `0.94` vs `0.03` | Shared variant + loss-of-function protection (`inhibitor` direction) |
+| Confounded non-coding locus (`rs_confounded_ld`) | `0.25` (`0.04`) SD eQTL | `0.10` (`0.03`) log-odds disease | `0.4000` (`0.1360`) | `39.06` | `0.12` vs `0.81` | Distinct causal variants in LD (`H3 > H4`); MR ratio rejected as target claim |
+
+Across the four Open Targets Platform v4 targets, the command also contrasts germline
+versus somatic evidence: `PCSK9` (`ENSG00000169174`) is driven by human genetic
+associations (`0.8698` in hypercholesterolemia `EFO_0004611`, `0.8548` in familial
+hypercholesterolemia `MONDO_0007750`, `0.0000` somatic mutation score), whereas `BRAF`
+(`ENSG00000157764`) splits cleanly by disease state between germline cardiofaciocutaneous
+syndrome (`MONDO_0015280`, genetic `0.9442`, somatic `0.0000`) and somatic melanoma
+(`MONDO_0005105`, somatic `0.7964`).
+
 ## Independent exercise
 
 A different **constructed** locus is analysed under the same one-causal-

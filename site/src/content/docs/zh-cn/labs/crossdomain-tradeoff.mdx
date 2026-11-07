@@ -93,6 +93,20 @@ import ScrollableRegions from "../../../../components/ScrollableRegions.astro";
 普查,描述的是实测族的覆盖,而不是"提名决策所需的输入是否在其中"。这里它们不在:队列里
 最充裕的两个族,不是规则要的那两个。
 
+## 计入不确定性的定量 EGFR 提名审计（`quant-tradeoff`）
+
+当为 `4` 个真实 ChEMBL 37 EGFR 候选物（每个含 `4` 次 EGFR IC50 重复测定；阈值为效价 `<= 50.0` nM、相对 ERBB2 `CHEMBL1824` 选择性 `>= 20.0` 倍、暴露比 `>= 3.0` 倍、路线产率 `>= 0.5`）配齐靶点匹配重复值、选择性、暴露区间与合成产率时，运行 `quant-tradeoff` 与 `check-quant-tradeoff` 展示了保守 95% 置信界如何改变点估计下的提名结论（点估计规则下 `2` 个幸存，保守 95% CI 规则下仅 `1` 个幸存）：
+
+```bash
+.venv/bin/python labs/crossdomain_tradeoff/inspect_crossdomain_tradeoff.py quant-tradeoff
+.venv/bin/python labs/crossdomain_tradeoff/inspect_crossdomain_tradeoff.py check-quant-tradeoff
+```
+
+- **`CHEMBL553`（`Erlotinib`）**：EGFR IC50 中位数 `2.1` nM（95% CI `[1.4, 2.6]` nM），相对 ERBB2（`1450.0` nM）选择性比 `690.4762` 倍（95% 下界 `500.0` 倍），暴露比 `18.5` 倍（`[14.2, 22.8]` 倍），`1` 步 SNAr 产率 `0.78`，同时通过点估计与 95% CI 规则。
+- **`CHEMBL939`（`Gefitinib`）**：EGFR IC50 中位数 `22.5` nM（`[15.0, 33.0]` nM），相对 ERBB2（`1800.0` nM）选择性比 `80.0` 倍（下界 `54.5455` 倍），`1` 步 SNAr 产率 `0.81`，通过点估计暴露比（`3.4 >= 3.0`），但在保守 95% 下界暴露规则下被阻断（`2.2 < 3.0`，95% CI `[2.2, 4.6]` 倍）。
+- **`CHEMBL1201583`（`Lapatinib`）**：EGFR IC50 中位数 `11.1` nM（`[9.2, 14.0]` nM），暴露比 `4.1` 倍（`[3.1, 5.2]` 倍），`3` 步路线产率 `0.42`，在 `selectivity_ratio` 处被阻断（相对 ERBB2 `9.0` nM 为 `0.8108` 倍，95% 下界 `0.6429` 倍）。
+- **`CHEMBL53711`（`PD-153035`）**：EGFR IC50 中位数 `0.032` nM（`[0.025, 0.05]` nM），选择性比 `450.0` 倍（相对 ERBB2 `14.4` nM 下界 `310.0` 倍），`1` 步产率 `0.84`，在 `exposure_ratio` 处被阻断（`0.8` 倍，95% CI `[0.4, 1.2]` 倍）。
+
 ## 独立练习
 
 检查 `CHEMBL1144`,唯一带有效力点位的实测候选。说出五个输入各自的状态,指出阻断提名的

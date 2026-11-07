@@ -40,7 +40,7 @@ const assetRoot = path.join(root, 'site/src/assets/editorial');
 const layoutOnly = process.argv.includes('--layout-only');
 // Increment for a reviewed layout change. This ordinary native-document revision
 // is checked without hashes, timestamps, private manifests or authoring packages.
-const sceneRevision = '2026-11-07.1';
+const sceneRevision = '2026-11-07.2';
 const compactRevisions = {};
 const mm = (n) => (n * 96) / 25.4;
 const pt = (n) => (n * 96) / 72;
@@ -135,6 +135,7 @@ const lifecycleNames = [
   'One-time\nopening',
   'Reviewed\nsummary',
 ];
+const lifecycleX = [4, 37, 70, 112, 145];
 const artifactRecords = [
   { name: 'Learn', role: 'Ordered lessons' },
   { name: 'Atlas', role: 'Source records' },
@@ -184,8 +185,8 @@ const motion = {
     reading_direction: 'left to right',
     stages: lifecycleNames.map((name, i) => ({
       name: name.replaceAll('\n', ' '),
-      bounds_mm: { x: 5 + i * 35, y: 24, w: 31, h: 54 },
-      detail_bounds_mm: { x: 5 + i * 35, y: 24, w: 30.6, h: 54 },
+      bounds_mm: { x: lifecycleX[i], y: 24, w: 31, h: 54 },
+      detail_bounds_mm: { x: lifecycleX[i], y: 24, w: 30.6, h: 54 },
     })),
   },
 };
@@ -878,7 +879,7 @@ async function artifacts(s) {
     'artifacts-panel',
     '(a)  Four reader-facing forms',
     4,
-    12,
+    10.5,
     172,
     5,
     10.2,
@@ -895,18 +896,19 @@ async function artifacts(s) {
   const colors = [C.teal, C.coral, C.ember, C.slate];
   for (let i = 0; i < 4; i++) {
     const x = columns[i];
-    s.text(`artifact-name-${i}`, labels[i], x, 18, 37, 5, 10, { bold: true });
+    s.text(`artifact-name-${i}`, labels[i], x, 16.5, 37, 5, 10, { bold: true });
     if (i === 0) {
-      const a = document(s, 'learn-left-page', x + 2, 26, 15, 20, colors[i]);
-      document(s, 'learn-right-page', x + 18, 26, 15, 20, colors[i]);
+      s.graphic('learn-backdrop', x + 1, 22.5, 33, 25.5, C.wash.teal, C.rule);
+      document(s, 'learn-left-page', x + 2.5, 24, 14, 19, colors[i]);
+      document(s, 'learn-right-page', x + 18, 24, 14, 19, colors[i]);
       for (let j = 0; j < 4; j++)
         s.graphic(
           `learn-sequence-${j}`,
-          x + 5 + j * 7.5,
-          48 - j * 1.5,
-          5.3,
-          2.8,
-          j === 3 ? colors[i] : C.wash.teal,
+          x + 4 + j * 7.2,
+          44.2,
+          5.4,
+          2.6,
+          j === 3 ? colors[i] : C.white,
           colors[i],
         );
       s.node(
@@ -920,9 +922,9 @@ async function artifacts(s) {
         'atlas-data-illustration',
         'data',
         x + 1,
-        24,
+        22.5,
         34,
-        28,
+        26,
         'A conceptual registry of source records',
       );
       s.node(
@@ -936,9 +938,9 @@ async function artifacts(s) {
         'labs-computation-illustration',
         'model',
         x + 1,
-        24,
+        22.5,
         34,
-        28,
+        26,
         'A conceptual computation implementing a teaching procedure',
       );
       s.node(
@@ -948,15 +950,16 @@ async function artifacts(s) {
         'An executable procedure; illustration is not a lab result',
       );
     } else {
-      document(s, 'report-page', x + 3, 25, 28, 27, colors[i]);
-      s.graphic('report-figure-field', x + 7, 39, 18, 8, C.wash.slate);
+      s.graphic('report-backdrop', x + 1, 22.5, 33, 25.5, C.wash.slate, C.rule);
+      document(s, 'report-page', x + 3.5, 23.8, 28, 23, colors[i]);
+      s.graphic('report-figure-field', x + 7.5, 36.5, 18, 8, C.wash.slate);
       for (let j = 0; j < 3; j++)
         s.graphic(
           `report-bars-${j}`,
-          x + 9 + j * 5,
-          46 - j * 1.4,
+          x + 9.5 + j * 5,
+          43.2 - j * 1.3,
           2.5,
-          1 + j * 1.4,
+          1 + j * 1.3,
           colors[i],
         );
       s.node(
@@ -970,18 +973,18 @@ async function artifacts(s) {
       `artifact-description-${i}`,
       wrapWords(subtitles[i], 20),
       x,
-      54,
+      49.5,
       39,
-      10,
+      9,
       9.2,
       { color: C.muted },
     );
     const chip = s.graphic(
       `artifact-identifier-${i}`,
       x + 1,
-      66,
+      66.5,
       32,
-      7,
+      6.5,
       C.white,
       colors[i],
     );
@@ -989,13 +992,13 @@ async function artifacts(s) {
       `artifact-identifier-text-${i}`,
       'resource ID',
       x + 2,
-      67,
+      67.3,
       30,
       5,
       9.2,
       { align: 'center', color: colors[i] },
     );
-    const rail = s.anchor(`artifact-rail-anchor-${i}`, x + 17, 84);
+    const rail = s.anchor(`artifact-rail-anchor-${i}`, x + 17, 81.5);
     s.connector(`correction-to-artifact-${i}`, rail, chip, {
       dashed: true,
       fromSide: 'top',
@@ -1006,16 +1009,26 @@ async function artifacts(s) {
         'A source-backed correction should propagate to every affected repeated claim',
     });
   }
-  s.text('coupling-panel', '(b)', 4, 80, 8, 5, 10.2, { bold: true });
-  s.line('shared-identifier-rail', 21, 84, 154, 84, {
+  s.text(
+    'coupling-panel',
+    '(b)  Shared identity and correction routes',
+    4,
+    59.5,
+    172,
+    5,
+    10.2,
+    { bold: true },
+  );
+  s.line('shared-identifier-rail', 21, 75.5, 154, 75.5, {
     arrow: false,
     source,
     role: 'association',
     claim: 'The artifacts share resource identifiers',
   });
-  s.graphic('correction-token', 62, 79.5, 57, 9, C.wash.coral, C.coral);
-  s.text('correction-label', 'Source-backed correction', 64, 81, 53, 5, 10, {
+  s.graphic('correction-token', 61, 81.5, 58, 8.5, C.wash.coral, C.coral);
+  s.text('correction-label', 'Source-backed correction', 63, 83.2, 54, 5, 10, {
     bold: true,
+    align: 'center',
   });
   s.footer();
 }
@@ -1040,6 +1053,7 @@ async function statements(s) {
     { x: 93, y: 72, color: C.slate },
   ];
   s.rule('statement-horizontal-divider', 4, 68, 172);
+  s.graphic('statement-vertical-divider', 89.2, 22, 0.15, 92, C.rule);
   for (const [i, g] of groups.entries()) {
     const r = statementRecords[i],
       x = g.x,
@@ -1170,7 +1184,7 @@ async function statements(s) {
         y + 15,
         22,
         22,
-        C.white,
+        C.wash.coral,
         g.color,
         'ellipse',
         true,
@@ -1204,7 +1218,7 @@ async function statements(s) {
           y + 17,
           24,
           19,
-          C.white,
+          C.wash.slate,
           g.color,
           'rect',
           true,
@@ -1217,8 +1231,18 @@ async function statements(s) {
           24,
           6,
           9.5,
-          { align: 'center' },
+          { align: 'center', bold: true },
         );
+        if (j < 2) {
+          s.graphic(
+            `future-step-link-${j}`,
+            x + j * 28 + 24.6,
+            y + 26.2,
+            2.8,
+            0.4,
+            g.color,
+          );
+        }
       }
       s.text(
         'future-state',
@@ -1704,43 +1728,6 @@ async function openness(s) {
     }
     s.rule(`openness-row-rule-${j}`, 4, y + 9.5, 172);
   }
-  s.text(
-    'openness-review-date',
-    `Record review: ${resources[0].last_verified}. Availability does not establish unrestricted use.`,
-    4,
-    113,
-    172,
-    6,
-    9.2,
-    { color: C.muted },
-  );
-  s.text(
-    'openness-axes-title',
-    '(b)  Independent record axes',
-    4,
-    123,
-    172,
-    6,
-    10.2,
-    { bold: true },
-  );
-  s.text('access-axis-name', 'Access', 4, 133, 60, 6, 10.2, { bold: true });
-  s.text('lifecycle-axis-name', 'Lifecycle', 4, 142, 60, 6, 10.2, {
-    bold: true,
-  });
-  resources.forEach((r, i) => {
-    const x = 69 + i * 55;
-    s.text(
-      `openness-access-${i}`,
-      r.access_level.value.replaceAll('_', ' '),
-      x,
-      133,
-      53,
-      6,
-      9.4,
-    );
-    s.text(`openness-lifecycle-${i}`, r.status.value, x, 142, 53, 6, 9.4);
-  });
   const legendStates = [
     'available',
     'not_available',
@@ -1749,12 +1736,12 @@ async function openness(s) {
   ];
   legendStates.forEach((state, i) => {
     const x = 4 + i * 44;
-    opennessMark(s, `openness-legend-${i}`, state, x, 154, 4.6);
+    opennessMark(s, `openness-legend-${i}`, state, x, 113.5, 4.6);
     s.text(
       `openness-legend-label-${i}`,
       state.replaceAll('_', ' '),
       x + 6,
-      153,
+      112.5,
       37,
       6,
       9.2,
@@ -1764,10 +1751,59 @@ async function openness(s) {
     'openness-unknown-boundary',
     'Unverified preserves an unresolved claim; it does not mean unavailable.',
     4,
-    166,
+    120.5,
+    172,
+    5.5,
+    9.2,
+    { color: C.muted },
+  );
+  s.rule('openness-section-divider', 4, 128, 172);
+  s.text(
+    'openness-axes-title',
+    '(b)  Independent record axes',
+    4,
+    131,
+    62,
+    6,
+    10.2,
+    { bold: true },
+  );
+  resources.forEach((r, i) => {
+    const x = 69 + i * 55;
+    s.text(`openness-axes-record-${i}`, r.name, x, 131, 52, 6, 9.2, {
+      color: C.muted,
+      bold: true,
+    });
+  });
+  s.rule('openness-axes-header-rule', 4, 138.5, 172);
+  s.text('access-axis-name', 'Access', 4, 141, 60, 6, 10.2, { bold: true });
+  s.rule('openness-axes-mid-rule', 4, 148.5, 172);
+  s.text('lifecycle-axis-name', 'Lifecycle', 4, 151, 60, 6, 10.2, {
+    bold: true,
+  });
+  s.rule('openness-axes-bottom-rule', 4, 158.5, 172);
+  resources.forEach((r, i) => {
+    const x = 69 + i * 55;
+    s.text(
+      `openness-access-${i}`,
+      r.access_level.value.replaceAll('_', ' '),
+      x,
+      141,
+      53,
+      6,
+      9.4,
+    );
+    s.text(`openness-lifecycle-${i}`, r.status.value, x, 151, 53, 6, 9.4);
+  });
+  s.text(
+    'openness-review-date',
+    `Record review: ${resources[0].last_verified}. Availability does not establish unrestricted use.`,
+    4,
+    162,
     172,
     6,
-    9.3,
+    9.2,
+    { color: C.muted },
   );
   s.footer();
 }
@@ -1792,13 +1828,13 @@ async function lifecycle(s) {
   const source =
     'docs/EDITORIAL_GUIDE.md#lab-protocol-freeze; report/aidd-commons-living-report-v0.2.md#frozen-evaluation';
   s.ledger.source_anchors.push(source);
-  s.graphic('test-boundary', 108, 15, 0.55, 107, C.coral);
-  s.text('test-boundary-label', 'TEST BOUNDARY', 111, 14, 65, 6, 9.8, {
+  s.graphic('test-boundary', 105.5, 15, 0.65, 107, C.coral);
+  s.text('test-boundary-label', 'TEST BOUNDARY', 108, 14, 65, 6, 9.8, {
     color: C.ember,
     bold: true,
   });
   for (let i = 0; i < 5; i++) {
-    const x = 5 + i * 35;
+    const x = lifecycleX[i];
     number(s, `lifecycle-number-${i}`, i + 1, x, 24, i >= 3 ? C.coral : C.teal);
     s.text(`lifecycle-name-${i}`, lifecycleNames[i], x, 32, 31, 12, 10.2, {
       bold: true,
@@ -1829,32 +1865,35 @@ async function lifecycle(s) {
       'Frozen evaluation stage',
       { bounds_mm: motion.S7.stages[i].bounds_mm },
     );
-    if (i > 0)
-      s.line(`lifecycle-order-${i}`, x - 4, 59, x - 1, 59, {
+    if (i > 0) {
+      const prevRight = lifecycleX[i - 1] + 29.5;
+      const nextLeft = x - 1.2;
+      s.line(`lifecycle-order-${i}`, prevRight, 59, nextLeft, 59, {
         source,
         claim: 'The frozen procedure orders this gate before the next',
       });
+    }
   }
   s.text(
     'freeze-records',
     'Task · data · labels\nsplit · fit · selection\nmetrics · calibration\nseeds · stop',
-    5,
+    4,
     82,
-    38,
+    34,
     24,
     9.2,
     { color: C.muted },
   );
-  s.text('pretest-scope', 'Training and\nvalidation only', 46, 83, 57, 12, 10, {
+  s.text('pretest-scope', 'Training and\nvalidation only', 41, 83, 57, 12, 10, {
     color: C.teal,
     bold: true,
     align: 'center',
   });
-  s.text('test-scope', 'Held-out test', 111, 83, 31, 7, 9.5, {
+  s.text('test-scope', 'Held-out test', 112, 83, 31, 7, 9.5, {
     color: C.ember,
     bold: true,
   });
-  s.text('summary-scope', 'Values and\nlimitations', 146, 83, 30, 12, 9.3, {
+  s.text('summary-scope', 'Values and\nlimitations', 145, 83, 31, 12, 9.3, {
     color: C.muted,
   });
   const retry = {
@@ -1865,18 +1904,18 @@ async function lifecycle(s) {
     claim:
       'Engineering repairs on training and validation are allowed only before opening the held-out test',
   };
-  s.line('pretest-return-drop', 91, 76, 91, 102, {
+  s.line('pretest-return-drop', 85, 76, 85, 102, {
     ...retry,
     arrow: false,
     fromSide: 'bottom',
     toSide: 'top',
   });
-  s.line('pretest-development-return', 91, 102, 48, 102, {
+  s.line('pretest-development-return', 85, 102, 51, 102, {
     ...retry,
     fromSide: 'left',
     toSide: 'right',
   });
-  s.text('pretest-return-label', 'Pre-test repairs only', 46, 105, 58, 6, 9.3, {
+  s.text('pretest-return-label', 'Pre-test repairs only', 40, 105, 58, 6, 9.3, {
     color: C.muted,
     align: 'center',
   });
@@ -1901,7 +1940,7 @@ async function lifecycle(s) {
   );
   s.connector(
     'posttest-invalidating-error',
-    s.anchor('posttest-error-branch', 126, 94),
+    s.anchor('posttest-error-branch', 127, 94),
     error,
     {
       dashed: true,
@@ -1918,9 +1957,9 @@ async function lifecycle(s) {
   s.text(
     'retuning-prohibition',
     'No result-driven retuning after test opening',
-    5,
+    4,
     129,
-    171,
+    172,
     6,
     10,
     { bold: true },

@@ -229,8 +229,31 @@ def check(data: dict) -> list[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", nargs="?", default="show", choices=["show", "check"])
+    parser.add_argument(
+        "action",
+        nargs="?",
+        default="show",
+        choices=["show", "check", "public-spaces", "check-public-spaces"],
+    )
     action = parser.parse_args().action
+    if action in ("public-spaces", "check-public-spaces"):
+        src_dir = ROOT / "labs" / "src"
+        if str(src_dir) not in sys.path:
+            sys.path.insert(0, str(src_dir))
+        from aidd_commons.design_space.public_spaces import (
+            check_public_spaces,
+            evaluate_public_spaces,
+        )
+
+        payload = evaluate_public_spaces()
+        if action == "public-spaces":
+            print(json.dumps(payload, indent=2))
+            return
+        failures = check_public_spaces(payload)
+        print(json.dumps({"ok": not failures, "failures": failures}, indent=2))
+        if failures:
+            sys.exit(1)
+        return
     data = load()
 
     print(f"Spaces {SPACES.relative_to(ROOT)}")

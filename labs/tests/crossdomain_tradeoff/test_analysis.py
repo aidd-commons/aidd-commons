@@ -198,3 +198,33 @@ def test_the_audit_refuses_a_filled_missing_input(teaching_decisions: list[dict]
     tampered[2]["inputs"] = inputs
     with pytest.raises(ValueError):
         audit_decisions(tampered)
+
+
+def test_quant_tradeoff_point_vs_ci95_nomination_audit() -> None:
+    import json
+    import subprocess
+    import sys
+
+    lab = ROOT / "labs/crossdomain_tradeoff"
+    out = subprocess.run(
+        [sys.executable, str(lab / "inspect_crossdomain_tradeoff.py"), "quant-tradeoff"],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=ROOT,
+    )
+    payload = json.loads(out.stdout)
+    assert payload["candidate_count"] == 4
+    assert payload["point_rule_survivor_ids"] == ["CHEMBL553", "CHEMBL939"]
+    assert payload["ci95_rule_survivor_ids"] == ["CHEMBL553"]
+
+    chk = subprocess.run(
+        [sys.executable, str(lab / "inspect_crossdomain_tradeoff.py"), "check-quant-tradeoff"],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=ROOT,
+    )
+    chk_payload = json.loads(chk.stdout)
+    assert chk_payload["ok"] is True
+    assert chk_payload["failures"] == []

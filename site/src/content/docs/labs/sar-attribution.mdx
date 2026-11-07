@@ -87,11 +87,11 @@ first pair readable rather than noise.
 
 ```bash
 python labs/sar_attribution/inspect_attribution.py check
+python labs/sar_attribution/inspect_attribution.py chembl-series
+python labs/sar_attribution/inspect_attribution.py check-chembl-series
 ```
 
-Fourteen checks run, including that the correlation is perfect in training, that
-the confounder is declared non-causal, that the threshold was declared before
-fitting, and that the inverted ranking still holds.
+Fourteen checks run on the constructed confounder dataset, including that the correlation is perfect in training, that the confounder is declared non-causal, that the threshold was declared before fitting, and that the inverted ranking still holds. Running `chembl-series` and `check-chembl-series` extends the audit to 12 real ChEMBL 37 human EGFR (`CHEMBL203`) inhibitors across 3 medicinal-chemistry optimization rounds (6 Round 1 reversible 4-anilinoquinazolines with mean T790M minus WT selectivity `-3.2250` log units, 3 Round 2 covalent acrylamide quinazolines raising mean T790M `pIC50` by `+2.5200` log units to `7.7733` while keeping selectivity at `-1.1033`, and 3 Round 3 mutant-selective aminopyrimidines flipping selectivity to `+1.7333` log units), comparing 3 explanation methods (`linear_bit_provenance`, `counterfactual_loso_ablation`, and `matched_molecular_pair_delta`) across 4 measured matched molecular pairs (`4/4` directional agreement).
 
 ## 5. What this licenses, and what it does not
 

@@ -270,6 +270,23 @@ LAB-Bench 记录指出，多项选择的表现度量的是指定问题与工具�
 
 </details>
 
+## 可执行的开放性、生物安全与发布治理审计（`governance-release`）
+
+为在软件、模型权重、从头蛋白质设计、自主化学合成与临床候选物之间判定哪些内容可以公开发布或付诸行动，可在[资产开放性审计实验室](/zh-cn/labs/asset-openness-audit/)中运行五维治理审计：
+
+```bash
+.venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py governance-release
+.venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py check-governance-release
+```
+
+在 `232` 条目录记录（`24` 条受检记录包含 `57` 个可用单元、`26` 个不适用单元、`83` 个未核实单元与 `2` 个不可用单元；`22` 条带许可证、`9` 条含限制性范围条款）上，该审计评估 `6` 个具体发布与行动治理案例（`GOV-01` 至 `GOV-06`）：
+- `GOV-01-rdkit-open-cheminformatics`（`tool-rdkit`，`BSD-3-Clause`，`1/7` 可用）-> **`approved_for_public_release`**（标准教学化学信息学脚本可公开发布）。
+- `GOV-02-protenix-commercial-weights-check`（`model-protenix`，`6/7` 可用，`Apache-2.0` 代码 + `Proprietary, no open-source licence` 范围限制）-> **`blocked_by_licence_scope_restriction`**（未经单独权重许可审查不得打包进商业 SaaS 产品）。
+- `GOV-03-ai-researcher-unlicensed-benchmark`（`benchmark-ai-researcher`，`1/7` 可用，`0` 份许可证，`access_level = unverified`）-> **`blocked_by_unverified_licence`**（不得将未声明许可证的仓库文件作为 MIT 开源数据集再分发）。
+- `GOV-04-rfdiffusion-de-novo-toxin-binder-screen`（`model-rfdiffusion`，`BSD-3-Clause`，`5/7` 可用）-> **`escalate_to_biosecurity_and_gene_synthesis_screening_gate`**（开源软件许可证 `BSD-3-Clause` 绝不豁免双重用途从头蛋白质设计的生物安全审查及基因合成前的客户与序列筛查）。
+- `GOV-05-coscientist-autonomous-synthesis`（`agent-coscientist`，`1/7` 可用，`Apache-2.0 with Commons Clause v1.0`）-> **`blocked_by_commons_clause_and_escalated_to_chemist_safety_gate`**（同时受 `Commons Clause` 商业销售禁令及无人值守机器人化学合成的化学家危险品安全关口阻断）。
+- `GOV-06-candidate-nomination-vs-patient-dosing`（`model-boltz-2`，`MIT`，`5/7` 可用）-> **`blocked_by_human_clinical_authority_and_nonclinical_safety_gate`**（无论 MIT 模型许可证还是亚微摩尔预测/体外活性，均不授权在缺乏 GLP 毒理、IND 监管审批与临床研究者权限的情况下对人体给药）。
+
 ## 来源与署名
 
 <div data-case-sources>

@@ -151,7 +151,12 @@ inferred. A confounder correlated with that cause takes the larger share of atom
 credit on seven of eight actives, and the matched pair that breaks the
 correlation is ranked backwards. The generating rule gives this constructed case a direct reference.
 Real activity data require independent interventions and controls for a
-causal check; attribution alone is insufficient.
+causal check; attribution alone is insufficient. Running `chembl-series` and `check-chembl-series` evaluates 12 real ChEMBL 37 human EGFR inhibitors across 3 optimization rounds and compares 3 explanation methods (`linear_bit_provenance`, `counterfactual_loso_ablation`, and `matched_molecular_pair_delta`) against 4 measured analogues (`+2.50` log T790M gain from gefitinib to afatinib and `+3.11` log selectivity flip from afatinib to osimertinib).
+
+```bash
+.venv/bin/python labs/sar_attribution/inspect_attribution.py chembl-series
+.venv/bin/python labs/sar_attribution/inspect_attribution.py check-chembl-series
+```
 
 ## Independent exercises
 

@@ -72,7 +72,11 @@ RDKit 这一名称标识项目。[RDKit 仓库](https://github.com/rdkit/rdkit)�
 .venv/bin/python labs/source_review_scope_audit/run_lab.py check
 .venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py show
 .venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py check
+.venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py verify-passages
+.venv/bin/python labs/source_review_scope_audit/inspect_source_review_scope_audit.py check-passages
 ```
+
+除检查 4 条 Atlas 记录（`show` / `check`）外，`verify-passages` 与 `check-passages` 还在已提交的真实 PDB 结构记录（`1M17`、`4HJO`、`1XKK`、`3POZ`，分辨率 `2.6` Å 与 `2.4` Å）、ChEMBL 37 EGFR 生物活性记录（`320` 条清洗记录）、Open Targets 26.03 遗传/临床证据快照（`MONDO_0005233` 评分 `0.8503`）以及 FreeSolv v0.52 水合自由能记录（`642` 个分子）上核验 6 条一手来源段落绑定，同时检验表面、版本、日期与范围字段以及内容级段落匹配（`4` 条合规绑定主张与 `2` 条超范围违规主张）。
 
 ## 来源与署名
 

@@ -111,6 +111,20 @@ response: { status: "qc_failed", data_ref: "run-19", control_pass: false }
 [智能体评价任务集](/zh-cn/labs/agent-evaluation-taskset/)把本项目自己的实验室当作固定任务，
 在来源解析、执行正确性、失败恢复、主张准确性与动作授权五个维度上逐项检查。
 
+## 基于真实数据的检查点轨迹恢复（`inspect_trace_recovery.py`）
+
+在 `labs/paperqa_local` 中运行确定性的检查点轨迹恢复审计：
+
+```bash
+.venv/bin/python labs/paperqa_local/inspect_trace_recovery.py resume-workflow
+.venv/bin/python labs/paperqa_local/inspect_trace_recovery.py check-resume-workflow
+```
+
+该流程跨越 `4` 个工作流步骤，读取 `labs/paperqa_local/reviewed-example.json`（`2` 篇 Europe PMC 文献 `PMC3198950` 与 `PMC10457661`、`5` 个问题含 `4` 个可回答问题与 `1` 个阴性对照、实测索引与回答耗时 `109.368` 秒、`18` 次环回套接字事件、`17` 个检索片段、`13` 个引用片段，以及 `openbabel-2011 chunk 5` 上的 `1` 处摘要归属偏差）以及 `2` 个化合物的 `4` 条 ChEMBL 37 人源 EGFR（`CHEMBL203`）IC50 记录（`CHEMBL553` 由 `1.4` 与 `2.6` nM 得中位数 `2.0` nM；`CHEMBL939` 由 `0.015` uM 与 `30.0` nM 得中位数 `22.5` nM）：
+
+- **第 1 次尝试（`run_attempt_1_faulted`）**：完成步骤 `1` 与 `2`，保存已验证检查点步骤 `2`；在步骤 `3` 因记录 `chembl37_egfr_03` 在严格 `nM` 模式与 `150.0` 秒步骤时限下提供 `0.015` uM 而中止，保留步骤 `4` 未执行，且伪造输出数为 `0`。
+- **第 2 次尝试（`run_attempt_2_resumed_from_checkpoint_2`）**：直接从检查点步骤 `2` 恢复（重执行步骤数为 `0`，跳过已完成的步骤 `1` 与 `2`），在步骤 `3` 归一化全部 `4` 条 ChEMBL 37 EGFR 记录，并完成步骤 `4`，未验证主张数为 `0`。
+
 工具载荷和失败轨迹均为构造示例。本课不作软件执行、自主实验室或实验结果主张。原创课程文字采用
 CC BY 4.0；链接的软件和来源保留各自条款。
 

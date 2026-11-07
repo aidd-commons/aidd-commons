@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Three deposited EGFR structures, read as evidence rather than as answers."""
 
 import copy
@@ -206,3 +207,28 @@ def test_fewer_than_three_site_cutoffs_is_rejected(data, entries):
     broken["declared_parameters"]["site_cutoffs_angstrom"] = [4.0, 5.0]
     failures = inspect_state.check(broken, inspect_state.measure(entries, broken))
     assert any("three or more cutoffs" in failure for failure in failures), failures
+
+
+def test_disease_state_subcommands_verify_thr790_contacts_and_ipass_reversal():
+    show_res = subprocess.run(
+        [sys.executable, str(LAB / "inspect_state.py"), "disease-state"],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=ROOT,
+    )
+    assert "SIX-FIELD DISEASE-STATE DEFINITION & SUBGROUP REVERSAL" in show_res.stdout
+    assert "1M17  Thr790-to-ligand min heavy atom: 3.41 A" in show_res.stdout
+    assert "1XKK  Thr790-to-ligand min heavy atom: 3.14 A" in show_res.stdout
+
+    check_res = subprocess.run(
+        [sys.executable, str(LAB / "inspect_state.py"), "check-disease-state"],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=ROOT,
+    )
+    assert (
+        "PASS: six-field disease-state definitions, IPASS subgroup reversal, Open Targets scores and Thr790 gatekeeper contacts agree"
+        in check_res.stdout
+    )

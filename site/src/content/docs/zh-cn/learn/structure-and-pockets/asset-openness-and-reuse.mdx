@@ -61,7 +61,12 @@ import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 ## 材料没有展示的内容
 
-目录追踪声明和所引页面，而非经过测试的安装过程或法律判断。证据引用在各记录内部可以解析，但本课不会重新打开每个外部页面，也不会复现模型结果。范围文字标记不是许可分类器。[实验室](/zh-cn/labs/asset-openness-audit/)检查已声明的 24 条记录，并报告该集合与完整目录的计数，不把这些计数视为读者学习结果。
+目录追踪声明和所引页面，而非经过测试的安装过程或法律判断。证据引用在各记录内部可以解析，但本课不会重新打开每个外部页面，也不会复现模型结果。范围文字标记不是许可分类器。[实验室](/zh-cn/labs/asset-openness-audit/)检查已声明的 24 条记录，并报告该集合与完整目录的计数，不把这些计数视为读者学习结果。运行 `verify-reproducibility` 与 `check-reproducibility` 可将目录的 7 个开放性维度与 5 个已提交真实数据实验室（含 320 行数据的 `chembl_egfr`、含 4 个 PDB 条目的 `egfr_structures`、含 416 条突变的 `skempi_affinity`、含 642 个分子的 `freesolv`，以及含 1000 帧阿司匹林构象的 `rmd17_system_state`）的实测复现工件配对核验，验证全部 5 个本地实验室均达到 `7/7` 工件完整度，并与上游模型记录（`model-boltz-1` 为 `6/7`、`model-boltz-2` 为 `5/7`、`model-chai-1` 为 `3/7`、`model-alphafold-3-inference` 为 `1/7`）形成定量对比。
+
+```bash
+.venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py verify-reproducibility
+.venv/bin/python labs/asset_openness_audit/inspect_asset_openness_audit.py check-reproducibility
+```
 
 ## 来源与复核日期
 

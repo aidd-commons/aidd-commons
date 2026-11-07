@@ -257,6 +257,24 @@ without alerts have positive findings, and one of twelve has organism-level
 evidence. These counts illustrate evidence levels; they are not observed
 safety measurements on real compounds.
 
+### Real-data clinical safety and unbound hERG exposure-margin audit (`public-safety`)
+
+To evaluate real measured ChEMBL 37 human hERG (`CHEMBL240`) and EGFR (`CHEMBL203`) `IC50` values, structural alerts, clinical unbound peak plasma exposure (`Cmax,u`), and FDA Boxed Warning / withdrawal outcomes across `6` clinical drugs:
+
+```bash
+.venv/bin/python labs/safety_evidence/inspect_safety.py public-safety
+.venv/bin/python labs/safety_evidence/inspect_safety.py check-public-safety
+```
+
+- **Exposure-normalized hERG safety margin (`IC50_hERG / Cmax_u`, Redfern threshold `30.0`x, high-risk threshold `10.0`x)**:
+  - `CHEMBL553` (`Erlotinib`, `150` mg QD, `Cmax,u = 0.19 uM`, `fu = 0.07`): `1` alert (`terminal_alkyne_cyp_inactivator`), EGFR `IC50 = 0.002 uM`, hERG `IC50 = 28.5 uM`, hERG margin `150.0`x (`log10_herg_margin = 2.1761`), hERG/EGFR selectivity `14250.0`x.
+  - `CHEMBL939` (`Gefitinib`, `250` mg QD, `Cmax,u = 0.035 uM`, `fu = 0.09`): `1` alert (`halogenated_aniline`), EGFR `IC50 = 0.033 uM`, hERG `IC50 = 1.0 uM`, hERG margin `28.57`x (`log10_herg_margin = 1.4559`), hERG/EGFR selectivity `30.3`x.
+  - `CHEMBL1201583` (`Lapatinib`, `1250` mg QD, `Cmax,u = 0.042 uM`, `fu = 0.01`): `1` alert (`para_alkoxy_or_hydroxy_aniline_quinone_imine_precursor`), EGFR `IC50 = 0.011 uM`, hERG `IC50 = 1.1 uM`, hERG margin `26.19`x (`log10_herg_margin = 1.4181`), hERG/EGFR selectivity `100.0`x, FDA Boxed Warning for hepatotoxicity (`HLA-DQA1*02:01` + quinone-imine metabolite).
+  - `CHEMBL24828` (`Vandetanib`, `300` mg QD, `Cmax,u = 0.18 uM`, `fu = 0.06`): `0` alerts, EGFR `IC50 = 0.5 uM`, hERG `IC50 = 0.4 uM`, hERG margin `2.22`x (`log10_herg_margin = 0.3468`), hERG/EGFR selectivity `0.8`x, FDA Boxed Warning & REMS for Torsades de Pointes.
+  - `CHEMBL3353410` (`Osimertinib`, `80` mg QD, `Cmax,u = 0.025 uM`, `fu = 0.05`): `2` alerts (`michael_acceptor_acrylamide`, `para_alkoxy_or_hydroxy_aniline_quinone_imine_precursor`), EGFR `IC50 = 0.001 uM`, hERG `IC50 = 1.58 uM`, hERG margin `63.2`x (`log10_herg_margin = 1.8007`), hERG/EGFR selectivity `1580.0`x.
+  - `CHEMBL17157` (`Terfenadine`, `60` mg QD, `Cmax,u = 0.03 uM`, `fu = 0.03`): `0` alerts, EGFR `IC50 = 50.0 uM`, hERG `IC50 = 0.056 uM`, hERG margin `1.87`x (`log10_herg_margin = 0.2711`), hERG/EGFR selectivity `0.0`x, withdrawn for Torsades de Pointes.
+- **Classification of clinical Torsades liability**: `structural_alert_only` yields `tp = 0`, `fp = 4`, `fn = 2`, whereas `exposure_linked_herg_margin_under_10x` yields `tp = 2`, `fp = 0`, `fn = 0`.
+
 ## Sources and next lesson
 
 The regulatory sources were opened on 2026-09-09; they support mechanism and

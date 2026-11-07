@@ -138,6 +138,21 @@ class lack measurements, and six positives occupy three scaffolds.
 The band marks threshold-sensitive labels; it does not determine the noise
 realization or prove that a label is wrong.
 
+### Real-data ChEMBL 37 EGFR binder classifier across measured inactives vs decoys (`public-binders`)
+
+Run the real-data binder classification audit (`128`-bit Morgan `radius = 2` + physicochemical logistic classifier, `alpha = 0.2`, `400` steps) across `24` real ChEMBL 37 human EGFR (`CHEMBL203`) compounds (`16` train, `8` test across `15` Bemis-Murcko scaffolds, cutoff `pIC50 >= 7.0`, uncertainty `0.3` log units) and `8` property-matched untested decoys:
+
+```bash
+.venv/bin/python labs/binder_definition/inspect_definition.py public-binders
+.venv/bin/python labs/binder_definition/inspect_definition.py check-public-binders
+```
+
+- **Cutoff grid `{6.0, 6.5, 7.0, 7.5, 8.0}`**: Positive counts shift across `18`, `14`, `12`, `9`, and `4`, with `4` compounds (`CHEMBL1173655`, `CHEMBL24828`, `CHEMBL101253`, `CHEMBL365756`) within `0.3` log units of `7.0`.
+- **Negative-class inflation on held-out test**:
+  - `measured_inactives_only` (`4` actives vs `4` measured inactives, `prevalence = 0.5`, `never_measured_negative_share = 0.0`): `roc_auc = 0.75`, `precision_at_0_5 = 0.6667`, `recall_at_0_5 = 1.0`, `false_positive_rate_at_0_5 = 0.5`.
+  - `untested_decoys_only` (`4` actives vs `8` untested decoys, `prevalence = 0.3333`, `never_measured_negative_share = 1.0`): `roc_auc = 0.875`, `precision_at_0_5 = 0.8`, `recall_at_0_5 = 1.0`, `false_positive_rate_at_0_5 = 0.125`.
+  - `pooled_measured_and_decoys` (`4` actives vs `4` measured inactives + `8` untested decoys, `prevalence = 0.25`, `never_measured_negative_share = 0.6667`): `roc_auc = 0.8333`, `precision_at_0_5 = 0.5714`, `recall_at_0_5 = 1.0`, `false_positive_rate_at_0_5 = 0.25`.
+
 ## Check a real transport claim
 
 The [screening transport lab](/labs/screening-transport/) reads this repository's

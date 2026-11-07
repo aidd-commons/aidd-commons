@@ -280,8 +280,31 @@ def check(data: dict) -> list[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", nargs="?", default="show", choices=["show", "check"])
+    parser.add_argument(
+        "action",
+        nargs="?",
+        default="show",
+        choices=["show", "check", "public-safety", "check-public-safety"],
+    )
     action = parser.parse_args().action
+    if action in ("public-safety", "check-public-safety"):
+        src_dir = ROOT / "labs" / "src"
+        if str(src_dir) not in sys.path:
+            sys.path.insert(0, str(src_dir))
+        from aidd_commons.safety_evidence.public_safety import (
+            check_public_safety,
+            evaluate_public_safety,
+        )
+
+        payload = evaluate_public_safety()
+        if action == "public-safety":
+            print(json.dumps(payload, indent=2))
+            return
+        failures = check_public_safety(payload)
+        print(json.dumps({"ok": not failures, "failures": failures}, indent=2))
+        if failures:
+            sys.exit(1)
+        return
     data = load()
 
     print(f"Record {DATASET.relative_to(ROOT)}")

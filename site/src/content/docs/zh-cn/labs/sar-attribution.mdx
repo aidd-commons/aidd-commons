@@ -75,10 +75,11 @@ python labs/sar_attribution/inspect_attribution.py show
 
 ```bash
 python labs/sar_attribution/inspect_attribution.py check
+python labs/sar_attribution/inspect_attribution.py chembl-series
+python labs/sar_attribution/inspect_attribution.py check-chembl-series
 ```
 
-共十四项检查，包括训练集上的相关是否完全、混杂因子是否被声明为无因果作用、
-阈值是否在拟合前声明，以及那个反转的排序是否仍然成立。
+在构造混杂数据集上共运行十四项检查，包括训练集上的相关是否完全、混杂因子是否被声明为无因果作用、阈值是否在拟合前声明，以及那个反转的排序是否仍然成立。运行 `chembl-series` 与 `check-chembl-series` 可将审计扩展到跨越 3 轮药物化学迭代优化的 12 个真实 ChEMBL 37 人源 EGFR（`CHEMBL203`）抑制剂（6 个第 1 轮可逆 4-苯胺基喹唑啉，平均 T790M 减 WT 选择性为 `-3.2250` 个对数单位；3 个第 2 轮共价丙烯酰胺喹唑啉，将平均 T790M `pIC50` 提高 `+2.5200` 个对数单位至 `7.7733`，但选择性仍为 `-1.1033`；以及 3 个第 3 轮突变选择性氨基嘧啶，将选择性翻转为 `+1.7333` 个对数单位），并在 4 对实测匹配分子对上对比 3 种解释方法（`linear_bit_provenance`、`counterfactual_loso_ablation` 与 `matched_molecular_pair_delta`，方向一致率 `4/4`）。
 
 ## 5. 它许可什么，不许可什么
 

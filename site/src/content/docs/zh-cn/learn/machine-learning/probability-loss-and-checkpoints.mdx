@@ -120,4 +120,24 @@ GP 均值为 `2/1.25=1.6`，潜在方差为 `1−1/1.25=0.2`，新观测方差�
 再到[延迟反馈下的采集](/zh-cn/learn/active-learning/acquisition-delays-and-stopping/)，
 理解如何用预测分布选择实验。
 
+## 真实数据下优化器收敛与有限样本自助重采样不确定性对比（`real-benchmark`）
+
+在 `40` 个真实 ChEMBL 37 人类 EGFR（`CHEMBL203`）抑制剂（`24` 个训练化合物含 `5` 个阳性与 `19` 个阴性、`8` 个验证、`8` 个测试）上运行优化器起点/步数预算变异性与有限样本自助重采样（bootstrap）对比：
+
+```sh
+.venv/bin/python labs/student_modelling/run_lab.py real-benchmark
+.venv/bin/python labs/student_modelling/run_lab.py check-real-benchmark
+```
+
+- **优化器步数预算扫描（`3` 个起点 `(0.0, 0.0)`、`(-1.5, 0.5)`、`(1.5, -0.5)`）**：
+  - `50` 步（`1200` 次梯度评估）：`decisions_agree_across_starts = false`，`max_test_probability_spread = 0.3064`。
+  - `200` 步（`4800` 次梯度评估）：`decisions_agree_across_starts = true`，`max_test_probability_spread = 0.0239`。
+  - `500` 步（`12000` 次梯度评估）：`decisions_agree_across_starts = true`，`max_test_probability_spread = 0.0003`。
+- **有限样本自助重采样不确定性（在 `500` 步下对 `24` 个训练化合物进行 `40` 次分层重采样）**：
+  - `mean_test_90pct_interval_width = 0.3836`，`max_test_90pct_interval_width = 0.4684`，且 `8` 个测试化合物中有 `7` 个在不同重采样训练集间发生二分类决策翻转（`p >= 0.5`）。
+- **类别不平衡分类建模（`20.83%` 少数类阳性比例，`pos_weight = 3.8`）**：
+  - `unweighted_logistic`（`test`）：`recall = 0.0`，`balanced_accuracy = 0.5`，`mean_predicted_probability = 0.2492`，`log_loss = 0.4723`。
+  - `class_weighted_logistic`（`pos_weight = 3.8`，`test`）：`recall = 1.0`，`balanced_accuracy = 0.75`，`mean_predicted_probability = 0.4779`，`log_loss = 0.5903`。
+  - `minority_oversampled_logistic`（`20` 个过采样阳性对 `19` 个阴性，`test`）：`recall = 1.0`，`balanced_accuracy = 0.75`，`mean_predicted_probability = 0.4901`，`log_loss = 0.6040`。
+
 原创例子与文字：CC BY 4.0。来源检查：2026-09-09。

@@ -107,6 +107,37 @@ import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 J 是唯一条件性幸存者，绝非“可制造”或“已验证”：soluble fraction 来自一个指定筛，功能对比仍可反映未测替代解释。下一步是预先声明的独立生产或语境比较，加上正交功能测量。K 不能因更大 `Δ_func` 而推进，除非修改声明规则；L 也不能以平均其 27 和其他好看列获救。
 
+## 在公开记录上可运行的跨模态可开发性与 6 阶段功能验证审计
+
+**模式：对已提交的 UniProt、DailyMed、PDB/SKEMPI 2.0 与 ChEMBL/PubChem 记录进行读取与确定性核验。**
+运行 [`labs/biologic_construct_audit/inspect_biologic_construct_audit.py`](https://github.com/gxcaesar/aidd-commons/blob/main/labs/biologic_construct_audit/inspect_biologic_construct_audit.py)
+中的 `developability` / `check-developability` 以及
+[`labs/functional_validation_audit/inspect_functional_validation_audit.py`](https://github.com/gxcaesar/aidd-commons/blob/main/labs/functional_validation_audit/inspect_functional_validation_audit.py)
+中的 `progression` / `check-progression`，在全部 `6` 种生物药/偶联物模态上评估表达宿主、糖基化、自缔合/聚集、
+免疫原性、递送与生产（CMC）约束，并检验 `6` 阶段功能验证递进：
+
+```bash
+.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py developability
+.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py check-developability
+.venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py progression
+.venv/bin/python labs/functional_validation_audit/inspect_functional_validation_audit.py check-progression
+```
+
+| 实体 / 模态（`来源`） | 表达宿主与翻译后修饰（PTM） | 稳定性、聚集与递送瓶颈 | 核心 CMC / 验证门槛 |
+| --- | --- | --- | --- |
+| `adalimumab`（`IgG1 mAb`，`1330` aa，`148` kDa，DailyMed `v6`） | `CHO`；Fc N-糖基化对 FcRn 再循环与 C1q 结合必需 | 高浓度皮下制剂要求 SEC 单体比例 `>= 0.95` 且 HIC 保留时间低（`<= 11.5` min） | 专用病毒灭活与去除步骤；结合 TNF-alpha（不结合 TNF-beta）并在补体存在下裂解表面 TNF 细胞 |
+| `etanercept`（`p75 TNFR-Fc 二聚体`，`934` aa，`150` kDa，`P20333`，DailyMed `v218`） | `CHO`；高度 O- 与 N-糖基化，缺失 IgG1 `CH1` 结构域 | 铰链区二硫键配对与唾液酸化控制清除率 | 同时结合 TNF-alpha 与 TNF-beta（`LT-alpha`），不形成大复合物且不引发补体裂解 |
+| `agalsidase-beta`（`同源二聚体酶替代`，`2 x 398` aa，`100` kDa，`P06280`，DailyMed `v35`） | `CHO`（区别于人类细胞系生产的 `agalsidase-alpha`）；每亚基 `3` 个 N-糖基化位点 | 须在血浆 pH `7.4` 下保持可溶，并经甘露糖-6-磷酸（`M6P`）受体转运至溶酶体（pH `4.5`） | 比酶活 `70` U/mg（`1` umol/min 底物水解）+ 溶酶体 GL-3 清除 |
+| `insulin-lispro`（`多肽类似物`，`P01308`，UniProt `v284`） | 微生物胰岛素原表达；非糖基化（`3` 对二硫键） | 天然 `52-Pro-Lys-53` 自缔合为六聚体；`52-Lys-Pro-53` 倒位破坏二聚体界面以加速单体吸收 | 六聚体向单体解离动力学与抗淀粉样纤维化稳定性 |
+| `reteplase`（`kringle-2 + 蛋白酶片段`，`BM 06.022`，`P00750`，UniProt `v282`） | 大肠杆菌包涵体表达 + 体外氧化复性（非糖基化） | 不溶性包涵体复性产率并防止自催化降解 | 血管内双次推注纤溶活性与活性单体完整性 |
+| `LNP-siRNA / ADC`（`PMID:29988049`、`PMID:31825569`、`P04626`） | 固相寡核苷酸合成 + 微流控 LNP；`CHO` mAb + 巯基连接子偶联（`DAR ~ 8`） | 高 `DAR`（`4` 至 `8`）增加 HIC 疏水性与聚集；裸 siRNA 有效递送率仅 `0.08` x `0.005` = `0.00040`，而 LNP 为 `0.85` x `0.024` = `0.0204` | 靶区室有效递送率 `>= 0.015`（`ERT-201`：`0.42` x `0.65` = `0.2730`；`SIRNA-302`：`0.0204`）且游离载荷 `< 1%` |
+
+在 `6` 个候选构建体的多门槛面板（`SEC >= 0.95`、`HIC <= 11.5` min、`Fab T_m >= 65.0` °C、`PSR <= 0.27`、
+`Δ_func+ >= 30.0`、`Δ_func- <= 10.0` 且靶区室递送率 `>= 0.015`）中，仅有 `3` 个候选项通过全部门槛
+（`MAB-101` 的 SEC 为 `0.972`、HIC 为 `9.1` min、`T_m` 为 `74.5` °C、PSR 为 `0.14`；`ERT-201` 递送率 `0.2730`；
+`SIRNA-302` 递送率 `0.0204`），而 `MAB-102` 未通过物理可开发性门槛（SEC `0.785`、HIC `13.8` min、`T_m` `61.0` °C），
+`MAB-103` 未通过特异性门槛（PSR `0.49`、`Δ_func-` `18.5`），未包封的 `SIRNA-301` 则未通过区室递送门槛（`0.00040`）。
+
 ## 替代方法、局限与独立练习
 
 当门槛未决定时，Pareto front 可保留数个候选项等待更多证据；加权分数只在单位、方向、权重和缺失规则固定后才合理。设计模型置信度可优先化小面板，却不能代替实测表达或功能。已发表 physicochemical rules 是特定抗体数据集中的相对风险模式，不是通用准入规则 [Zhang et al.](https://pubmed.ncbi.nlm.nih.gov/32453957/)。

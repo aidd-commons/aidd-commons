@@ -1,12 +1,22 @@
+# ruff: noqa: E501
 from __future__ import annotations
 
 import argparse
 import csv
+import json
 import sys
 from collections.abc import Sequence
 from pathlib import Path
 
-from aidd_commons.representations.inspection import (
+SRC_DIR = Path(__file__).resolve().parents[1] / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
+from aidd_commons.representations.conformers_and_graphs import (  # noqa: E402
+    check_conformers_and_graphs,
+    evaluate_conformers_and_graphs,
+)
+from aidd_commons.representations.inspection import (  # noqa: E402
     MoleculeInput,
     RepresentationConfig,
     RepresentationInputError,
@@ -37,6 +47,14 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="omit chirality from Morgan atom invariants and record that choice",
     )
+    subparsers.add_parser(
+        "conformers-and-graphs",
+        help="inspect 3D ETKDGv3/MMFF94 conformer ensembles and 2D/3D graph message-passing encodings on real ChEMBL drugs",
+    )
+    subparsers.add_parser(
+        "check-conformers-and-graphs",
+        help="verify deterministic 3D conformer and graph encoding invariants",
+    )
     return parser.parse_args(argv)
 
 
@@ -62,6 +80,14 @@ def load_inputs(path: Path) -> tuple[MoleculeInput, ...]:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
+    if args.action == "conformers-and-graphs":
+        print(json.dumps(evaluate_conformers_and_graphs(), indent=2))
+        return 0
+    if args.action == "check-conformers-and-graphs":
+        payload = evaluate_conformers_and_graphs()
+        failures = check_conformers_and_graphs(payload)
+        print(json.dumps({"ok": not failures, "failures": failures}, indent=2))
+        return 1 if failures else 0
     try:
         input_path = _resolve_repository_path(args.input)
         output_path = _resolve_repository_path(args.output)

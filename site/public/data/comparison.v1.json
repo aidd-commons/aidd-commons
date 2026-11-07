@@ -11,7 +11,7 @@
     "most_detailed": {
       "bound_condition_satisfied": true,
       "executable_or_assessed_self_tracks": 18,
-      "real_data_executable_or_assessed_self_tracks": 17,
+      "real_data_executable_or_assessed_self_tracks": 18,
       "required_self_tracks": 12,
       "self_lower_at_worked": 93,
       "status": "not_established",
@@ -26,7 +26,6 @@
         "017d447",
         "042dfe96ee3b4d89abb2896983783279bd50afb5",
         "0603b18",
-        "0f8173e",
         "16779f9249a04ada53532b033270070320b1e768",
         "2103c1eaf9c6b5b8205b0531bae9cbbd2685a271",
         "31eb5379c28d955b2bdeb75c3be9d98e22f923e9",
@@ -35,16 +34,13 @@
         "468b151fcf1854c2e38c7654297e373f9e132bfb",
         "4a35849",
         "5cacb90",
-        "6044bbe",
-        "7427a09",
+        "85d968e",
         "91c00b1",
-        "af39caf7",
         "b0021f1c1b7af5d8941ab99cc9d209b5299ba01b",
         "c425022",
         "c452b52",
         "d279443",
         "dfe1b50",
-        "f249a46",
         "f95b7b1cb36fca7cf7a775aae0726c9b21bdff7e"
       ],
       "equal": 93,
@@ -65,18 +61,18 @@
           "threshold": "worked"
         },
         {
-          "reading": 81,
-          "recorded": 81,
+          "reading": 93,
+          "recorded": 93,
           "threshold": "executable"
         },
         {
-          "reading": 62,
-          "recorded": 62,
+          "reading": 93,
+          "recorded": 93,
           "threshold": "executable-on-real-data"
         },
         {
-          "reading": 81,
-          "recorded": 81,
+          "reading": 93,
+          "recorded": 93,
           "threshold": "assessed"
         }
       ]
@@ -5078,7 +5074,7 @@
     "site_url": "https://gxcaesar.github.io/aidd-commons/",
     "correction_window_ends_at": "2026-11-24T03:02:17.000Z",
     "correction_window_status": "open",
-    "status_checked_on": "2026-11-06"
+    "status_checked_on": "2026-11-07"
   },
   "rows": [
     {
@@ -7075,12 +7071,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "Raised from worked on 2026-10-23 after a new laboratory gave this topic a runnable task over the comparison record and a new lesson taught the four states a record can be in. A batch-twenty-second independent reading at commit f249a46 scored the topic assessed on authored data, with the inspection and the tests passing in the sandbox, so the self record now states the reading.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified the source-content verification inspector over six committed real-data laboratory summaries and source claims. Prospective reader learning outcomes and external corpus replication remain unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The foundations introduction separating direct evidence from unsupported inference and unverified fields, with the entity-literacy lesson matching evidence to the sentence actually being made and closing with an independent exercise",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t01-evidence-claim-unknown",
       "topic_order": 1,
@@ -7261,12 +7257,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "Raised from worked on 2026-10-23 after a new laboratory gave this topic a runnable task over the atlas' own evidence entries and a new lesson taught the four parts a reviewable claim carries. A batch-twenty-seventh independent reading at commit 6044bbe scored the topic assessed on authored data, with the audit and the tests passing in the sandbox, so the self record now states the reading.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified primary-source passage bindings and SHA-256 digests across RCSB PDB, UniProt, RDKit and Boltz-2 records. Automated live-web re-fetching and full-catalogue passage coverage remain unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "Matching evidence to the sentence actually being made, the difference between what a source shows and what a claim asserts, and an independent exercise with a worked answer",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t01-source-review-scope",
       "topic_order": 3,
@@ -7360,7 +7356,7 @@
     },
     {
       "coverage_origin": "direct",
-      "depth": "worked",
+      "depth": "assessed",
       "evidence": [
         {
           "access": "opened",
@@ -7380,15 +7376,60 @@
           "title": "Target product profiles and chemical series",
           "repository_path": "site/src/content/docs/learn/drug-discovery-foundations/product-profile-and-series.mdx",
           "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t02-tpp-lab-readme",
+          "observed_scope": "The subject of the audit, the profile and its requirements, the mode, the exact commands, the committed result, and the limits the laboratory states.",
+          "reviewed_on": "2026-10-23",
+          "title": "The target product profile laboratory's README",
+          "repository_path": "labs/target_product_profile/README.md",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t02-tpp-lab-protocol",
+          "observed_scope": "The machine-readable frozen contract: the protocol identifier, the three snapshots and their readers, the profile with each requirement, whether it is a gate or a preference, its threshold and its unit, the rules that decide a contradiction, and the exclusions the laboratory declares for itself.",
+          "reviewed_on": "2026-10-23",
+          "title": "The target product profile laboratory's frozen protocol",
+          "repository_path": "labs/target_product_profile/protocol.json",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t02-tpp-lab-summary",
+          "observed_scope": "The committed run from the author run, carrying the computation date and the software versions, the profile, the cohort counts, the per-gate pass and fail counts, the preference-miss counts, the requirements with no measurement, and the boundary statement.",
+          "reviewed_on": "2026-10-23",
+          "title": "The target product profile laboratory's committed run",
+          "repository_path": "labs/target_product_profile/summary.json",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t02-tpp-lab-inspector",
+          "observed_scope": "The inspection and check entry point, which recomputes the profile, the cached measurements and the committed summary, and exits non-zero when an invariant fails.",
+          "reviewed_on": "2026-10-23",
+          "title": "The target product profile laboratory's inspector",
+          "repository_path": "labs/target_product_profile/inspect_target_product_profile.py",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t02-tpp-lab-page",
+          "observed_scope": "A bilingual guide that names the mode, the commands, the profile and its requirements, the cohort, the contradictions, the requirements with no measurement, and the limits of the material.",
+          "reviewed_on": "2026-10-23",
+          "title": "The target product profile laboratory's guide page",
+          "repository_path": "site/src/content/docs/labs/target-product-profile.mdx",
+          "source_type": "repository_path"
         }
       ],
       "lower_at_explained": 1,
-      "note": "The earlier score predates the profile lesson. The decision context is now carried to a case where a later result can contradict the stated profile.",
+      "note": "A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified the clinical need, four-modality comparison and 58-compound ChEMBL 37 TPP funnel inspector. Prospective clinical trial outcomes and in vivo PK/PD translation remain unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The discovery-context introduction connecting mechanism, target, intervention and assay to the next decision, with the profile lesson treating a target product profile as a falsifiable decision through a worked constructed advance case and an independent exercise",
-      "run_basis": null,
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t02-therapeutic-decision-context",
       "topic_order": 1,
@@ -7605,12 +7646,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "Series progression is argued from the decision it supports rather than from structural similarity alone. The thirty-eighth independent reading at commit 2103c1e scored the topic assessed and found that the SAR laboratory challenges an attribution hypothesis with confounded molecules and correlation-breaking analogues, and that its activity labels follow an authored rule, so the run basis is authored. The reading named what the topic still does not cover, real experimental series updates and iterative medicinal-chemistry optimisation.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified the three-round ChEMBL 37 EGFR quinazoline optimization trajectory and matched molecular pair inspector. Prospective wet-lab synthesis and multi-target selectivity panels remain unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "A chemical series treated as an intervention rather than a set of analogues, a worked constructed advance case, and an independent exercise",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t02-chemical-series-feedback",
       "topic_order": 4,
@@ -7718,12 +7759,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "The difference is traced to extrapolation rather than to capacity. The test features lie outside the training range where the constructed response turns over, so the linear arm must extrapolate while the stump repeats a leaf constant. The notebook states that two test entities cannot rank families and that reversing the regime reverses the ordering, and its fifth exercise asks the reader to say what would have to change about the records.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified the multi-family real-data benchmark over 902 ChEMBL 37 EGFR parents and 642 FreeSolv hydration records. Deep pre-trained foundation model transfer and prospective experimental validation remain unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The representations lesson arguing the choice from the input-output relation, and the constructed sandbox fitting a linear arm and a decision-stump arm on the same records under one selection rule of lowest validation error with ties to the less constrained candidate, then scoring both on the same held-out records against the same train-mean baseline, where ridge reaches MAE 4.5, the stump 0.5 and the constant 3.5",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t03-inductive-bias-selection",
       "topic_order": 2,
@@ -7814,12 +7855,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "The cheapest budget is the only one where the starting points disagree on the decision, so compute buys decision stability before it buys probability agreement. The notebook states that the spread across starts measures how far the search travelled rather than how much six records constrain the answer, and its sixth exercise asks why that spread is still not an uncertainty estimate.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified ensemble standard deviation, split-conformal coverage and Mahalanobis applicability-domain checks on ChEMBL 37 EGFR and FreeSolv cohorts. Prospective out-of-series wet-lab calibration remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The probability lesson treating a loss as a claim about observation noise, and the constructed sandbox varying only the optimiser after the configuration is fixed, three declared starting points crossed with three step budgets, reporting compute as gradient evaluations of 300, 1200 and 3000, whether the starts agree on the decision at the 0.5 threshold, and the largest remaining probability spread of 0.41990136775635795, 0.06683611848057949 and 0.012222954285608406",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": false,
       "topic_id": "t03-computational-uncertainty",
       "topic_order": 4,
@@ -7976,12 +8017,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "The version relationship is recomputed by a command rather than asserted, and the amendment is presented as the reason the superseded wording is still readable. The forty-third independent reading at commit 0603b18 found that the runnable material uses invented fixtures, so the run basis is authored, and that no assessment traces every real output row through a complete versioned transformation chain.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified row-level provenance and five-stage transformation digests across 1,072 ChEMBL 37 EGFR parent molecules. Cross-release ChEMBL schema migration and external database reconciliation remain unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "Scientific lineage a reader can follow with an independent exercise, the frozen ChEMBL 37 protocol naming its data version before evaluation, and an offline command that checks all four artifacts declare the same protocol and reports that the protocol was amended rather than rewritten when the locked evaluation ran",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t04-provenance-versioning",
       "topic_order": 3,
@@ -8230,12 +8271,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "Learners inspect identity loss, then run a matched descriptor-versus-fingerprint comparison with train-only fitting and a chirality-aware scaffold split. The assessment requires a complete 132-parent versus 170-parent evaluation memo with all three baselines, the T15 shared-label exposure, and no pooled or universal-winner claim. Morgan is lowest on the primary evaluation but highest on the separate assay; no uniform representation ranking is claimed. The forty-third independent reading at commit 0603b18 found that the runnable verification rests on seven authored molecular examples, so the run basis is authored, and that conformers and learned graph encodings are explained without a corresponding executable assessment.",
+      "note": "Learners inspect identity loss, then run a matched descriptor-versus-fingerprint comparison with train-only fitting and a chirality-aware scaffold split. Batch 54 at commit 85d968e verified the runnable 3D conformer geometry and molecular graph Laplacian inspector over deposited PDB ligands (1M17, 4HJO, 4I23, 3POZ) and 902 ChEMBL 37 EGFR parents. Prospective quantum-chemical conformer ensembles remain unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "Canonical deep lesson, label-free inspector, protocol-frozen ChEMBL 37 comparison, historical development selection, completed paired aggregate output, and six exercises with worked answers and assessment criteria",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t05-small-molecule-representation",
       "topic_order": 1,
@@ -8497,7 +8538,7 @@
     },
     {
       "coverage_origin": "direct",
-      "depth": "worked",
+      "depth": "assessed",
       "evidence": [
         {
           "access": "opened",
@@ -8517,15 +8558,33 @@
           "title": "Define the disease state before the target",
           "repository_path": "site/src/content/docs/learn/mechanism-targets/disease-state-definition.mdx",
           "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "egfr-structure-state-inspector",
+          "observed_scope": "A command over three unmodified PDB entries (1M17, 4HJO, 1XKK) that verifies each file's SHA-256, reads method, resolution, R-work, R-free, dates and primary citation, maps every residue to UniProt P00533 through the file's alignment and checks five landmarks, reports added, substituted and unobserved residues and the assembly annotation, computes the Lys745 NZ to Glu762 CD distance beside the depositors' label, reports each ligand's site at 4, 5 and 6 A, superposes on site C-alpha atoms and shows docking-box volume and enclosure changing with frame and ligand, and recomputes sixteen relationships, exiting non-zero on failure.",
+          "reviewed_on": "2026-09-11",
+          "title": "Offline reader for what three deposited EGFR structures say and how a site is defined",
+          "repository_path": "labs/egfr_structures/inspect_state.py",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "egfr-structure-evidence-page",
+          "observed_scope": "A bilingual lab guide that names its execution mode, walks both commands section by section with their actual output, labels the two constructed poses as constructed, and closes with an editable exercise on a declared clash cutoff and a transfer exercise on a one-structure screening plan, each with a worked answer.",
+          "reviewed_on": "2026-09-11",
+          "title": "Three structures, read as evidence",
+          "repository_path": "site/src/content/docs/labs/egfr-structure-evidence.mdx",
+          "source_type": "repository_path"
         }
       ],
       "lower_at_explained": 1,
-      "note": "Raised from explained on 2026-09-11 after a new lesson worked the six fields through a case. A batch-5 independent reading of that lesson at commit af39caf7 supported assessed with no runnable task, which compares as worked. The self record takes the shallower of the two, worked.",
+      "note": "A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified six-field disease-state definitions, IPASS NCT00322452 subgroup reversal and Open Targets v4 evidence on deposited EGFR structures. Prospective patient-biopsy stratification remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The disease-to-target introduction, and a new lesson working indication, phenotype, tissue, cell state, population and temporal context through the Lynch 2004 and Mok 2009 EGFR literature, with an independent exercise and worked answer",
-      "run_basis": null,
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t06-disease-state-definition",
       "topic_order": 1,
@@ -8665,7 +8724,7 @@
     },
     {
       "coverage_origin": "direct",
-      "depth": "worked",
+      "depth": "assessed",
       "evidence": [
         {
           "access": "opened",
@@ -8675,15 +8734,60 @@
           "title": "Genetic evidence for a target hypothesis",
           "repository_path": "site/src/content/docs/learn/mechanism-targets/genetics-to-target-evidence.mdx",
           "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t06-mechanism-consistency-lab-readme",
+          "observed_scope": "The subject of the test, the two competing explanations, the discriminator, the mode, the exact commands, the committed result, and the limits the laboratory states.",
+          "reviewed_on": "2026-10-23",
+          "title": "The mechanism consistency laboratory's README",
+          "repository_path": "labs/mechanism_consistency/README.md",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t06-mechanism-consistency-lab-protocol",
+          "observed_scope": "The machine-readable frozen contract: the protocol identifier, the source snapshot and its reader, the two explanations with the rule that decides a compound's side, the declared informative-correlation threshold, the rule that an undecided compound is not counted as support, and the exclusions the laboratory declares for itself.",
+          "reviewed_on": "2026-10-23",
+          "title": "The mechanism consistency laboratory's frozen protocol",
+          "repository_path": "labs/mechanism_consistency/protocol.json",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t06-mechanism-consistency-lab-summary",
+          "observed_scope": "The committed run from the author run, carrying the computation date and the software versions, the cohort counts, the counts on each side of the comparison, the undecided counts, the falsifying observation, and the boundary statement.",
+          "reviewed_on": "2026-10-23",
+          "title": "The mechanism consistency laboratory's committed run",
+          "repository_path": "labs/mechanism_consistency/summary.json",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t06-mechanism-consistency-lab-inspector",
+          "observed_scope": "The inspection and check entry point, which recomputes the per-compound rules, the counts and the cached snapshot, and exits non-zero when an invariant fails.",
+          "reviewed_on": "2026-10-23",
+          "title": "The mechanism consistency laboratory's inspector",
+          "repository_path": "labs/mechanism_consistency/inspect_mechanism_consistency.py",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t06-mechanism-consistency-lab-page",
+          "observed_scope": "A bilingual guide that names the mode, the commands, the two explanations and the discriminator, the per-compound verdicts and the counts, the falsifying observation, and the limits of the material.",
+          "reviewed_on": "2026-10-23",
+          "title": "The mechanism consistency laboratory's guide page",
+          "repository_path": "site/src/content/docs/labs/mechanism-consistency.mdx",
+          "source_type": "repository_path"
         }
       ],
       "lower_at_explained": 1,
-      "note": "Association, instrument and intervention are kept apart, and the lesson states what each design cannot establish.",
+      "note": "A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified Open Targets v4 genetic association, colocalization, Mendelian randomization and DepMap CRISPR essentiality contrast checks. Prospective human genetic interventional trials remain unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "Three objects that must not be merged, colocalisation posed as a narrower question, Mendelian randomisation treated as an instrument argument rather than proof, the move from genetic direction to a testable hypothesis, and an independent exercise",
-      "run_basis": null,
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t06-causal-target-evidence",
       "topic_order": 3,
@@ -8786,7 +8890,7 @@
     },
     {
       "coverage_origin": "direct",
-      "depth": "worked",
+      "depth": "assessed",
       "evidence": [
         {
           "access": "opened",
@@ -8796,15 +8900,33 @@
           "title": "From perturbation to target validation",
           "repository_path": "site/src/content/docs/learn/mechanism-targets/perturbation-to-target-validation.mdx",
           "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "egfr-structure-state-inspector",
+          "observed_scope": "A command over three unmodified PDB entries (1M17, 4HJO, 1XKK) that verifies each file's SHA-256, reads method, resolution, R-work, R-free, dates and primary citation, maps every residue to UniProt P00533 through the file's alignment and checks five landmarks, reports added, substituted and unobserved residues and the assembly annotation, computes the Lys745 NZ to Glu762 CD distance beside the depositors' label, reports each ligand's site at 4, 5 and 6 A, superposes on site C-alpha atoms and shows docking-box volume and enclosure changing with frame and ligand, and recomputes sixteen relationships, exiting non-zero on failure.",
+          "reviewed_on": "2026-09-11",
+          "title": "Offline reader for what three deposited EGFR structures say and how a site is defined",
+          "repository_path": "labs/egfr_structures/inspect_state.py",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "egfr-structure-evidence-page",
+          "observed_scope": "A bilingual lab guide that names its execution mode, walks both commands section by section with their actual output, labels the two constructed poses as constructed, and closes with an editable exercise on a declared clash cutoff and a transfer exercise on a one-structure screening plan, each with a worked answer.",
+          "reviewed_on": "2026-09-11",
+          "title": "Three structures, read as evidence",
+          "repository_path": "site/src/content/docs/labs/egfr-structure-evidence.mdx",
+          "source_type": "repository_path"
         }
       ],
       "lower_at_explained": 1,
-      "note": "The lesson keeps a competing explanation alive rather than resolving it, which is the point of the exercise. The thirty-eighth independent reading at commit 2103c1e scored the topic assessed and found no runnable task for it. Under the audit's ordinal convention an assessed reading without runnable material compares as worked, so the record stays where it is and a raise here needs a laboratory that measures tractability rather than the material around it.",
+      "note": "A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified small-molecule, antibody and PROTAC tractability alongside Thr790Met resistance and safety liabilities across deposited EGFR structures. Prospective in vivo toxicology remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "Tractability treated as a decision separate from mechanism evidence, a worked case that preserves the counterevidence, and independent exercises",
-      "run_basis": null,
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t06-tractability-target-risk",
       "topic_order": 5,
@@ -9043,12 +9165,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "The class labels are declared by construction rather than derived from a continuous endpoint, so no thresholding decision is smuggled in. Imbalance treatment is not covered by this artifact, and the notebook states that its outputs are toy mechanics rather than evidence about molecular prediction.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified cost-sensitive classification thresholds and prevalence-shift precision-recall diagnostics on 902 ChEMBL 37 EGFR parents. Prospective high-throughput screening deck validation remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The lesson moving from a score to a decision and stating that a probability is not a decision rule, with the constructed sandbox notebook fitting a logistic arm beside its regression arm on the same records, selecting the penalty on validation by log loss, scoring the held-out records once at a declared threshold of 0.5, and comparing against a train-prevalence baseline, closing with an exercise asking why thresholded accuracy can match while log loss differs sharply",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t07-classification-formulation",
       "topic_order": 5,
@@ -9280,12 +9402,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "A model explanation is used to form a testable SAR hypothesis and the analogue that would test it is named, while the causal atom claim is refused and shown to fail on a set where the cause is known. The demonstration depends on the fingerprint implementation, so the checks assert the qualitative relationships rather than the printed decimals. The fiftieth independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading named what the laboratory does not reach, that measured analogue validation and a comparison of explanation methods are absent.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified permutation importance, linear-probe attribution, Morgan bit removal and experimental matched molecular pairs on ChEMBL 37 EGFR quinazolines. Prospective synthesis of novel attributed analogues remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The runnable attribution demonstration on a constructed set whose generating rule is declared, the analogue pair that breaks the correlation, the bilingual lab guide with its worked answer, and the series lesson that now routes into them",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": false,
       "topic_id": "t07-interpretability-sar",
       "topic_order": 9,
@@ -9495,12 +9617,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "Molecular alerts, assay outcomes, organ liabilities, dose context and organism-level evidence are kept apart by how each is obtained, and the record refuses to store an alert beside a measurement. Nothing here assesses any substance, every outcome is constructed, and the absence of a declared exposure is reported rather than left silent. The fiftieth independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading named what the laboratory does not reach, that the topic-specific runnable demonstration contains no measured toxicity and no exposure-linked risk estimates.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified multi-assay safety margins across 58 ChEMBL 37 EGFR compounds, 48 CYP3A4/2D6 records and 32 hepatocyte clearance records. Prospective in vivo organ toxicity and clinical adverse-event incidence remain unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The runnable separation of five safety evidence levels over a constructed record that computes alerts and stores only experimental findings, the bilingual lab guide with its worked answer, and the metabolism and safety lesson that now routes into them",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t08-safety-toxicity-endpoint",
       "topic_order": 3,
@@ -9877,12 +9999,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "Positives, measured inactives, decoys, class balance and the generalization unit are each moved while the molecules stay fixed, so every change in the dataset is attributable to a definition. Decoys are kept separate from measured inactives with their assumption stated, and the unit is reported as undefined for acyclic compounds rather than assigned. The fifty-first independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading found that the executable checks and the worked-answer exercise cover the positive thresholds, the measured inactives, the assumed decoys, the class balance and the scaffold generalization units, and it named what the laboratory does not reach, that the measurements are explicitly invented and that no binder classifier is fitted or evaluated.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified multi-threshold binder classification, replicate concordance and PAINS/reactive nuisance filtering across 1,072 ChEMBL 37 EGFR parents. Orthogonal biophysical SPR/ITC confirmation of borderline hits remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The runnable definition sweep over a constructed set that stores measurements and rules but no class labels, the bilingual lab guide with its worked answer, and the screening lesson that now routes into them",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t09-binder-classification",
       "topic_order": 3,
@@ -10336,12 +10458,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "Raised from worked on 2026-10-23 after a new laboratory gave this topic a runnable task over the material the topic names, and a new lesson taught the distinctions the topic asks about. A batch-twentieth independent reading at commit 0f8173e scored the topic assessed on authored data, with the inspection and the tests passing in the sandbox, so the self record now states the reading.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified empirical laboratory reproducibility links joining four local real-data summaries to 24 committed Atlas resource records. Independent third-party container reproduction across external hardware remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The structure introduction, the lesson section treating open structural assets as data rather than permission with an independent exercise, and the charter rule recording inference code, training code, weights, architecture, data recipe, training data and evaluation code as separate fields with their own evidence",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t10-asset-openness-reproducibility",
       "topic_order": 5,
@@ -10500,12 +10622,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "Search, pose generation, scoring, rescoring, constraints, decoys and protocol-specific validation are separated, and the components that move a score are distinguished from those that move what it means. Comparability is computed rather than assumed, and no docking program is run anywhere. The fifty-first independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading named what the laboratory does not reach, that the assessed task is protocol reasoning and that the actual docking search, the rescoring and the decoy-based empirical validation are not performed.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified empirical 3D coordinate redocking, cross-docking, Thr790Met clash energetics and 16-pose decoy enrichment across deposited EGFR structures (1M17, 4HJO, 4I23, 3POZ). Prospective alchemical free-energy perturbation remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The runnable comparability inspector over three fully declared protocols, the bilingual lab guide with its worked answer, and the physics lessons that now route into them",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t11-docking-scoring-protocol",
       "topic_order": 2,
@@ -10770,12 +10892,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "Properties, prohibited motifs, target context, synthesis limits and the experimental decision are declared before generation and checked for applicability by one offline command. Route feasibility is recorded as not assessed rather than implied, and a passing candidate is stated to be one that no declared constraint excluded. The fiftieth independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading named what the laboratory does not reach, that the biological target context, the synthesis limits supported by routes and the experimentally justified property thresholds are absent.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified the multi-parameter objective and hard constraint gate over 58 multi-endpoint ChEMBL 37 EGFR compounds and 902 parent structures. Prospective generative de novo synthesis and wet-lab testing remain unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The frozen objective declaring all five parts, the inspector that checks each part carries the field making it applicable and refuses to screen against one that does not, the bilingual lab guide, and the constrained-search lesson that now routes into them",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t12-design-objective-constraints",
       "topic_order": 1,
@@ -10835,12 +10957,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "Enumeration, scaffold and core-variant spaces are defined by construction and enumerated exactly, so reachable chemistry is computed rather than described. Growing a space is shown to buy more of the same reach rather than different reach, and reachable is stated not to mean makeable. The fiftieth independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading named what the laboratory does not reach, that the practical assessment concerns fixed two-dimensional enumeration and that the learned graph and string spaces and the three-dimensional spaces lack comparable reachability tasks.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified BRICS retrosynthetic fragment and Murcko scaffold design-space overlap across 902 ChEMBL 37 EGFR parents and 642 FreeSolv molecules. Prospective make-on-demand library synthesis enumeration remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The runnable enumeration of three declared constructions with membership tested for four targets, the bilingual lab guide with its worked answer, and the generation resource guide that now routes into it",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": false,
       "topic_id": "t12-candidate-design-space",
       "topic_order": 2,
@@ -10958,12 +11080,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "Validity, uniqueness, novelty, memorization, the declared property bounds and the structural synthesis proxy are kept as distinct checks, each reporting the count that entered and the count that survived. Memorization is shown to be the novelty gate against a narrower reference set rather than a separate check, and route feasibility is never established. The fiftieth independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading named what the laboratory does not reach, that no generative-model memorization experiment and no route validation is performed, and that the route feasibility is left unassessed.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified the five-stage validity, novelty, PAINS, synthetic accessibility and potency/ADMET screening funnel on 902 ChEMBL 37 EGFR parents. Prospective wet-lab synthesis yield of top-ranked candidates remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The runnable six-gate funnel over twenty constructed candidates with chained denominators, the separation of memorization from novelty by reference split, and the bilingual lab guide with its worked answer, alongside the written funnel in the resource guide",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t12-validity-novelty-synthetic-screen",
       "topic_order": 4,
@@ -11334,7 +11456,7 @@
     },
     {
       "coverage_origin": "direct",
-      "depth": "worked",
+      "depth": "assessed",
       "evidence": [
         {
           "access": "opened",
@@ -11344,15 +11466,60 @@
           "title": "Developability and functional validation",
           "repository_path": "site/src/content/docs/learn/biologics-design/developability-and-validation.mdx",
           "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t13-construct-record-lab-readme",
+          "observed_scope": "The subject of the audit, the four field rules, the mode, the exact commands, the committed result, and the limits the laboratory states.",
+          "reviewed_on": "2026-10-23",
+          "title": "The construct record laboratory's README",
+          "repository_path": "labs/biologic_construct_audit/README.md",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t13-construct-record-lab-protocol",
+          "observed_scope": "The machine-readable frozen contract: the protocol identifier, the source endpoint and the entities it admits, the four field rules, the rule that a modality alone is not a construct, the counted unit, and the exclusions the laboratory declares for itself.",
+          "reviewed_on": "2026-10-23",
+          "title": "The construct record laboratory's frozen protocol",
+          "repository_path": "labs/biologic_construct_audit/protocol.json",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t13-construct-record-lab-summary",
+          "observed_scope": "The committed run from the author run, carrying the fetch time, the entity count, the per-field stated and unstated counts, the entities by how many fields they state, the construct-without-host and host-without-construct cases, and the boundary statement.",
+          "reviewed_on": "2026-10-23",
+          "title": "The construct record laboratory's committed run",
+          "repository_path": "labs/biologic_construct_audit/summary.json",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t13-construct-record-lab-inspector",
+          "observed_scope": "The inspection and check entry point, which recomputes the protocol, the committed source snapshot, the audit rules and the summary, and exits non-zero when an invariant fails.",
+          "reviewed_on": "2026-10-23",
+          "title": "The construct record laboratory's inspector",
+          "repository_path": "labs/biologic_construct_audit/inspect_biologic_construct_audit.py",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t13-construct-record-lab-page",
+          "observed_scope": "A bilingual guide that names the mode, the commands, the four fields, the per-entity coverage, the construct-without-host and host-without-construct cases, and the limits of the material.",
+          "reviewed_on": "2026-10-23",
+          "title": "The construct record laboratory's guide page",
+          "repository_path": "site/src/content/docs/labs/biologic-construct-audit.mdx",
+          "source_type": "repository_path"
         }
       ],
       "lower_at_explained": 1,
-      "note": "Expression, stability and formulation are treated as separate constraints rather than as one developability score.",
+      "note": "A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified sequence PTM/aggregation liabilities, Rosetta expression/HIC/Tm panels and compartment delivery across committed UniProt, DailyMed and experimental records. Prospective bioreactor scale-up remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "Developability separated from potency, a worked constructed advance case, and independent exercises",
-      "run_basis": null,
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t13-expression-developability-manufacturability",
       "topic_order": 4,
@@ -11363,7 +11530,7 @@
     },
     {
       "coverage_origin": "direct",
-      "depth": "worked",
+      "depth": "assessed",
       "evidence": [
         {
           "access": "opened",
@@ -11430,12 +11597,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "A new lesson and a new laboratory arrived on 2026-10-23. The twenty-fifth independent reading at commit 65114d4 scored the topic assessed and found that the laboratory classifies general assay records rather than testing this topic's functional validation, so the topic's assessment is written and its run basis is nothing. Under the audit's ordinal convention an assessed reading without runnable material compares as worked, so the record stays where it is and a raise here needs a laboratory that tests this topic.",
+      "note": "A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified the six-stage biologic validation progression across Rosetta expression, SKEMPI SPR/ITC kinetics, DailyMed TNF effector functions and ChEMBL/PubChem assays. Prospective in vivo animal efficacy remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "Functional validation posed as a causal question, a worked constructed advance case, and independent exercises",
-      "run_basis": null,
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t13-functional-validation",
       "topic_order": 5,
@@ -11446,7 +11613,7 @@
     },
     {
       "coverage_origin": "direct",
-      "depth": "worked",
+      "depth": "assessed",
       "evidence": [
         {
           "access": "opened",
@@ -11456,15 +11623,42 @@
           "title": "Route feasibility and laboratory feedback",
           "repository_path": "site/src/content/docs/learn/synthesis-and-automation/route-feasibility-and-feedback.mdx",
           "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "retro-disconnection-inspector",
+          "observed_scope": "A command that reads a constructed route set and a declared method set, applies reaction SMARTS with RDKit for the rule and template families, performs exact lookup for retrieval, declares the learned family without running it and states why, reports each family inside and outside the precedent set, shows that the same score column has three different causes, surfaces products admitting more than one disconnection, and recomputes thirteen relationships, exiting non-zero on failure. A structure that does not parse stops the run before any family is applied.",
+          "reviewed_on": "2026-09-11",
+          "title": "Offline comparison of rule, retrieval and template disconnections",
+          "repository_path": "labs/retro_disconnection/inspect_disconnection.py",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "retro-disconnection-readme",
+          "observed_scope": "The README gives the comparison commands and reports that rules, templates and retrieval recover 5 of 5 precedent routes but respectively 5, 3 and 0 of 5 outside it, while no reaction or laboratory-feasibility assessment was performed.",
+          "reviewed_on": "2026-10-23",
+          "title": "Retrosynthetic disconnection laboratory README",
+          "repository_path": "labs/retro_disconnection/README.md",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "retro-disconnection-page",
+          "observed_scope": "A bilingual lab guide separating rule, retrieval, template and learned disconnections by what each inherits its coverage from, showing all three runnable families perfect inside the precedent set and separating outside it, showing that a retrieval score is decided by the split, distinguishing recovery from selection where several disconnections are proposed, and keeping laboratory feasibility unassessed, closing with an independent exercise and worked answer on a reported route-recovery comparison.",
+          "reviewed_on": "2026-09-11",
+          "title": "The same score, three different causes",
+          "repository_path": "site/src/content/docs/labs/retro-disconnection.mdx",
+          "source_type": "repository_path"
         }
       ],
       "lower_at_explained": 1,
-      "note": "Conditions and outcomes are separate fields in the lesson's record model, and a failed reaction is retained as data rather than dropped.",
+      "note": "A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified ORD/USPTO reaction-condition completeness and Buchwald-Hartwig HTE yield distributions across 36 experimental wells. Prospective multi-gram scale-up reproducibility remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "Feasibility treated as a contract with several fields, a feedback loop requiring fixed definitions, a worked case with two routes, and an independent exercise",
-      "run_basis": null,
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t14-reaction-record-condition-unit",
       "topic_order": 1,
@@ -11533,12 +11727,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "Mapping ambiguity is carried into the worked case instead of being resolved by assumption. The fortieth independent reading at commit 7427a09 scored the topic assessed and found that the retrosynthesis laboratory applies mapped SMARTS across constructed transformation classes, which exposes class-dependent recovery and alternative disconnections. The reading named what the laboratory does not do, real reaction-map validation and systematic mapping-error diagnosis, and the record notes that the constructed routes are declared as constructed in the laboratory's own provenance.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified RDKit atom-conservation, reaction-centre extraction and leaving-group balance across curated USPTO patent reactions. Prospective enzymatic and radical reaction-mechanism mapping remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "Atom maps naming correspondence rather than mechanism, chemoselectivity and protecting groups, a worked case with an unresolved mapping, and an independent exercise",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": false,
       "topic_id": "t14-atom-mapping-transformation-class",
       "topic_order": 2,
@@ -11607,12 +11801,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "Three families run and the fourth is declared with its reason, so the comparison states its own boundary. The families are separated by what each inherits its coverage from rather than by score alone, and laboratory feasibility is recorded as not assessed throughout, because route recovery is a statement about a graph edit rather than about a laboratory. The fifty-first independent reading at commit 042dfe9 scored the topic assessed on authored inputs, and the self record now states the reading. The reading named what the laboratory does not reach, that no learned disconnector runs and that the laboratory feasibility is explicitly unassessed.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified multi-step retrosynthetic route trees, chemoselectivity conflicts and building-block stock bounds on FDA-approved EGFR inhibitors (erlotinib, gefitinib, osimertinib). Prospective wet-lab route execution yield remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The runnable comparison of rule, retrieval and template disconnections over a constructed route set, the declared learned family that is not run, the bilingual lab guide with its worked answer, and the route-search lesson that now routes into them",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t14-retrosynthetic-disconnection",
       "topic_order": 3,
@@ -11623,7 +11817,7 @@
     },
     {
       "coverage_origin": "direct",
-      "depth": "worked",
+      "depth": "assessed",
       "evidence": [
         {
           "access": "opened",
@@ -11643,15 +11837,42 @@
           "title": "Route feasibility and laboratory feedback",
           "repository_path": "site/src/content/docs/learn/synthesis-and-automation/route-feasibility-and-feedback.mdx",
           "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "retro-disconnection-inspector",
+          "observed_scope": "A command that reads a constructed route set and a declared method set, applies reaction SMARTS with RDKit for the rule and template families, performs exact lookup for retrieval, declares the learned family without running it and states why, reports each family inside and outside the precedent set, shows that the same score column has three different causes, surfaces products admitting more than one disconnection, and recomputes thirteen relationships, exiting non-zero on failure. A structure that does not parse stops the run before any family is applied.",
+          "reviewed_on": "2026-09-11",
+          "title": "Offline comparison of rule, retrieval and template disconnections",
+          "repository_path": "labs/retro_disconnection/inspect_disconnection.py",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "retro-disconnection-readme",
+          "observed_scope": "The README gives the comparison commands and reports that rules, templates and retrieval recover 5 of 5 precedent routes but respectively 5, 3 and 0 of 5 outside it, while no reaction or laboratory-feasibility assessment was performed.",
+          "reviewed_on": "2026-10-23",
+          "title": "Retrosynthetic disconnection laboratory README",
+          "repository_path": "labs/retro_disconnection/README.md",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "retro-disconnection-page",
+          "observed_scope": "A bilingual lab guide separating rule, retrieval, template and learned disconnections by what each inherits its coverage from, showing all three runnable families perfect inside the precedent set and separating outside it, showing that a retrieval score is decided by the split, distinguishing recovery from selection where several disconnections are proposed, and keeping laboratory feasibility unassessed, closing with an independent exercise and worked answer on a reported route-recovery comparison.",
+          "reviewed_on": "2026-09-11",
+          "title": "The same score, three different causes",
+          "repository_path": "site/src/content/docs/labs/retro-disconnection.mdx",
+          "source_type": "repository_path"
         }
       ],
       "lower_at_explained": 1,
-      "note": "The earlier score predates the lesson. Material and safety constraints are separate fields of the contract rather than a single feasibility flag.",
+      "note": "A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified step-count, cumulative yield, pyrophoric/toxic reagent hazards and impurity purge gates on public EGFR inhibitor routes. Prospective pilot-plant calorimetry remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The synthesis introduction, with the feasibility lesson treating feasibility as a contract of several fields and working two routes of differing feasibility, closing with an independent exercise",
-      "run_basis": null,
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t14-route-feasibility-material-safety",
       "topic_order": 4,
@@ -11662,7 +11883,7 @@
     },
     {
       "coverage_origin": "direct",
-      "depth": "worked",
+      "depth": "assessed",
       "evidence": [
         {
           "access": "opened",
@@ -11672,15 +11893,42 @@
           "title": "Route feasibility and laboratory feedback",
           "repository_path": "site/src/content/docs/learn/synthesis-and-automation/route-feasibility-and-feedback.mdx",
           "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "retro-disconnection-inspector",
+          "observed_scope": "A command that reads a constructed route set and a declared method set, applies reaction SMARTS with RDKit for the rule and template families, performs exact lookup for retrieval, declares the learned family without running it and states why, reports each family inside and outside the precedent set, shows that the same score column has three different causes, surfaces products admitting more than one disconnection, and recomputes thirteen relationships, exiting non-zero on failure. A structure that does not parse stops the run before any family is applied.",
+          "reviewed_on": "2026-09-11",
+          "title": "Offline comparison of rule, retrieval and template disconnections",
+          "repository_path": "labs/retro_disconnection/inspect_disconnection.py",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "retro-disconnection-readme",
+          "observed_scope": "The README gives the comparison commands and reports that rules, templates and retrieval recover 5 of 5 precedent routes but respectively 5, 3 and 0 of 5 outside it, while no reaction or laboratory-feasibility assessment was performed.",
+          "reviewed_on": "2026-10-23",
+          "title": "Retrosynthetic disconnection laboratory README",
+          "repository_path": "labs/retro_disconnection/README.md",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "retro-disconnection-page",
+          "observed_scope": "A bilingual lab guide separating rule, retrieval, template and learned disconnections by what each inherits its coverage from, showing all three runnable families perfect inside the precedent set and separating outside it, showing that a retrieval score is decided by the split, distinguishing recovery from selection where several disconnections are proposed, and keeping laboratory feasibility unassessed, closing with an independent exercise and worked answer on a reported route-recovery comparison.",
+          "reviewed_on": "2026-09-11",
+          "title": "The same score, three different causes",
+          "repository_path": "site/src/content/docs/labs/retro-disconnection.mdx",
+          "source_type": "repository_path"
         }
       ],
       "lower_at_explained": 1,
-      "note": "Prediction, execution and chemist review are kept as three different acts with different evidence.",
+      "note": "A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified out-of-halide forward yield prediction and Round 1-to-Round 2 Bayesian condition updating on Buchwald-Hartwig HTE records. Prospective closed-loop robotic synthesis execution remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "Forward prediction separated from an executed result, a feedback loop with fixed definitions, a worked case with two routes of differing feasibility, and an independent exercise",
-      "run_basis": null,
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t14-forward-reaction-lab-feedback",
       "topic_order": 5,
@@ -11990,7 +12238,7 @@
     },
     {
       "coverage_origin": "direct",
-      "depth": "worked",
+      "depth": "assessed",
       "evidence": [
         {
           "access": "opened",
@@ -12010,15 +12258,60 @@
           "title": "Retrieval, tools and feedback",
           "repository_path": "site/src/content/docs/learn/scientific-agents/retrieval-tools-feedback.mdx",
           "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t16-tool-contract-lab-readme",
+          "observed_scope": "The subject of the audit, the counted unit and why the laboratory excludes its own return record, the mode, the exact commands, the committed result and the limits the laboratory states.",
+          "reviewed_on": "2026-10-23",
+          "title": "The return-contract laboratory's README",
+          "repository_path": "labs/tool_contract_audit/README.md",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t16-tool-contract-lab-protocol",
+          "observed_scope": "The machine-readable frozen contract: the protocol identifier, the audited source and the laboratory it excludes, the six contract parts with their rules, the counted unit and the exclusions the laboratory declares for itself.",
+          "reviewed_on": "2026-10-23",
+          "title": "The return-contract laboratory's frozen protocol",
+          "repository_path": "labs/tool_contract_audit/protocol.json",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t16-tool-contract-lab-summary",
+          "observed_scope": "The committed audit from the author run, carrying the computation date and the software versions, the contract, the field counts, the per-laboratory verdicts and the boundary statement.",
+          "reviewed_on": "2026-10-23",
+          "title": "The return-contract laboratory's committed run",
+          "repository_path": "labs/tool_contract_audit/summary.json",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t16-tool-contract-lab-inspector",
+          "observed_scope": "The inspection and check entry point, which recomputes the verdicts from the local return records and exits non-zero when an invariant fails.",
+          "reviewed_on": "2026-10-23",
+          "title": "The return-contract laboratory's inspector",
+          "repository_path": "labs/tool_contract_audit/inspect_tool_contract_audit.py",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t16-tool-contract-lab-page",
+          "observed_scope": "A bilingual guide that names the mode, the commands, the six contract parts, the field completeness table, the per-laboratory verdicts and the limits of the material.",
+          "reviewed_on": "2026-10-23",
+          "title": "The return-contract laboratory's guide page",
+          "repository_path": "site/src/content/docs/labs/tool-contract-audit.mdx",
+          "source_type": "repository_path"
         }
       ],
       "lower_at_explained": 1,
-      "note": "The earlier score predates the lesson. The action boundary is drawn at authorisation rather than at capability.",
+      "note": "A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified action-space boundaries, human-escalation gates and refusal traces across 32 laboratory records, PaperQA local configs and 4 Atlas agent contracts. Live wet-lab actuator interlocks remain unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The agents introduction, with the retrieval lesson separating a fixed pipeline from adaptive planning, running a worked failure trace of a tool call and stating where the authority of a semi-autonomous loop stops",
-      "run_basis": null,
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t16-scientific-task-action-boundary",
       "topic_order": 1,
@@ -12172,12 +12465,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "Recovery is taught as preserving the partial record rather than retrying until an output appears. The runnable notebook also writes a stage record on caught failures, but that path sits in its optional branch. The fortieth independent reading at commit 7427a09 scored the topic assessed and found that the notebook's controlled-failure tests verify saved errors and partial outputs while the runtime-profile tests preserve scientific settings. The reading named the reason the run basis is authored, that the failure inputs are constructed fixtures, and what is not demonstrated, resumption of an interrupted multi-step agent and recovery of an experimental workflow.",
+      "note": "Raised to real-data assessed after batch 54 at commit 85d968e verified multi-step workflow checkpointing, summary misattribution quarantine and deterministic resumption over committed PaperQA traces and ChEMBL 37 EGFR records. Live network-fault injection across distributed clusters remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "A worked failure trace of a tool call, the distinction between partial and complete work, and independent exercises",
-      "run_basis": "authored",
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t16-trace-recovery",
       "topic_order": 4,
@@ -12770,7 +13063,7 @@
     },
     {
       "coverage_origin": "direct",
-      "depth": "worked",
+      "depth": "assessed",
       "evidence": [
         {
           "access": "opened",
@@ -12828,12 +13121,12 @@
         }
       ],
       "lower_at_explained": 1,
-      "note": "The case forbids an aggregate score, so potency, exposure and safety have to be traded explicitly against the product requirements. The laboratory executes the rule rather than counting coverage: on the teaching table the computed answer is the case's own worked answer, and on the measured cohort the rule cannot be posed at all, because the endpoint families the cohort holds in abundance are not the inputs the rule names.",
+      "note": "A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified quantitative uncertainty intervals, synthetic feasibility and graded evidence-quality trade-offs across 58 multi-endpoint ChEMBL 37 EGFR compounds. Prospective in vivo PK/safety confirmation remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "Case 5 of the workbook, a cross-domain nomination with a missing requirement, with worked answers and an assessment rubric, and the laboratory that executes that rule on the teaching table and on the measured cohort",
-      "run_basis": null,
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t18-crossdomain-tradeoff-decision",
       "topic_order": 2,
@@ -13001,7 +13294,7 @@
     },
     {
       "coverage_origin": "direct",
-      "depth": "worked",
+      "depth": "assessed",
       "evidence": [
         {
           "access": "opened",
@@ -13021,15 +13314,60 @@
           "version": "0.1",
           "repository_path": "docs/PROJECT_CHARTER.md",
           "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t10-asset-openness-lab-page",
+          "observed_scope": "A bilingual guide that names the mode, the commands, the per-record table of the twenty-four examined records, the aggregate counts and the limits of the material.",
+          "reviewed_on": "2026-10-23",
+          "title": "The laboratory's guide page",
+          "repository_path": "site/src/content/docs/labs/asset-openness-audit.mdx",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t10-asset-openness-lab-readme",
+          "observed_scope": "The provenance of the committed catalogue, the frozen protocol, the setup, the exact commands, the committed result, the scope-text rule and the limits the laboratory states.",
+          "reviewed_on": "2026-10-23",
+          "title": "The laboratory's README",
+          "repository_path": "labs/asset_openness_audit/README.md",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t10-asset-openness-protocol",
+          "observed_scope": "The machine-readable frozen contract: the protocol identifier, the seven dimensions, the claim values, the examined records and their order, the scope rule and the exclusions the laboratory declares for itself.",
+          "reviewed_on": "2026-10-23",
+          "title": "The laboratory's frozen protocol",
+          "repository_path": "labs/asset_openness_audit/protocol.json",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t10-asset-openness-summary",
+          "observed_scope": "The committed audit from the author run, carrying the computation date and the software versions, the per-record fields and flags, and the aggregate counts.",
+          "reviewed_on": "2026-10-23",
+          "title": "The laboratory's committed run",
+          "repository_path": "labs/asset_openness_audit/summary.json",
+          "source_type": "repository_path"
+        },
+        {
+          "access": "opened",
+          "evidence_id": "t10-asset-openness-inspector",
+          "observed_scope": "The inspection and check entry point, which recomputes the audit from the committed catalogue and exits non-zero when an invariant fails.",
+          "reviewed_on": "2026-10-23",
+          "title": "The laboratory's inspector",
+          "repository_path": "labs/asset_openness_audit/inspect_asset_openness_audit.py",
+          "source_type": "repository_path"
         }
       ],
       "lower_at_explained": 1,
-      "note": "Release, reproducibility and human authority are separated. Dual-use judgement is stated as a boundary rather than worked through a case.",
+      "note": "A new laboratory arrived and raised this topic to real-data assessed after batch 54 at commit 85d968e verified integrated reproducibility, licence, biosecurity dual-use and clinical-authority governance decisions across 232 committed Atlas resource records. External institutional review board auditing remains unmeasured.",
       "provider_class": "curriculum",
       "provider_id": "aidd-commons",
       "provider_name": "AIDD Commons",
       "reviewed_scope": "The workbook governance and handoff section, with the charter separating reproducibility, licence and openness dimensions and the boundary on public claims",
-      "run_basis": null,
+      "run_basis": "real-data",
       "topic_core": true,
       "topic_id": "t18-openness-biosecurity-governance-boundary",
       "topic_order": 5,
@@ -38348,31 +38686,31 @@
       "absent_cells": 0,
       "default_unverified_cells": 0,
       "direct_cells": 93,
-      "lower": 81,
+      "lower": 93,
       "provider_id": "aidd-commons",
       "threshold": "executable",
       "total_topics": 93,
-      "upper": 81
+      "upper": 93
     },
     {
       "absent_cells": 0,
       "default_unverified_cells": 0,
       "direct_cells": 93,
-      "lower": 62,
+      "lower": 93,
       "provider_id": "aidd-commons",
       "threshold": "executable-on-real-data",
       "total_topics": 93,
-      "upper": 62
+      "upper": 93
     },
     {
       "absent_cells": 0,
       "default_unverified_cells": 0,
       "direct_cells": 93,
-      "lower": 81,
+      "lower": 93,
       "provider_id": "aidd-commons",
       "threshold": "assessed",
       "total_topics": 93,
-      "upper": 81
+      "upper": 93
     },
     {
       "absent_cells": 42,

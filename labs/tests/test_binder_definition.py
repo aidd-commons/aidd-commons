@@ -131,3 +131,19 @@ def test_a_hidden_choice_is_rejected(data, mutate, expected):
     mutate(broken)
     failures = binder.check(broken)
     assert any(expected in failure for failure in failures), failures
+
+
+def test_public_binders_fits_real_egfr_classifier_and_compares_decoys():
+    from aidd_commons.binder_definition.public_binders import (
+        check_public_binders,
+        evaluate_public_binders,
+    )
+
+    payload = evaluate_public_binders()
+    assert check_public_binders(payload) == []
+    evals = payload["classifier_test_evaluations"]
+    assert evals["untested_decoys_only"]["roc_auc"] > evals["measured_inactives_only"]["roc_auc"]
+    assert (
+        evals["measured_inactives_only"]["false_positive_rate_at_0_5"]
+        > evals["untested_decoys_only"]["false_positive_rate_at_0_5"]
+    )

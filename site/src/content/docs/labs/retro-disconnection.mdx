@@ -99,6 +99,72 @@ destroy the rest of the molecule. This is the same boundary the
 [generation gate](/labs/generation-gate/) records when it calls its structural
 filters a proxy and keeps `route_feasibility` unassessed.
 
+## 6. Real public reaction records, atom maps, route trees and HTE feedback
+
+To evaluate these distinctions on published synthesis data rather than only the
+`10` constructed routes, run the public-records audit over the committed
+snapshot in `labs/src/aidd_commons/retro_disconnection/__init__.py`:
+
+```bash
+python labs/retro_disconnection/inspect_disconnection.py public-records
+python labs/retro_disconnection/inspect_disconnection.py check-public
+```
+
+The committed snapshot combines four open sources:
+
+- **Condition-resolved HTE reaction records (`t14-reaction-record-condition-unit`)**:
+  `12` nanomole Suzuki-Miyaura records from Perera et al. (*Science* `2018`,
+  `doi:10.1126/science.aap9112`) sharing `1` identical indazole-quinoline biaryl
+  product (`Cc1ccc2c(cnn2C2CCCCO2)c1-c1ccc2ncccc2c1`) where measured yield spans
+  `0.0000` (rows `5170` and `5566`, Xantphos failure) to `0.9029` (row `2091`,
+  span `0.9029`), and where `9` of `12` flow records include the internal
+  standard `1,3-diethylbenzene` (`CCc1cccc(CC)c1`) while `3` of `12`
+  reversed-polarity plate records omit it. In parallel, `24` Buchwald-Hartwig
+  HTE records from Ahneman et al. (*Science* `2018`, `doi:10.1126/science.aar5169`,
+  `1536`-well plate at `60.0` °C for `16.0` h in DMSO) show that holding the
+  substrate fixed while varying ligand, base and isoxazole additive spans
+  `0.00%` to `98.73%` yield on `Brc1cccnc1` (`n = 4`, span `98.73%`), `0.00%` to
+  `68.77%` on `Clc1cccnc1` (`n = 3`, span `68.77%`), `0.00%` to `45.05%` on
+  `FC(F)(F)c1ccc(Cl)cc1` (`n = 3`, span `45.05%`), and `0.00%` to `44.14%` on
+  `COc1ccc(Cl)cc1` (`n = 6`, span `44.14%`).
+- **USPTO atom maps, bond edits and template recovery (`t14-atom-mapping-transformation-class`)**:
+  `3` USPTO atom-mapped reactions and extracted `RetroTemplate` SMARTS from
+  `MolecularAI/aizynthfinder` (`test_reactions_template.csv` with `64`-character
+  hashes `23f00a3c507e...`, `dadfa1075f08...`, and `01ba54afaa6c...` at
+  confidences `0.9425`, `0.9855`, and `0.9708`). RDKit execution recovers `3` of
+  `3` recorded reactant sets and separates the amide bond edit `(8, 9)` from the
+  aryl-Cl amidation bond edit `(7, 8)`. Swapping product aromatic atom-map
+  numbers `:7` and `:18` corrupts `bonds_formed` from `[(8, 9)]` to
+  `[(3, 7), (6, 18), (7, 19), (8, 9), (8, 18)]`, demonstrating how mapping
+  errors propagate into extracted templates.
+- **Multi-step route trees, selectivity and safety gates (`t14-retrosynthetic-disconnection` and `t14-route-feasibility-material-safety`)**:
+  `3` AiZynthFinder route trees (`routes_for_clustering.json`) for the
+  acridine-thiourea target `Cc1ccc2nc3ccccc3c(Nc3ccc(NC(=S)Nc4ccccc4)cc3)c2c1`
+  all terminate in `in_stock = True` leaves, yet only `acridine_route_0` (`1`
+  step, depth `1`, direct SNAr with pre-formed thiourea aniline) avoids the
+  unprotected *p*-phenylenediamine (`Nc1ccc(N)cc1`) bis-arylation trap in
+  `acridine_route_1` (`2` steps, depth `2`) and the self-reactive
+  `4`-bromoaniline (`Nc1ccc(Br)cc1`) homocoupling trap in `acridine_route_2`
+  (`2` steps, depth `2`). Comparing `linear_route.json` (`2` steps, depth `2`,
+  `3` in-stock leaves) with `branched_route.json` (`4` steps, depth `3`, `5`
+  leaves where `O` is out of stock) also flags the aryl hydroperoxide motif
+  (`OOc1...`). On the USPTO benzanilide intermediate
+  `N#Cc1cccc(NC(=O)c2ccc(F)cc2)c1F`, acyl-chloride acylation (`0` competing
+  aryl-halide sites) is separated from Buchwald-Hartwig amidation on
+  `Fc1c(Cl)cccc1C#N` (`2` competing ortho-activated halogen sites).
+- **Forward condition modelling and HTE feedback (`t14-forward-reaction-lab-feedback`)**:
+  Across the `24` Ahneman Buchwald-Hartwig records, leave-one-out Ridge regression
+  with condition features (`[aryl_halide, additive, base, ligand]`) reduces MAE
+  from `27.19%` (substrate-only baseline) to `16.51%`. Dropping the `6`
+  zero-yield chemical-failure wells (`0.0%` yield caused by base-induced
+  isoxazole ring-opening catalyst poisoning) inflates the mean predicted yield
+  on those poisoned conditions from `7.47%` to `36.37%` (`+28.90` percentage
+  points). The feedback ledger therefore separates `well A01` (entry `49`, yield
+  `10.6578%`, internal standard valid -> `update_model_productive`), `well H12`
+  (entry `1601`, yield `0.0%`, internal standard valid ->
+  `update_model_negative_chemical_failure`), and `well P24` (entry `1613`,
+  internal standard missing -> `quarantine_qc_fault_repeat_dispense`).
+
 ## Independent exercise
 
 A retrosynthesis paper reports: "our model achieves 92% top-1 route recovery on

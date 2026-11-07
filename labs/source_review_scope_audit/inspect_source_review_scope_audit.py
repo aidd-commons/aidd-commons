@@ -17,6 +17,10 @@ from aidd_commons.source_review_scope_audit.protocol import (  # noqa: E402
     EXAMINED_IDS,
     load_protocol,
 )
+from aidd_commons.source_review_scope_audit.real_passage_binding import (  # noqa: E402
+    check_real_source_passages,
+    verify_real_source_passages,
+)
 from aidd_commons.source_review_scope_audit.records import (  # noqa: E402
     load_catalogue,
     load_reading,
@@ -28,8 +32,25 @@ ROOT = LAB.parents[1]
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("show", "check"))
+    parser.add_argument(
+        "action",
+        choices=("show", "check", "verify-passages", "check-passages"),
+    )
     action = parser.parse_args().action
+    if action == "verify-passages":
+        payload = verify_real_source_passages(ROOT)
+        print("REAL PRIMARY-SOURCE PASSAGE & CLAIM-SCOPE BINDINGS")
+        for row in payload["bindings"]:
+            print(json.dumps(row, ensure_ascii=False))
+        return 0
+    if action == "check-passages":
+        failures = check_real_source_passages()
+        for failure in failures:
+            print(f"FAIL: {failure}")
+        if failures:
+            return 1
+        print("PASS: 4 real primary-source passage bindings and SHA-256 digests verified")
+        return 0
     try:
         protocol = load_protocol(LAB / "protocol.json")
         reading = load_reading(ROOT, protocol)

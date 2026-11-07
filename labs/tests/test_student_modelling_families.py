@@ -130,3 +130,34 @@ def test_the_default_optimiser_arguments_reproduce_the_original_fit():
     assert run_lab.fit_logistic(x, hits, 0.0) == run_lab.fit_logistic(
         x, hits, 0.0, steps=500, start=(0.0, 0.0)
     )
+
+
+def test_real_student_benchmark_covers_inductive_bias_uncertainty_and_imbalance():
+    from aidd_commons.student_modelling.real_benchmark import (
+        check_real_student_benchmark,
+        run_real_student_benchmark,
+    )
+
+    payload = run_real_student_benchmark()
+    assert check_real_student_benchmark(payload) == []
+    ib = payload["inductive_bias_selection"]
+    assert ib["graph_permutation_invariance_max_diff"] == 0.0
+    assert ib["selected_family_by_validation_mae"] == "multimodal_graph_sequence_ridge"
+    assert (
+        ib["families"]["multimodal_graph_sequence_ridge"]["test_mae"]
+        < ib["families"]["tabular_descriptor_ridge"]["test_mae"]
+    )
+    unc = payload["computational_vs_sampling_uncertainty"]
+    assert (
+        unc["bootstrap_sampling_uncertainty"]["max_test_90pct_interval_width"]
+        > unc["optimizer_budget_sweep"][-1]["max_test_probability_spread"]
+    )
+    imb = payload["imbalanced_classification_formulations"]["formulations"]
+    assert (
+        imb["class_weighted_logistic"]["test"]["recall"]
+        > imb["unweighted_logistic"]["test"]["recall"]
+    )
+    assert (
+        imb["minority_oversampled_logistic"]["test"]["recall"]
+        > imb["unweighted_logistic"]["test"]["recall"]
+    )

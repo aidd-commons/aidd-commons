@@ -40,16 +40,36 @@ Multimodal target-to-candidate systems may join chemical, structural, and
 mechanistic evidence. Their utility depends on whether the linkages and the
 downstream experimental feedback are available at the same decision point.
 
+## End-to-end therapeutic decision context over real EGFR NSCLC and ChEMBL 37 records
+
+Before running a molecular representation or generative model, a discovery programme must specify the full decision chain connecting: (1) clinical disease need, (2) biological intervention hypothesis, (3) therapeutic modality choice, (4) target-product-profile (TPP) gate thresholds, and (5) the next falsifying experiment. Run the fresh independent audit in [the target-product-profile laboratory](/labs/target-product-profile/):
+
+```bash
+.venv/bin/python labs/target_product_profile/inspect_target_product_profile.py decision-context
+.venv/bin/python labs/target_product_profile/inspect_target_product_profile.py check-decision-context
+```
+
+1. **Clinical need and disease state (`MONDO_0005233`)**: In EGFR-mutant (`exon 19` deletion / `L858R`) advanced non-small-cell lung cancer with central nervous system (CNS) metastases, Open Targets 26.03 records an overall association score of `0.8503` (`somatic_mutation = 0.8316`), `21` curated wild-type EGFR safety events (rash, diarrhea, interstitial lung disease), and the Phase III IPASS subgroup reversal (`EGFR`-mutant PFS `HR = 0.48` vs wild-type `HR = 2.85`, ratio `5.94`). First-generation reversible quinazolines fail via acquired `Thr790Met` (`T790M`) gatekeeper resistance (`3.14`–`3.48` Å contact in PDB `1M17`/`4HJO`/`1XKK`) and incomplete CNS penetration.
+2. **4-modality comparison**:
+   - **Oral brain-penetrant small-molecule kinase inhibitor** (`selected_primary_modality`): reaches the intracellular kinase domain, crosses the intact blood-brain barrier for CNS metastases, supports chronic oral dosing, and discriminates the mutant ATP/allosteric pocket; primary risks are `CYP3A4` drug-drug interaction (`pChEMBL <= 5.0` gate), hepatic microsome clearance (`<= 50 mL.min-1.g-1` gate), and wild-type epithelial EGFR toxicity.
+   - **Extracellular anti-EGFR IgG1 monoclonal antibody** (`rejected_for_intracellular_cns_indication`): a `150` kDa IgG1 has `< 0.1%` CSF-to-plasma penetration across an intact blood-brain barrier and binds the extracellular domain (`1IVO`/`1YY9`) without discriminating intracellular `L858R`/`T790M` from wild-type EGFR.
+   - **Heterobifunctional PROTAC degrader** (`backup_for_catalytic_independent_scaffolding_resistance`): reaches the intracellular kinase and ablates scaffolding function, but high molecular weight (`850`–`1,100` Da) and polar surface area (`> 160` Å²) limit oral bioavailability and intact-BBB CNS exposure.
+   - **Lipid-nanoparticle (LNP) siRNA** (`rejected_due_to_extrahepatic_tumour_delivery_bottleneck`): systemic ionizable LNPs distribute predominantly to liver hepatocytes via ApoE rather than extrahepatic lung and CNS tumours.
+3. **ChEMBL 37 TPP funnel (`7,908` -> `58` -> `37` -> `0`)**: Across the `7,908`-parent ChEMBL 37 union (`7,850` single-family parents excluded), `58` parents have at least `2` measured endpoint families. Applying the frozen mandatory gates (`response_ic50 <= 1000 nM`, human liver microsome clearance `<= 50 mL.min-1.g-1`, `CYP3A4 <= 5.0 pChEMBL`, clinical response `>= 30%` ORR) contradicts `21` parents (`20` fail `CYP3A4`, `5` fail human microsome clearance, `1` fails response `IC50`), leaves `37` parents with no observed gate failure, and yields `0` profile-satisfying compounds because `57` of `58` lack an admitted `response_ic50` value and all `58` lack clinical response and immunogenicity (`<= 5%` ADA) measurements (`12` miss rat hepatocyte clearance `<= 30 uL.min-1.(10^6cells)-1` and `19` miss `CYP2D6 <= 5.0 pChEMBL`).
+4. **Next falsifiable experimental decisions**: For the `37` uncontradicted parents, Step `1` measures paired cellular phospho-EGFR `IC50` in mutant (`H1975` `L858R`/`T790M`) vs wild-type (`A431`) cells, rejecting any parent with mutant `IC50 > 100 nM` or wild-type/mutant selectivity ratio `< 10`x. Step `2` runs bidirectional `MDCK-MDR1` and `MDCK-BCRP` permeability and efflux assays, rejecting any compound with `Papp < 5e-6 cm/s` or efflux ratio `ER > 2.0` before in vivo `Kp,uu,brain` studies.
+
 ## A bounded worked decision and independent task
 
-Begin with [the pipeline](/learn/foundations/getting-started/). This orientation asks what evidence belongs to a discovery decision. Consider a constructed molecule that lowers a reporter signal and also acts in a direct reporter counterscreen. The first observation is compatible with a biological effect, detector interference or both; the second supplies evidence for a measurement alternative. Neither observation by itself identifies a molecular target.
+Begin with [the pipeline](/learn/foundations/getting-started/). This orientation asks what evidence belongs to a discovery decision. Consider two problems: (A) a constructed molecule that lowers a reporter signal and also acts in a direct reporter counterscreen, and (B) choosing between an extracellular anti-EGFR IgG1 antibody and an oral brain-penetrant small-molecule kinase inhibitor for `L858R`/`T790M` NSCLC with brain metastases, where `37` of `58` ChEMBL 37 multi-family parents have no observed gate failure.
 
-Write the next question without calling the molecule an effective drug. What changes in an orthogonal assay, and what should remain relevant?
+1. For (A), write the next orthogonal assay question without calling the molecule an effective drug.
+2. For (B), state why the IgG1 antibody is rejected for this indication, why the `37` uncontradicted ChEMBL parents still have `0` profile-satisfying compounds, and which two quantitative assays falsify the remaining candidates next.
 
 <details data-worked-answer>
 <summary>Check the reasoning after your attempt</summary>
 
-A bounded question asks whether the response persists when detection changes while the relevant biology is retained. That addresses detection dependence, not clinical efficacy or a fully resolved mechanism. Continue to [assay controls and dose response](/learn/drug-discovery-foundations/assay-controls-dose-response/) for normalization and a numerical example.
+1. A bounded question asks whether the response persists when the detection method changes while the relevant biological target and cellular context are retained. That tests detection interference rather than clinical efficacy.
+2. An ~`150` kDa IgG1 antibody achieves `< 0.1%` CSF-to-plasma exposure across an intact blood-brain barrier and binds the ectodomain without discriminating intracellular `L858R`/`T790M` from wild-type EGFR (`21` curated safety liabilities). The `37` ChEMBL parents with no observed gate failure yield `0` profile-satisfying compounds because `57` of `58` cohort parents are unmeasured on `response_ic50` and all `58` are unmeasured on clinical response (`>= 30%` ORR). The next two falsifiers are paired cellular phospho-EGFR `IC50` in `H1975` (`L858R`/`T790M`) vs `A431` (wild-type) requiring mutant `IC50 <= 100 nM` and `>= 10`-fold selectivity, followed by bidirectional `MDCK-MDR1`/`BCRP` assay requiring `Papp >= 5e-6 cm/s` and efflux ratio `ER <= 2.0`. Continue to [assay controls and dose response](/learn/drug-discovery-foundations/assay-controls-dose-response/) for normalization and a numerical example.
 
 </details>
 

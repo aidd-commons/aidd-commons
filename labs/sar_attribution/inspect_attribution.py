@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Explain a well-fitted model whose true cause is known, and watch the explanation miss it.
 
 Model explanations are routinely read as statements about which atoms cause
@@ -304,8 +305,38 @@ def check(data: dict) -> list[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", nargs="?", default="show", choices=["show", "check"])
+    parser.add_argument(
+        "action",
+        nargs="?",
+        default="show",
+        choices=["show", "check", "chembl-series", "check-chembl-series"],
+    )
     action = parser.parse_args().action
+
+    if action in ("chembl-series", "check-chembl-series"):
+        sys.path.insert(0, str(ROOT / "labs/src"))
+        from aidd_commons.sar_attribution.real_series_attribution import (
+            analyze_real_chembl_series,
+            check_real_chembl_series,
+        )
+
+        payload = analyze_real_chembl_series()
+        failures = check_real_chembl_series(payload)
+        if action == "chembl-series":
+            print(json.dumps(payload, indent=2))
+            if failures:
+                sys.exit(1)
+            return
+        if failures:
+            for item in failures:
+                print(f"FAIL: {item}", file=sys.stderr)
+            sys.exit(1)
+        print(
+            f"PASS: verified {payload['compound_count']} ChEMBL 37 EGFR series compounds across 3 optimization rounds, "
+            f"3 explanation methods, and {len(payload['matched_molecular_pairs'])} experimental MMPs"
+        )
+        return
+
     data = load()
 
     print(f"Dataset {DATASET.relative_to(ROOT)}")

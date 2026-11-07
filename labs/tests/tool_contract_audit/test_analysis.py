@@ -2,9 +2,15 @@
 
 from __future__ import annotations
 
+import subprocess
+import sys
 from copy import deepcopy
 from pathlib import Path
 
+from aidd_commons.tool_contract_audit.action_boundary import (
+    audit_action_boundaries,
+    check_action_boundaries,
+)
 from aidd_commons.tool_contract_audit.analysis import audit_records, load_records
 from aidd_commons.tool_contract_audit.contract import check_record
 from aidd_commons.tool_contract_audit.protocol import expected_fields
@@ -58,3 +64,21 @@ def test_missing_field_and_empty_value_have_distinct_real_record_failures() -> N
     )
     assert missing_reason == "missing_required_field"
     assert empty_reason == "invalid_or_empty_value"
+
+
+def test_action_boundary_audit_and_cli() -> None:
+    payload = audit_action_boundaries()
+    assert check_action_boundaries(payload) == []
+    assert payload["audited_laboratory_count"] == 32
+    assert payload["records_carrying_boundary_or_limit"] == 11
+    assert payload["paperqa_local_contract"]["local_ollama_endpoints_only"] is True
+    assert len(payload["atlas_agent_records"]) == 4
+
+    script = ROOT / "labs/tool_contract_audit/inspect_tool_contract_audit.py"
+    proc = subprocess.run(
+        [sys.executable, str(script), "check-action-boundary"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert "PASS:" in proc.stdout

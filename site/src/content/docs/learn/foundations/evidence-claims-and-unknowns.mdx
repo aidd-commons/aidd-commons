@@ -82,7 +82,11 @@ Mode is a fresh independent computation over the frozen protocol and committed l
 
 ```bash
 .venv/bin/python labs/claims_evidence_audit/inspect_claims_evidence_audit.py show
+.venv/bin/python labs/claims_evidence_audit/inspect_claims_evidence_audit.py verify-source-content
+.venv/bin/python labs/claims_evidence_audit/inspect_claims_evidence_audit.py check-source-content
 ```
+
+In addition to classifying the 52 comparison-matrix cells (`show`), `verify-source-content` and `check-source-content` perform content-level source verification over 4 real committed scientific datasets and laboratory outputs (`labs/chembl_egfr/data/egfr_ic50.csv` with 320 ChEMBL 37 rows and 272 unique molecules, `labs/freesolv/summary.json` with 642 FreeSolv hydration free-energy molecules, `labs/skempi_affinity/summary.json` with 142 of 144 test rows sharing a wild-type complex, and `labs/egfr_structures/summary.json` with 4 RCSB PDB EGFR coordinate entries), demonstrating all 4 evidence states (`direct-observation`, `bounded-inference`, `unsupported-claim`, and `unresolved-field`) on real measured scientific records.
 
 ## Sources and attribution
 

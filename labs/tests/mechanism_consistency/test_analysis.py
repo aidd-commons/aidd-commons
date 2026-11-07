@@ -62,3 +62,21 @@ def test_wrong_rotation_refused():
     mismatched = (pair("A~A", 0.0), pair("B~A", 0.0))
     with pytest.raises(AuditError, match="rotation"):
         classify_pairs(matched, mismatched)
+
+
+def test_target_evidence_audit_verifies_open_targets_and_mr_coloc():
+    from aidd_commons.mechanism_consistency.target_evidence import (
+        audit_causal_target_evidence,
+        audit_disease_state_definition,
+        audit_tractability_and_risk,
+        check_target_evidence,
+    )
+
+    ds = audit_disease_state_definition()
+    causal = audit_causal_target_evidence()
+    tract = audit_tractability_and_risk()
+    assert ds["hr_reversal_ratio_wt_over_mut"] == 5.94
+    assert causal["mr_instruments"][0]["wald_ratio"] == 0.9429
+    assert causal["mr_instruments"][0]["instrument_f_statistic"] == 136.11
+    assert len(tract["target_profiles"]) == 4
+    assert check_target_evidence() == []

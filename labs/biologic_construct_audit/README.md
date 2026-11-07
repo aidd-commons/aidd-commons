@@ -31,6 +31,8 @@ For an offline fresh independent computation, retain the committed snapshot and 
 ```bash
 .venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py show
 .venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py check
+.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py developability
+.venv/bin/python labs/biologic_construct_audit/inspect_biologic_construct_audit.py check-developability
 .venv/bin/python labs/biologic_construct_audit/export_summary.py
 .venv/bin/python -m pytest labs/tests/biologic_construct_audit -q
 ```

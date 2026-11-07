@@ -219,8 +219,31 @@ def check(data: dict) -> list[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", nargs="?", default="show", choices=["show", "check"])
+    parser.add_argument(
+        "action",
+        nargs="?",
+        default="show",
+        choices=["show", "check", "empirical-docking", "check-empirical-docking"],
+    )
     action = parser.parse_args().action
+    if action in ("empirical-docking", "check-empirical-docking"):
+        src_dir = ROOT / "labs" / "src"
+        if str(src_dir) not in sys.path:
+            sys.path.insert(0, str(src_dir))
+        from aidd_commons.docking_protocol.empirical_docking import (
+            check_empirical_docking,
+            evaluate_empirical_docking,
+        )
+
+        payload = evaluate_empirical_docking()
+        if action == "empirical-docking":
+            print(json.dumps(payload, indent=2))
+            return
+        failures = check_empirical_docking(payload)
+        print(json.dumps({"ok": not failures, "failures": failures}, indent=2))
+        if failures:
+            sys.exit(1)
+        return
     data = load()
 
     print(f"Protocols {PROTOCOLS.relative_to(ROOT)}")

@@ -10,7 +10,11 @@ proposal.
 ```bash
 python labs/sar_attribution/inspect_attribution.py show
 python labs/sar_attribution/inspect_attribution.py check
+python labs/sar_attribution/inspect_attribution.py chembl-series
+python labs/sar_attribution/inspect_attribution.py check-chembl-series
 ```
+
+In addition to the 16-molecule constructed confounder audit (`show` / `check`), the `chembl-series` and `check-chembl-series` commands evaluate 12 real ChEMBL 37 human EGFR (`CHEMBL203`) inhibitors across 3 iterative medicinal-chemistry optimization rounds (Round 1 reversible 4-anilinoquinazolines `PD153035`, `AG1478`, `erlotinib`, `gefitinib`, `lapatinib`, `vandetanib`; Round 2 irreversible covalent acrylamide quinazolines `pelitinib`, `afatinib`, `dacomitinib`; and Round 3 mutant-selective aminopyrimidines `osimertinib`, `AZ5104`, `lazertinib`), comparing 3 explanation methods (`linear_bit_provenance`, `counterfactual_loso_ablation`, and `matched_molecular_pair_delta`) against 4 experimental matched molecular pairs (`MMP-01` through `MMP-04`).
 
 ## The construction
 

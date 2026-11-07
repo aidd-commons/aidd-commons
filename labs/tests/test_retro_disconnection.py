@@ -148,3 +148,46 @@ def test_a_collapsed_comparison_is_rejected(loaded, mutate, expected):
     mutate(broken_routes, broken_methods)
     failures = retro.check(broken_routes, broken_methods)
     assert any(expected in failure for failure in failures), failures
+
+
+def test_public_synthesis_records_and_checks_pass():
+    sys.path.insert(0, str(ROOT / "labs/src"))
+    from aidd_commons.retro_disconnection.public_synthesis_audit import (
+        audit_atom_mapping_and_templates,
+        audit_forward_feedback_loop,
+        audit_reaction_records,
+        audit_routes_and_feasibility,
+        check_public_synthesis,
+        load_public_snapshot,
+    )
+
+    snap = load_public_snapshot()
+    assert check_public_synthesis(snap) == []
+    rec = audit_reaction_records(snap)
+    assert rec["suzuki_record_count"] == 12
+    assert rec["suzuki_unique_products"] == 1
+    assert rec["suzuki_yield_span_fraction"] > 0.85
+    mapping = audit_atom_mapping_and_templates(snap)
+    assert all(row["template_recovers_recorded"] for row in mapping["uspto_template_records"])
+    assert mapping["mapping_error_diagnosis"]["introduces_spurious_bond_edits"] is True
+    routes = audit_routes_and_feasibility(snap)
+    assert len(routes["acridine_clustering_routes"]) == 3
+    fb = audit_forward_feedback_loop(snap)
+    assert fb["loocv_mae_condition_aware_pct"] < fb["loocv_mae_substrate_only_pct"]
+    assert fb["survivorship_bias_inflation_pct"] > 20.0
+
+
+def test_public_synthesis_rejects_corrupted_records():
+    sys.path.insert(0, str(ROOT / "labs/src"))
+    from aidd_commons.retro_disconnection.public_synthesis_audit import (
+        check_public_synthesis,
+        load_public_snapshot,
+    )
+
+    snap = load_public_snapshot()
+    broken = copy.deepcopy(snap)
+    broken["perera_suzuki_hte_records"] = [
+        r for r in broken["perera_suzuki_hte_records"] if r["measured_yield_fraction"] > 0.0
+    ]
+    failures = check_public_synthesis(broken)
+    assert any("Perera 2018 Suzuki-Miyaura" in f for f in failures)

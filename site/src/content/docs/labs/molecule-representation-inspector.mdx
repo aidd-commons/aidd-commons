@@ -139,4 +139,16 @@ governed standards and implementations.
 to see how representation choice interacts with the evaluation set. Reading
 the saved result does not require downloading data or rerunning evaluation.
 
+## Real-data 3D conformer ensemble and 2D/3D graph encoding audit (`conformers-and-graphs`)
+
+Run the real-data 3D conformer ensemble (`8` ETKDGv3 + MMFF94 conformers per molecule at `298.15` K) and 2-layer graph message-passing assessment across `5` real clinical drug structures from ChEMBL 37 (`CHEMBL553` erlotinib, `CHEMBL939` gefitinib, `CHEMBL3353410` osimertinib, `CHEMBL1431_R` `(R)-thalidomide`, and `CHEMBL1431_S` `(S)-thalidomide`):
+
+```sh
+.venv/bin/python labs/molecule_representations/run_lab.py conformers-and-graphs
+.venv/bin/python labs/molecule_representations/run_lab.py check-conformers-and-graphs
+```
+
+- **Flexible vs rigid 3D conformer ensembles**: Flexible `erlotinib` (`10` rotatable bonds, `2.304` Å max heavy-atom RMSD, `4.2871` kcal/mol MMFF94 span, Boltzmann `Rg = 4.8658` Å vs lowest-energy `4.9111` Å), `gefitinib` (`8` rotatable bonds, `2.7395` Å max RMSD, `15.7796` kcal/mol span, Boltzmann `Rg = 5.3976` Å), and `osimertinib` (`10` rotatable bonds, `3.44` Å max RMSD, `18.3368` kcal/mol span, Boltzmann `Rg = 5.5744` Å) span broader 3D conformational ensembles than rigid `(R)-thalidomide` (`1` rotatable bond, `1.8385` Å max RMSD, `3.7284` kcal/mol span, Boltzmann `Rg = 3.1949` Å).
+- **2D topological vs 3D chiral graph message passing**: Across all `5` drugs, reversing atom indices yields `max_atom_permutation_invariance_diff = 0.0`. Plain 2D topological graph message passing and unsigned 3D interatomic distances (`4.1006` Å vs `4.1006` Å, diff `0.0`) collapse `(R)-thalidomide` and `(S)-thalidomide` (`enantiomer_2d_topological_graph_l2_distance = 0.0`), whereas CIP-ordered signed tetrahedral volume (`2.4273` Å³ vs `-2.4273` Å³) separates their 3D chiral graph embeddings (`enantiomer_3d_chiral_graph_l2_distance = 1.6755`, compared with `0.1515` between `erlotinib` and `gefitinib` in 2D graph space).
+
 Last reviewed: 2026-09-08.

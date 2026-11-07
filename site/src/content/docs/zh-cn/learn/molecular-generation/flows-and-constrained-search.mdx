@@ -83,7 +83,8 @@ Rezende 与 Mohamed 使用 normalizing flows，通过可逆变换构造更丰富
 
 本课主张目标必须冻结、门槛必须可见。[生成闸门实验](/zh-cn/labs/generation-gate/)
 把两者都做成可离线运行的：当目标的性质没有界限、或基团没有模式时，它拒绝对其运行筛选；
-随后施加六道分母逐级相扣的闸门，于是头条有效率与幸存数可以被直接对照。
+随后施加六道分母逐级相扣的闸门，于是头条有效率与幸存数可以被直接对照。运行
+`python labs/generation_gate/inspect_gate.py public-series` 可将漏斗扩展至 `3` 个采样温度（`T = 0.2`、`0.8`、`1.5`，各 `10` 个，共 `30` 个候选物），针对 `7` 个真实 ChEMBL 37 EGFR（`CHEMBL203`）抑制剂和商用 `4` × `8` SNAr（`80` °C）砌块库进行核验（分别获得 `1`、`5` 与 `1` 个路线核验幸存者，净产率 `0.1`、`0.5` 与 `0.1`）；配套的[设计空间实验](/zh-cn/labs/design-space/)（`python labs/design_space/inspect_space.py public-spaces`）则对比了 `16` 个 2D SNAr 片段产物（覆盖 `6` 个真实 ChEMBL 37 EGFR 靶标中的 `4` 个）、`16` 条 1D SMILES 语法字符串（覆盖 `6` 个中的 `3` 个，捕获 `CHEMBL2177370` 的 `3-cyanoquinoline` 骨架跃迁）以及 3D `1M17` 活性口袋（容纳全部 `5` 个 Type-I 抑制剂，`< 2.4` Å 碰撞 `0` 次且距 Met793 距离 `2.9831`–`2.9904` Å，而 DFG-out 构象 `CHEMBL1201583` 产生 `31` 次碰撞且距离为 `3.3522` Å）。
 
 ## 已解案例：透明的构造短名单
 

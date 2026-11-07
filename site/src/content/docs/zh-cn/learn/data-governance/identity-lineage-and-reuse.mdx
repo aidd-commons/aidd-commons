@@ -111,6 +111,11 @@ import TeachingViewLink from "../../../../../components/TeachingViewLink.astro";
 
 </details>
 
-继续阅读[复杂生物对象的表示](/zh-cn/learn/representations/complex-cell-and-knowledge-graphs/)，理解如何把已消歧实体变成特征，并保留测量语境。
+继续阅读[复杂生物对象的表示](/zh-cn/learn/representations/complex-cell-and-knowledge-graphs/)，理解如何把已消歧实体变成特征，并保留测量语境。如需将全部 1,072 行真实 ChEMBL 37 EGFR 输出母体记录（`CHEMBL5736995` 主测定 `902` 行与 `CHEMBL3705421` 复现测定 `170` 行）沿 5 个版本化转换阶段（`634` 个训练、`136` 个验证与 `132` 个测试骨架）追溯至 1,139 条保留的源 `activity_id` 记录，并核验人工录入与图像识别结构的完整溯源契约，请运行：
+
+```bash
+.venv/bin/python labs/chembl_egfr/run_lab.py trace-lineage
+.venv/bin/python labs/chembl_egfr/run_lab.py check-lineage
+```
 
 原创示例与正文：CC BY 4.0。来源核对日期：2026-09-09。

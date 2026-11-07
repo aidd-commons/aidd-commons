@@ -138,7 +138,12 @@ D 虽通过构造的 1 µM 抑制门槛，却因 `22%` 不低于 15% 的报告�
 </div>
 
 [目标产品 profile 实验](/zh-cn/labs/target-product-profile/)把一份由硬性门槛与偏好组成、在读测量之前
-就定下的 profile,套到三个实测终点族共有的化合物上，并报告哪些化合物被后来的测量推翻了。
+就定下的 profile,套到三个实测终点族共有的化合物上，并报告哪些化合物被后来的测量推翻了。如需在跨越 3 代药物化学优化的 12 个真实 ChEMBL 37 人源 EGFR 抑制剂上检验多轮化学系列反馈与实测匹配分子对更新（6 个第 1 轮可逆喹唑啉的平均选择性为 `-3.2250` 个对数单位，3 个第 2 轮共价喹唑啉将平均 T790M `pIC50` 提高 `+2.5200` 至 `7.7733` 但选择性为 `-1.1033`，3 个第 3 轮氨基嘧啶在 4 对实测 MMP 上实现 `+1.7333` 个对数单位的突变选择性），请运行：
+
+```bash
+.venv/bin/python labs/sar_attribution/inspect_attribution.py chembl-series
+.venv/bin/python labs/sar_attribution/inspect_attribution.py check-chembl-series
+```
 
 下一步读[从扰动到靶点验证](/zh-cn/learn/mechanism-targets/perturbation-to-target-validation/)，检验面向产品的靶点叙述能否经得起替代解释。原始课程文字为 CC BY 4.0；链接来源保留其自身条款。
 

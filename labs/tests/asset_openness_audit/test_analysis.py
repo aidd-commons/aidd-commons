@@ -1,5 +1,7 @@
 """The analysis counts distinct claims and literal scope limits."""
 
+import subprocess
+import sys
 from pathlib import Path
 
 from aidd_commons.asset_openness_audit.analysis import (
@@ -7,6 +9,12 @@ from aidd_commons.asset_openness_audit.analysis import (
     audit_record,
     check_invariants,
     scope_limits_grant,
+)
+from aidd_commons.asset_openness_audit.governance_release import (
+    audit_governance_release,
+    check_governance_release,
+    check_reproducibility,
+    verify_reproducibility,
 )
 from aidd_commons.asset_openness_audit.protocol import EXAMINED_IDS
 from aidd_commons.asset_openness_audit.records import load_catalogue
@@ -51,3 +59,35 @@ def test_aggregate_counts_recompute_from_catalogue() -> None:
         "records": 232,
         "records_with_seven_separate_dimensions": 232,
     }
+
+
+def test_governance_release_audit_and_cli() -> None:
+    payload = audit_governance_release()
+    assert check_governance_release(payload) == []
+    assert payload["catalogue_total_records"] == 232
+    assert payload["examined_record_count"] == 24
+    assert len(payload["governance_cases"]) == 6
+
+    script = ROOT / "labs/asset_openness_audit/inspect_asset_openness_audit.py"
+    proc = subprocess.run(
+        [sys.executable, str(script), "check-governance-release"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert "PASS:" in proc.stdout
+
+
+def test_verify_reproducibility_and_cli() -> None:
+    payload = verify_reproducibility()
+    assert check_reproducibility(payload) == []
+    assert payload["examined_record_count"] == 24
+    assert payload["empirically_linked_count"] == 4
+    script = ROOT / "labs/asset_openness_audit/inspect_asset_openness_audit.py"
+    proc = subprocess.run(
+        [sys.executable, str(script), "check-reproducibility"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert "PASS:" in proc.stdout

@@ -43,7 +43,7 @@ experimental systems problem rather than a score-optimization exercise.
 
 ## A bounded worked decision and independent task
 
-After [molecular representations](/learn/representations/small-molecule-representations/), distinguish a graph operation from an observed reaction. The authored [p01 retrosynthesis case](/labs/retro-disconnection/) records product CC(=O)Nc1ccccc1 and reactants CC(=O)O plus Nc1ccccc1. Recovering those graphs matches the recorded disconnection. No reaction conditions, yield or laboratory feasibility was observed.
+After [molecular representations](/learn/representations/small-molecule-representations/), distinguish a graph operation from an observed reaction. The authored [p01 retrosynthesis case](/labs/retro-disconnection/) records product CC(=O)Nc1ccccc1 and reactants CC(=O)O plus Nc1ccccc1. Recovering those graphs matches the recorded disconnection. No reaction conditions, yield or laboratory feasibility was observed. To inspect real condition-resolved reaction records (`12` Perera et al. `2018` Suzuki-Miyaura records spanning `0.0000` to `0.9029` yield on `1` shared biaryl product and `24` Ahneman et al. `2018` Buchwald-Hartwig `1536`-well records spanning `0.00%` to `98.73%`), USPTO atom maps, AiZynthFinder route trees, and closed-loop HTE feedback gating (`27.19%` substrate-only MAE vs `16.51%` condition-aware MAE), run `python labs/retro_disconnection/inspect_disconnection.py public-records` and `python labs/retro_disconnection/inspect_disconnection.py check-public`.
 
 A planning tool returns those reactants and a successful software status. Which success occurred, and what feedback is still needed before calling the route experimentally successful?
 

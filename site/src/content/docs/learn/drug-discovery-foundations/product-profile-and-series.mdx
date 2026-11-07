@@ -204,7 +204,17 @@ assay-interpretation boundary; all values above are invented teaching values.
 The [target product profile laboratory](/labs/target-product-profile/) applies a
 profile of mandatory gates and preferences, fixed before the measurements are
 read, to the compounds three measured endpoint families share, and reports the
-compounds a later measurement contradicts.
+compounds a later measurement contradicts. To inspect real multi-round chemical-series
+feedback and matched molecular pair updates across 12 ChEMBL 37 human EGFR inhibitors
+spanning 3 optimization generations (`-3.2250` log selectivity in 6 Round 1 reversible
+quinazolines, `+2.5200` log T790M `pIC50` gain to `7.7733` with `-1.1033` log selectivity in
+3 Round 2 covalent quinazolines, and `+1.7333` log mutant selectivity in 3 Round 3
+aminopyrimidines across 4 measured MMPs), run:
+
+```bash
+.venv/bin/python labs/sar_attribution/inspect_attribution.py chembl-series
+.venv/bin/python labs/sar_attribution/inspect_attribution.py check-chembl-series
+```
 
 Next, [Mechanism hypothesis and counterevidence](/learn/mechanism-targets/perturbation-to-target-validation/)
 asks whether a product-directed target story survives alternatives. Original

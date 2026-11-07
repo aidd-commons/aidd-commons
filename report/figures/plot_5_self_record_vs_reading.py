@@ -92,11 +92,19 @@ def build() -> dict[str, Path]:
         fontweight="bold",
         color=colours["coral"],
     )
-    outcome_ax = fig.add_axes((0.30, 0.69, 0.61, 0.10))
+    fig.text(
+        0.035,
+        0.79,
+        "(a) Per-topic agreement",
+        fontsize=10.2,
+        fontweight="bold",
+        color=tokens["ink"],
+    )
+    outcome_ax = fig.add_axes((0.30, 0.68, 0.61, 0.10))
     keys = ["equal", "reading_deeper", "reading_shallower"]
     values = [reading[k] for k in keys]
     labels = ["Same depth", "Read deeper", "Read shallower*"]
-    for x, key, label, n in zip([0.10, 0.50, 0.90], keys, labels, values, strict=True):
+    for x, key, label, n in zip([0.12, 0.50, 0.88], keys, labels, values, strict=True):
         outcome_ax.text(
             x,
             0.95,
@@ -116,7 +124,7 @@ def build() -> dict[str, Path]:
             fontsize=20,
             fontweight="bold",
             transform=outcome_ax.transAxes,
-            color=tokens["ink"],
+            color=colours["teal"] if key == "equal" else tokens["ink"],
         )
         count_text.set_gid(f"reading-outcome-{key}")
     outcome_ax.text(
@@ -130,14 +138,22 @@ def build() -> dict[str, Path]:
         transform=outcome_ax.transAxes,
     )
     outcome_ax.set_axis_off()
-    ax = fig.add_axes((0.30, 0.25, 0.61, 0.32))
+    fig.text(
+        0.035,
+        0.555,
+        "(b) Threshold counts",
+        fontsize=10.2,
+        fontweight="bold",
+        color=tokens["ink"],
+    )
+    ax = fig.add_axes((0.30, 0.25, 0.61, 0.30))
     rows = list(reading["thresholds"])
     ys = list(range(len(rows)))[::-1]
     for row, y in zip(rows, ys, strict=True):
         a, b = row["recorded"], row["reading"]
-        ax.plot([a, b], [y, y], lw=2, color=tokens["rule"])
-        ax.plot(a, y, "o", ms=7, mfc=colours["teal"], mec=tokens["ink"], mew=0.5)
-        ax.plot(b, y, "s", ms=8, mfc="none", mec=colours["coral"], mew=1)
+        ax.plot([a, b], [y, y], lw=2.2, color=tokens["rule"], zorder=2)
+        ax.plot(a, y, "o", ms=7, mfc=colours["teal"], mec=tokens["ink"], mew=0.5, zorder=3)
+        ax.plot(b, y, "s", ms=8, mfc="none", mec=colours["coral"], mew=1.2, zorder=3)
         ax.text(
             1.04,
             y,
@@ -156,6 +172,8 @@ def build() -> dict[str, Path]:
             for r in rows
         ],
     )
+    ax.yaxis.grid(True, color=tokens["rule"], linestyle=":", linewidth=0.6, alpha=0.85)
+    ax.set_axisbelow(True)
     ax.set_xlim(-3, series.topics * 1.1)
     ax.set_ylim(-0.6, len(rows) - 0.4)
     ax.set_xlabel(f"Topics out of {series.topics}")
@@ -174,7 +192,7 @@ def build() -> dict[str, Path]:
         ["Current self record", "Retained readings"],
         ncol=2,
         loc="lower center",
-        bbox_to_anchor=(0.58, 0.105),
+        bbox_to_anchor=(0.58, 0.088),
         fontsize=10.0,
         handletextpad=0.4,
     )
