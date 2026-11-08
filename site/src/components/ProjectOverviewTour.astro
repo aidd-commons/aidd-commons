@@ -1,0 +1,505 @@
+---
+import { projectOverviewMedia } from "../lib/project-overview-media";
+import { withSiteBase } from "../lib/site-paths";
+
+interface Props {
+  chinese?: boolean;
+}
+
+const { chinese = false } = Astro.props;
+const locale = chinese ? "zh-cn" : "en";
+const media = projectOverviewMedia(locale);
+const asset = (path: string) => withSiteBase(path, import.meta.env.BASE_URL);
+const link = (path: string) => withSiteBase(path, import.meta.env.BASE_URL);
+const firstStage = media.stages[0]!;
+const stageStills = media.stages.map((_, idx) =>
+  asset(`/media/overview/aidd-commons-overview-${locale}-stage-${idx + 1}.webp`),
+);
+---
+
+<div
+  class="aidd-overview-tour"
+  data-overview-tour
+  data-duration={media.durationSeconds}
+>
+  <div class="aidd-overview-tour__topbar">
+    <div class="aidd-overview-tour__intro">
+      <p class="eyebrow">
+        {
+          chinese
+            ? "15 秒项目全景动画 · 5 阶段导览"
+            : "15-second platform walkthrough · 5-stage animated tour"
+        }
+      </p>
+      <h3 class="aidd-overview-tour__heading">
+        {
+          chinese
+            ? "一眼看懂四层耦合架构、7 维开放性审计与 CPU 真实数据实验"
+            : "How the four artefacts, 7-dimension openness audit, and CPU labs fit together"
+        }
+      </h3>
+    </div>
+    <div class="aidd-overview-tour__controls">
+      <button
+        type="button"
+        class="aidd-overview-tour__toggle"
+        data-overview-toggle
+        aria-pressed="true"
+        data-play-label={chinese ? "播放导览动画" : "Play overview animation"}
+        data-pause-label={chinese ? "暂停导览动画" : "Pause overview animation"}
+      >
+        {chinese ? "暂停导览动画" : "Pause overview animation"}
+      </button>
+      <div
+        class="aidd-overview-tour__downloads"
+        aria-label={chinese ? "下载导览媒体" : "Download walkthrough media"}
+      >
+        <a href={asset(media.mp4)} download>MP4</a>
+        <a href={asset(media.webm)} download>WebM</a>
+        <a href={asset(media.gif)} download>GIF</a>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="aidd-overview-tour__stepper"
+    role="tablist"
+    aria-label={chinese ? "项目导览阶段" : "Platform walkthrough stages"}
+  >
+    {
+      media.stages.map((stage, idx) => (
+        <button
+          type="button"
+          role="tab"
+          class="aidd-overview-tour__step"
+          aria-selected={idx === 0 ? "true" : "false"}
+          data-overview-step={idx}
+          data-start={stage.startSeconds}
+          data-end={stage.endSeconds}
+          data-still={stageStills[idx]}
+          data-badge={chinese ? stage.badgeZh : stage.badgeEn}
+          data-title={chinese ? stage.titleZh : stage.titleEn}
+          data-summary={chinese ? stage.summaryZh : stage.summaryEn}
+          data-href={link(chinese ? stage.hrefZh : stage.hrefEn)}
+          data-cta={chinese ? stage.ctaZh : stage.ctaEn}
+        >
+          <span class="aidd-overview-tour__step-code">{stage.code}</span>
+          <span class="aidd-overview-tour__step-label">
+            {chinese
+              ? stage.badgeZh.replace(/^0\d\s*·\s*/, "")
+              : stage.badgeEn.replace(/^0\d\s*·\s*/, "")}
+          </span>
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="aidd-overview-tour__stage">
+    <div class="aidd-overview-tour__viewport">
+      <video
+        class="aidd-overview-tour__video"
+        data-overview-video
+        muted
+        loop
+        playsinline
+        preload="none"
+        poster={asset(media.poster)}
+        width={media.width}
+        height={media.height}
+        aria-label={
+          chinese
+            ? "五阶段平台架构与实证基准导览视频"
+            : "Five-stage platform architecture and benchmark walkthrough video"
+        }
+      >
+        <source data-src={asset(media.webm)} type="video/webm" />
+        <source data-src={asset(media.mp4)} type="video/mp4" />
+      </video>
+      <img
+        class="aidd-overview-tour__still"
+        data-overview-still
+        src={stageStills[0]}
+        width={media.width}
+        height={media.height}
+        alt={chinese ? firstStage.titleZh : firstStage.titleEn}
+        loading="lazy"
+        decoding="async"
+        hidden
+      />
+    </div>
+
+    <div class="aidd-overview-tour__caption" aria-live="polite">
+      <div class="aidd-overview-tour__caption-copy">
+        <span class="aidd-overview-tour__badge" data-overview-badge>
+          {chinese ? firstStage.badgeZh : firstStage.badgeEn}
+        </span>
+        <strong class="aidd-overview-tour__title" data-overview-title>
+          {chinese ? firstStage.titleZh : firstStage.titleEn}
+        </strong>
+        <p class="aidd-overview-tour__summary" data-overview-summary>
+          {chinese ? firstStage.summaryZh : firstStage.summaryEn}
+        </p>
+      </div>
+      <a
+        class="aidd-overview-tour__cta"
+        data-overview-cta
+        href={link(chinese ? firstStage.hrefZh : firstStage.hrefEn)}
+      >
+        <span data-overview-cta-text>
+          {chinese ? firstStage.ctaZh : firstStage.ctaEn}
+        </span>
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  document.querySelectorAll<HTMLElement>("[data-overview-tour]").forEach((root) => {
+    const video = root.querySelector<HTMLVideoElement>("[data-overview-video]");
+    const still = root.querySelector<HTMLImageElement>("[data-overview-still]");
+    const toggle = root.querySelector<HTMLButtonElement>("[data-overview-toggle]");
+    const steps = Array.from(
+      root.querySelectorAll<HTMLButtonElement>("[data-overview-step]"),
+    );
+    const badgeEl = root.querySelector<HTMLElement>("[data-overview-badge]");
+    const titleEl = root.querySelector<HTMLElement>("[data-overview-title]");
+    const summaryEl = root.querySelector<HTMLElement>("[data-overview-summary]");
+    const ctaEl = root.querySelector<HTMLAnchorElement>("[data-overview-cta]");
+    const ctaTextEl = root.querySelector<HTMLElement>("[data-overview-cta-text]");
+
+    let activeIdx = 0;
+    let sourcesHydrated = false;
+
+    const hydrateVideoSources = () => {
+      if (!video || sourcesHydrated) return;
+      video.querySelectorAll<HTMLSourceElement>("source[data-src]").forEach((src) => {
+        if (src.dataset.src) {
+          src.src = src.dataset.src;
+        }
+      });
+      video.load();
+      sourcesHydrated = true;
+    };
+
+    const setToggleState = (playing: boolean) => {
+      if (!toggle) return;
+      toggle.setAttribute("aria-pressed", String(playing));
+      toggle.textContent =
+        (playing ? toggle.dataset.pauseLabel : toggle.dataset.playLabel) ?? "";
+    };
+
+    const applyStageMeta = (idx: number) => {
+      const btn = steps[idx];
+      if (!btn) return;
+      activeIdx = idx;
+      steps.forEach((stepBtn, sIdx) => {
+        stepBtn.setAttribute("aria-selected", String(sIdx === idx));
+      });
+      if (badgeEl && btn.dataset.badge) badgeEl.textContent = btn.dataset.badge;
+      if (titleEl && btn.dataset.title) titleEl.textContent = btn.dataset.title;
+      if (summaryEl && btn.dataset.summary)
+        summaryEl.textContent = btn.dataset.summary;
+      if (ctaEl && btn.dataset.href) ctaEl.href = btn.dataset.href;
+      if (ctaTextEl && btn.dataset.cta) ctaTextEl.textContent = btn.dataset.cta;
+      if (still && btn.dataset.still) {
+        still.src = btn.dataset.still;
+        if (btn.dataset.title) still.alt = btn.dataset.title;
+      }
+    };
+
+    const showStillMode = () => {
+      if (video) {
+        video.pause();
+        video.hidden = true;
+      }
+      if (still) {
+        still.hidden = false;
+      }
+      setToggleState(false);
+    };
+
+    const playVideoMode = () => {
+      if (reducedMotion.matches || !video) {
+        showStillMode();
+        return;
+      }
+      hydrateVideoSources();
+      if (still) still.hidden = true;
+      video.hidden = false;
+      video
+        .play()
+        .then(() => setToggleState(true))
+        .catch(() => showStillMode());
+    };
+
+    if (reducedMotion.matches) {
+      showStillMode();
+    } else if (video && "IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              playVideoMode();
+            } else if (!video.paused) {
+              video.pause();
+              setToggleState(false);
+            }
+          });
+        },
+        { threshold: 0.2 },
+      );
+      observer.observe(root);
+    }
+
+    video?.addEventListener("timeupdate", () => {
+      const t = video.currentTime;
+      const found = steps.findIndex((btn) => {
+        const start = Number(btn.dataset.start ?? 0);
+        const end = Number(btn.dataset.end ?? 3);
+        return t >= start && t < end;
+      });
+      if (found !== -1 && found !== activeIdx) {
+        applyStageMeta(found);
+      }
+    });
+
+    steps.forEach((btn, idx) => {
+      btn.addEventListener("click", () => {
+        applyStageMeta(idx);
+        const start = Number(btn.dataset.start ?? 0);
+        if (video && !video.hidden && sourcesHydrated) {
+          video.currentTime = start + 0.15;
+        }
+      });
+    });
+
+    toggle?.addEventListener("click", () => {
+      if (!video) return;
+      if (video.paused || video.hidden) {
+        hydrateVideoSources();
+        if (still) still.hidden = true;
+        video.hidden = false;
+        const currentBtn = steps[activeIdx];
+        if (currentBtn) {
+          video.currentTime = Number(currentBtn.dataset.start ?? 0) + 0.15;
+        }
+        video
+          .play()
+          .then(() => setToggleState(true))
+          .catch(() => showStillMode());
+      } else {
+        video.pause();
+        setToggleState(false);
+      }
+    });
+  });
+</script>
+
+<style>
+  .aidd-overview-tour {
+    margin: 0 0 1.15rem;
+    border: 1px solid var(--atlas-rule-strong);
+    background: var(--atlas-panel);
+  }
+  .aidd-overview-tour__topbar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1rem 0.75rem;
+    border-bottom: 1px solid var(--atlas-rule);
+    flex-wrap: wrap;
+  }
+  .aidd-overview-tour__intro .eyebrow {
+    margin: 0 0 0.25rem;
+    font-size: 0.72rem;
+  }
+  .aidd-overview-tour__heading {
+    margin: 0;
+    font-size: clamp(1rem, 1.45vw, 1.2rem);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    color: var(--atlas-ink);
+  }
+  .aidd-overview-tour__controls {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+  .aidd-overview-tour__toggle {
+    min-height: 44px;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid var(--atlas-rule-strong);
+    background: var(--atlas-paper);
+    color: var(--atlas-ink);
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  .aidd-overview-tour__toggle:hover {
+    border-color: var(--atlas-teal-deep);
+    color: var(--atlas-teal-deep);
+  }
+  .aidd-overview-tour__downloads {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .aidd-overview-tour__downloads a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 0.55rem;
+    border: 1px solid var(--atlas-rule);
+    background: var(--atlas-paper);
+    color: var(--atlas-muted);
+    font-family: var(--atlas-font-mono);
+    font-size: 0.72rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .aidd-overview-tour__downloads a:hover {
+    border-color: var(--atlas-teal-deep);
+    color: var(--atlas-teal-deep);
+  }
+  .aidd-overview-tour__stepper {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    border-bottom: 1px solid var(--atlas-rule);
+    background: var(--atlas-paper);
+  }
+  .aidd-overview-tour__step {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 44px;
+    padding: 0.5rem 0.65rem;
+    border: 0;
+    border-right: 1px solid var(--atlas-rule);
+    background: transparent;
+    color: var(--atlas-muted);
+    font: inherit;
+    font-size: 0.76rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+  }
+  .aidd-overview-tour__step:last-child {
+    border-right: 0;
+  }
+  .aidd-overview-tour__step[aria-selected="true"] {
+    background: var(--atlas-panel);
+    color: var(--atlas-ink);
+    box-shadow: inset 0 -2px 0 var(--atlas-teal-deep);
+  }
+  .aidd-overview-tour__step-code {
+    font-family: var(--atlas-font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--atlas-teal-deep);
+  }
+  .aidd-overview-tour__step-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .aidd-overview-tour__stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 0.85fr);
+    align-items: stretch;
+  }
+  .aidd-overview-tour__viewport {
+    position: relative;
+    background: #f7f4ec;
+    border-right: 1px solid var(--atlas-rule);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .aidd-overview-tour__video,
+  .aidd-overview-tour__still {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1280 / 760;
+    object-fit: contain;
+  }
+  .aidd-overview-tour__caption {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.85rem;
+    padding: 1rem 1.1rem;
+    background: var(--atlas-panel);
+  }
+  .aidd-overview-tour__caption-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .aidd-overview-tour__badge {
+    font-family: var(--atlas-font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--atlas-teal-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .aidd-overview-tour__title {
+    font-size: 1.02rem;
+    line-height: 1.35;
+    color: var(--atlas-ink);
+  }
+  .aidd-overview-tour__summary {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.6;
+    color: var(--atlas-muted);
+  }
+  .aidd-overview-tour__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 44px;
+    padding: 0.5rem 0.8rem;
+    border: 1px solid var(--atlas-teal);
+    background: var(--atlas-teal);
+    color: var(--atlas-action-ink);
+    font-size: 0.82rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .aidd-overview-tour__cta:hover {
+    background: var(--atlas-teal-deep);
+    color: var(--atlas-action-ink);
+  }
+  @media (max-width: 950px) {
+    .aidd-overview-tour__stage {
+      grid-template-columns: 1fr;
+    }
+    .aidd-overview-tour__viewport {
+      border-right: 0;
+      border-bottom: 1px solid var(--atlas-rule);
+    }
+    .aidd-overview-tour__stepper {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 600px) {
+    .aidd-overview-tour__stepper {
+      grid-template-columns: 1fr;
+    }
+    .aidd-overview-tour__step {
+      border-right: 0;
+      border-bottom: 1px solid var(--atlas-rule);
+    }
+  }
+</style>

@@ -4,6 +4,19 @@
 
 It joins a graduate-level curriculum, an evidence-backed atlas of methods and resources, reproducible labs, and a living technical report. English is canonical. Chinese readers have onboarding, pathway summaries, and translations of the current 111 Learn pages (including the curriculum and resource maps), 56 lab guides and a shared notebook practice guide. Four editable exercises have paired English/Chinese notebooks with identical code; existing numerical panels and historical downloads retain their original format. Atlas, Audit, Report and Contribute offer Chinese interface controls; original resource descriptions and historical reports remain in English.
 
+## 15-Second Platform Walkthrough
+
+![AIDD Commons 5-Stage Platform Walkthrough (English)](site/public/media/overview/aidd-commons-overview-en.gif)
+
+- **Walkthrough video & media:** [English MP4](site/public/media/overview/aidd-commons-overview-en.mp4) · [English WebM](site/public/media/overview/aidd-commons-overview-en.webm) · [中文 MP4](site/public/media/overview/aidd-commons-overview-zh-cn.mp4) · [中文 WebM](site/public/media/overview/aidd-commons-overview-zh-cn.webm) · [Living Report v0.2 PDF (94 pages)](site/public/aidd-commons-living-report-v0.2.pdf)
+
+<details>
+<summary><strong>查看中文 15 秒项目全景动画 · View Chinese 15-Second Platform Walkthrough (GIF)</strong></summary>
+
+![AIDD Commons 五阶段平台全景导览动画（中文）](site/public/media/overview/aidd-commons-overview-zh-cn.gif)
+
+</details>
+
 ## What the repository contains
 
 - **Learn:** 18 connected tracks from biological foundations to candidate nomination.

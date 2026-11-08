@@ -3,6 +3,7 @@ import AtlasFigure from "./AtlasFigure.astro";
 import AssayResultExplorer from "./AssayResultExplorer.astro";
 import HomeWorkflow from "./HomeWorkflow.astro";
 import LearningProgressPanel from "./LearningProgressPanel.astro";
+import ProjectOverviewTour from "./ProjectOverviewTour.astro";
 import figureManifest from "../data/atlas-figures.json";
 import { catalogResources, siteOverview } from "../lib/site-overview";
 import { withSiteBase } from "../lib/site-paths";
@@ -83,6 +84,7 @@ const selectedResources = ["model-boltz-2", "db-chembl-37", "tool-rdkit"].map((i
     </div>
     <a class="aidd-home-visual-library__cta" href={local("/report/figures/")}>{chinese ? "打开科学图件阅读台 · PDF 与可编辑方法图" : "Open the scientific figure library · PDFs and editable diagrams"}<span aria-hidden="true"> ↗</span></a>
   </div>
+  <ProjectOverviewTour chinese={chinese} />
   <div class="aidd-home-visual-library__grid">
     {featuredFigureMeta.map(({ badgeEn, badgeZh, summaryEn, summaryZh, entry }) => (
       <article class="aidd-home-visual-card">
