@@ -27,15 +27,15 @@ const stageStills = media.stages.map((_, idx) =>
       <p class="eyebrow">
         {
           chinese
-            ? "15 秒项目全景动画 · 5 阶段导览"
-            : "15-second platform walkthrough · 5-stage animated tour"
+            ? "2 分钟项目全景视频 · 10 章 30 步深度导览"
+            : "2-minute platform walkthrough · 10 chapters & 30 sub-stages"
         }
       </p>
       <h3 class="aidd-overview-tour__heading">
         {
           chinese
-            ? "一眼看懂四层耦合架构、7 维开放性审计与 CPU 真实数据实验"
-            : "How the four artefacts, 7-dimension openness audit, and CPU labs fit together"
+            ? "两分钟完整看懂四层耦合架构、18 轨道课程、7 维开放性审计与 CPU 真实数据实验"
+            : "Complete 2-minute tour of the four artefacts, 18-track curriculum, 7-dimension openness audit, and CPU labs"
         }
       </h3>
     </div>
@@ -45,16 +45,16 @@ const stageStills = media.stages.map((_, idx) =>
         class="aidd-overview-tour__toggle"
         data-overview-toggle
         aria-pressed="true"
-        data-play-label={chinese ? "播放导览动画" : "Play overview animation"}
-        data-pause-label={chinese ? "暂停导览动画" : "Pause overview animation"}
+        data-play-label={chinese ? "播放 2 分钟导览" : "Play 2-min tour"}
+        data-pause-label={chinese ? "暂停导览视频" : "Pause tour video"}
       >
-        {chinese ? "暂停导览动画" : "Pause overview animation"}
+        {chinese ? "暂停导览视频" : "Pause tour video"}
       </button>
       <div
         class="aidd-overview-tour__downloads"
         aria-label={chinese ? "下载导览媒体" : "Download walkthrough media"}
       >
-        <a href={asset(media.mp4)} download>MP4</a>
+        <a href={asset(media.mp4)} download>MP4 (2:00)</a>
         <a href={asset(media.webm)} download>WebM</a>
         <a href={asset(media.gif)} download>GIF</a>
       </div>
@@ -64,7 +64,7 @@ const stageStills = media.stages.map((_, idx) =>
   <div
     class="aidd-overview-tour__stepper"
     role="tablist"
-    aria-label={chinese ? "项目导览阶段" : "Platform walkthrough stages"}
+    aria-label={chinese ? "项目导览十个章节" : "Ten platform walkthrough chapters"}
   >
     {
       media.stages.map((stage, idx) => (
@@ -80,14 +80,17 @@ const stageStills = media.stages.map((_, idx) =>
           data-badge={chinese ? stage.badgeZh : stage.badgeEn}
           data-title={chinese ? stage.titleZh : stage.titleEn}
           data-summary={chinese ? stage.summaryZh : stage.summaryEn}
+          data-subphases={JSON.stringify(
+            chinese ? stage.subphasesZh : stage.subphasesEn,
+          )}
           data-href={link(chinese ? stage.hrefZh : stage.hrefEn)}
           data-cta={chinese ? stage.ctaZh : stage.ctaEn}
         >
           <span class="aidd-overview-tour__step-code">{stage.code}</span>
           <span class="aidd-overview-tour__step-label">
             {chinese
-              ? stage.badgeZh.replace(/^0\d\s*·\s*/, "")
-              : stage.badgeEn.replace(/^0\d\s*·\s*/, "")}
+              ? stage.shortZh.replace(/^\d+\s*·\s*/, "")
+              : stage.shortEn.replace(/^\d+\s*·\s*/, "")}
           </span>
         </button>
       ))
@@ -108,8 +111,8 @@ const stageStills = media.stages.map((_, idx) =>
         height={media.height}
         aria-label={
           chinese
-            ? "五阶段平台架构与实证基准导览视频"
-            : "Five-stage platform architecture and benchmark walkthrough video"
+            ? "两分钟十章节平台架构与实证基准导览视频"
+            : "Two-minute ten-chapter platform architecture and benchmark walkthrough video"
         }
       >
         <source data-src={asset(media.webm)} type="video/webm" />
@@ -139,6 +142,13 @@ const stageStills = media.stages.map((_, idx) =>
         <p class="aidd-overview-tour__summary" data-overview-summary>
           {chinese ? firstStage.summaryZh : firstStage.summaryEn}
         </p>
+        <ul class="aidd-overview-tour__subphases" data-overview-subphases>
+          {
+            (chinese ? firstStage.subphasesZh : firstStage.subphasesEn).map(
+              (sp) => <li>{sp}</li>,
+            )
+          }
+        </ul>
       </div>
       <a
         class="aidd-overview-tour__cta"
@@ -167,6 +177,9 @@ const stageStills = media.stages.map((_, idx) =>
     const badgeEl = root.querySelector<HTMLElement>("[data-overview-badge]");
     const titleEl = root.querySelector<HTMLElement>("[data-overview-title]");
     const summaryEl = root.querySelector<HTMLElement>("[data-overview-summary]");
+    const subphasesEl = root.querySelector<HTMLUListElement>(
+      "[data-overview-subphases]",
+    );
     const ctaEl = root.querySelector<HTMLAnchorElement>("[data-overview-cta]");
     const ctaTextEl = root.querySelector<HTMLElement>("[data-overview-cta-text]");
 
@@ -202,6 +215,19 @@ const stageStills = media.stages.map((_, idx) =>
       if (titleEl && btn.dataset.title) titleEl.textContent = btn.dataset.title;
       if (summaryEl && btn.dataset.summary)
         summaryEl.textContent = btn.dataset.summary;
+      if (subphasesEl && btn.dataset.subphases) {
+        try {
+          const items = JSON.parse(btn.dataset.subphases) as string[];
+          subphasesEl.innerHTML = "";
+          items.forEach((item) => {
+            const li = document.createElement("li");
+            li.textContent = item;
+            subphasesEl.appendChild(li);
+          });
+        } catch {
+          // keep existing list
+        }
+      }
       if (ctaEl && btn.dataset.href) ctaEl.href = btn.dataset.href;
       if (ctaTextEl && btn.dataset.cta) ctaTextEl.textContent = btn.dataset.cta;
       if (still && btn.dataset.still) {
@@ -258,7 +284,7 @@ const stageStills = media.stages.map((_, idx) =>
       const t = video.currentTime;
       const found = steps.findIndex((btn) => {
         const start = Number(btn.dataset.start ?? 0);
-        const end = Number(btn.dataset.end ?? 3);
+        const end = Number(btn.dataset.end ?? 12);
         return t >= start && t < end;
       });
       if (found !== -1 && found !== activeIdx) {
@@ -379,19 +405,23 @@ const stageStills = media.stages.map((_, idx) =>
     align-items: center;
     gap: 0.45rem;
     min-height: 44px;
-    padding: 0.5rem 0.65rem;
+    padding: 0.45rem 0.6rem;
     border: 0;
     border-right: 1px solid var(--atlas-rule);
+    border-bottom: 1px solid var(--atlas-rule);
     background: transparent;
     color: var(--atlas-muted);
     font: inherit;
-    font-size: 0.76rem;
+    font-size: 0.75rem;
     font-weight: 600;
     text-align: left;
     cursor: pointer;
   }
-  .aidd-overview-tour__step:last-child {
+  .aidd-overview-tour__step:nth-child(5n) {
     border-right: 0;
+  }
+  .aidd-overview-tour__step:nth-child(n + 6) {
+    border-bottom: 0;
   }
   .aidd-overview-tour__step[aria-selected="true"] {
     background: var(--atlas-panel);
@@ -411,7 +441,7 @@ const stageStills = media.stages.map((_, idx) =>
   }
   .aidd-overview-tour__stage {
     display: grid;
-    grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 0.85fr);
+    grid-template-columns: minmax(0, 1.55fr) minmax(16.5rem, 0.85fr);
     align-items: stretch;
   }
   .aidd-overview-tour__viewport {
@@ -453,15 +483,27 @@ const stageStills = media.stages.map((_, idx) =>
     letter-spacing: 0.04em;
   }
   .aidd-overview-tour__title {
-    font-size: 1.02rem;
+    font-size: 1rem;
     line-height: 1.35;
     color: var(--atlas-ink);
   }
   .aidd-overview-tour__summary {
     margin: 0;
-    font-size: 0.84rem;
-    line-height: 1.6;
+    font-size: 0.82rem;
+    line-height: 1.55;
     color: var(--atlas-muted);
+  }
+  .aidd-overview-tour__subphases {
+    margin: 0.25rem 0 0;
+    padding: 0.5rem 0 0 1rem;
+    border-top: 1px solid var(--atlas-rule);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-family: var(--atlas-font-mono);
+    font-size: 0.71rem;
+    line-height: 1.45;
+    color: var(--atlas-ink);
   }
   .aidd-overview-tour__cta {
     display: inline-flex;
@@ -492,14 +534,23 @@ const stageStills = media.stages.map((_, idx) =>
     .aidd-overview-tour__stepper {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+    .aidd-overview-tour__step:nth-child(5n) {
+      border-right: 1px solid var(--atlas-rule);
+    }
+    .aidd-overview-tour__step:nth-child(2n) {
+      border-right: 0;
+    }
+    .aidd-overview-tour__step:nth-child(n + 6) {
+      border-bottom: 1px solid var(--atlas-rule);
+    }
   }
   @media (max-width: 600px) {
     .aidd-overview-tour__stepper {
       grid-template-columns: 1fr;
     }
     .aidd-overview-tour__step {
-      border-right: 0;
-      border-bottom: 1px solid var(--atlas-rule);
+      border-right: 0 !important;
+      border-bottom: 1px solid var(--atlas-rule) !important;
     }
   }
 </style>

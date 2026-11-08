@@ -16,10 +16,11 @@ const figuresDir = resolve(scriptDir, "../public/figures");
 
 const WIDTH = 1280;
 const HEIGHT = 760;
-const FPS = 12;
-const STAGE_SECONDS = 3;
-const TOTAL_SECONDS = OVERVIEW_STAGES.length * STAGE_SECONDS;
-const TOTAL_FRAMES = TOTAL_SECONDS * FPS;
+const RENDER_FPS = 4;
+const OUTPUT_FPS = 12;
+const STAGE_SECONDS = 12;
+const TOTAL_SECONDS = OVERVIEW_STAGES.length * STAGE_SECONDS; // 120 seconds (2:00)
+const TOTAL_FRAMES = TOTAL_SECONDS * RENDER_FPS; // 480 rendered frames per locale
 
 const esc = (value: string): string =>
   value
@@ -37,10 +38,456 @@ const loadFigureBase64 = async (fileName: string): Promise<string> => {
   return `data:image/png;base64,${bytes.toString("base64")}`;
 };
 
-const fig01DataUri = await loadFigureBase64("schematic-01-artifacts.png");
-const fig08DataUri = await loadFigureBase64("plot-6-openness-matrix.png");
-const fig11DataUri = await loadFigureBase64("plot-2-coverage-bounds.png");
-const fig16DataUri = await loadFigureBase64("plot-9-representation-ranking-flips.png");
+const figureUris = await Promise.all([
+  loadFigureBase64("schematic-01-artifacts.png"),
+  loadFigureBase64("schematic-02-statement-classes.png"),
+  loadFigureBase64("schematic-03-decision-pipeline.png"),
+  loadFigureBase64("schematic-05-prerequisite-graph.png"),
+  loadFigureBase64("plot-1-registry-composition.png"),
+  loadFigureBase64("plot-6-openness-matrix.png"),
+  loadFigureBase64("schematic-07-frozen-lifecycle.png"),
+  loadFigureBase64("plot-9-representation-ranking-flips.png"),
+  loadFigureBase64("plot-10-acquisition-policy-recovery.png"),
+  loadFigureBase64("plot-2-coverage-bounds.png"),
+]);
+
+const formatTime = (sec: number): string => {
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+};
+
+interface ChapterLeftSpec {
+  headerEn: string;
+  headerZh: string;
+  figLabelEn: string;
+  figLabelZh: string;
+  cards: Array<{
+    tag: string;
+    titleEn: string;
+    titleZh: string;
+    detailEn: string;
+    detailZh: string;
+    metricEn: string;
+    metricZh: string;
+    color: string;
+  }>;
+  footerEn: string;
+  footerZh: string;
+}
+
+const CHAPTER_SPECS: ChapterLeftSpec[] = [
+  // Chapter 01 (0:00-0:12)
+  {
+    headerEn: "CHAPTER 01 · FOUR-ARTEFACT COUPLED ARCHITECTURE",
+    headerZh: "第 01 章 · 四层双向耦合系统架构",
+    figLabelEn: "FIGURE 01 · FOUR-ARTEFACT LOOP & SHARED RESOURCE IDS (S1)",
+    figLabelZh: "图 01 · 四层耦合制品与共享资源 ID 闭环 (S1)",
+    cards: [
+      {
+        tag: "1A · PROBLEM",
+        titleEn: "Why Disconnected Tutorials Fail",
+        titleZh: "为什么孤立的教程脚本难以复用",
+        detailEn: "Isolated notebooks hide split leakage, assay drift, and licence locks.",
+        detailZh: "孤立脚本往往掩盖划分泄漏、测定漂移与许可限制。",
+        metricEn: "4 Coupled Layers",
+        metricZh: "4 层耦合制品",
+        color: "#0b6e69",
+      },
+      {
+        tag: "1B · COUPLED SYSTEM",
+        titleEn: "Learn ↔ Atlas ↔ Labs ↔ Living Report",
+        titleZh: "课程 ↔ 资源图谱 ↔ 实验 ↔ 动态报告",
+        detailEn: "18 tracks, 232 Atlas records, 56 CPU labs, and a 94-page report.",
+        detailZh: "18 轨道课程、232 条资源记录、56 个实验与 94 页报告。",
+        metricEn: "1,905 Links",
+        metricZh: "1,905 条关联",
+        color: "#2b5c8f",
+      },
+      {
+        tag: "1C · CORRECTION LOOP",
+        titleEn: "Shared IDs & Source-Backed Updates",
+        titleZh: "共享实体 ID 与一手证据纠错回流",
+        detailEn: "Fixing one source record updates lessons, lab checks, and report tables.",
+        detailZh: "修正一条底层证据记录即可同步更新课程、实验与报告表格。",
+        metricEn: "100% Traceable",
+        metricZh: "100% 溯源闭环",
+        color: "#5b437a",
+      },
+    ],
+    footerEn: "Every lesson claim traces to an Atlas record, executable lab, and report table.",
+    footerZh: "核心契约：任何课程论断均双向锚定图谱记录、可执行实验与报告证据表。",
+  },
+  // Chapter 02 (0:12-0:24)
+  {
+    headerEn: "CHAPTER 02 · EPISTEMIC & EVIDENCE DISCIPLINE",
+    headerZh: "第 02 章 · 认识论边界与四类科学陈述",
+    figLabelEn: "FIGURE 02 · FOUR STATEMENT CLASSES & VERIFICATION LOOP (S2)",
+    figLabelZh: "图 02 · 四类科学陈述与构建-审查-实测闭环 (S2)",
+    cards: [
+      {
+        tag: "2A · STATEMENT TAXONOMY",
+        titleEn: "Observed vs Contract vs Expectation vs Open",
+        titleZh: "严格区分实测、契约、理论预期与开放问题",
+        detailEn: "Never conflate a hypothesis or literature claim with a measured lab result.",
+        detailZh: "绝不把文献宣称或理论预期混同于本地复现实验的实测结果。",
+        metricEn: "4 Classes",
+        metricZh: "4 类陈述隔离",
+        color: "#0b6e69",
+      },
+      {
+        tag: "2B · MEASUREMENT RECEIPT",
+        titleEn: "Hardware, Version, Split & Verification Date",
+        titleZh: "硬件环境、软件版本、划分协议与核验日期",
+        detailEn: "Every reported metric names the exact CPU/OS, package version, and date.",
+        detailZh: "每一个报告数值均记录运行机器、依赖版本、数据划分与日期。",
+        metricEn: "Zero Unanchored #",
+        metricZh: "零无源裸奔数值",
+        color: "#2b5c8f",
+      },
+      {
+        tag: "2C · HONEST UNKNOWNS",
+        titleEn: "Unknown Metadata Stays Explicitly Unverified",
+        titleZh: "未知或不可达信息显式保持 Unverified",
+        detailEn: "Paywalled recipes or missing licences are recorded as unverified, never guessed.",
+        detailZh: "未公开的数据配方或缺失条款如实标为 unverified，绝不猜测。",
+        metricEn: "Build→Review→Measure",
+        metricZh: "构建→审查→实测",
+        color: "#8b4c24",
+      },
+    ],
+    footerEn: "Automated tests verify software contracts; human reader outcomes stay not observed.",
+    footerZh: "自动化测试仅证明软件与数据契约；人类读者学习成效保持 not observed。",
+  },
+  // Chapter 03 (0:24-0:36)
+  {
+    headerEn: "CHAPTER 03 · TARGET-TO-CANDIDATE DECISION PIPELINE",
+    headerZh: "第 03 章 · 从靶点机制到候选分子提名的决策流水线",
+    figLabelEn: "FIGURE 03 · NINE-STAGE DISCOVERY & MODELLING PIPELINE (S3)",
+    figLabelZh: "图 03 · 九阶段药物发现与建模决策流水线 (S3)",
+    cards: [
+      {
+        tag: "3A · UPSTREAM FRAMING",
+        titleEn: "Target Biology, Assay Endpoint & Parent Entity",
+        titleZh: "靶点生物学、测定端点与母核化学实体标准化",
+        detailEn: "Separate salt forms, tautomers, IC50 vs Ki, and assay confidence before modelling.",
+        detailZh: "在建模前严格区分盐型、互变异构体、IC50/Ki 与测定置信度。",
+        metricEn: "Tracks T01–T04, T06",
+        metricZh: "轨道 T01–T04, T06",
+        color: "#0b6e69",
+      },
+      {
+        tag: "3B · REPRESENTATION & 3D PHYSICS",
+        titleEn: "Fingerprints, 3D Co-Folding & MD Trajectories",
+        titleZh: "分子指纹、3D 共折叠结构与分子动力学采样",
+        detailEn: "Connect 2D baselines (Morgan/Ridge) to 3D pockets (1M17) and rMD17 dynamics.",
+        detailZh: "从 2D 指纹基线延伸至 PDB 1M17 真实口袋与 rMD17 动力学轨迹。",
+        metricEn: "Tracks T05, T07–T11",
+        metricZh: "轨道 T05, T07–T11",
+        color: "#2b5c8f",
+      },
+      {
+        tag: "3C · DESIGN & NOMINATION",
+        titleEn: "Generation, Active Learning, Synthesis & TPP",
+        titleZh: "受控生成、主动学习、逆合成路线与候选提名",
+        detailEn: "Filter generative candidates by validity, retrosynthesis, ADMET, and Pareto gates.",
+        detailZh: "通过化学有效性、逆合成可行性、ADMET 与帕累托门禁筛选候选物。",
+        metricEn: "Tracks T12–T18",
+        metricZh: "轨道 T12–T18",
+        color: "#5b437a",
+      },
+    ],
+    footerEn: "Interactive workflow navigator lets readers inspect inputs, failure modes, and labs per stage.",
+    footerZh: "主页交互式工作流导航支持按阶段检查输入对象、失败模式与配套实验。",
+  },
+  // Chapter 04 (0:36-0:48)
+  {
+    headerEn: "CHAPTER 04 · 18 TRACKS & 93/93 ASSESSED DEPTH",
+    headerZh: "第 04 章 · 18 轨道课程与 93/93 实测单元",
+    figLabelEn: "FIGURE 10 · 18-TRACK PREREQUISITE GRAPH & ROUTES (S5)",
+    figLabelZh: "图 10 · 18 轨道前置依赖图谱与六条学习路径 (S5)",
+    cards: [
+      {
+        tag: "4A · PREREQUISITE GRAPH",
+        titleEn: "18 Connected Tracks & 111 Bilingual Pages",
+        titleZh: "18 条前置依赖轨道与 111 篇中英双语章节",
+        detailEn: "Every lesson declares upstream prerequisites and downstream decision units.",
+        detailZh: "每节课程显式声明前置依赖单元、关联资源记录与下游决策任务。",
+        metricEn: "18 Tracks · 111 Pages",
+        metricZh: "18 轨道 · 111 章节",
+        color: "#0b6e69",
+      },
+      {
+        tag: "4B · 100% REAL-DATA ASSESSED",
+        titleEn: "All 93/93 Topics Upgraded to Assessed + Real Data",
+        titleZh: "全部 93/93 课程主题达到真实数据实测与评分深度",
+        detailEn: "Backed by committed PDB, ChEMBL, SKEMPI, rMD17, USPTO, and PK datasets.",
+        detailZh: "全部配备 PDB、ChEMBL、SKEMPI、rMD17、USPTO 与药代动力学实测核验。",
+        metricEn: "93 / 93 (100%)",
+        metricZh: "93 / 93 (100% 实测)",
+        color: "#2b5c8f",
+      },
+      {
+        tag: "4C · SIX ENTRY ROUTES",
+        titleEn: "Role-Specific Pathways Without Forced Linear Order",
+        titleZh: "六条按学科背景定制的进入路线",
+        detailEn: "Core spine plus routes for wet-lab biologists, ML engineers, and 3D modellers.",
+        detailZh: "提供核心主线及面向实验生物学、AI 算法、数据治理与物理建模的专属路线。",
+        metricEn: "6 Guided Routes",
+        metricZh: "6 条定制路线",
+        color: "#8b4c24",
+      },
+    ],
+    footerEn: "Lesson header strips expose track step, capability badges, objectives, and prerequisites.",
+    footerZh: "所有课程顶部均内置契约信息条：直接展示轨道步骤、实测徽章、学习目标与前置知识。",
+  },
+  // Chapter 05 (0:48-1:00)
+  {
+    headerEn: "CHAPTER 05 · 232-RECORD ATLAS & LICENCE TIERS",
+    headerZh: "第 05 章 · 232 条证据图谱与访问许可分层",
+    figLabelEn: "FIGURE 05 · ATLAS REGISTRY COMPOSITION BY KIND & ACCESS (P1)",
+    figLabelZh: "图 05 · 232 条资源图谱类型构成与访问层级分布 (P1)",
+    cards: [
+      {
+        tag: "5A · REGISTRY COMPOSITION",
+        titleEn: "84 Models · 59 Tools · 27 Benchmarks · 36 DB/Datasets",
+        titleZh: "84 模型 · 59 工具 · 27 基准 · 36 数据库与数据集",
+        detailEn: "Also indexes 11 scientific agents, 7 tutorials, 4 papers, and 3 standards.",
+        detailZh: "同时收录 11 个科学代理、7 个教程集、4 篇基准论文与 3 项数据标准。",
+        metricEn: "232 Audited Records",
+        metricZh: "232 条核验记录",
+        color: "#0b6e69",
+      },
+      {
+        tag: "5B · ACCESS != LICENCE",
+        titleEn: "Access Level Separated from Legal Reuse Terms",
+        titleZh: "访问层级（公开/注册/受限）与法律许可证解耦",
+        detailEn: "Public download does not imply commercial reuse; registration gates are flagged.",
+        detailZh: "可免费下载不代表允许商业复用；注册门禁与非商业条款逐条标注。",
+        metricEn: "Dated Verification",
+        metricZh: "逐条标注核验日期",
+        color: "#2b5c8f",
+      },
+      {
+        tag: "5C · SIDE-BY-SIDE COMPARISON",
+        titleEn: "Compare 2–4 Resources Across List, Table & Landscape",
+        titleZh: "支持 2–4 项资源在列表、表格与全景视图下并排对比",
+        detailEn: "Zero-backend static index (0.036 MB initial HTML) with full no-JS browsing.",
+        detailZh: "纯静态零后端架构（首屏 HTML 仅 0.036 MB），无 JavaScript 亦可完整浏览。",
+        metricEn: "2–4 Resource Diff",
+        metricZh: "2–4 项资源并排对标",
+        color: "#5b437a",
+      },
+    ],
+    footerEn: "Every Atlas record cites primary repositories, publications, and verification timestamps.",
+    footerZh: "每条图谱记录均绑定一手代码仓库、原始论文引文与精确到日的核验时间戳。",
+  },
+  // Chapter 06 (1:00-1:12)
+  {
+    headerEn: "CHAPTER 06 · 7-DIMENSION OPENNESS AUDIT",
+    headerZh: "第 06 章 · 七维工程开放性解耦审计",
+    figLabelEn: "FIGURE 08 · SEVEN OPENNESS DIMENSIONS ACROSS 232 RECORDS (P6)",
+    figLabelZh: "图 08 · 232 条资源在七个工程开放性维度上的实证分布 (P6)",
+    cards: [
+      {
+        tag: "6A · SEVEN SEPARATE QUESTIONS",
+        titleEn: "Inference · Training · Weights · Arch · Recipe · Data · Eval",
+        titleZh: "推理 · 训练 · 权重 · 架构 · 数据配方 · 训练数据 · 评测",
+        detailEn: "Never collapse engineering reproducibility into a single binary 'open' badge.",
+        detailZh: "拒绝笼统的“开源”标签，将复现所需的七项工程资产拆分为独立字段。",
+        metricEn: "7×232 = 1,624 Cells",
+        metricZh: "1,624 个开放性证据格",
+        color: "#0b6e69",
+      },
+      {
+        tag: "6B · MODEL REPRODUCIBILITY GAP",
+        titleEn: "Inference Code (78/84) vs Data Recipe (29/84)",
+        titleZh: "模型推理代码（78/84）与数据清洗配方（29/84）的显著落差",
+        detailEn: "93% of audited models ship inference code, but only 35% publish data recipes.",
+        detailZh: "93% 的模型公开推理代码，但仅 35% 公开完整数据清洗配方、25% 公开评测代码。",
+        metricEn: "93% vs 35% Gap",
+        metricZh: "93% 对 35% 复现鸿沟",
+        color: "#8b4c24",
+      },
+      {
+        tag: "6C · FOUR EVIDENCE STATES",
+        titleEn: "Available · Not Available · Unverified · Not Applicable",
+        titleZh: "可用 · 不可用 · 未核验 (Unverified) · 不适用 (N/A)",
+        detailEn: "Excludes N/A denominators (e.g. weights for databases) to prevent distortion.",
+        detailZh: "计算分母时自动剔除不适用项（如数据库的模型权重），避免统计失真。",
+        metricEn: "4 Evidence States",
+        metricZh: "4 态证据严格区分",
+        color: "#2b5c8f",
+      },
+    ],
+    footerEn: "Executable lab `labs/asset_openness_audit` verifies all 232 records on CPU.",
+    footerZh: "配套可执行实验 `labs/asset_openness_audit` 支持在本地 CPU 上一键复核全部 232 条记录。",
+  },
+  // Chapter 07 (1:12-1:24)
+  {
+    headerEn: "CHAPTER 07 · 56 CPU LABS & FROZEN LIFECYCLE",
+    headerZh: "第 07 章 · 56 个 CPU 实验与冻结评测周期",
+    figLabelEn: "FIGURE 14 · FIVE-STAGE FROZEN EVALUATION LIFECYCLE (S7)",
+    figLabelZh: "图 14 · 五阶段冻结评测生命周期与测试边界隔离 (S7)",
+    cards: [
+      {
+        tag: "7A · FROZEN PROTOCOL LIFECYCLE",
+        titleEn: "Protocol Lock → Split Audit → Dev → One-Shot Test",
+        titleZh: "协议锁定 → 划分审计 → 开发选择 → 单次锁定测试",
+        detailEn: "Hard TEST BOUNDARY prevents test-set peeking or post-hoc hyperparameter retuning.",
+        detailZh: "硬性测试边界（TEST BOUNDARY）严禁测试集偷看与事后超参数重调。",
+        metricEn: "5 Lifecycle Stages",
+        metricZh: "5 阶段防泄漏闭环",
+        color: "#0b6e69",
+      },
+      {
+        tag: "7B · SPLIT CALIBRATION (FREESOLV)",
+        titleEn: "Scaffold vs Random Split Error & Calibration Drift",
+        titleZh: "FreeSolv (n=642) 骨架划分与随机划分校准漂移",
+        detailEn: "Random splits overstate accuracy and understate uncertainty on unseen scaffolds.",
+        detailZh: "随机划分显著高估新母核泛化性能并低估预测不确定性。",
+        metricEn: "FreeSolv n = 642",
+        metricZh: "FreeSolv n = 642 实测",
+        color: "#2b5c8f",
+      },
+      {
+        tag: "7C · THREE EXECUTION MODES",
+        titleEn: "Read Retained · Fresh Reproduction · Student Exercise",
+        titleZh: "阅读保留结果 · 独立复现 · 学生隔离目录练习",
+        detailEn: "Student runs write to an isolated folder and never overwrite locked baselines.",
+        detailZh: "学生练习输出至独立目录，绝不覆盖仓库中已锁定的基准结果。",
+        metricEn: "56 Lab Guides",
+        metricZh: "56 份双语实验指南",
+        color: "#5b437a",
+      },
+    ],
+    footerEn: "Four paired EN/ZH Jupyter notebooks share 100% identical code cells enforced by CI.",
+    footerZh: "4 组中英双语可编辑 Notebook 保持 100% 相同代码单元格，由 CI 自动校验同步。",
+  },
+  // Chapter 08 (1:24-1:36)
+  {
+    headerEn: "CHAPTER 08 · RETAINED ADVERSE EVIDENCE & FLIPS",
+    headerZh: "第 08 章 · 保留反面证据与跨测定排名反转",
+    figLabelEn: "FIGURE 16 · CHEMBL 37 EGFR ASSAY-TRANSFER RANK FLIP (P9)",
+    figLabelZh: "图 16 · ChEMBL 37 EGFR 主划分与独立测定排名反转 (P9)",
+    cards: [
+      {
+        tag: "8A · PRIMARY PARTITION (n=132)",
+        titleEn: "Morgan Ridge Wins Primary Split (MAE 0.418, ρ=0.505)",
+        titleZh: "主划分 (n=132)：Morgan Ridge 排名第一 (MAE 0.418)",
+        detailEn: "On the primary chiral scaffold split, Morgan Ridge beats Descriptor Ridge (0.469).",
+        detailZh: "在主划分手性骨架测试集上，Morgan 指纹优于理化描述符基线（0.469）。",
+        metricEn: "#1 · MAE 0.418",
+        metricZh: "主划分 #1 (0.418)",
+        color: "#0b6e69",
+      },
+      {
+        tag: "8B · ASSAY REPLICATION (n=170)",
+        titleEn: "Ranking Inverts on Separate Assay (MAE 3.132, ρ=-0.041)",
+        titleZh: "独立测定复现 (n=170)：Morgan Ridge 跌至末位 (MAE 3.132)",
+        detailEn: "Spearman correlation flips sign (-0.041); Descriptor Ridge holds #1 (MAE 0.579).",
+        detailZh: "秩相关变为负值（-0.041），理化描述符基线反超升至第一（MAE 0.579）。",
+        metricEn: "Rank Flip #1 → #3",
+        metricZh: "排名反转 #1 → #3",
+        color: "#8b4c24",
+      },
+      {
+        tag: "8C · MULTI-ASSAY & 3D POCKET REALITY",
+        titleEn: "CYP2D6/3A4 Disagreement & PDB 1M17 3D Coordinates",
+        titleZh: "CYP 跨测定分歧与 PDB 1M17 厄洛替尼 3D 口袋核验",
+        detailEn: "Negative results, refusals, and assay shifts are preserved as core teaching cases.",
+        detailZh: "跨测定不一致性、阴性结果与模型失效边界被完整保留为核心教学案例。",
+        metricEn: "Adverse Evidence Kept",
+        metricZh: "完整保留反面证据",
+        color: "#2b5c8f",
+      },
+    ],
+    footerEn: "A frozen benchmark establishes one comparison; it never guarantees cross-assay transfer.",
+    footerZh: "核心教训：单次固定基准只能证明当前划分表现，绝不自动保证跨测定迁移有效。",
+  },
+  // Chapter 09 (1:36-1:48)
+  {
+    headerEn: "CHAPTER 09 · rMD17 PHYSICS & ACTIVE LEARNING",
+    headerZh: "第 09 章 · rMD17 动力学统计与主动学习预算",
+    figLabelEn: "FIGURE 19 · POOL-BUDGET ACQUISITION RECOVERY CURVES (P10)",
+    figLabelZh: "图 19 · 主动学习采集策略恢复曲线与随机种子对照 (P10)",
+    cards: [
+      {
+        tag: "9A · TRACK 11 (rMD17 DYNAMICS)",
+        titleEn: "Correlated MD Frames & Block-Averaged Error Bars",
+        titleZh: "rMD17 分子动力学时间自相关与分块误差棒校正",
+        detailEn: "Naive i.i.d. frame errors underestimate uncertainty on benzene, uracil & ethanol.",
+        detailZh: "直接按独立同分布计算帧误差会严重低估苯、尿嘧啶与乙醇构象的不确定性。",
+        metricEn: "rMD17 Trajectory Audit",
+        metricZh: "rMD17 轨迹统计核验",
+        color: "#0b6e69",
+      },
+      {
+        tag: "9B · TRACK 15 (ACTIVE LEARNING)",
+        titleEn: "Ensemble Variance vs Maxmin Diversity vs 5 Random Seeds",
+        titleZh: "集成方差、最大最小多样性与 5 随机种子基线对标",
+        detailEn: "Evaluates top-k hit recovery across budget rounds against explicit random baselines.",
+        detailZh: "在多轮受限实验预算下定量比较不确定性采样、多样性采样与 5 条随机曲线。",
+        metricEn: "5 Random Seeds Shown",
+        metricZh: "完整展示 5 条随机曲线",
+        color: "#2b5c8f",
+      },
+      {
+        tag: "9C · PROVENANCE DISCLOSURE",
+        titleEn: "Explicit Disclosure of Prior Shared Label Access",
+        titleZh: "如实披露 T15 与 T05 共享标签的历史访问记录",
+        detailEn: "T15 accessed shared EGFR labels before T05 locked eval; recorded transparently.",
+        detailZh: "T15 曾在 T05 锁定评测前访问共享标签，平台如实披露而非冒充未接触确认集。",
+        metricEn: "Zero Hidden Leakage",
+        metricZh: "零隐瞒历史标签接触",
+        color: "#5b437a",
+      },
+    ],
+    footerEn: "All 20 report figures pair static PDF/PNG masters with interactive web data inspectors.",
+    footerZh: "全部 20 张报告图件均同时提供出版级 PDF/PPTX 母版与网页端交互式数据检查器。",
+  },
+  // Chapter 10 (1:48-2:00)
+  {
+    headerEn: "CHAPTER 10 · 13-SYSTEM COVERAGE & RELEASE AUDIT",
+    headerZh: "第 10 章 · 13 系统覆盖审计与全栈可复现交付",
+    figLabelEn: "FIGURE 11 · 13-SYSTEM × 93-TOPIC COVERAGE BOUNDS AUDIT (P2)",
+    figLabelZh: "图 11 · 13 个公开系统 × 93 个主题的覆盖率上下界审计 (P2)",
+    cards: [
+      {
+        tag: "10A · 13 SYSTEMS × 93 TOPICS",
+        titleEn: "1,209 Audited Cells With Lower/Upper Evidence Bounds",
+        titleZh: "13 个系统 × 93 个主题（1,209 审计格）上下界区间",
+        detailEn: "Compares curricula, benchmark hubs, tutorial collections, and specialist references.",
+        detailZh: "横跨课程体系、基准平台、教程集合与专业手册四类提供方，拒绝黑盒排行榜。",
+        metricEn: "1,209 Audited Cells",
+        metricZh: "1,209 个一手证据格",
+        color: "#0b6e69",
+      },
+      {
+        tag: "10B · BLIND SANDBOX ISOLATION",
+        titleEn: "93/93 Direct Real-Data Observations (Problems = 0)",
+        titleZh: "盲审沙箱复核：93/93 真实数据实测（违规数 = 0）",
+        detailEn: "Every topic command verified inside an isolated sandbox without network peeking.",
+        detailZh: "全部 93 个主题命令均在隔离沙箱内完成实测核验，实现全维度 93/93 覆盖。",
+        metricEn: "93 / 93 Across 5 Tiers",
+        metricZh: "五级深度全部 93/93",
+        color: "#2b5c8f",
+      },
+      {
+        tag: "10C · FULL-STACK VERIFICATION",
+        titleEn: "1,267 Pytest · 922 Web Pages · 94-Page PDF · 0 Hygiene Leaks",
+        titleZh: "1,267 项测试 · 922 页双语站点 · 94 页报告 · 零卫生泄漏",
+        detailEn: "Open-source curriculum, catalogue, CPU labs, and living report ready for the community.",
+        detailZh: "课程、图谱、CPU 实验与动态报告全栈开源可复现，随时支持独立复核与协作。",
+        metricEn: "2,145 Release Files",
+        metricZh: "2,145 个净室发布文件",
+        color: "#5b437a",
+      },
+    ],
+    footerEn: "AIDD Commons · Open Curriculum · Evidence Atlas · CPU-First Labs · Living Report",
+    footerZh: "AIDD Commons · 开放课程 · 证据图谱 · CPU 优先实验 · 动态技术报告",
+  },
+];
 
 const renderStageCenter = (
   locale: OverviewLocale,
@@ -48,364 +495,106 @@ const renderStageCenter = (
   stageProgress: number,
 ): string => {
   const zh = locale === "zh-cn";
-  const pulse = 0.5 + 0.5 * Math.sin(stageProgress * Math.PI * 4);
-  const barGrow = Math.min(1, stageProgress * 1.45);
+  const spec = CHAPTER_SPECS[stageIndex]!;
+  const figUri = figureUris[stageIndex]!;
+  const activeSubphase = Math.min(2, Math.floor(stageProgress * 3));
+  const subphaseProgress = (stageProgress * 3) % 1;
 
-  if (stageIndex === 0) {
-    // Stage 01: Four Coupled Artefacts + Figure 01 preview
-    const cards = [
-      {
-        code: "01 · LEARN",
-        title: zh ? "18 条课程轨道" : "18 Curriculum Tracks",
-        metric: zh ? "93 / 93 真实数据核验" : "93 / 93 Real-Data Assessed",
-        sub: zh ? "111 篇中英双语章节" : "111 bilingual chapters",
-        color: "#0b6e69",
-        bg: "#eef7f6",
-        x: 56,
-        y: 184,
-      },
-      {
-        code: "02 · ATLAS",
-        title: zh ? "232 条证据资源记录" : "232 Evidence Atlas Records",
-        metric: zh ? "7 维技术开放性审计" : "7 Openness Dimensions",
-        sub: zh ? "许可与工程资产分离记录" : "Licence decoupled from assets",
-        color: "#2b5c8f",
-        bg: "#eff5fb",
-        x: 346,
-        y: 184,
-      },
-      {
-        code: "03 · LABS",
-        title: zh ? "56 个 CPU 优先实验" : "56 CPU-First Executable Labs",
-        metric: zh ? "871 项自动化回归测试" : "871 Automated Pytest Gates",
-        sub: zh ? "冻结协议 + 保留阴性结果" : "Frozen protocols + negative results",
-        color: "#8b4c24",
-        bg: "#fbf4ee",
-        x: 56,
-        y: 360,
-      },
-      {
-        code: "04 · REPORT",
-        title: zh ? "94 页动态技术报告" : "94-Page Living Report",
-        metric: zh ? "13 系统 × 93 主题审计" : "13-System × 93-Topic Audit",
-        sub: zh ? "20 张出版级科学图件" : "20 publication-grade figures",
-        color: "#5b437a",
-        bg: "#f5f1fa",
-        x: 346,
-        y: 360,
-      },
-    ];
-
-    const packetX = 346 + 155 * Math.cos(stageProgress * Math.PI * 2);
-    const packetY = 346 + 86 * Math.sin(stageProgress * Math.PI * 2);
-
-    return `
-      <!-- Left: 4 Coupled Artefact Loop Cards -->
-      <rect x="40" y="148" width="612" height="398" rx="12" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
-      <text x="58" y="172" fill="#0b6e69" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "四层双向耦合证据闭环 · FOUR-ARTEFACT EVIDENCE LOOP" : "FOUR-ARTEFACT COUPLED EVIDENCE LOOP")}</text>
-
-      <!-- Connecting loop tracks -->
-      <path d="M 326 258 L 366 258 M 190 334 L 190 364 M 480 334 L 480 364 M 326 434 L 366 434" stroke="#0b6e69" stroke-width="3" stroke-dasharray="5 4"/>
-      <ellipse cx="346" cy="346" rx="155" ry="86" fill="none" stroke="#0b6e69" stroke-opacity="0.26" stroke-width="2" stroke-dasharray="6 4"/>
-
-      ${cards
-        .map(
-          (c, idx) => `
-        <g>
-          <rect x="${c.x}" y="${c.y}" width="272" height="150" rx="10" fill="${c.bg}" stroke="${c.color}" stroke-width="${idx === Math.floor(stageProgress * 4) % 4 ? "2.6" : "1.5"}"/>
-          <rect x="${c.x}" y="${c.y}" width="272" height="6" rx="3" fill="${c.color}"/>
-          <text x="${c.x + 16}" y="${c.y + 26}" fill="${c.color}" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(c.code)}</text>
-          <text x="${c.x + 16}" y="${c.y + 52}" fill="#171614" font-size="17.5" font-weight="700">${esc(c.title)}</text>
-          <rect x="${c.x + 16}" y="${c.y + 68}" width="240" height="32" rx="6" fill="#ffffff" stroke="${c.color}" stroke-opacity="0.35"/>
-          <text x="${c.x + 26}" y="${c.y + 89}" fill="${c.color}" font-size="13.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(c.metric)}</text>
-          <text x="${c.x + 16}" y="${c.y + 126}" fill="#4d4943" font-size="12.5" font-weight="600">${esc(c.sub)}</text>
-        </g>`,
-        )
-        .join("")}
-      <circle cx="${packetX.toFixed(1)}" cy="${packetY.toFixed(1)}" r="7" fill="#0b6e69" stroke="#ffffff" stroke-width="2"/>
-
-      <!-- Right: Figure 01 Master Schematic Preview -->
-      <rect x="672" y="148" width="568" height="398" rx="12" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
-      <text x="692" y="172" fill="#2b5c8f" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "图 01 · 系统架构主图 (S1)" : "FIGURE 01 · ARCHITECTURAL SCHEMATIC (S1)")}</text>
-      <image href="${fig01DataUri}" x="686" y="184" width="540" height="314" preserveAspectRatio="xMidYMid meet"/>
-      <rect x="688" y="504" width="536" height="30" rx="6" fill="#eef7f6"/>
-      <text x="702" y="524" fill="#0b6e69" font-size="12.5" font-weight="700">${esc(zh ? "核心准则：任何课程断言必须可追溯至图谱记录、可运行脚本与报告证据表。" : "Contract: Every lesson claim traces to an Atlas record, executable lab, and report table.")}</text>
-    `;
-  }
-
-  if (stageIndex === 1) {
-    // Stage 02: 18-Track Curriculum (93/93 Real-Data Assessed)
-    const pillars = [
-      {
-        tag: "T01 – T04",
-        title: zh ? "药物发现与数据治理基石" : "Discovery & Data Governance",
-        tracks: zh
-          ? "靶点测定 · 分子实体 · 泄漏审计 · 证据规范"
-          : "Assay framing · Chemical identity · Split leakage · Evidence",
-        units: "22 / 22",
-        color: "#0b6e69",
-      },
-      {
-        tag: "T05 – T10",
-        title: zh ? "分子表示、QSAR 与多端点建模" : "Representations, QSAR & ADMET",
-        tracks: zh
-          ? "指纹与图网络 · 3D 构象 · 校准与不确定性 · ADMET"
-          : "FP & GNNs · 3D conformers · Calibration · Multi-endpoint ADMET",
-        units: "31 / 31",
-        color: "#2b5c8f",
-      },
-      {
-        tag: "T11 – T14",
-        title: zh ? "生物大分子结构、物理与生成模型" : "Structure, Physics & Generation",
-        tracks: zh
-          ? "共折叠 (Boltz/AF3) · rMD17 动力学 · 口袋条件生成"
-          : "Co-folding (Boltz/AF3) · rMD17 dynamics · Pocket generation",
-        units: "20 / 20",
-        color: "#5b437a",
-      },
-      {
-        tag: "T15 – T18",
-        title: zh ? "主动学习、文献代理与候选提名" : "Active Learning, Agents & Nomination",
-        tracks: zh
-          ? "预算获取 (T15) · 本地检索代理 · 合成路线 · 候选提名"
-          : "Pool budgets (T15) · Local RAG · Retrosynthesis · Nomination",
-        units: "20 / 20",
-        color: "#8b4c24",
-      },
-    ];
-
-    return `
-      <!-- Left: 18 Tracks Grouped into 4 Dependency Pillars -->
-      <rect x="40" y="148" width="660" height="398" rx="12" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
-      <text x="62" y="176" fill="#0b6e69" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "18 条前置依赖轨道 · 93/93 真实数据核验主题 (100%)" : "18 PREREQUISITE-LINKED TRACKS · 93/93 REAL-DATA ASSESSED (100%)")}</text>
-
-      ${pillars
-        .map((p, idx) => {
-          const y = 194 + idx * 84;
-          const active = idx <= Math.floor(stageProgress * 4);
-          return `
-          <g>
-            <rect x="60" y="${y}" width="620" height="72" rx="9" fill="${active ? "#f8faf9" : "#ffffff"}" stroke="${p.color}" stroke-width="${active ? "2.2" : "1.2"}"/>
-            <rect x="60" y="${y}" width="106" height="72" rx="9" fill="${p.color}"/>
-            <text x="113" y="${y + 32}" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(p.tag)}</text>
-            <text x="113" y="${y + 53}" text-anchor="middle" fill="#e2f3f1" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(p.units)}</text>
-            <text x="182" y="${y + 29}" fill="#171614" font-size="16" font-weight="700">${esc(p.title)}</text>
-            <text x="182" y="${y + 52}" fill="#4d4943" font-size="13" font-weight="500">${esc(p.tracks)}</text>
-            <rect x="554" y="${y + 20}" width="110" height="30" rx="15" fill="#eef7f6" stroke="${p.color}" stroke-width="1.2"/>
-            <text x="609" y="${y + 40}" text-anchor="middle" fill="${p.color}" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "100% 实测" : "100% Assessed")}</text>
-          </g>`;
-        })
-        .join("")}
-
-      <!-- Right: Anatomy of a Teaching Unit -->
-      <rect x="720" y="148" width="520" height="398" rx="12" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
-      <text x="742" y="176" fill="#2b5c8f" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "标准教学单元结构 · LESSON TEACHING CONTRACT" : "ANATOMY OF AN ASSESSED TEACHING UNIT")}</text>
-
-      ${[
-        {
-          step: "1",
-          title: zh ? "科学问题与生物/化学实体边界" : "1. Biological & Chemical Object Framing",
-          desc: zh ? "明确测定协议、配体母核、靶点构象与决策单位" : "Define assay protocol, parent salt form, pocket state & decision unit",
-          color: "#0b6e69",
-        },
-        {
-          step: "2",
-          title: zh ? "交互式机制图与多源图谱锚点" : "2. Interactive Mechanism & Atlas Anchors",
-          desc: zh ? "内嵌可步进科学故事动画、公式推导与开放性卡片" : "Step-by-step animated mechanism story, math & resource cards",
-          color: "#2b5c8f",
-        },
-        {
-          step: "3",
-          title: zh ? "CPU 可执行真实数据基线核验" : "3. CPU-First Real-Data Lab Verification",
-          desc: zh ? "固定划分 + 一键复现实验脚本 + 学生独立输出目录" : "Locked split + deterministic CLI/notebook + isolated student output",
-          color: "#5b437a",
-        },
-        {
-          step: "4",
-          title: zh ? "失败模式、阴性结果与适用边界" : "4. Failure Modes & Explicit Scope Limits",
-          desc: zh ? "保留跨测定排名反转、泄漏陷阱与不适用场景" : "Retained ranking flips, leakage traps & non-transferable bounds",
-          color: "#8b4c24",
-        },
-      ]
-        .map((item, i) => {
-          const y = 196 + i * 82;
-          return `
-          <g>
-            <rect x="742" y="${y}" width="476" height="68" rx="8" fill="#fbfaf7" stroke="${item.color}" stroke-width="1.4"/>
-            <circle cx="772" cy="${y + 34}" r="16" fill="${item.color}"/>
-            <text x="772" y="${y + 39}" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${item.step}</text>
-            <text x="800" y="${y + 28}" fill="#171614" font-size="15" font-weight="700">${esc(item.title)}</text>
-            <text x="800" y="${y + 50}" fill="#4d4943" font-size="12.5" font-weight="500">${esc(item.desc)}</text>
-          </g>`;
-        })
-        .join("")}
-    `;
-  }
-
-  if (stageIndex === 2) {
-    // Stage 03: 232-Record Evidence Atlas & 7 Openness Dimensions (exact Figure 08 model n=84 counts)
-    const dims = [
-      { name: zh ? "推理代码" : "Inference Code", count: "78/84", pct: 93, color: "#0b6e69" },
-      { name: zh ? "模型架构" : "Architecture", count: "58/84", pct: 69, color: "#0b6e69" },
-      { name: zh ? "训练代码" : "Training Code", count: "51/84", pct: 61, color: "#2b5c8f" },
-      { name: zh ? "模型权重" : "Model Weights", count: "50/84", pct: 60, color: "#2b5c8f" },
-      { name: zh ? "训练数据" : "Training Data", count: "30/84", pct: 36, color: "#5b437a" },
-      { name: zh ? "数据配方" : "Data Recipe", count: "29/84", pct: 35, color: "#8b4c24" },
-      { name: zh ? "评测代码" : "Evaluation Code", count: "21/84", pct: 25, color: "#a23b2a" },
-    ];
-
-    return `
-      <!-- Left: 7 Openness Dimensions Audit Breakdown -->
-      <rect x="40" y="148" width="590" height="398" rx="12" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
-      <text x="62" y="176" fill="#0b6e69" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "232 条资源图谱 · 模型子集 (n=84) 七维开放性实证" : "232 ATLAS RECORDS · MODEL SUBSET (n=84) 7 OPENNESS FIELDS")}</text>
-      <text x="62" y="200" fill="#4d4943" font-size="13" font-weight="600">${esc(zh ? "拒绝笼统“开源”标签：推理代码可用 (78/84) ≠ 数据配方可复现 (29/84)" : "Never collapse openness: inference code (78/84) != data recipe (29/84)")}</text>
-
-      ${dims
-        .map((d, i) => {
-          const y = 222 + i * 42;
-          const w = Math.round(290 * (d.pct / 100) * barGrow);
-          return `
-          <g>
-            <text x="62" y="${y + 18}" fill="#171614" font-size="13.5" font-weight="700">${esc(d.name)}</text>
-            <rect x="206" y="${y + 4}" width="290" height="20" rx="5" fill="#f1ece1" stroke="#d5cec2" stroke-width="1"/>
-            <rect x="206" y="${y + 4}" width="${w}" height="20" rx="5" fill="${d.color}"/>
-            <text x="508" y="${y + 19}" fill="${d.color}" font-size="12.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${d.count} (${d.pct}%)</text>
-          </g>`;
-        })
-        .join("")}
-
-      <rect x="62" y="514" width="546" height="22" rx="4" fill="#eef7f6"/>
-      <text x="74" y="529" fill="#0b6e69" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "字段：lifecycle · access · license · 7×openness · last_verified" : "Schema: lifecycle · access · license · 7×openness · last_verified")}</text>
-
-      <!-- Right: Figure 08 Openness Audit Preview -->
-      <rect x="650" y="148" width="590" height="398" rx="12" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
-      <text x="672" y="176" fill="#2b5c8f" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "图 08 · 七维资产开放性实证分布 (P6)" : "FIGURE 08 · SEVEN-DIMENSION OPENNESS AUDIT (P6)")}</text>
-      <image href="${fig08DataUri}" x="664" y="186" width="562" height="346" preserveAspectRatio="xMidYMid meet"/>
-    `;
-  }
-
-  if (stageIndex === 3) {
-    // Stage 04: 56 CPU-First Real-Data Labs & ChEMBL 37 EGFR Assay-Transfer Ranking Flip
-    return `
-      <!-- Left: ChEMBL 37 EGFR Ranking Inversion & Protocol Card -->
-      <rect x="40" y="148" width="576" height="398" rx="12" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
-      <text x="62" y="176" fill="#8b4c24" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "真实案例 · 跨测定基线排名反转 (CHEMBL203 EGFR)" : "WORKED CASE · ASSAY-TRANSFER RANKING INVERSION (CHEMBL203)")}</text>
-      <text x="62" y="202" fill="#171614" font-size="15.5" font-weight="700">${esc(zh ? "同一靶点 EGFR：主划分最优模型在独立测定上排名反转" : "Same EGFR target: top model on primary split flips on independent assay")}</text>
-
-      <!-- Slope / Crossing Ranking Diagram -->
-      <rect x="62" y="218" width="532" height="196" rx="10" fill="#fbfaf7" stroke="#d5cec2" stroke-width="1.2"/>
-      <text x="195" y="242" text-anchor="middle" fill="#2b5c8f" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "T05 主划分 (n=132)" : "Primary Split (n=132)")}</text>
-      <text x="455" y="242" text-anchor="middle" fill="#8b4c24" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "独立测定复现 (n=170)" : "Assay Replication (n=170)")}</text>
-
-      <line x1="195" y1="254" x2="195" y2="394" stroke="#d5cec2" stroke-width="2"/>
-      <line x1="455" y1="254" x2="455" y2="394" stroke="#d5cec2" stroke-width="2"/>
-
-      <!-- Crossing lines -->
-      <line x1="195" y1="282" x2="455" y2="366" stroke="#0b6e69" stroke-width="3.5"/>
-      <line x1="195" y1="362" x2="455" y2="286" stroke="#8b4c24" stroke-width="3.5" stroke-dasharray="7 4"/>
-
-      <circle cx="195" cy="282" r="6.5" fill="#0b6e69"/>
-      <circle cx="455" cy="366" r="6.5" fill="#0b6e69"/>
-      <text x="76" y="276" fill="#0b6e69" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Morgan Ridge</text>
-      <text x="76" y="293" fill="#0b6e69" font-size="11" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">#1 · MAE 0.418</text>
-      <text x="468" y="362" fill="#0b6e69" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Morgan Ridge</text>
-      <text x="468" y="379" fill="#0b6e69" font-size="11" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">#3 · MAE 3.132</text>
-
-      <circle cx="195" cy="362" r="6.5" fill="#8b4c24"/>
-      <circle cx="455" cy="286" r="6.5" fill="#8b4c24"/>
-      <text x="76" y="358" fill="#8b4c24" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Descriptor</text>
-      <text x="76" y="375" fill="#8b4c24" font-size="11" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">#2 · MAE 0.469</text>
-      <text x="468" y="282" fill="#8b4c24" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Descriptor</text>
-      <text x="468" y="299" fill="#8b4c24" font-size="11" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">#1 · MAE 0.579</text>
-
-      <rect x="277" y="310" width="96" height="26" rx="13" fill="#fff3cd" stroke="#8b4c24" stroke-width="1.5"/>
-      <text x="325" y="327" text-anchor="middle" fill="#8b4c24" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "排名反转!" : "RANK FLIP!")}</text>
-
-      <!-- 3 Execution Modes -->
-      <rect x="62" y="428" width="532" height="102" rx="8" fill="#eef7f6" stroke="#0b6e69" stroke-width="1.2"/>
-      <text x="78" y="450" fill="#0b6e69" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "三类明确隔离的执行模式 · THREE EXPLICIT LAB EXECUTION MODES" : "THREE EXPLICITLY SEPARATED LAB EXECUTION MODES")}</text>
-      <text x="78" y="474" fill="#171614" font-size="12.5" font-weight="600">${esc(zh ? "① 阅读冻结结果 (Read Retained)   ② 独立完整复现 (Fresh Reproduction)" : "1. Read Retained Results   2. Fresh Independent Reproduction")}</text>
-      <text x="78" y="498" fill="#171614" font-size="12.5" font-weight="600">${esc(zh ? "③ 学生可编辑练习 (Student Exercise → 独立目录，绝不覆盖锁定基线)" : "3. Editable Student Exercise -> isolated folder, never overwrites locked outputs")}</text>
-
-      <!-- Right: Figure 16 Assay-Transfer & 3D 1M17 Pocket Preview -->
-      <rect x="636" y="148" width="604" height="398" rx="12" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
-      <text x="658" y="176" fill="#2b5c8f" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "图 16 · EGFR 跨测定迁移与排名反转实证 (P9)" : "FIGURE 16 · EGFR ASSAY TRANSFER & RANK INVERSION (P9)")}</text>
-      <image href="${fig16DataUri}" x="650" y="186" width="576" height="346" preserveAspectRatio="xMidYMid meet"/>
-    `;
-  }
-
-  // Stage 05: 13-System Coverage Audit & Living Report
   return `
-    <!-- Left: Figure 11 Coverage Audit Preview -->
-    <rect x="40" y="148" width="660" height="398" rx="12" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
-    <text x="62" y="176" fill="#0b6e69" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "图 11 · 13 个公开系统 × 93 个课程主题覆盖率与证据上下界审计 (P2)" : "FIGURE 11 · 13-SYSTEM × 93-TOPIC COVERAGE & EVIDENCE BOUNDS AUDIT (P2)")}</text>
-    <image href="${fig11DataUri}" x="54" y="186" width="632" height="346" preserveAspectRatio="xMidYMid meet"/>
+    <!-- Left Column: 3 Animated Sub-Phase Evidence Cards -->
+    <rect x="40" y="146" width="600" height="402" rx="12" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
+    <text x="60" y="172" fill="#0b6e69" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(
+      zh ? spec.headerZh : spec.headerEn,
+    )}</text>
 
-    <!-- Right: Verification Summary & Call to Action -->
-    <rect x="720" y="148" width="520" height="398" rx="12" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
-    <text x="742" y="176" fill="#5b437a" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(zh ? "全栈可复现验证 · FULL-STACK VERIFICATION GATES" : "END-TO-END REPRODUCIBLE VERIFICATION GATES")}</text>
+    <!-- Sub-phase pill indicator in top-right of left box -->
+    <g transform="translate(454, 156)">
+      ${[0, 1, 2]
+        .map((sp) => {
+          const isCur = sp === activeSubphase;
+          const isPast = sp < activeSubphase;
+          const bx = sp * 56;
+          return `
+            <rect x="${bx}" y="0" width="50" height="20" rx="10" fill="${
+              isCur ? "#0b6e69" : isPast ? "#d6efec" : "#eee8dc"
+            }"/>
+            <text x="${bx + 25}" y="14" text-anchor="middle" fill="${
+              isCur ? "#ffffff" : "#171614"
+            }" font-size="10.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${
+              stageIndex + 1
+            }${["A", "B", "C"][sp]}</text>
+          `;
+        })
+        .join("")}
+    </g>
 
-    ${[
-      {
-        metric: "93 / 93",
-        label: zh ? "课程主题完成真实数据实测 (100%)" : "Curriculum topics real-data assessed (100%)",
-        color: "#0b6e69",
-      },
-      {
-        metric: "871",
-        label: zh ? "Python 实验与统计契约自动化测试通过" : "Python lab & statistical contract tests passing",
-        color: "#2b5c8f",
-      },
-      {
-        metric: "362",
-        label: zh ? "中英双语静态网页路由 + 94 页 v0.2 报告 PDF" : "Bilingual static web pages + 94-page v0.2 report PDF",
-        color: "#5b437a",
-      },
-      {
-        metric: "0",
-        label: zh ? "断链 · 引文漂移 · 双语数值偏差 · 卫生扫描违规" : "Broken links, citation drift, or release hygiene leaks",
-        color: "#8b4c24",
-      },
-    ]
-      .map((row, idx) => {
-        const y = 196 + idx * 66;
+    ${spec.cards
+      .map((card, idx) => {
+        const y = 186 + idx * 104;
+        const isActive = idx === activeSubphase;
+        const isDone = idx < activeSubphase;
+        const borderW = isActive ? "2.6" : "1.3";
+        const bgFill = isActive ? "#f4fbfa" : isDone ? "#faf9f5" : "#ffffff";
+        const barW = isActive
+          ? Math.round(556 * Math.min(1, 0.25 + subphaseProgress * 0.85))
+          : isDone
+            ? 556
+            : 0;
         return `
         <g>
-          <rect x="742" y="${y}" width="476" height="54" rx="8" fill="#fbfaf7" stroke="${row.color}" stroke-width="1.4"/>
-          <text x="760" y="${y + 34}" fill="${row.color}" font-size="21" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(row.metric)}</text>
-          <text x="860" y="${y + 33}" fill="#171614" font-size="13" font-weight="700">${esc(row.label)}</text>
+          <rect x="60" y="${y}" width="560" height="92" rx="9" fill="${bgFill}" stroke="${card.color}" stroke-width="${borderW}"/>
+          <rect x="60" y="${y}" width="8" height="92" rx="4" fill="${card.color}" opacity="${isActive ? "1" : "0.55"}"/>
+          <text x="80" y="${y + 22}" fill="${card.color}" font-size="11" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(card.tag)}</text>
+          <rect x="424" y="${y + 8}" width="182" height="22" rx="11" fill="${
+            isActive ? card.color : "#eef4f3"
+          }"/>
+          <text x="515" y="${y + 23}" text-anchor="middle" fill="${
+            isActive ? "#ffffff" : card.color
+          }" font-size="11" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(
+            zh ? card.metricZh : card.metricEn,
+          )}</text>
+          <text x="80" y="${y + 48}" fill="#171614" font-size="15.5" font-weight="700">${esc(
+            zh ? card.titleZh : card.titleEn,
+          )}</text>
+          <text x="80" y="${y + 71}" fill="#4d4943" font-size="12.5" font-weight="500">${esc(
+            zh ? card.detailZh : card.detailEn,
+          )}</text>
+          ${
+            barW > 0
+              ? `<rect x="62" y="${y + 87}" width="${barW}" height="3" rx="1.5" fill="${card.color}"/>`
+              : ""
+          }
         </g>`;
       })
       .join("")}
 
-    <rect x="742" y="468" width="476" height="60" rx="8" fill="#0b6e69" opacity="${(0.92 + 0.08 * pulse).toFixed(2)}"/>
-    <text x="980" y="494" text-anchor="middle" fill="#ffffff" font-size="14.5" font-weight="700">${esc(zh ? "开源可复现 · 18 轨道 · 232 资源 · 56 实验 · 94 页报告" : "Open & Reproducible · 18 Tracks · 232 Records · 56 CPU Labs")}</text>
-    <text x="980" y="516" text-anchor="middle" fill="#d9f2ef" font-size="12.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Learn · Atlas · Labs · Living Report · 13-System Audit</text>
+    <rect x="60" y="502" width="560" height="32" rx="6" fill="#eef7f6"/>
+    <text x="74" y="523" fill="#0b6e69" font-size="12" font-weight="700">${esc(
+      zh ? spec.footerZh : spec.footerEn,
+    )}</text>
+
+    <!-- Right Column: Publication Figure Preview & Sub-Phase Callout -->
+    <rect x="656" y="146" width="584" height="402" rx="12" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
+    <text x="676" y="172" fill="#2b5c8f" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(
+      zh ? spec.figLabelZh : spec.figLabelEn,
+    )}</text>
+    <rect x="672" y="182" width="552" height="312" rx="8" fill="#fbfaf7" stroke="#e5dfd3" stroke-width="1"/>
+    <image href="${figUri}" x="678" y="186" width="540" height="304" preserveAspectRatio="xMidYMid meet"/>
+    <rect x="672" y="502" width="552" height="32" rx="6" fill="#eff5fb"/>
+    <text x="686" y="523" fill="#2b5c8f" font-size="12" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(
+      zh
+        ? OVERVIEW_STAGES[stageIndex]!.subphasesZh[activeSubphase]!
+        : OVERVIEW_STAGES[stageIndex]!.subphasesEn[activeSubphase]!,
+    )}</text>
   `;
 };
-
-const STEPPER_PILLS_EN = [
-  "01 · Four Artefacts",
-  "02 · 18 Tracks (93/93)",
-  "03 · 232-Record Atlas",
-  "04 · 56 CPU Labs",
-  "05 · 13-System Audit",
-];
-
-const STEPPER_PILLS_ZH = [
-  "01 · 四层耦合架构",
-  "02 · 18 轨道 (93/93)",
-  "03 · 232 条资源图谱",
-  "04 · 56 个 CPU 实验",
-  "05 · 13 系统对标审计",
-];
 
 const renderFrameSvg = (
   locale: OverviewLocale,
   frameIndex: number,
 ): string => {
   const zh = locale === "zh-cn";
-  const framesPerStage = STAGE_SECONDS * FPS;
+  const framesPerStage = STAGE_SECONDS * RENDER_FPS;
   const stageIndex = Math.min(
     OVERVIEW_STAGES.length - 1,
     Math.floor(frameIndex / framesPerStage),
@@ -413,42 +602,46 @@ const renderFrameSvg = (
   const stageFrame = frameIndex - stageIndex * framesPerStage;
   const stageProgress = stageFrame / Math.max(1, framesPerStage - 1);
   const stage = OVERVIEW_STAGES[stageIndex]!;
-  const overallProgress = (frameIndex + 1) / TOTAL_FRAMES;
+  const elapsedSeconds = (frameIndex + 1) / RENDER_FPS;
+  const activeSubphase = Math.min(2, Math.floor(stageProgress * 3));
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}">
   <rect width="${WIDTH}" height="${HEIGHT}" fill="#f7f4ec"/>
 
   <!-- Top Header Banner -->
-  <rect x="0" y="0" width="${WIDTH}" height="62" fill="#162121"/>
-  <rect x="24" y="14" width="148" height="34" rx="6" fill="#0b6e69"/>
-  <text x="98" y="36" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">AIDD COMMONS</text>
-  <text x="190" y="37" fill="#f7f4ec" font-size="16" font-weight="700" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">${esc(
+  <rect x="0" y="0" width="${WIDTH}" height="58" fill="#162121"/>
+  <rect x="24" y="12" width="148" height="34" rx="6" fill="#0b6e69"/>
+  <text x="98" y="34" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">AIDD COMMONS</text>
+  <text x="188" y="35" fill="#f7f4ec" font-size="15.5" font-weight="700" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">${esc(
     zh
-      ? "AI 药物发现开放学习与实证研究系统 · 15 秒全景导览"
-      : "Open Learning & Empirical Benchmark System for AI Drug Discovery",
+      ? "AI 药物发现开放学习与实证研究系统 · 2 分钟全景深度导览"
+      : "Open Learning & Empirical Benchmark System for AI Drug Discovery · 2-Minute Tour",
   )}</text>
-  <text x="1252" y="37" text-anchor="end" fill="#9ed8d3" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(
+  <text x="1252" y="35" text-anchor="end" fill="#9ed8d3" font-size="12.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(
     zh
-      ? `阶段 ${stage.code}/05 · 18 轨道 · 93/93 实测 · 232 资源 · 56 实验`
-      : `STAGE ${stage.code}/05 · 18 TRACKS · 93/93 ASSESSED · 232 RECORDS · 56 LABS`,
+      ? `章节 ${stage.code}/10 · 子阶段 ${stageIndex + 1}${["A", "B", "C"][activeSubphase]} · ${formatTime(elapsedSeconds)} / 2:00`
+      : `CHAPTER ${stage.code}/10 · PHASE ${stageIndex + 1}${["A", "B", "C"][activeSubphase]} · ${formatTime(elapsedSeconds)} / 2:00`,
   )}</text>
 
-  <!-- 5-Stage Stepper Bar -->
-  <g transform="translate(40, 76)">
-    ${OVERVIEW_STAGES.map((_, idx) => {
-      const boxW = 232;
-      const gap = 10;
-      const x = idx * (boxW + gap);
+  <!-- 10-Chapter Stepper Bar (single row of 10 compact pills) -->
+  <g transform="translate(40, 70)">
+    ${OVERVIEW_STAGES.map((item, idx) => {
+      const boxW = 114;
+      const gap = 6.6;
+      const x = Math.round(idx * (boxW + gap));
       const isCurrent = idx === stageIndex;
       const isDone = idx < stageIndex;
       const fill = isCurrent ? "#0b6e69" : isDone ? "#dcefeb" : "#ebe5d8";
       const stroke = isCurrent ? "#0b6e69" : isDone ? "#0b6e69" : "#cfc7b8";
       const textFill = isCurrent ? "#ffffff" : "#171614";
-      const label = (zh ? STEPPER_PILLS_ZH[idx] : STEPPER_PILLS_EN[idx]) ?? "";
+      const label = zh ? item.shortZh : item.shortEn;
       return `
         <g>
-          <rect x="${x}" y="0" width="${boxW}" height="46" rx="8" fill="${fill}" stroke="${stroke}" stroke-width="${isCurrent ? "2" : "1.2"}"/>
-          <text x="${x + 16}" y="28" fill="${textFill}" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(label)}</text>
+          <rect x="${x}" y="0" width="${boxW}" height="58" rx="8" fill="${fill}" stroke="${stroke}" stroke-width="${isCurrent ? "2" : "1.2"}"/>
+          <text x="${x + 10}" y="23" fill="${isCurrent ? "#c8f2ed" : "#0b6e69"}" font-size="10.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(
+            `${formatTime(item.startSeconds)}–${formatTime(item.endSeconds)}`,
+          )}</text>
+          <text x="${x + 9}" y="44" fill="${textFill}" font-size="10.8" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(label)}</text>
         </g>`;
     }).join("")}
   </g>
@@ -456,23 +649,41 @@ const renderFrameSvg = (
   <!-- Center Stage Canvas -->
   ${renderStageCenter(locale, stageIndex, stageProgress)}
 
-  <!-- Bottom Narrative & Progress Bar -->
-  <rect x="40" y="562" width="1200" height="162" rx="12" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
-  <rect x="40" y="562" width="10" height="162" rx="4" fill="#0b6e69"/>
-  <text x="68" y="594" fill="#0b6e69" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(
+  <!-- Bottom Narrative & Timeline Bar -->
+  <rect x="40" y="562" width="1200" height="166" rx="12" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
+  <rect x="40" y="562" width="10" height="166" rx="4" fill="#0b6e69"/>
+  <text x="68" y="592" fill="#0b6e69" font-size="12.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${esc(
     zh ? stage.badgeZh : stage.badgeEn,
   )}</text>
-  <text x="68" y="628" fill="#171614" font-size="22" font-weight="700" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">${esc(
+  <text x="68" y="624" fill="#171614" font-size="20.5" font-weight="700" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">${esc(
     zh ? stage.titleZh : stage.titleEn,
   )}</text>
-  <text x="68" y="662" fill="#4d4943" font-size="15" font-weight="500" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">${esc(
+  <text x="68" y="656" fill="#4d4943" font-size="14" font-weight="500" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">${esc(
     zh ? stage.summaryZh : stage.summaryEn,
   )}</text>
 
-  <!-- Timeline progress bar -->
-  <rect x="68" y="688" width="1020" height="12" rx="6" fill="#ebe5d8"/>
-  <rect x="68" y="688" width="${Math.round(1020 * overallProgress)}" height="12" rx="6" fill="#0b6e69"/>
-  <text x="1108" y="699" fill="#0b6e69" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${((frameIndex + 1) / FPS).toFixed(1)}s / ${TOTAL_SECONDS}.0s</text>
+  <!-- 10-Chapter Segmented Timeline Progress Bar -->
+  <g transform="translate(68, 684)">
+    ${OVERVIEW_STAGES.map((_, idx) => {
+      const segW = 98;
+      const segGap = 4;
+      const sx = idx * (segW + segGap);
+      let fillW = 0;
+      if (idx < stageIndex) fillW = segW;
+      else if (idx === stageIndex) fillW = Math.round(segW * stageProgress);
+      return `
+        <rect x="${sx}" y="0" width="${segW}" height="12" rx="4" fill="#ebe5d8"/>
+        ${
+          fillW > 0
+            ? `<rect x="${sx}" y="0" width="${fillW}" height="12" rx="4" fill="#0b6e69"/>`
+            : ""
+        }
+      `;
+    }).join("")}
+  </g>
+  <text x="1104" y="695" fill="#0b6e69" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${formatTime(
+    elapsedSeconds,
+  )} / 2:00</text>
 </svg>`;
 };
 
@@ -488,25 +699,36 @@ const exportLocale = async (locale: OverviewLocale): Promise<void> => {
     join(tmpdir(), `aidd-project-overview-${locale}-`),
   );
   try {
-    for (let frame = 0; frame < TOTAL_FRAMES; frame += 1) {
-      const svg = renderFrameSvg(locale, frame);
-      const pngPath = join(
-        workDir,
-        `frame-${String(frame).padStart(4, "0")}.png`,
-      );
-      await sharp(Buffer.from(svg)).png().toFile(pngPath);
+    // Render 480 frames in parallel batches of 24 for speed
+    const batchSize = 24;
+    for (let base = 0; base < TOTAL_FRAMES; base += batchSize) {
+      const tasks: Array<Promise<unknown>> = [];
+      for (
+        let frame = base;
+        frame < Math.min(TOTAL_FRAMES, base + batchSize);
+        frame += 1
+      ) {
+        const svg = renderFrameSvg(locale, frame);
+        const pngPath = join(
+          workDir,
+          `frame-${String(frame).padStart(4, "0")}.png`,
+        );
+        tasks.push(sharp(Buffer.from(svg)).png().toFile(pngPath));
+      }
+      await Promise.all(tasks);
     }
 
     const stem = join(outDir, `aidd-commons-overview-${locale}`);
-    // Save poster from Stage 01 representative frame (frame 18 = 1.5s)
-    const posterFramePath = join(workDir, "frame-0018.png");
+    // Save poster from Chapter 01 Phase 1B representative frame
+    const posterFramePath = join(workDir, "frame-0020.png");
     await sharp(posterFramePath)
       .webp({ quality: 90 })
       .toFile(`${stem}.webp`);
 
-    // Also save per-stage crisp WebP stills so the interactive walkthrough can jump/inspect in reduced-motion or no-JS
+    // Save per-chapter crisp WebP stills (1..10)
+    const framesPerStage = STAGE_SECONDS * RENDER_FPS;
     for (let s = 0; s < OVERVIEW_STAGES.length; s += 1) {
-      const midFrame = s * STAGE_SECONDS * FPS + Math.floor((STAGE_SECONDS * FPS) / 2);
+      const midFrame = s * framesPerStage + Math.floor(framesPerStage * 0.55);
       const midPath = join(
         workDir,
         `frame-${String(midFrame).padStart(4, "0")}.png`,
@@ -519,42 +741,48 @@ const exportLocale = async (locale: OverviewLocale): Promise<void> => {
     const inputPattern = join(workDir, "frame-%04d.png");
     runFfmpeg([
       "-framerate",
-      String(FPS),
+      String(RENDER_FPS),
       "-i",
       inputPattern,
+      "-vf",
+      `fps=${OUTPUT_FPS}`,
       "-c:v",
       "libx264",
+      "-tune",
+      "stillimage",
       "-pix_fmt",
       "yuv420p",
       "-movflags",
       "+faststart",
       "-crf",
-      "21",
+      "22",
       `${stem}.mp4`,
     ]);
     runFfmpeg([
       "-framerate",
-      String(FPS),
+      String(RENDER_FPS),
       "-i",
       inputPattern,
+      "-vf",
+      `fps=${OUTPUT_FPS}`,
       "-c:v",
       "libvpx-vp9",
       "-b:v",
       "0",
       "-crf",
-      "31",
+      "32",
       "-pix_fmt",
       "yuv420p",
       `${stem}.webm`,
     ]);
-    // High-clarity 960px-wide GIF for GitHub README and docs
+    // 2-minute animated GIF (1 fps across all 120 seconds, 960px wide) for GitHub README
     runFfmpeg([
       "-framerate",
-      String(FPS),
+      String(RENDER_FPS),
       "-i",
       inputPattern,
       "-vf",
-      "fps=8,scale=960:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=160[p];[s1][p]paletteuse=dither=bayer:bayer_scale=4",
+      "fps=1,scale=960:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=160[p];[s1][p]paletteuse=dither=bayer:bayer_scale=4",
       "-loop",
       "0",
       `${stem}.gif`,
@@ -567,5 +795,7 @@ const exportLocale = async (locale: OverviewLocale): Promise<void> => {
 mkdirSync(outDir, { recursive: true });
 for (const locale of ["en", "zh-cn"] as const) {
   await exportLocale(locale);
-  console.log(`exported project overview media: aidd-commons-overview-${locale}`);
+  console.log(
+    `exported 2-minute (120s) project overview media: aidd-commons-overview-${locale}`,
+  );
 }

@@ -4,16 +4,16 @@
 
 It joins a graduate-level curriculum, an evidence-backed atlas of methods and resources, reproducible labs, and a living technical report. English is canonical. Chinese readers have onboarding, pathway summaries, and translations of the current 111 Learn pages (including the curriculum and resource maps), 56 lab guides and a shared notebook practice guide. Four editable exercises have paired English/Chinese notebooks with identical code; existing numerical panels and historical downloads retain their original format. Atlas, Audit, Report and Contribute offer Chinese interface controls; original resource descriptions and historical reports remain in English.
 
-## 15-Second Platform Walkthrough
+## 2-Minute Complete Platform Walkthrough (10 Chapters · 30 Sub-Stages)
 
-![AIDD Commons 5-Stage Platform Walkthrough (English)](site/public/media/overview/aidd-commons-overview-en.gif)
+![AIDD Commons 2-Minute Platform Walkthrough (English, 10 Chapters)](site/public/media/overview/aidd-commons-overview-en.gif)
 
-- **Walkthrough video & media:** [English MP4](site/public/media/overview/aidd-commons-overview-en.mp4) · [English WebM](site/public/media/overview/aidd-commons-overview-en.webm) · [中文 MP4](site/public/media/overview/aidd-commons-overview-zh-cn.mp4) · [中文 WebM](site/public/media/overview/aidd-commons-overview-zh-cn.webm) · [Living Report v0.2 PDF (94 pages)](site/public/aidd-commons-living-report-v0.2.pdf)
+- **Walkthrough video & media (2:00 / 120s):** [English MP4 (HD)](site/public/media/overview/aidd-commons-overview-en.mp4) · [English WebM](site/public/media/overview/aidd-commons-overview-en.webm) · [中文 MP4 (HD)](site/public/media/overview/aidd-commons-overview-zh-cn.mp4) · [中文 WebM](site/public/media/overview/aidd-commons-overview-zh-cn.webm) · [Living Report v0.2 PDF (94 pages)](site/public/aidd-commons-living-report-v0.2.pdf)
 
 <details>
-<summary><strong>查看中文 15 秒项目全景动画 · View Chinese 15-Second Platform Walkthrough (GIF)</strong></summary>
+<summary><strong>查看中文 2 分钟项目全景导览动画（10 章节 30 步） · View Chinese 2-Minute Platform Walkthrough (GIF)</strong></summary>
 
-![AIDD Commons 五阶段平台全景导览动画（中文）](site/public/media/overview/aidd-commons-overview-zh-cn.gif)
+![AIDD Commons 两分钟十章节平台全景导览动画（中文）](site/public/media/overview/aidd-commons-overview-zh-cn.gif)
 
 </details>
 
