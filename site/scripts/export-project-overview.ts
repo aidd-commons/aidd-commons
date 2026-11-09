@@ -7,7 +7,7 @@ import sharp from "sharp";
 import {
   OVERVIEW_STAGES,
   type OverviewLocale,
-} from "../src/lib/project-overview-media";
+} from "../src/lib/project-overview-media.js";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, "../..");

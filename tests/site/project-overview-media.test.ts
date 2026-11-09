@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   OVERVIEW_STAGES,
   projectOverviewMedia,
-} from "../../site/src/lib/project-overview-media";
+} from "../../site/src/lib/project-overview-media.js";
 
 const publicDir = resolve(process.cwd(), "site/public");
 
