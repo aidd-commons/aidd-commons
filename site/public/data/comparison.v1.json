@@ -5066,15 +5066,15 @@
     }
   ],
   "publication": {
-    "correction_url": "https://github.com/gxCaesar/aidd-commons/issues/new?template=correction.yml",
+    "correction_url": "https://github.com/aidd-commons/aidd-commons/issues/new?template=correction.yml",
     "correction_window_days": 30,
     "first_published_at": "2026-10-25T03:02:17Z",
-    "repository_url": "https://github.com/gxCaesar/aidd-commons",
+    "repository_url": "https://github.com/aidd-commons/aidd-commons",
     "schema_version": "publication.v1",
-    "site_url": "https://gxcaesar.github.io/aidd-commons/",
+    "site_url": "https://aidd-commons.github.io/aidd-commons/",
     "correction_window_ends_at": "2026-11-24T03:02:17.000Z",
     "correction_window_status": "open",
-    "status_checked_on": "2026-11-07"
+    "status_checked_on": "2026-11-09"
   },
   "rows": [
     {

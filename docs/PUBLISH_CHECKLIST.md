@@ -2,9 +2,9 @@
 
 This is a reusable checklist for each future AIDD Commons release candidate.
 The unchecked boxes below are template fields, not the status of an already
-completed release. [v0.2.1](https://github.com/gxCaesar/aidd-commons/releases/tag/v0.2.1)
+completed release. [v0.2.1](https://github.com/aidd-commons/aidd-commons/releases/tag/v0.2.1)
 was published on 25 October 2026 after all seven stages of its
-[hosted validation and deployment](https://github.com/gxCaesar/aidd-commons/actions/runs/40161346027)
+[hosted validation and deployment](https://github.com/aidd-commons/aidd-commons/actions/runs/40161346027)
 passed. Its accepted scope and exact-artifact checks are recorded in the
 [public milestones and scientific limits](PUBLIC_ROADMAP.md).
 Actual first public availability and the correction window are recorded in
@@ -101,9 +101,9 @@ receipt above remains historical evidence for that release.
 
 | Decision | Why it cannot be automated | Note |
 |---|---|---|
-| The public repository's name and owner | it is an identity claim | `gxCaesar/aidd-commons` |
+| The public repository's name and owner | it is an identity claim | `aidd-commons/aidd-commons` |
 | The licence of the released code and prose | it is a rights decision | currently Apache-2.0 for code and CC BY 4.0 for prose |
-| The deployment target and its address | it is an outward-facing service choice | GitHub Pages at `https://gxcaesar.github.io/aidd-commons/` |
+| The deployment target and its address | it is an outward-facing service choice | GitHub Pages at `https://aidd-commons.github.io/aidd-commons/` |
 | The release title and date | it is a naming decision | match the candidate version and date; v0.2.1 above is a historical acceptance example |
 | Whether to mint a DOI and deposit a release | it is a permanent public commitment | no DOI deposit in this release |
 | Who may correct the published record | it is a governance decision | the correction issue template is the route |

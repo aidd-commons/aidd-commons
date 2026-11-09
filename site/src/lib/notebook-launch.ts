@@ -15,5 +15,5 @@ export function colabNotebookUrl(
       "Notebook launches require a published commit or version tag.",
     );
   }
-  return `https://colab.research.google.com/github/gxCaesar/aidd-commons/blob/${revision}/${path}`;
+  return `https://colab.research.google.com/github/aidd-commons/aidd-commons/blob/${revision}/${path}`;
 }

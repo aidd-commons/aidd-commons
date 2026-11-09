@@ -34,9 +34,9 @@ it("ships consistent release metadata, the report addendum, and the historical c
   expect(citation.version).toBe(root.version);
   expect(citation["preferred-citation"].version).toBe(root.version);
   expect(citation["repository-code"]).toBe(
-    "https://github.com/gxCaesar/aidd-commons",
+    "https://github.com/aidd-commons/aidd-commons",
   );
-  expect(citation.url).toBe("https://gxcaesar.github.io/aidd-commons/");
+  expect(citation.url).toBe("https://aidd-commons.github.io/aidd-commons/");
   const publication = JSON.parse(
     await read("catalog/comparisons/publication.json"),
   );

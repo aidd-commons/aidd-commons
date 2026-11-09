@@ -18,8 +18,8 @@ const context = {
   pathname: "/learn/foundations/getting-started/",
   base: "/",
   lessonId: "foundations/getting-started",
-  publicSiteUrl: "https://gxcaesar.github.io/aidd-commons/",
-  repositoryUrl: "https://github.com/gxCaesar/aidd-commons",
+  publicSiteUrl: "https://aidd-commons.github.io/aidd-commons/",
+  repositoryUrl: "https://github.com/aidd-commons/aidd-commons",
   sourceRevision: commit,
   version: "0.3.0",
 };

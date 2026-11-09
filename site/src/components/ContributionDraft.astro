@@ -19,7 +19,7 @@ const examples = [
       <button type="submit">{t("Prepare the GitHub draft","准备 GitHub 草稿")}</button>
     </form>
     <p data-draft-status role="status">{t("The text stays on this page until you open the draft. GitHub requires sign-in and a separate submission.","打开草稿前，文字仅保留在此页面。GitHub 需要登录，并由你单独提交。")}</p>
-    <a data-draft-link href="https://github.com/gxCaesar/aidd-commons/issues/new?template=learning-question.yml" hidden>{t("Open the prepared draft on GitHub →","在 GitHub 打开准备好的草稿 →")}</a>
+    <a data-draft-link href="https://github.com/aidd-commons/aidd-commons/issues/new?template=learning-question.yml" hidden>{t("Open the prepared draft on GitHub →","在 GitHub 打开准备好的草稿 →")}</a>
     <noscript><p>{t("Use the contribution forms below directly.","直接使用下方贡献表单。")}</p></noscript>
   </contribution-draft>
 </section>
@@ -34,7 +34,7 @@ const examples = [
         params.set(correction?"summary":"question",String(data.get("message")??""));
         params.set(correction?"evidence":"reasoning",String(data.get("evidence")??""));
         const link=this.querySelector<HTMLAnchorElement>("[data-draft-link]")!;
-        link.href=`https://github.com/gxCaesar/aidd-commons/issues/new?${params}`;link.hidden=false;
+        link.href=`https://github.com/aidd-commons/aidd-commons/issues/new?${params}`;link.hidden=false;
         this.querySelector("[data-draft-status]")!.textContent=this.dataset.locale === "zh-cn" ? "草稿已在本地准备。请在 GitHub 查看其余字段，再决定是否提交。" : "Draft prepared locally. Open it on GitHub to review the remaining fields and decide whether to submit.";
         link.focus();
       });

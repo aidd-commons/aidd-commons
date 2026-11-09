@@ -7,7 +7,7 @@ version: "0.2.0-rc.1"
 
 Version 0.2.0 packages this living addendum with the bilingual curriculum and
 curated Atlas. The dated sections below retain their original evidence scope.
-The [publication record](https://github.com/gxCaesar/aidd-commons/blob/main/docs/PUBLICATION.md) gives the public correction
+The [publication record](https://github.com/aidd-commons/aidd-commons/blob/main/docs/PUBLICATION.md) gives the public correction
 route and window. Neither coverage claim is established by publication.
 
 Prepared 8 September 2026 for the **0.2.0-rc.1 release candidate**. This

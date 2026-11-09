@@ -2,7 +2,9 @@
 
 ## Project contributors
 
-- [Guanxing Chen (@gxCaesar)](https://github.com/gxCaesar) — project contributor and repository owner.
+- [Guanxing Chen (@gxCaesar)](https://github.com/gxCaesar) — project contributor and organization owner ([AIDD Commons](https://github.com/aidd-commons)).
+- [Zhenchao Tang (@shapsider)](https://github.com/shapsider) — project contributor and organization owner ([AIDD Commons](https://github.com/aidd-commons)).
+- [Haohuai He (@hehh77)](https://github.com/hehh77) — project contributor and organization owner ([AIDD Commons](https://github.com/aidd-commons)).
 
 ## Open ecosystem
 

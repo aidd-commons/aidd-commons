@@ -107,8 +107,8 @@ The browser checks cover bilingual routes, downloads, progress, worked answers a
 serious/critical accessibility findings. Cloud execution and reader learning remain
 unverified; local software acceptance does not establish either.
 
-Most recent public version: **0.3.1**. The [website](https://gxcaesar.github.io/aidd-commons/)
-and [source repository](https://github.com/gxCaesar/aidd-commons) provide the
+Most recent public version: **0.3.1**. The [website](https://aidd-commons.github.io/aidd-commons/)
+and [source repository](https://github.com/aidd-commons/aidd-commons) provide the
 same curated learning materials. See the
 [changes](CHANGELOG.md) and [v0.2 report addendum](report/aidd-commons-v0.2-addendum.md).
 The [v0.1 report](report/aidd-commons-living-report-v0.1.md) remains a historical snapshot.

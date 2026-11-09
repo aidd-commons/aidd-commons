@@ -4,8 +4,8 @@ title: "AIDD Commons"
 type: software
 version: 0.3.1
 date-released: "2026-10-25"
-repository-code: https://github.com/gxCaesar/aidd-commons
-url: https://gxcaesar.github.io/aidd-commons/
+repository-code: https://github.com/aidd-commons/aidd-commons
+url: https://aidd-commons.github.io/aidd-commons/
 authors:
   - name: "AIDD Commons contributors"
 license: Apache-2.0

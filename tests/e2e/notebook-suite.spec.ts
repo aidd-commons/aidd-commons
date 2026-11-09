@@ -47,7 +47,7 @@ test("bilingual notebook route reaches runnable downloads and keeps result readi
         await expect(colab).toBeVisible();
         const colabUrl = new URL((await colab.getAttribute("href"))!);
         const pinnedPath = colabUrl.pathname.match(
-          /^\/github\/gxCaesar\/aidd-commons\/blob\/([a-f0-9]{40}|v\d+\.\d+\.\d+(?:-rc\.\d+)?)\/(.+)$/u,
+          /^\/github\/aidd-commons\/aidd-commons\/blob\/([a-f0-9]{40}|v\d+\.\d+\.\d+(?:-rc\.\d+)?)\/(.+)$/u,
         );
         expect(
           pinnedPath,

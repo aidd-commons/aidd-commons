@@ -106,8 +106,8 @@ prospective discovery, or uniform model superiority.
 
 The first written pass covers the declared unit map. Deeper empirical exercises,
 full CMC/clinical/regulatory training and modality-specific production workflows
-are not implied. The published [v0.2.1 release](https://github.com/gxCaesar/aidd-commons/releases/tag/v0.2.1)
-completed local and [hosted software acceptance](https://github.com/gxCaesar/aidd-commons/actions/runs/40161346027),
+are not implied. The published [v0.2.1 release](https://github.com/aidd-commons/aidd-commons/releases/tag/v0.2.1)
+completed local and [hosted software acceptance](https://github.com/aidd-commons/aidd-commons/actions/runs/40161346027),
 including bilingual consistency, the released source and curated export, site
 builds, desktop/mobile navigation and accessibility. Recorded notebook runs retain
 the execution-mode boundaries above. Colab execution and a Chinese live PaperQA

@@ -17,7 +17,7 @@ describe("versioned student notebook launches", () => {
         const url = new URL(colabNotebookUrl(path, revision)!);
         expect(url.origin).toBe("https://colab.research.google.com");
         expect(url.pathname).toBe(
-          `/github/gxCaesar/aidd-commons/blob/${revision}/${path}`,
+          `/github/aidd-commons/aidd-commons/blob/${revision}/${path}`,
         );
       }
     }

@@ -49,7 +49,7 @@ test("contribution composer prepares the real form fields locally", async ({ pag
   await composer.getByRole("button",{name:"Prepare the GitHub draft"}).click();
   const url=new URL((await composer.locator("[data-draft-link]").getAttribute("href"))!);
   expect(url.origin).toBe("https://github.com");
-  expect(url.pathname).toBe("/gxCaesar/aidd-commons/issues/new");
+  expect(url.pathname).toBe("/aidd-commons/aidd-commons/issues/new");
   expect(url.searchParams.get("template")).toBe("correction.yml");
   expect(url.searchParams.get("location")).toContain("tool-rdkit");
   expect(url.searchParams.get("summary")).toBe("Check the asset-specific licence.");

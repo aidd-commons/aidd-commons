@@ -1,7 +1,7 @@
 # Public milestones and scientific limits
 
 Source version 0.3.1, 25 October 2026. Dated source packages are listed on the
-[release page](https://github.com/gxCaesar/aidd-commons/releases). This document
+[release page](https://github.com/aidd-commons/aidd-commons/releases). This document
 records teaching delivery and scientific boundaries. It does not report
 human learning outcomes or an established global ranking.
 
@@ -47,7 +47,7 @@ The 109 canonical teaching chapters in each language now offer continuation
 links. A chapter appearing in several declared learning routes retains a
 separate previous/next step for each route. Other chapters offer neighboring
 chapters within their track. These links work without JavaScript. The
-[curriculum map](https://gxcaesar.github.io/aidd-commons/learn/foundations/curriculum-map/)
+[curriculum map](https://aidd-commons.github.io/aidd-commons/learn/foundations/curriculum-map/)
 explains the routes and prerequisites.
 
 Four editable exercises provide paired English/Chinese notebooks with identical
